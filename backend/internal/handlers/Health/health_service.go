@@ -11,7 +11,7 @@ type HealthService struct {
 }
 
 func (h *HealthService) CheckHealth(ctx context.Context, input *struct{}) (*models.ResponseBody[models.HealthModel], error) {
-	healthModel := &models.HealthModel{Id: 1, Word: "Stinky"}
+	healthModel := &models.HealthModel{Id: 1, Name: "Stinky"}
 	resp := &models.ResponseBody[models.HealthModel]{Body: healthModel}
 	return resp, nil
 }
