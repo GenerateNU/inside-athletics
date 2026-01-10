@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	models "inside-athletics/internal/models"
-	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5"
@@ -21,13 +20,13 @@ func (h *HealthDB) GetFromDB(id string) (*models.HealthModel, error) {
 	rows, err := h.conn.Query(context.Background(), sql)
 
 	if err != nil {
-		return &models.HealthModel{}, huma.NewError(http.StatusBadRequest, fmt.Sprintf("Could not fetch value with id %s", id))
+		return &models.HealthModel{}, huma.Error404NotFound(fmt.Sprintf("Could not fetch value with id %s", id))
 	}
 
 	healthModels, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[models.HealthModel])
 
 	if err != nil {
-		return &models.HealthModel{}, huma.NewError(http.StatusBadRequest, "Unable to collect row into HealthModel object, the given id is not stored in the db")
+		return &models.HealthModel{}, huma.Error400BadRequest("Unable to collect row into HealthModel object, the given id is not stored in the db")
 	}
 
 	return &healthModels, nil
