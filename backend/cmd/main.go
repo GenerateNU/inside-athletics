@@ -24,7 +24,7 @@ func main() {
 	ctx := context.Background()
 	dbUrl := os.Getenv("DB_CONNECTION_STRING")
 
-	dbpool, err := pgxpool.New(context.Background(), dbUrl)
+	dbpool, err := pgxpool.New(ctx, dbUrl)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
