@@ -1,5 +1,5 @@
 package healthRouteParams
 
-type GetHealthInput struct {
+type GetHealthParams struct {
 	Name string `path:"name" maxLength:"30" example:"Joe" doc:"Name to identify test data"`
 }

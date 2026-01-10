@@ -2,7 +2,7 @@ package health
 
 import (
 	"context"
-	healthTypes "inside-athletics/internal/handlers/Health/health_route_params"
+	paramTypes "inside-athletics/internal/handlers/Health/health_route_params"
 	"inside-athletics/internal/models"
 )
 
@@ -16,7 +16,7 @@ func (h *HealthService) CheckHealth(ctx context.Context, input *struct{}) (*mode
 	return resp, nil
 }
 
-func (h *HealthService) GetHealthEntry(ctx context.Context, input *healthTypes.GetHealthInput) (*models.HealthModel, error) {
+func (h *HealthService) GetHealthEntry(ctx context.Context, input *paramTypes.GetHealthParams) (*models.HealthModel, error) {
 	id := input.Name
 
 	healthModel, err := h.healthDB.GetFromDB(id)
