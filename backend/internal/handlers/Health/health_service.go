@@ -2,7 +2,7 @@ package health
 
 import (
 	"context"
-	paramTypes "inside-athletics/internal/handlers/Health/health_route_params"
+	paramTypes "inside-athletics/internal/handlers/Health/types"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 )
