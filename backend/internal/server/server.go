@@ -29,7 +29,7 @@ func CreateApp(connection *pgxpool.Pool) *App {
 	var api huma.API = humafiber.New(router, huma.DefaultConfig("Inside Athletics API", "1.0.0"))
 
 	// Create all the routing groups:
-	var routeGroups []handlers.RouteFN = []handlers.RouteFN{health.Route}
+	routeGroups := [...]handlers.RouteFN{health.Route}
 	for _, fn := range routeGroups {
 		fn(api, connection)
 	}
