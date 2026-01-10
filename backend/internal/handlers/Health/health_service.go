@@ -1,28 +1,29 @@
 package health
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"context"
+	healthTypes "inside-athletics/internal/handlers/Health/health_route_types"
+	"inside-athletics/internal/models"
 )
 
 type HealthService struct {
 	healthDB *HealthDB
 }
 
-func (h *HealthService) CheckHealth(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "AYYYY"})
+func (h *HealthService) CheckHealth(ctx context.Context, input *struct{}) (*healthTypes.GetHealthOutput, error) {
+	healthModel := &models.HealthModel{Id: 1, Word: "Stinky"}
+	resp := &healthTypes.GetHealthOutput{Body: healthModel}
+	return resp, nil
 }
 
-func (h *HealthService) GetHealth(c *gin.Context) {
-	id := c.Param("id")
+func (h *HealthService) GetHealthEntry(ctx context.Context, input *healthTypes.GetHealthInput) (*models.HealthModel, error) {
+	id := input.Name
 
 	healthModel, err := h.healthDB.GetFromDB(id)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		return &models.HealthModel{}, err
 	}
 
-	c.IndentedJSON(200, healthModel)
+	return healthModel, nil
 }
