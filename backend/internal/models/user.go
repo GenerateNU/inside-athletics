@@ -5,6 +5,6 @@ import (
 )
 
 type User struct {
-	gorm.model 
+	gorm.Model 
 	Name string `gorm:"type:varchar(100);not null"`
 }

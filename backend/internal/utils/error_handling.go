@@ -1,7 +1,14 @@
 package utils
 
+import (
+	"errors"
+
+	"github.com/danielgtaylor/huma/v2"
+	"gorm.io/gorm"
+)
+
 /*
-Returns the correct huma error depending on what error is 
+Returns the correct huma error depending on what error is
 returned by GORM
 */
 func handleGORMErrors(err error) error {
@@ -30,9 +37,9 @@ func handleGORMErrors(err error) error {
 Handles case when an error is returned by the DB. Ensures that nil is returned
 instead of an empty entity struct
 */
-func handleDBError[T any](entity *T, err error) (*T, error) {
+func HandleDBError[T any](entity *T, err error) (*T, error) {
 	if err != nil {
-		return nil, handleGORMErrors(dbReponse)
+		return nil, handleGORMErrors(err)
 	}
 	return entity, nil
 }

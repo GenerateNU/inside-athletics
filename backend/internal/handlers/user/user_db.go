@@ -1,12 +1,8 @@
 package user
 
 import (
-	"context"
-	"fmt"
+	"inside-athletics/internal/utils"
 	models "inside-athletics/internal/models"
-
-	"github.com/danielgtaylor/huma/v2"
-	"github.com/jackc/pgx/v5"
 	"gorm.io/gorm"
 )
 
@@ -21,6 +17,6 @@ which allows us to interact with the database without having to write raw SQL qu
 func (u *UserDB) GetUser(name string) (*models.User, error) {
 	var user models.User
 	dbResponse := u.db.Where("name = ?", name).First(&user)
-	return handleDBError(&user, dbReponse.error) // helper function that maps GORM errors to Huma errors
+	return utils.HandleDBError(&user, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 

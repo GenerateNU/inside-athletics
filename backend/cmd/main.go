@@ -9,9 +9,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"gorm.io/gorm"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"time"
+
 	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -28,7 +30,9 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Fprintf(os.Stderr, "Successefully connected to Supabase 🚀")
-	defer db.Close()
+
+	sqlDB, err := db.DB()
+	defer sqlDB.Close();
 
 	app := server.CreateApp(db)
 	app.Server.Listen("localhost:8080")
@@ -40,7 +44,11 @@ func main() {
 
 	slog.Info("Server is shutting down...")
 
-	if err := app.Server.ShutdownWithContext(ctx); err != nil {
+	// The context is used to inform the server it has 10 seconds to finish
+	// the request it is currently handling
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := app.Server.ShutdownWithContext(shutdownCtx); err != nil {
 		log.Fatal("Failed to shutdown server:", err)
 	}
 

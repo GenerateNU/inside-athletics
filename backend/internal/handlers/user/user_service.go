@@ -1,9 +1,8 @@
-package health
+package user
 
 import (
-	types "inside-athletics/internal/handlers/Health/types"
-	"inside-athletics/internal/models"
-	"inside-athletics/internal/utils"
+	"context"
+	types "inside-athletics/internal/handlers/user/types"
 )
 
 type UserService struct {
@@ -17,9 +16,9 @@ IF there is an error it will automatically send the correct response back with t
 Here we are mapping to a GetUserResponse so that we can control what the return type is. It's important to make seperate 
 return types so that we can control what information we are sending back instead of just the entire model
 */
-func (u *UserService) GetUser(c *fiber.Ctx, input *paramTypes.GetUserParams) (*utils.ResponseBody[types.GetUserResponse], error) {
+func (u *UserService) GetUser(ctx context.Context, input *types.GetUserParams) (*types.GetUserResponse, error) {
 	id := input.Name
-	user, err := u.healthDB.GetUser(id)
+	user, err := u.userDB.GetUser(id)
 
 	// mapping to correct response type
 	// we do this so we can control what values are 
@@ -29,7 +28,5 @@ func (u *UserService) GetUser(c *fiber.Ctx, input *paramTypes.GetUserParams) (*u
         Name:      user.Name,
     }
 
-	return &utils.ResponseBody[types.GetUserResponse]{
-		Body: user
-	}, err
+	return &response, err
 }

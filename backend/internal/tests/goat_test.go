@@ -1,10 +1,13 @@
-package models
+package tests
 
-import "testing"
+import (
+	"testing"
+	"inside-athletics/internal/models"
+)
 
 func TestGoat(t *testing.T) {
-	goat := Goat{Id: 1, Name: "Joe", Age: 67}
-	actual := goat.makeSomeNoise()
+	goat := models.Goat{Id: 1, Name: "Joe", Age: 67}
+	actual := goat.MakeSomeNoise()
 	expected := "BAAAAA"
 
 	if actual != expected {

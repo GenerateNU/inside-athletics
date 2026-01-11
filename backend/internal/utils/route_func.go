@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"gorm.io/gorm"
 )
 
-type RouteFN func(api huma.API, connection *pgxpool.Pool)
+type RouteFN func(api huma.API, db *gorm.DB)
