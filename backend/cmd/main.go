@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
+	"gorm.io/gorm"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
@@ -20,19 +20,17 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
-	ctx := context.Background()
 	dbUrl := os.Getenv("DB_CONNECTION_STRING")
 
-	dbpool, err := pgxpool.New(ctx, dbUrl)
+	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	defer dbpool.Close()
+	fmt.Fprintf(os.Stderr, "Successefully connected to Supabase 🚀")
+	defer db.Close()
 
-	app := server.CreateApp(dbpool)
-
+	app := server.CreateApp(db)
 	app.Server.Listen("localhost:8080")
 
 	// gracefully shutdown the server

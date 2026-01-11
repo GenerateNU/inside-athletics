@@ -1,8 +1,7 @@
 package health
 
 import (
-	"context"
-	paramTypes "inside-athletics/internal/handlers/Health/types"
+	types "inside-athletics/internal/handlers/Health/types"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 )
@@ -11,22 +10,18 @@ type HealthService struct {
 	healthDB *HealthDB
 }
 
-func (h *HealthService) CheckHealth(ctx context.Context, input *struct{}) (*utils.ResponseBody[models.HealthModel], error) {
-	healthModel := &models.HealthModel{Id: 1, Name: "YIPPEEE SO HEALTHY"}
-	resp := &utils.ResponseBody[models.HealthModel]{Body: healthModel}
-	return resp, nil
+func (h *HealthService) CheckHealth(c *fiber.Ctx) (*utils.ResponseBody[types.HealthcheckResponse], error) {
+	response := &utils.ResponseBody[types.HealthcheckResponse]{}
+	error := h.healthDB.Ping(id)
+	if error != nil {
+		return nil, huma.Error500InternalServerError("Database is unable to be reached") 
+	}
+	response.body = "Database reached successfully"
+	return response, nil
 }
 
-func (h *HealthService) GetHealthEntry(ctx context.Context, input *paramTypes.GetHealthParams) (*utils.ResponseBody[models.HealthModel], error) {
-	id := input.Name
-	response := &utils.ResponseBody[models.HealthModel]{}
-
-	healthModel, err := h.healthDB.GetFromDB(id)
-
-	if err != nil {
-		return response, err
-	}
-
-	response.Body = healthModel
+func (h *HealthService) Health(c *fiber.Ctx) (*utils.ResponseBody[types.HealthcheckResponse], error) {
+	response := &utils.ResponseBody[types.HealthcheckResponse]{}
+	response.body = "Welcome to Inside Athletics API Version 1.0.0"
 	return response, nil
 }
