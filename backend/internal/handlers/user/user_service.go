@@ -19,7 +19,7 @@ return types so that we can control what information we are sending back instead
 */
 func (u *UserService) GetUser(c *fiber.Ctx, input *paramTypes.GetUserParams) (*utils.ResponseBody[types.GetUserResponse], error) {
 	id := input.Name
-	user, err := u.healthDB.GetUser(id)
+	user, err := u.userDB.GetUser(id)
 
 	// mapping to correct response type
 	// we do this so we can control what values are 

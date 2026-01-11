@@ -32,7 +32,7 @@ instead of an empty entity struct
 */
 func handleDBError[T any](entity *T, err error) (*T, error) {
 	if err != nil {
-		return nil, handleGORMErrors(dbReponse)
+		return nil, handleGORMErrors(err)
 	}
 	return entity, nil
 }
