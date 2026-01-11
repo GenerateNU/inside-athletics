@@ -10,6 +10,6 @@ func Route(api huma.API, db *gorm.DB) {
 	var UserService *UserService = &UserService{healthDB} // create object with user functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/user")
-		huma.Get(grp, "/{user}", healthService.GetUser)
+		huma.Get(grp, "/{name}", healthService.GetUser)
 	}
 }

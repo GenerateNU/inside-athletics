@@ -14,10 +14,9 @@ type UserDB struct {
 	db *gorm.DB
 }
 
-
-func (h *HealthDB) GetUser(name string) (*models.User, error) {
+func (u *UserDB) GetUser(name string) (*models.User, error) {
 	var user models.User
-	dbResponse := db.Where("name = ?", name).First(&user)
-	return &user, dbResponse
+	dbResponse := u.db.Where("name = ?", name).First(&user)
+	return handleDBError(&user, dbReponse.error)
 }
 

@@ -12,9 +12,17 @@ type UserService struct {
 
 func (u *UserService) GetUser(c *fiber.Ctx, input *paramTypes.GetUserParams) (*utils.ResponseBody[types.GetUserResponse], error) {
 	id := input.Name
-	response := &utils.ResponseBody[types.GetUserResponse]{}
-	healthModel, dbResponse := h.healthDB.GetFromDB(id)
+	user, err := u.healthDB.GetUser(id)
 
-	response.Body = healthModel
-	return response, handleDbErrors(dbResponse)
+	// mapping to correct response type
+	// we do this so we can control what values are 
+	// returned by the API
+	response := types.GetUserResponse{
+		ID:        user.ID,
+        Name:      user.Name,
+    }
+
+	return &utils.ResponseBody[types.GetUserResponse]{
+		Body: user
+	}, err
 }

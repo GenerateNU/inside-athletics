@@ -1,5 +1,5 @@
 package healthRouteParams
 
-type HealthcheckResponse struct {
+type HealthResponse struct {
 	message string
 }
