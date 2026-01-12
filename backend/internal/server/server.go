@@ -2,8 +2,9 @@ package server
 
 import (
 	"encoding/json"
-	"inside-athletics/internal/handlers"
-	health "inside-athletics/internal/handlers/Health"
+	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/user"
+	"inside-athletics/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -12,10 +13,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
+
+	"gorm.io/gorm"
 )
 
 type App struct {
@@ -23,20 +25,24 @@ type App struct {
 	Api    huma.API
 }
 
-func CreateApp(connection *pgxpool.Pool) *App {
+func CreateApp(db *gorm.DB) *App {
 
 	router := setupApp()
 	var api huma.API = humafiber.New(router, huma.DefaultConfig("Inside Athletics API", "1.0.0"))
 
-	// Create all the routing groups:
-	routeGroups := [...]handlers.RouteFN{health.Route}
-	for _, fn := range routeGroups {
-		fn(api, connection)
-	}
+	CreateRoutes(db, api)
 
 	return &App{
 		Server: router,
 		Api:    api,
+	}
+}
+
+func CreateRoutes(db *gorm.DB, api huma.API) {
+	// Create all the routing groups:
+	routeGroups := [...]utils.RouteFN{health.Route, user.Route}
+	for _, fn := range routeGroups {
+		fn(api, db)
 	}
 }
 

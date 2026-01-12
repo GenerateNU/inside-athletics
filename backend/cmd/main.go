@@ -9,30 +9,43 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
 
-	err := godotenv.Load()
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	dbUrl := os.Getenv("PROD_DB_CONNECTION_STRING")
 
-	ctx := context.Background()
-	dbUrl := os.Getenv("DB_CONNECTION_STRING")
-
-	dbpool, err := pgxpool.New(ctx, dbUrl)
+	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	defer dbpool.Close()
+	fmt.Fprintf(os.Stderr, "Successefully connected to Supabase 🚀")
 
-	app := server.CreateApp(dbpool)
+	sqlDB, err := db.DB()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to get database instance: %v\n", err)
+		os.Exit(1)
+	}
+	defer sqlDB.Close()
 
+	app := server.CreateApp(db)
+
+	fmt.Fprintf(os.Stderr, "Access server on localhost:8080")
+	app.Server.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Server is running! 🚀")
+	})
 	app.Server.Listen("localhost:8080")
 
 	// gracefully shutdown the server
@@ -42,7 +55,11 @@ func main() {
 
 	slog.Info("Server is shutting down...")
 
-	if err := app.Server.ShutdownWithContext(ctx); err != nil {
+	// The context is used to inform the server it has 10 seconds to finish
+	// the request it is currently handling
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := app.Server.ShutdownWithContext(shutdownCtx); err != nil {
 		log.Fatal("Failed to shutdown server:", err)
 	}
 

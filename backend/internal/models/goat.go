@@ -24,7 +24,7 @@ func (g *Goat) validateGoatStatus() (string, error) {
 	return "", nil
 }
 
-func (g *Goat) makeSomeNoise() string {
+func (g *Goat) MakeSomeNoise() string {
 	return "BAAAAA"
 }
 

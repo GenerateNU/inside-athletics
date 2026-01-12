@@ -1,13 +1,14 @@
-package models
+package tests
 
 import (
 	"fmt"
+	"inside-athletics/internal/models"
 	"testing"
 )
 
 func TestGoat(t *testing.T) {
-	goat := Goat{Id: 1, Name: "Joe", Age: 67}
-	actual := goat.makeSomeNoise()
+	goat := models.Goat{Id: 1, Name: "Joe", Age: 67}
+	actual := goat.MakeSomeNoise()
 	expected := "BAAAAA"
 
 	if actual != expected {
@@ -16,7 +17,7 @@ func TestGoat(t *testing.T) {
 }
 
 func TestPointers(t *testing.T) {
-	goat := Goat{Id: 1, Name: "Joe", Age: 67}
+	goat := models.Goat{Id: 1, Name: "Joe", Age: 67}
 	goat.SetName("Suli")
 	if goat.Name != "Suli" {
 		t.Error("Set name didn't work...")
