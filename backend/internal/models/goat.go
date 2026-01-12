@@ -1,9 +1,13 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+
+	"gorm.io/gorm"
+)
 
 type Goat struct {
-	Id   int8   `json:"id" example:"1" doc:"ID representing this goat"`
+	gorm.Model
 	Name string `json:"name" example:"Suli" doc:"The name of a goat"`
 	Age  int8   `json:"age" example:"67" doc:"The age of this goat"`
 	// TODO: Add a list of drinks this goat fucks with
