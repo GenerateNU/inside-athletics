@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	dbUrl := os.Getenv("DB_CONNECTION_STRING")
+	dbUrl := os.Getenv("IPV4")
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
@@ -36,7 +36,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unable to get database instance: %v\n", err)
 		os.Exit(1)
 	}
-	defer sqlDB.Close();
+	defer sqlDB.Close()
 
 	app := server.CreateApp(db)
 	app.Server.Listen("localhost:8080")

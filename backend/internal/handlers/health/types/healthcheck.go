@@ -1,7 +1,7 @@
 package types
 
 type HealthResponse struct {
-	Message string `json:"message"`
+	Body string `json:"message"`
 }
 
-type EmptyInput struct {}
+type EmptyInput struct{}
