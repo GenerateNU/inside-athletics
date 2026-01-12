@@ -7,7 +7,7 @@ import (
 )
 
 func TestGoat(t *testing.T) {
-	goat := models.Goat{Id: 1, Name: "Joe", Age: 67}
+	goat := models.Goat{Name: "Joe", Age: 67}
 	actual := goat.MakeSomeNoise()
 	expected := "BAAAAA"
 
@@ -17,7 +17,7 @@ func TestGoat(t *testing.T) {
 }
 
 func TestPointers(t *testing.T) {
-	goat := models.Goat{Id: 1, Name: "Joe", Age: 67}
+	goat := models.Goat{Name: "Joe", Age: 67}
 	goat.SetName("Suli")
 	if goat.Name != "Suli" {
 		t.Error("Set name didn't work...")
