@@ -18,11 +18,11 @@ import (
 
 func main() {
 
-	err := godotenv.Load()
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	dbUrl := os.Getenv("IPV4")
+	dbUrl := os.Getenv("PROD_DB_CONNECTION_STRING")
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
