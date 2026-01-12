@@ -32,6 +32,10 @@ func main() {
 	fmt.Fprintf(os.Stderr, "Successefully connected to Supabase 🚀")
 
 	sqlDB, err := db.DB()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to get database instance: %v\n", err)
+		os.Exit(1)
+	}
 	defer sqlDB.Close();
 
 	app := server.CreateApp(db)
