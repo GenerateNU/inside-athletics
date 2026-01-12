@@ -6,6 +6,7 @@ import (
 	"inside-athletics/internal/server"
 	"log"
 	"log/slog"
+	"github.com/gofiber/fiber/v2"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,6 +40,11 @@ func main() {
 	defer sqlDB.Close()
 
 	app := server.CreateApp(db)
+
+	fmt.Fprintf(os.Stderr, "Access server on localhost:8080")
+	app.Server.Get("/", func(c *fiber.Ctx) error {
+        return c.SendString("Server is running! 🚀")
+    })
 	app.Server.Listen("localhost:8080")
 
 	// gracefully shutdown the server

@@ -9,6 +9,7 @@ data "external_schema" "gorm" {
     "--dialect", "postgres", // | postgres | sqlite | sqlserver
   ]
 }
+
 variable "envfile" {
     type    = string
     default = "./.env"
@@ -19,6 +20,8 @@ locals {
         if !startswith(line, "#") && length(split("=", line)) > 1
     }
 }
+
+
 env "gorm" {
   src = data.external_schema.gorm.url
   dev = "docker://postgres/15/dev"
@@ -31,6 +34,8 @@ env "gorm" {
     }
   }
 }
+
+
 env "dev" {
   url = local.envfile["DEV_MIGRATION_DB_CONNECTION_STRING"]
   schemas = ["public"]
@@ -38,6 +43,8 @@ env "dev" {
     dir = "file://internal/migrations"
   }
 }
+
+
 env "prod" {
   url = local.envfile["PROD_MIGRATION_DB_CONNECTION_STRING"]
   schemas = ["public"]
