@@ -5,6 +5,6 @@ type GetUserParams struct {
 }
 
 type GetUserResponse struct {
-    ID        uint      `json:"id"`
-    Name      string    `json:"name"`
+	ID   uint   `json:"id" example:"1" doc:"ID of the user"`
+	Name string `json:"name" example:"Joe" doc:"Name of the user"`
 }

@@ -6,11 +6,12 @@ import (
 	"inside-athletics/internal/server"
 	"log"
 	"log/slog"
-	"github.com/gofiber/fiber/v2"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -43,8 +44,8 @@ func main() {
 
 	fmt.Fprintf(os.Stderr, "Access server on localhost:8080")
 	app.Server.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("Server is running! 🚀")
-    })
+		return c.SendString("Server is running! 🚀")
+	})
 	app.Server.Listen("localhost:8080")
 
 	// gracefully shutdown the server
