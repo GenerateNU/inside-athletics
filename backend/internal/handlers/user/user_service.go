@@ -16,7 +16,7 @@ IF there is an error it will automatically send the correct response back with t
 Here we are mapping to a GetUserResponse so that we can control what the return type is. It's important to make seperate 
 return types so that we can control what information we are sending back instead of just the entire model
 */
-func (u *UserService) GetUser(ctx context.Context, input *types.GetUserParams) (*types.GetUserResponse, error) {
+func (u *UserService) GetUser(ctx context.Context, input *types.GetUserParams) (*utils.ResponseBody[types.GetUserResponse], error) {
 	id := input.Name
 	user, err := u.userDB.GetUser(id)
 
@@ -28,5 +28,7 @@ func (u *UserService) GetUser(ctx context.Context, input *types.GetUserParams) (
         Name:      user.Name,
     }
 
-	return &response, err
+	return &utils.ResponseBody[types.GetUserResponse]{
+		Body: response,
+	}, err
 }
