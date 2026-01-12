@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type Goat struct {
 	Id   int8   `json:"id" example:"1" doc:"ID representing this goat"`
 	Name string `json:"name" example:"Suli" doc:"The name of a goat"`
@@ -24,4 +26,17 @@ func (g *Goat) validateGoatStatus() (string, error) {
 
 func (g *Goat) makeSomeNoise() string {
 	return "BAAAAA"
+}
+
+func (g *Goat) SetName(name string) {
+	g.Name = name
+}
+
+func (g Goat) SetNameCopy(name string) {
+	g.Name = name
+	fmt.Println(g.Name)
+}
+
+func (g Goat) MakeCopy() Goat {
+	return g
 }
