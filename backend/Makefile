@@ -16,11 +16,11 @@ migrate-prod:
 
 # starts server utilizing local supabase db
 start-dev:
-	APP_ENV=development go run . 
+	cd cmd && APP_ENV=development go run . 
 
 # starts server utilizing prod supabase db
 start-prod:
-	APP_ENV=production go run . 
+	cd cmd && APP_ENV=production go run . 
 
 # runs the linter
 lint:
