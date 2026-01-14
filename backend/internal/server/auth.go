@@ -17,6 +17,8 @@ endpoints
 */
 func AuthMiddleware(c *fiber.Ctx) error {
 
+	// The url holding the public key. This can be exposed publicly as it is only for
+	// verification purposes and should be used as a URL so we can rotate keys
 	jwksURL := "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
 
 	// created a new keyfunc.KeyFunc which is used
