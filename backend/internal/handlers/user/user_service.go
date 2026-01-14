@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	types "inside-athletics/internal/handlers/user/types"
 	"inside-athletics/internal/utils"
 )
 
@@ -18,10 +17,10 @@ IF there is an error it will automatically send the correct response back with t
 Here we are mapping to a GetUserResponse so that we can control what the return type is. It's important to make seperate
 return types so that we can control what information we are sending back instead of just the entire model
 */
-func (u *UserService) GetUser(ctx context.Context, input *types.GetUserParams) (*utils.ResponseBody[types.GetUserResponse], error) {
+func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils.ResponseBody[GetUserResponse], error) {
 	id := input.Name
 	user, err := u.userDB.GetUser(id)
-	respBody := &utils.ResponseBody[types.GetUserResponse]{}
+	respBody := &utils.ResponseBody[GetUserResponse]{}
 
 	if err != nil {
 		return respBody, err
@@ -30,12 +29,12 @@ func (u *UserService) GetUser(ctx context.Context, input *types.GetUserParams) (
 	// mapping to correct response type
 	// we do this so we can control what values are
 	// returned by the API
-	response := &types.GetUserResponse{
+	response := &GetUserResponse{
 		ID:   user.ID,
 		Name: user.Name,
 	}
 
-	return &utils.ResponseBody[types.GetUserResponse]{
+	return &utils.ResponseBody[GetUserResponse]{
 		Body: response,
 	}, err
 }
