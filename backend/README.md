@@ -40,10 +40,10 @@ If you haven't already install go on your computer!
 ### env file
 In the backend directory create a .env file! We will send the contents of the file during the meeting
 
-## How to Run (for now)
+## How to Run
 ``` bash
-cd backend/cmd
-go run .
+cd backend
+go make start-prod
 ```
 
 The server should then start and you will be able to ping some endpoints! Try `/api/v1/health/`
@@ -126,6 +126,20 @@ func Route(api huma.API, db *gorm.DB) {
 
 This will (kind of) create your first endpoint! Now your huma.Get call should be red... That's because we need to pass in a `function` for huma to call when this route is hit. As of now, we haven't defined anything so we can't pass anything yet...
 
+Lastly, navigate to the backend/internal/server.go file
+
+In the CreateRoutes() function add your goat.Route function to the list of route functions
+
+``` go
+func CreateRoutes(db *gorm.DB, api huma.API) {
+	// Create all the routing groups:
+	routeGroups := [...]RouteFN{health.Route, user.Route, goat.Route} // Here!!!
+	for _, fn := range routeGroups {
+		fn(api, db)
+	}
+}
+```
+
 So the next logical step is to define some `Business Logic` in the service file!!!!
 
 ### Implementing a service, `goat_service.go`
@@ -151,6 +165,8 @@ func (g *GoatService) Ping(ctx context.Context, input *utils.EmptyInput) (_, err
 }
 ```
 Now your function should be highlighted red, yet again... The reason is we have yet to define a return type for our service. When we use Huma, it's important to define structs for our input and output types. As you can see, since this route isn't taking anything in as an input we are using our utils.EmptyInput struct (which is just a blank struct)
+
+The `input` variable to this function represents the route parameters associated with this route. In the future this will be a struct that actually has values mapping to the path params it takes in. Stay tuned for the next example!
 
 Lets create our first response type for the service!
 
@@ -206,23 +222,198 @@ Navigate to `goat_service.go` and add this function to your endpoint
 
 ``` go
 func Route(api huma.API, db *gorm.DB) {
-	goat_service := GoatService{} // define an instance of the goat service
+	goatService := GoatService{} // define an instance of the goat service
 	{
 		grp := huma.NewGroup(api, "api/v1/goat")
-		huma.Get(grp, "/", goat_service.Ping) // add functionality of the endpoint!
+		huma.Get(grp, "/", goatService.Ping) // add functionality of the endpoint!
 	}
 }
 ```
 
 Now we can actually run this!
 
-### Creating a model
+From the backend directory call `make start-prod`. Open the local host in your browser and go to the http://localhost:8080/api/v1/goat/ url (if you have postman I highly recommend just using that instead and calling it from there)
+
+You should see the GoatResponse we created!
+
+### Creating a model `backend/internal/models/goat.go`
+For more complex queries (i.e getting stuff back from the DB) we need to define some models to match our database schemas!
+
+Lucky for you guys I've created a goat model with one small thing to add
+
+Navigate to the backend/internal/models folder
+
+This is where we will store all of our models for the project! This folder represents all of the database models we have translated into go to use within the codebase!
+
+Peep the `goat.go` file, here we have a struct defined for a goat.
+
+``` go
+type Goat struct {
+	gorm.Model // Id, created_at, deleted_at, updated_at
+	Name string `json:"name" example:"Suli" doc:"The name of a goat"`
+	Age  int8   `json:"age" example:"67" doc:"The age of this goat"`
+}
+```
+
+After you've done that we can jump into the awesome part...
+
+### Database transaction `goat_db.go`
+This is where we will interact with the database to get live information!
+
+First we start by creating the struct to attach all of our database functionality onto
+
+``` go
+package goat
+
+import "gorm.io/gorm"
+
+type GoatDB struct {
+	db *gorm.DB // our connection to Supabase
+}
+```
+
+Next we will define a simple `GET` transaction from our goat table!
+
+``` go
+func (g *GoatDB) GetGoat(id int8) (*models.Goat, error) {
+
+}
+```
+
+Notice here how we are returning the `models.Goat` and not the GoatResponse we defined earlier. This is because the GoatResponse struct will only return data that we want the user of the endpoint to see. For example, the models.Goat structure has a created_at, deleted_at, updated_at, etc... These variables might not be needed to be seen by someone who is actually calling our endpoint and they only exist for our internal usage. Therefore we don't return them and only return a subset of the values through our endpoints (ofc this can be updated and def will be updated throughout the sem).
+
+Next lets actually make the call to our database!
+
+``` go
+func (g *GoatDB) GetGoat(id uint) (*models.Goat, error) {
+	var goat models.Goat
+	dbResponse := g.db.Where("id = ?", id).First(&goat) // gets the entry with the given id and copies the data into goat
+	return utils.HandleDBError(&goat, dbResponse.Error) // Error handling utility function!!!
+}
+```
+
+CONGRATS! This is your first DB transaction!!!
+
+Now we want our service to have access to these database functions
+
+In the `goat_service.go` file add the following line to the struct:
+
+``` go
+type GoatService struct {
+	goatDB *GoatDB // give the service a DB connection!
+}
+```
+
+Now in the `goat_route.go` file add the db to your service
+
+``` go
+func Route(api huma.API, db *gorm.DB) {
+	goatDB := &GoatDB{db: db} // create instance of the db!
+	goatService := GoatService{goatDB: goatDB} // add the transactions to the service! 
+	{
+		grp := huma.NewGroup(api, "api/v1/goat")
+		huma.Get(grp, "/", goatService.Ping)
+	}
+}
+```
+
+## ANOTHA ENDPOINT!
+Now that you are familiar with the file structure of the codebase it's time to implement some real functionality!
+
+We just defined a DB transaction, but none of our endpoints use it... 
+
+Lets fix that!
+
+This endpoint will implement one more step of logic!
+
+### Create the route to the endpoint
+Just like the previous endpoint go to your `goat_route.go` endpoint and create a new goat route
+
+``` go
+func Route(api huma.API, db *gorm.DB) {
+	goatDB := &GoatDB{db: db}
+	goatService := GoatService{goatDB: goatDB}
+	{
+		grp := huma.NewGroup(api, "api/v1/goat")
+		huma.Get(grp, "/", goatService.Ping)
+		huma.Get(grp, "/{id}", _) // NEW ENDPOINT!
+	}
+}
+```
+
+See how this endpoint ends in {id}, this is called a `path param` and it allows us to pass in variables, similar to a function, into our endpoint! 
+
+Now we need to define the service functionality for our endpoint
+
+In the `goat_service.go` file: 
+
+``` go
+func (g *GoatService) GetGoat(ctx context.Context, _) (utils.ResponseBody[GoatResponse], error) {
+	
+}
+```
+
+Now... how do we get access to that path parameter we defined earlier?
+
+That would be through the input struct! All we need to do is create a type to represent the input data for the path and sub it in for the _
+
+In the `goat_types.go` file add the following struct
+
+``` go
+type GetGoatParams struct {
+	Id int8 `path:"id" example:"1" doc:"id of this goat"`
+}
+```
+
+NOTE: that we are using the tag path:"id" to tell huma to map the param ID to this variable in the struct
+
+In the service we can now add: 
+
+``` go
+func (g *GoatService) GetGoat(ctx context.Context, input *GetGoatParams) (*utils.ResponseBody[GoatResponse], error) {
+
+}
+```
+
+Now we can access the Id param that we pass in through the path!
+
+``` go
+func (g *GoatService) GetGoat(ctx context.Context, input *GetGoatParams) (*utils.ResponseBody[GoatResponse], error) {
+	resp := &utils.ResponseBody[GoatResponse]{}
+	id := input.Id
+	goat, err := g.goatDB.GetGoat(id)
+
+	if err != nil { // if we have an err getting the goat return the empty response and the error
+		return resp, err
+	}
+
+	resp.Body = &GoatResponse{
+		Id:   int8(goat.ID),
+		Name: goat.Name,
+		Age:  goat.Age,
+	}
+
+	return resp, nil
+}
+```
+
+Now go back into the route and add the service:
+
+``` go
+func Route(api huma.API, db *gorm.DB) {
+	goatDB := &GoatDB{db: db}
+	goatService := GoatService{goatDB: goatDB}
+	{
+		grp := huma.NewGroup(api, "api/v1/goat")
+		huma.Get(grp, "/", goatService.Ping)
+		huma.Get(grp, "/{id}", goatService.GetGoat) // ADD THE FUNCTIONALITY
+	}
+}
+```
+
+YOUVE MADE A ROUTE THAT CAN TAKE IN INPUTTTT
+
+There is wayyy more to learn and as we start making routes you will encounter the other cases but this is a general overview!
 
 
-
-### Database transaction
-
-### Making Transaction Global
-
-### Adding your Route to App
 

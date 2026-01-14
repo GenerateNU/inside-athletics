@@ -10,7 +10,6 @@ type Goat struct {
 	gorm.Model
 	Name string `json:"name" example:"Suli" doc:"The name of a goat"`
 	Age  int8   `json:"age" example:"67" doc:"The age of this goat"`
-	// TODO: Add a list of drinks this goat fucks with
 }
 
 func (g *Goat) validateGoatStatus() (string, error) {
@@ -20,7 +19,6 @@ func (g *Goat) validateGoatStatus() (string, error) {
 		1) The goats id MUST be a positive integer (> 0)
 		2) If the goats name doesn't start with an "s" are they really goated?
 		3) They can't have a negative age... It also needs to be even with the exception of 67
-		4) Milk must be in the list of drinks that they like
 
 		If the goat is really goated then you return "AYYY GOATED", nil (nil meaning there is no error)
 		Else... return the empty string "", [INSERT_ERROR_HERE]
@@ -29,7 +27,7 @@ func (g *Goat) validateGoatStatus() (string, error) {
 }
 
 func (g *Goat) MakeSomeNoise() string {
-	return "BAAAAA"
+	return fmt.Sprintf("BAAAAA %s", g.Name)
 }
 
 func (g *Goat) SetName(name string) {
