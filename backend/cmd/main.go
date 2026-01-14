@@ -24,7 +24,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	dbUrl := os.Getenv("PROD_DB_CONNECTION_STRING")
+	var dbUrl string
+	env := os.Getenv("APP_ENV") // or "ENV", "APP_ENV", etc.
+
+	if env == "production" {
+		dbUrl = os.Getenv("PROD_DB_CONNECTION_STRING")
+	} else {
+		dbUrl = os.Getenv("DEV_DB_CONNECTION_STRING")
+	}
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {

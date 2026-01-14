@@ -29,7 +29,7 @@ type RouteFN func(api huma.API, db *gorm.DB)
 func CreateApp(db *gorm.DB) *App {
 
 	router := setupApp()
-	var api huma.API = humafiber.New(router, huma.DefaultConfig("Inside Athletics API", "1.0.0"))
+	var api = humafiber.New(router, huma.DefaultConfig("Inside Athletics API", "1.0.0"))
 
 	CreateRoutes(db, api)
 
