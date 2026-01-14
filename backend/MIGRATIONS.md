@@ -20,4 +20,4 @@ To generate a migration run: `make gen-migration`. This will create a new file i
 ### Testing a Migration
 
 NEVER apply a migration to prod. This will be done by the TL's after your code has been reviewed. In order to test your
-migration run it on your local supabase database. This can be run with `make apply-dev`.
+migration run it on your local supabase database. This can be run with `make migration-dev`.
