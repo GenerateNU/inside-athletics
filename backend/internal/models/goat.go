@@ -12,6 +12,7 @@ type Goat struct {
 	Age  int8   `json:"age" example:"67" doc:"The age of this goat"`
 }
 
+//nolint:unused // temporary
 func (g *Goat) validateGoatStatus() (string, error) {
 	/*
 		TODO: Validate if this goat is really a GOAT.
