@@ -1,0 +1,22 @@
+name: backend-lint
+defaults:
+    run:
+        working-directory: ./backend
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install golganci-lint
+              run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+            
+            - name: Run golangci lint
+              run: make lint
