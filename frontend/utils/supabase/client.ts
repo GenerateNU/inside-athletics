@@ -1,5 +1,4 @@
 import { AppState, Platform } from 'react-native'
-import 'react-native-url-polyfill/auto'
 import { createClient, processLock } from '@supabase/supabase-js'
 import { secureStorage } from '../secure-storage'
 
