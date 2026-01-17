@@ -37,12 +37,3 @@ After reverting if you want to completely get rid of this change you must:
 1) Delete the Migration: `rm migrations/20240101120000_bad_change.sql`
 
 2) Regenerate the hash file: `atlas migrate hash`
-
-Here are some useful flags for reverting migrations: 
-
-| Goal                  | Command          |
-|-----------------------|------------------|
-| Revert last migration | `--steps 1`      |
-| Revert multiple       | `--steps N`      |
-| Revert to version     | `--to <version>` |
-| Preview changes       | `--dry-run`      |

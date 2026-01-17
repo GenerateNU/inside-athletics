@@ -28,10 +28,10 @@ lint:
 
 # reverts single migration for prod
 revert-single-prod:
-	atlas migrate down --env prod --steps 1
+	atlas migrate down --env prod 
 
 # reverts single migration for dev
 revert-single-dev:
-	atlas migrate down --env dev --steps 1
+	atlas migrate down --env dev
 
 
