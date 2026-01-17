@@ -25,3 +25,13 @@ start-prod:
 # runs the linter
 lint:
 	golangci-lint run
+
+# reverts single migration for prod
+revert-single-prod:
+	atlas migrate down --env prod --steps 1
+
+# reverts single migration for dev
+revert-single-dev:
+	atlas migrate down --env dev --steps 1
+
+
