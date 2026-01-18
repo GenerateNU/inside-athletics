@@ -16,6 +16,8 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	_ "ariga.io/atlas-provider-gorm/gormschema"
 )
 
 func main() {
