@@ -367,6 +367,8 @@ type GetGoatParams struct {
 
 NOTE: that we are using the tag path:"id" to tell huma to map the param ID to this variable in the struct
 
+Some extra documentation, for more validation tags for huma input visit: https://huma.rocks/features/request-validation/ 
+
 In the service we can now add: 
 
 ``` go
