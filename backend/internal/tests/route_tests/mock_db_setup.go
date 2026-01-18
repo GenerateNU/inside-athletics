@@ -90,7 +90,11 @@ func (td *TestDatabase) Teardown(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		sqlDb.Close()
+		err = sqlDb.Close()
+
+		if err != nil {
+			t.Fatalf("Unable to close DB connection %s", err.Error())
+		}
 	}
 
 	if td.Container != nil {
