@@ -21,10 +21,11 @@ locals {
     }
 }
 
-
-env "gorm" {
+env "dev" {
   src = data.external_schema.gorm.url
   dev = "docker://postgres/15/dev"
+  url = local.envfile["DEV_MIGRATION_DB_CONNECTION_STRING"]
+  schemas = ["public"]
   migration {
     dir = "file://internal/migrations"
   }
@@ -36,19 +37,17 @@ env "gorm" {
 }
 
 
-env "dev" {
-  url = local.envfile["DEV_MIGRATION_DB_CONNECTION_STRING"]
-  schemas = ["public"]
-  migration {
-    dir = "file://internal/migrations"
-  }
-}
-
-
 env "prod" {
+  src = data.external_schema.gorm.url
+  dev = "docker://postgres/15/dev"
   url = local.envfile["PROD_MIGRATION_DB_CONNECTION_STRING"]
   schemas = ["public"]
   migration {
     dir = "file://internal/migrations"
+  }
+  format {
+    migrate {
+      diff = "{{ sql . \"  \" }}"
+    }
   }
 }

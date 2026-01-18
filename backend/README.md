@@ -43,7 +43,7 @@ In the backend directory create a .env file! We will send the contents of the fi
 ## How to Run
 ``` bash
 cd backend
-go make start-prod
+make start-prod
 ```
 
 The server should then start and you will be able to ping some endpoints! Try `/api/v1/health/`

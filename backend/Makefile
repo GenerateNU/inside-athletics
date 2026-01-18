@@ -3,25 +3,48 @@
 
 # Generates a new migration if there have been changes
 # made to any of the models
+
+.PHONY: gen-migration
 gen-migration:
-	atlas migrate dif --env gorm
+	if [ -z "$(MIGRATION_NAME)" ]; then \
+		echo "MIGRATION_NAME must be set"; \
+	else \
+		atlas migrate diff --env dev $(MIGRATION_NAME);	\
+	fi
 
 # Applies migration to development (local) supabase db
+.PHONY: migrate-dev
 migrate-dev:
 	atlas migrate apply --env dev
 
 # Applies migration to production supabase db
+.PHONY: migrate-prod
 migrate-prod:
 	atlas migrate apply --env prod
 
 # starts server utilizing local supabase db
+.PHONY: start-dev
 start-dev:
 	cd cmd && APP_ENV=development go run . 
 
 # starts server utilizing prod supabase db
+.PHONY: start-prod
 start-prod:
 	cd cmd && APP_ENV=production go run . 
 
 # runs the linter
+.PHONY: lint
 lint:
 	golangci-lint run
+
+# reverts single migration for prod
+.PHONY: revert-prod
+revert-single-prod:
+	atlas migrate down --env prod 
+
+.PHONY: revert-dev
+# reverts single migration for dev
+revert-single-dev:
+	atlas migrate down --env dev
+
+

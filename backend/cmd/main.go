@@ -47,7 +47,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unable to get database instance: %v\n", err)
 		os.Exit(1)
 	}
-	defer sqlDB.Close()
+
+	defer func() {
+		if err := sqlDB.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to close DB: %v", err)
+		}
+	}()	
 
 	app := server.CreateApp(db)
 
@@ -55,7 +60,11 @@ func main() {
 	app.Server.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Server is running! 🚀")
 	})
-	app.Server.Listen("localhost:8080")
+	
+	listenErr := app.Server.Listen("localhost:8080")
+	if listenErr != nil {
+		fmt.Fprintf(os.Stderr, "Unable to start server: %v", listenErr)
+	}
 
 	// gracefully shutdown the server
 	quit := make(chan os.Signal, 1)

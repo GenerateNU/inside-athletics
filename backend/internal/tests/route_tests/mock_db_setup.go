@@ -2,6 +2,7 @@ package routeTests
 
 import (
 	"encoding/json"
+	"fmt"
 	"inside-athletics/internal/server"
 	"log"
 	"net/http/httptest"
@@ -24,6 +25,10 @@ func SetupTestAPI(t *testing.T) humatest.TestAPI {
 	dbUrl := os.Getenv("PROD_DB_CONNECTION_STRING")
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connection DB: %v", err)
+	}
 
 	server.CreateRoutes(db, api)
 
