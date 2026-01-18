@@ -35,7 +35,7 @@ start-prod:
 # runs the linter
 .PHONY: lint
 lint:
-	golangci-lint run
+	golangci-lint run --timeout=5m
 
 # reverts single migration for prod
 .PHONY: revert-prod
