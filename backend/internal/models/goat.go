@@ -8,8 +8,8 @@ import (
 
 type Goat struct {
 	gorm.Model
-	Name string `json:"name" example:"Suli" doc:"The name of a goat"`
-	Age  int8   `json:"age" example:"67" doc:"The age of this goat"`
+	Name string `json:"name" example:"Suli" doc:"The name of a goat" gorm:"type:text;not null"`
+	Age  int8   `json:"age" example:"67" doc:"The age of this goat" gorm:"type:int8;not null"`
 }
 
 //nolint:unused // temporary
