@@ -7,7 +7,7 @@ import (
 )
 
 type Goat struct {
-	gorm.Model
+	gorm.Model // Id, created_at, deleted_at, updated_at
 	Name string `json:"name" example:"Suli" doc:"The name of a goat"`
 	Age  int8   `json:"age" example:"67" doc:"The age of this goat"`
 }
