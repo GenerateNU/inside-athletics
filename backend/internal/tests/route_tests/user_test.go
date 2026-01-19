@@ -12,7 +12,9 @@ func TestGetUser(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	// Not the best way to add a user.. i got lazy and didn't wanna make an endpoint
+	// insert directly into DB to test
+	// Don't use another endpoint to test this one - harder to tell which one is
+	// incorrect if the test fails
 	user := models.User{Name: "Suli"}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -21,6 +23,9 @@ func TestGetUser(t *testing.T) {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
 
+	// Need to authenticate each request by passing an authorization header like this
+	// when we start making endpoints that require a user-id you should add the user-id
+	// you need here
 	resp := api.Get("/api/v1/user/Suli", "Authorization: Bearer mock-token",)
 
 	var u h.GetUserResponse
