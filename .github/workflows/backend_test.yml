@@ -8,12 +8,12 @@ on:
     pull_request:
         branches: [main]
 jobs:
-    lint:
+    test:
         runs-on: ubuntu-latest
 
         steps:
             - name: Setup AtlasCLI
-              uses: ariga/setup-atlas
+              uses: ariga/setup-atlas@v1.13.9
 
             - name: Checkout code
               uses: actions/checkout@v4
