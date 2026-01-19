@@ -2,85 +2,69 @@ package server
 
 import (
 	"context"
-	"strings"
 	"net/http"
-	"github.com/MicahParks/keyfunc/v3"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/danielgtaylor/huma/v2"
-)
+	"strings"
 
+	"github.com/MicahParks/keyfunc/v3"
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+)
 
 /**
 Middleware used for verifying JWT in Authorization header
 and injecting userID into context for use across all API
 endpoints
 */
-func AuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
-	return func(ctx huma.Context, next func(huma.Context)) {
-		// The url holding the public key. This can be exposed publicly as it is only for
-		// verification purposes and should be used as a URL so we can rotate keys
-		jwksURL := "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
+func AuthMiddleware(c *fiber.Ctx) error {
 
-		// created a new keyfunc.KeyFunc which is used
-		// when verifying the token 
-		bgContext := context.Background()
-		key, err := keyfunc.NewDefaultCtx(bgContext, []string{jwksURL})
-		if err != nil {
-			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError,
-				"Unable to verify JWT", err,
-			)
-			return
-		}
+	  jwksURL := "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
+    bgContext := context.Background()
+    
+	key, err := keyfunc.NewDefaultCtx(bgContext, []string{jwksURL})
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+            "error": "Unable to Verify JWT",
+    }	)
+	}
 
-		// extracting the JWT from the authorization
-		// header. If it cannot be extracted an Unauthorized
-		// error will be thrown
-		authHeader := ctx.Header("Authorization")
-		if authHeader == "" {
-			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
-				"Authorization Header not in Request", err,
-			)
-			return
-		}
-		headerComponents := strings.Split(authHeader, "")
-		if len(headerComponents) != 2 && headerComponents[0] != "Bearer"{
-			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
-				"Bearer not ioncluded in Authorization Header",
-			)
-			return
-		}
-		token := headerComponents[1]
 
-		// Parse the jwt to see if the key has been maniuplated with or
-		// is not signed with the correct private key
-		parsed, parseErr := jwt.Parse(token, key.Keyfunc, jwt.WithValidMethods([]string{"ES256"}))
-		if parseErr != nil  || !parsed.Valid {
-			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
-				"Token is not valid", parseErr,
-			)
-			return
-		}
-
-		// Now that the key is verified we extract out the userID
-		// and save this in the context so that we can access it in
-		// any method
-		claims, parseWorks := parsed.Claims.(jwt.MapClaims)
-		if !parseWorks {
-			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError,
-				"Unable to extract User ID",
-			)
-			return
-		}
-
-		userID, userFetched := claims["sub"].(string)
-		if !userFetched {
-			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError,
-				"Unable to extract User ID",
-			)
-			return
-		}
-		ctx = huma.WithValue(ctx, "user_id", userID)
-
-		next(ctx)
-}
+    authHeader := c.Get("Authorization")
+    if authHeader == "" {
+        return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+            "error": "Authorization header not in request",
+        })
+    }
+    
+    headerComponents := strings.Split(authHeader, " ")
+    if len(headerComponents) != 2 || headerComponents[0] != "Bearer" {
+        return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+            "error": "Bearer not included in Authorization header",
+        })
+    }
+    
+    token := headerComponents[1]
+    
+    parsed, parseErr := jwt.Parse(token, key.Keyfunc, jwt.WithValidMethods([]string{"ES256"}))
+    if parseErr != nil || !parsed.Valid {
+        return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+            "error": "Token is not valid",
+        })
+    }
+    
+    claims, ok := parsed.Claims.(jwt.MapClaims)
+    if !ok {
+        return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Unable to extract claims",
+        })
+    }
+    
+    userID, ok := claims["sub"].(string)
+    if !ok {
+        return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Unable to extract user ID",
+        })
+    }
+    
+    c.Locals("user_id", userID)
+    return c.Next()
 }
