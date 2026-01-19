@@ -15,7 +15,7 @@ PRIVATE_JWK_DICT = {
     "crv": "P-256",
     "x": "8W4dxm9IaI6k0d4DtgwXtHyxaXfUFsFNROOxLWP_SDI",
     "y": "n1OXBOVJwN64HhGm_sapKD-fhdWUHHggjYnPqbbkofA"
-  }
+}
 
 def main():
     key = jwk.JWK(**PRIVATE_JWK_DICT)
@@ -23,7 +23,7 @@ def main():
     header = {
         "alg": "ES256",
         "typ": "JWT",
-        "kid": key['kid']
+        "kid": "03d4a51d-d8b1-469b-858b-0e586fef312d"
     }
 
     payload = {
@@ -32,7 +32,7 @@ def main():
         "role": "authenticated",
         "email": "user@example.com",
         "iat": int(datetime.now().timestamp()),
-        "exp": int((datetime.now() + timedelta(minutes=15)).timestamp()), 
+        "exp": int((datetime.now() + timedelta(minutes=60)).timestamp()), 
         "app_metadata": {                           
             "custom_claim": "some_value"
         }
@@ -41,7 +41,7 @@ def main():
     token = jwt.JWT(header=header, claims=json.dumps(payload))
     token.make_signed_token(key)
     generated_token = token.serialize()
-    print("Authorization Bearer:", generated_token)
+    print("TOKEN:", generated_token)
 
 
 if __name__ == "__main__":
