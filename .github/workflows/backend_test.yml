@@ -16,7 +16,7 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Install go packages
-              uses: go download
+              run: go download
 
             - name: Run tests
-              uses: make run-all-tests
+              run: make run-all-tests

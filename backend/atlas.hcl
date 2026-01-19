@@ -24,7 +24,7 @@ locals {
 env "dev" {
   src = data.external_schema.gorm.url
   dev = "docker://postgres/15/dev"
-  url = local.envfile["DEV_MIGRATION_DB_CONNECTION_STRING"]
+  url = local.envfile["DEV_DB_CONNECTION_STRING"]
   schemas = ["public"]
   migration {
     dir = "file://internal/migrations"
