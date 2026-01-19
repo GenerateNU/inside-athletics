@@ -1,17 +1,19 @@
 package routeTests
 
 import (
-	"inside-athletics/internal/handlers/health/types"
+	"inside-athletics/internal/handlers/health"
 	"strings"
 	"testing"
 )
 
 func TestGetGreeting(t *testing.T) {
-	api := SetupTestAPI(t)
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
 
 	resp := api.Get("/api/v1/health/")
 
-	var health types.HealthResponse
+	var health health.HealthResponse
 
 	DecodeTo(&health, resp)
 

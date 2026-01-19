@@ -16,6 +16,8 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	_ "ariga.io/atlas-provider-gorm/gormschema"
 )
 
 func main() {
@@ -24,7 +26,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	dbUrl := os.Getenv("PROD_DB_CONNECTION_STRING")
+	var dbUrl string
+	env := os.Getenv("APP_ENV") // or "ENV", "APP_ENV", etc.
+
+	if env == "production" {
+		dbUrl = os.Getenv("PROD_DB_CONNECTION_STRING")
+	} else {
+		dbUrl = os.Getenv("DEV_DB_CONNECTION_STRING")
+	}
 
 	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
 	if err != nil {
@@ -38,7 +47,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unable to get database instance: %v\n", err)
 		os.Exit(1)
 	}
-	defer sqlDB.Close()
+
+	defer func() {
+		if err := sqlDB.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to close DB: %v", err)
+		}
+	}()	
 
 	app := server.CreateApp(db)
 
@@ -46,7 +60,11 @@ func main() {
 	app.Server.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Server is running! 🚀")
 	})
-	app.Server.Listen("localhost:8080")
+	
+	listenErr := app.Server.Listen("localhost:8080")
+	if listenErr != nil {
+		fmt.Fprintf(os.Stderr, "Unable to start server: %v", listenErr)
+	}
 
 	// gracefully shutdown the server
 	quit := make(chan os.Signal, 1)

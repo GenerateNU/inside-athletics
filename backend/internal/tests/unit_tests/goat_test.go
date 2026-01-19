@@ -1,4 +1,4 @@
-package tests
+package unitTests
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 func TestGoat(t *testing.T) {
 	goat := models.Goat{Name: "Joe", Age: 67}
 	actual := goat.MakeSomeNoise()
-	expected := "BAAAAA"
+	expected := "BAAAAA Joe"
 
 	if actual != expected {
 		t.Error("The goat did not make some noise...")
