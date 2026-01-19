@@ -17,7 +17,7 @@ endpoints
 */
 func AuthMiddleware(c *fiber.Ctx) error {
 
-	  jwksURL := "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
+	jwksURL := "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
     bgContext := context.Background()
     
 	key, err := keyfunc.NewDefaultCtx(bgContext, []string{jwksURL})
