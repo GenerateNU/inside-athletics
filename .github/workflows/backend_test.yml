@@ -12,6 +12,9 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Setup AtlasCLI
+              uses: mongodb/atlas-github-action@v0.2.0
+
             - name: Checkout code
               uses: actions/checkout@v4
 
