@@ -15,5 +15,12 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                go-version-file: 'backend/go.mod'
+
             -  name: golangci-lint
                uses: golangci/golangci-lint-action@v8
+               with:
+                    working-directory: backend
