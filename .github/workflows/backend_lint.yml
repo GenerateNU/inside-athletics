@@ -17,6 +17,3 @@ jobs:
 
             -  name: golangci-lint
                uses: golangci/golangci-lint-action@v8
-
-            - name: Run golangci lint
-              run: make lint
