@@ -26,7 +26,7 @@ func AuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 		bgContext := context.Background()
 		key, err := keyfunc.NewDefaultCtx(bgContext, []string{jwksURL})
 		if err != nil {
-			huma.WriteErr(api, ctx, http.StatusInternalServerError,
+			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError,
 				"Unable to verify JWT", err,
 			)
 			return
@@ -37,14 +37,14 @@ func AuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 		// error will be thrown
 		authHeader := ctx.Header("Authorization")
 		if authHeader == "" {
-			huma.WriteErr(api, ctx, http.StatusUnauthorized,
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
 				"Authorization Header not in Request", err,
 			)
 			return
 		}
 		headerComponents := strings.Split(authHeader, "")
 		if len(headerComponents) != 2 && headerComponents[0] != "Bearer"{
-			huma.WriteErr(api, ctx, http.StatusUnauthorized,
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
 				"Bearer not ioncluded in Authorization Header",
 			)
 			return
@@ -55,7 +55,7 @@ func AuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 		// is not signed with the correct private key
 		parsed, parseErr := jwt.Parse(token, key.Keyfunc, jwt.WithValidMethods([]string{"ES256"}))
 		if parseErr != nil  || !parsed.Valid {
-			huma.WriteErr(api, ctx, http.StatusUnauthorized,
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
 				"Token is not valid", parseErr,
 			)
 			return
@@ -66,7 +66,7 @@ func AuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 		// any method
 		claims, parseWorks := parsed.Claims.(jwt.MapClaims)
 		if !parseWorks {
-			huma.WriteErr(api, ctx, http.StatusInternalServerError,
+			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError,
 				"Unable to extract User ID",
 			)
 			return
@@ -74,7 +74,7 @@ func AuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 
 		userID, userFetched := claims["sub"].(string)
 		if !userFetched {
-			huma.WriteErr(api, ctx, http.StatusInternalServerError,
+			_ = huma.WriteErr(api, ctx, http.StatusInternalServerError,
 				"Unable to extract User ID",
 			)
 			return
