@@ -18,8 +18,10 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Install go packages
-              run: go mod download
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                go-version-file: 'go.mod'
 
             - name: Run tests
               run: make run-all-tests
