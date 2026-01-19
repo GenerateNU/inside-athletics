@@ -15,10 +15,8 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Install golganci-lint
-              run: |
-                go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-                echo "$HOME/go/bin" >> $GITHUB_PATH
-            
+            -  name: golangci-lint
+               uses: golangci/golangci-lint-action@v8
+
             - name: Run golangci lint
               run: make lint
