@@ -19,7 +19,7 @@ func MockAuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 		// error will be thrown
 		authHeader := ctx.Header("Authorization")
 		if authHeader == "" {
-			huma.WriteErr(api, ctx, http.StatusUnauthorized,
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
 				"Authorization Header not in Request",
 			)
 			return
@@ -27,7 +27,7 @@ func MockAuthMiddleware(api huma.API) func(huma.Context, func(huma.Context)) {
 		headerComponents := strings.Split(authHeader, " ")
 		fmt.Println("headerComponents:", headerComponents)
 		if len(headerComponents) != 2 && headerComponents[0] != "Bearer"{
-			huma.WriteErr(api, ctx, http.StatusUnauthorized,
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized,
 				"Bearer not included in Authorization Header",
 			)
 			return
