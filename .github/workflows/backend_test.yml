@@ -21,7 +21,7 @@ jobs:
             - name: Set up Go
               uses: actions/setup-go@v5
               with:
-                go-version-file: 'go.mod'
+                go-version-file: 'backend/go.mod'
 
             - name: Run tests
               run: make run-all-tests
