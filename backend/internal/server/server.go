@@ -58,6 +58,7 @@ func setupApp() *fiber.App {
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${ip}:${port} ${pid} ${locals:requestid} ${status} - ${latency} ${method} ${path}\n",
 	}))
+	app.Use(AuthMiddleware)
 	app.Use(favicon.New())
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,

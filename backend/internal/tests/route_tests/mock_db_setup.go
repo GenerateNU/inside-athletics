@@ -150,6 +150,8 @@ Create API routing with test DB connection based on given dbUrl
 func SetupTestAPI(t *testing.T, dbUrl string) (humatest.TestAPI, *gorm.DB) {
 	_, api := humatest.New(t) // setup test API
 
+	api.UseMiddleware(MockAuthMiddleware(api))
+
 	db, err := gorm.Open(gormPostgres.Open(dbUrl), &gorm.Config{})
 
 	if err != nil {

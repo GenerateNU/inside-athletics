@@ -21,7 +21,7 @@ func TestGetUser(t *testing.T) {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/user/Suli")
+	resp := api.Get("/api/v1/user/Suli", "Authorization: Bearer mock-token",)
 
 	var u h.GetUserResponse
 
