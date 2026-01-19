@@ -13,7 +13,7 @@ jobs:
 
         steps:
             - name: Setup AtlasCLI
-              uses: mongodb/atlas-github-action@v0.2.0
+              uses: ariga/setup-atlas
 
             - name: Checkout code
               uses: actions/checkout@v4
