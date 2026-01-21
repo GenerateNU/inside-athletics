@@ -23,7 +23,6 @@ Please use a meaningful name for the [migration-name] like "CreateUserTable". Th
 NEVER apply a migration to prod. This will be done by the TL's after your code has been reviewed. In order to test your
 migration run it on your local supabase database. This can be run with `make migration-dev`.
 
-
 ## Reverting Migrations
 
 You can revert a migration by running: `make revert-single-prod` or `make revert-single-dev`. This will generate a plan so you can make sure you are reverting what you actually want.

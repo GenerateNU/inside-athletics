@@ -66,6 +66,17 @@ run-unit-tests:
 	go test $(V_FLAG) ./internal/tests/unit_tests
 
 
+.PHONY: gen-token
+gen-token:
+	if [ -z "$(TOKEN)" ]; then \
+		echo "TOKEN must be set"; \
+	else \
+		python3 -m pip install -r ./scripts/requirements.txt && \
+		python3 ./scripts/gen_token.py $(TOKEN); \
+	fi
+
+
+
 
 
 

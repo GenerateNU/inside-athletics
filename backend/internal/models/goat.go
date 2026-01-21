@@ -2,12 +2,16 @@ package models
 
 import (
 	"fmt"
+	"time"
 
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 )
 
 type Goat struct {
-	gorm.Model
+	ID         uuid.UUID  `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+	DeletedAt  *time.Time `sql:"index" json:"deleted_at"`
 	Name string `json:"name" example:"Suli" doc:"The name of a goat" gorm:"type:text;not null"`
 	Age  int8   `json:"age" example:"67" doc:"The age of this goat" gorm:"type:int8;not null"`
 }
