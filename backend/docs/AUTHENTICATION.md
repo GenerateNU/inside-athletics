@@ -7,3 +7,6 @@ We use the token supabase give the user through login for this. I created a help
 To use this value once the Auth Middleware verifies it fetch it from the ctx. 
 
 
+Troubleshooting:
+ - Make sure you started supabase from within the backend folder -> it needs to read the specific configuration file
+ 

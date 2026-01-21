@@ -71,8 +71,8 @@ gen-token:
 	if [ -z "$(TOKEN)" ]; then \
 		echo "TOKEN must be set"; \
 	else \
-		python -m pip install -r ./scripts/requirements.txt && \
-		python ./scripts/gen_token.py $(TOKEN); \
+		python3 -m pip install -r ./scripts/requirements.txt && \
+		python3 ./scripts/gen_token.py $(TOKEN); \
 	fi
 
 
