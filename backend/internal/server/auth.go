@@ -10,7 +10,6 @@ import (
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 )
 
 /**
@@ -19,10 +18,6 @@ and injecting userID into context for use across all API
 endpoints
 */
 func AuthMiddleware(c *fiber.Ctx) error {
-    err := godotenv.Load("../.env")
-    if err != nil {
-		log.Fatal("Error loading .env file")
-	}
     env := os.Getenv("APP_ENV") 
     var jwksURL string
     if env == "production" {
