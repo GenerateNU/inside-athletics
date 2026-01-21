@@ -5,7 +5,6 @@ go 1.24.11
 require (
 	ariga.io/atlas-provider-gorm v0.6.0
 	github.com/gofiber/fiber/v2 v2.52.7
-	github.com/joho/godotenv v1.5.1
 	github.com/testcontainers/testcontainers-go v0.40.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.40.0
 	gorm.io/driver/postgres v1.5.11
