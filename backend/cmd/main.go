@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -21,11 +19,6 @@ import (
 )
 
 func main() {
-
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	var dbUrl string
 	env := os.Getenv("APP_ENV") // or "ENV", "APP_ENV", etc.
 
