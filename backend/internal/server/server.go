@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"inside-athletics/internal/handlers/college"
+	"inside-athletics/internal/handlers/goat"
 	"inside-athletics/internal/handlers/health"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
@@ -57,7 +58,11 @@ func CreateApp(db *gorm.DB) *App {
 
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
+<<<<<<< HEAD
 	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route}
+=======
+	routeGroups := [...]RouteFN{health.Route, user.Route, goat.Route}
+>>>>>>> fb97f5e (go beginner tutorial)
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
@@ -90,3 +95,4 @@ func setupApp() *fiber.App {
 
 	return app
 }
+
