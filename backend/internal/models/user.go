@@ -19,7 +19,8 @@ type User struct {
 	Username                string     `json:"username" example:"suliproathelete" doc:"The username of a user" gorm:"type:varchar(100);not null"`
 	Bio                     *string    `json:"bio" example:"My name is Suli and I'm a pro athlete" doc:"The name of a user" gorm:"type:varchar(100);"` //nullable
 	Account_Type            bool       `json:"account_type" example:"True" doc:"If the user has access to premium features" gorm:"type:bool;not null"`
-	Sport                   *string    `json:"sport" example:"hockey" doc:"The sport(s) the user is interested in" gorm:"type:varchar(100);"` //nullable
+	Sport                   []string   `json:"sport" example:"hockey" doc:"The sport(s) the user is interested in" gorm:"type:jsonb;"` //nullable
+	Expected_Grad_Year      uint       `json:"expected_grad_year" example:"2027" doc:"The user's grad year" gorm:"type:unint8;"`       //nullable
 	Verified_Athlete_Status string     `json:"verified_athelete_status" example:"pending" doc:"" gorm:"type:varchar(100);not null"`
 	College                 *string    `json:"college" example:"Northeastern University" doc:"The college of a user" gorm:"type:varchar(100);"`
 	Division                *uint8     `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint8;"`
