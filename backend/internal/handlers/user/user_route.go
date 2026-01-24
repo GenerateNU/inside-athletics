@@ -5,19 +5,23 @@ import (
 	"gorm.io/gorm"
 )
 
-/**
+/*
+*
 Groups together all of the User routes. Huma is a wrapper here that automatically does a few things:
 
-1) creates OpenAPI docs
-2) maps the response to the correct response type (if no error 200, 201, etc.) if error it will use the Huma
-   error status code
-
+ 1. creates OpenAPI docs
+ 2. maps the response to the correct response type (if no error 200, 201, etc.) if error it will use the Huma
+    error status code
 */
 func Route(api huma.API, db *gorm.DB) {
-	var userDB = &UserDB{db}              // create object storing all database level functions for user
+	var userDB = &UserDB{db}               // create object storing all database level functions for user
 	var userService = &UserService{userDB} // create object with user functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/user")
-		huma.Get(grp, "/{name}", userService.GetUser)
+		huma.Post(grp, "/{id}", userService.GetUser)
+		huma.Get(grp, "/", userService.GetUser)        // todo: change the service func
+		huma.Get(grp, "/{id}", userService.GetUser)    // todo: change the service func
+		huma.Patch(grp, "/{id}", userService.GetUser)  // todo: change the service func
+		huma.Delete(grp, "/{id}", userService.GetUser) // todo: change the service func
 	}
 }

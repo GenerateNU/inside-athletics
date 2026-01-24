@@ -18,7 +18,7 @@ Here we are mapping to a GetUserResponse so that we can control what the return 
 return types so that we can control what information we are sending back instead of just the entire model
 */
 func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils.ResponseBody[GetUserResponse], error) {
-	id := input.Name
+	id := input.ID
 	user, err := u.userDB.GetUser(id)
 	respBody := &utils.ResponseBody[GetUserResponse]{}
 
