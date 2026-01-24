@@ -31,7 +31,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	// returned by the API
 	response := &GetUserResponse{
 		ID:   user.ID,
-		Name: user.Name,
+		Name: user.FirstName,
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
