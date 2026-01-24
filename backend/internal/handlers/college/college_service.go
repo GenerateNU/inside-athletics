@@ -30,8 +30,14 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	// we do this so we can control what values are
 	// returned by the API
 	response := &GetCollegeResponse{
-		ID:   college.ID,
-		Name: college.Name,
+		ID:           college.ID,
+		Name:         college.Name,
+		State:        college.State,
+		City:         college.City,
+		Website:      &college.Website,
+		AcademicRank: college.AcademicRank,
+		DivisionRank: college.DivisionRank,
+		Logo:         &college.Logo,
 	}
 
 	return &utils.ResponseBody[GetCollegeResponse]{
