@@ -75,7 +75,18 @@ gen-token:
 		python3 ./scripts/gen_token.py $(TOKEN); \
 	fi
 
+build:
+	go build -o bin/inside-athletics ./cmd
 
+docker-build:
+	docker build -t inside-athletics-backend .
+
+docker-run:
+	@doppler run -- docker run --rm -p 8080:8080 \
+		-e APP_ENV=production \
+		-e PROD_DB_CONNECTION_STRING \
+		--name inside-athletics-container \
+		inside-athletics-backend
 
 
 
