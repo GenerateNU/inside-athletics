@@ -2,7 +2,11 @@ package user
 
 import (
 	"context"
+	"encoding/json"
+	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type UserService struct {
@@ -52,4 +56,131 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 	}
 
 	return respBody, nil
+}
+
+func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*utils.ResponseBody[CreateUserResponse], error) {
+	respBody := &utils.ResponseBody[CreateUserResponse]{}
+
+	currentUserID, err := u.userDB.GetCurrentUserID(ctx)
+	if err != nil {
+		return respBody, err
+	}
+
+	sportJSON, err := marshalSport(input.Body.Sport)
+	if err != nil {
+		return respBody, err
+	}
+
+	user := &models.User{
+		ID:                      currentUserID,
+		FirstName:               input.Body.FirstName,
+		LastName:                input.Body.LastName,
+		Email:                   input.Body.Email,
+		Username:                input.Body.Username,
+		Bio:                     input.Body.Bio,
+		Account_Type:            input.Body.AccountType,
+		Sport:                   sportJSON,
+		Expected_Grad_Year:      input.Body.ExpectedGradYear,
+		Verified_Athlete_Status: input.Body.VerifiedAthleteStatus,
+		College:                 input.Body.College,
+		Division:                input.Body.Division,
+	}
+
+	createdUser, err := u.userDB.CreateUser(user)
+	if err != nil {
+		return respBody, err
+	}
+
+	respBody.Body = &CreateUserResponse{
+		ID:   createdUser.ID,
+		Name: createdUser.FirstName,
+	}
+
+	return respBody, nil
+}
+
+func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*utils.ResponseBody[UpdateUserResponse], error) {
+	respBody := &utils.ResponseBody[UpdateUserResponse]{}
+
+	user, err := u.userDB.GetUser(input.ID)
+	if err != nil {
+		return respBody, err
+	}
+
+	body := input.Body
+	if body.FirstName != nil {
+		user.FirstName = *body.FirstName
+	}
+	if body.LastName != nil {
+		user.LastName = *body.LastName
+	}
+	if body.Email != nil {
+		user.Email = *body.Email
+	}
+	if body.Username != nil {
+		user.Username = *body.Username
+	}
+	if body.Bio != nil {
+		user.Bio = body.Bio
+	}
+	if body.AccountType != nil {
+		user.Account_Type = *body.AccountType
+	}
+	if body.Sport != nil {
+		sportJSON, err := marshalSport(*body.Sport)
+		if err != nil {
+			return respBody, err
+		}
+		user.Sport = sportJSON
+	}
+	if body.ExpectedGradYear != nil {
+		user.Expected_Grad_Year = *body.ExpectedGradYear
+	}
+	if body.VerifiedAthleteStatus != nil {
+		user.Verified_Athlete_Status = *body.VerifiedAthleteStatus
+	}
+	if body.College != nil {
+		user.College = body.College
+	}
+	if body.Division != nil {
+		user.Division = body.Division
+	}
+
+	updatedUser, err := u.userDB.UpdateUser(user)
+	if err != nil {
+		return respBody, err
+	}
+
+	respBody.Body = &UpdateUserResponse{
+		ID:   updatedUser.ID,
+		Name: updatedUser.FirstName,
+	}
+
+	return respBody, nil
+}
+
+func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*utils.ResponseBody[DeleteUserResponse], error) {
+	respBody := &utils.ResponseBody[DeleteUserResponse]{}
+
+	err := u.userDB.DeleteUser(input.ID)
+	if err != nil {
+		return respBody, err
+	}
+
+	respBody.Body = &DeleteUserResponse{
+		ID: input.ID,
+	}
+
+	return respBody, nil
+}
+
+func marshalSport(sport []string) ([]byte, error) {
+	if sport == nil {
+		return nil, nil
+	}
+	sportJSON, err := json.Marshal(sport)
+	if err != nil {
+		return nil, huma.Error400BadRequest("Invalid sport values", err)
+	}
+	return sportJSON, nil
 }

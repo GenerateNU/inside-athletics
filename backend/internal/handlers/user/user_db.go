@@ -43,3 +43,25 @@ func (u *UserDB) GetCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 
 	return parsedID, nil
 }
+
+func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
+	dbResponse := u.db.Create(user)
+	return utils.HandleDBError(user, dbResponse.Error)
+}
+
+func (u *UserDB) UpdateUser(user *models.User) (*models.User, error) {
+	dbResponse := u.db.Save(user)
+	return utils.HandleDBError(user, dbResponse.Error)
+}
+
+func (u *UserDB) DeleteUser(id uuid.UUID) error {
+	dbResponse := u.db.Delete(&models.User{}, "id = ?", id)
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError(&models.User{}, dbResponse.Error)
+		return err
+	}
+	if dbResponse.RowsAffected == 0 {
+		return huma.Error404NotFound("Resource not found")
+	}
+	return nil
+}

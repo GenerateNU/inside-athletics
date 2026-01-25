@@ -29,6 +29,7 @@ func handleGORMErrors(err error) error {
     	case errors.Is(err, gorm.ErrUnsupportedDriver), errors.Is(err, gorm.ErrNotImplemented):
         	return huma.Error501NotImplemented("Operation not supported", err)
 		}
+		return huma.Error500InternalServerError("Database error", err)
 	}
 	return nil
 }
