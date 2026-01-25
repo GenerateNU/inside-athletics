@@ -41,10 +41,10 @@ func (u *SportDB) GetSportByName(name string) (*models.Sport, error) {
 }
 
 // Get all sports
-func (u *SportDB) GetAllSports() ([]models.Sport, error) {
-	var sports []models.Sport
+func (u *SportDB) GetAllSports() (*[]models.Sport, error) {
+    var sports []models.Sport
 	dbResponse := u.db.Find(&sports)
-	return utils.HandleDBError(&sports, dbResponse.Error)
+    return utils.HandleDBError(&sports, dbResponse.Error)
 }
 
 // Update sport
