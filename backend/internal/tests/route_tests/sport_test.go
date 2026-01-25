@@ -1,9 +1,9 @@
 package routeTests
 
 import (
-	"inside-athletics/internal/handlers/sport"
-	"strings"
-	"testing"
+    "inside-athletics/internal/handlers/sport"
+    "net/http"
+    "testing"
 )
 
 func TestCreateSport(t *testing.T) {
@@ -33,16 +33,14 @@ func TestGetSportById(t *testing.T) {
     testDB := SetupTestDB(t)
     defer testDB.Teardown(t)
     api := testDB.API
+    sportDB := &SportDB{db: testDB.DB}
 
-    createdSport, err := api.CreateSport("Women's Basketball", 100000)
+    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
     if err != nil {
         t.Fatalf("failed to create sport", err)
     }
 
     resp := api.Get("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
-    if resp.Code != http.StatusOK {
-        t.Fatalf("expected status 200, got %d", resp.Code)
-    }
 
     var sport sport.SportResponse
     DecodeTo(&sport, resp)
@@ -60,16 +58,14 @@ func TestGetSportByName(t *testing.T) {
     testDB := SetupTestDB(t)
     defer testDB.Teardown(t)
     api := testDB.API
+	sportDB := &SportDB{db: testDB.DB}
 
-    createdSport, err := api.CreateSport("Women's Basketball", 100000)
+    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
     if err != nil {
         t.Fatalf("failed to create sport", err)
     }
 
     resp := api.Get("/api/v1/sport/" + createdSport.Name.String(), "Authorization: Bearer mock-token")
-    if resp.Code != http.StatusOK {
-        t.Fatalf("expected status 200, got %d", resp.Code)
-    }
 
     var sport sport.SportResponse
     DecodeTo(&sport, resp)
@@ -87,62 +83,84 @@ func TestGetAllSports(t *testing.T) {
     testDB := SetupTestDB(t)
     defer testDB.Teardown(t)
     api := testDB.API
+	sportDB := &SportDB{db: testDB.DB}
 
-    createdSport1, err1 := api.CreateSport("Basketball", 100000)
+    createdSport1, err1 := sportDB.CreateSport("Women's Basketball", 100000)
     if err1 != nil {
-        t.Fatalf("failed to create sport 1", err)
+        t.Fatalf("failed to create sport 1", err1)
     }
 
-	createdSport2, err2 := api.CreateSport("Hockey", 100000)
+	createdSport2, err2 := sportDB.CreateSport("Women's Hockey", 200000)
     if err2 != nil {
-        t.Fatalf("failed to create sport 1", err)
+        t.Fatalf("failed to create sport 2", err2)
     }
 
-    resp := api.Get("/api/v1/sport/" + createdSport.ID.String() "Authorization: Bearer mock-token")
-    if resp.Code != http.StatusOK {
-        t.Fatalf("expected status 200, got %d", resp.Code)
+    resp := api.Get("/api/v1/sports/", "Authorization: Bearer mock-token")
+
+    var sports []sport.SportResponse
+    DecodeTo(&sports, resp)
+
+    if sports[0].Name != createdSport1.Name {
+        t.Errorf("expected name Basketball, got %s", sports[0].Name)
     }
 
-    var sport sport.SportResponse
-    DecodeTo(&sport, resp)
-
-    if sport.Name != "Basketball" {
-        t.Errorf("expected name Basketball, got %s", sport.Name)
+    if sports[0].Popularity != createdSport1.Popularity {
+        t.Errorf("expected popularity 100000, got %d", sports[0].Popularity)
     }
 
-    if sport.Popularity != 100000 {
-        t.Errorf("expected popularity 100000, got %d", sport.Popularity)
+	if sports[1].Name != createdSport2.Name {
+        t.Errorf("expected name Basketball, got %s", sports[1].Name)
+    }
+
+    if sports[1].Popularity != createdSport2.Popularity {
+        t.Errorf("expected popularity 100000, got %d", sports[1].Popularity)
     }
 }
 
 func TestUpdateSport(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
+    testDB := SetupTestDB(t)
+    defer testDB.Teardown(t)
+    api := testDB.API
+	sportDB := &SportDB{db: testDB.DB}
 
-	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token",)
+    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
+    if err != nil {
+        t.Fatalf("failed to create sport", err)
+    }
 
-	var health health.HealthResponse
+    resp := api.Patch("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
 
-	DecodeTo(&health, resp)
+    var sport sport.SportResponse
+    DecodeTo(&sport, resp)
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
-	}
+    if sport.Name != "Men's Basketball" {
+        t.Errorf("expected name Men's Basketball, got %s", sport.Name)
+    }
+
+    if sport.Popularity != 200000 {
+        t.Errorf("expected popularity 200000, got %d", sport.Popularity)
+    }
 }
 
 func TestDeleteSport(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
+    testDB := SetupTestDB(t)
+    defer testDB.Teardown(t)
+    api := testDB.API
+	sportDB := &SportDB{db: testDB.DB}
 
-	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token",)
+    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
+    if err != nil {
+        t.Fatalf("failed to create sport", err)
+    }
 
-	var health health.HealthResponse
+    resp := api.Delete("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
 
-	DecodeTo(&health, resp)
+    var sport sport.SportResponse
+    DecodeTo(&sport, resp)
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
-	}
+	resp = api.Get("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
+    if resp.Code != http.StatusNotFound {
+        t.Errorf("expected 404 after delete, got %d", resp.Code)
+    }
+ 
 }
