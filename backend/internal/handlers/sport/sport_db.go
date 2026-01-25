@@ -21,7 +21,7 @@ func (u *SportDB) CreateSport(name string, popularity int32) (*models.Sport, err
 	if popularity < 0 {
 		return nil, fmt.Errorf("Popularity cannot be a negative number!")
 	}
-	sport := &models.Sport{Name: name, Popularity: popularity}
+	sport := models.Sport{Name: name, Popularity: popularity}
 	dbResponse := u.db.Create(&sport)
 	return utils.HandleDBError(&sport, dbResponse.Error)
 }

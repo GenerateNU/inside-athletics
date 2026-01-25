@@ -17,7 +17,7 @@ func TestGetGreeting(t *testing.T) {
 
 	DecodeTo(&health, resp)
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
+	if !strings.Contains(health.Name, "Welcome to Inside Athletics API Version 1.0.0") {
 		t.Fatalf("Unexpected response: %s", resp.Body.String())
 	}
 }
