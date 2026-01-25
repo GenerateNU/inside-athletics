@@ -19,5 +19,8 @@ func Route(api huma.API, db *gorm.DB) {
 	{
 		grp := huma.NewGroup(api, "/api/v1/college")
 		huma.Get(grp, "/{id}", collegeService.GetCollege)
+		huma.Post(grp, "", collegeService.CreateCollege)
+		huma.Put(grp, "/{id}", collegeService.UpdateCollege)
+		huma.Delete(grp, "/{id}", collegeService.DeleteCollege)
 	}
 }
