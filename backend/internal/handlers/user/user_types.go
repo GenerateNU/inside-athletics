@@ -10,3 +10,7 @@ type GetUserResponse struct {
 	ID   uuid.UUID `json:"id" example:"1" doc:"ID of the user"`
 	Name string    `json:"name" example:"Joe" doc:"Name of the user"`
 }
+
+type GetCurrentUserIDResponse struct {
+	ID uuid.UUID `json:"id" example:"1" doc:"ID of the currently authenticated user"`
+}

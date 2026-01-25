@@ -18,6 +18,7 @@ func Route(api huma.API, db *gorm.DB) {
 	var userService = &UserService{userDB} // create object with user functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/user")
+		huma.Get(grp, "/current", userService.GetCurrentUserID)
 		huma.Post(grp, "/{id}", userService.GetUser)
 		huma.Get(grp, "/", userService.GetUser)        // todo: change the service func
 		huma.Get(grp, "/{id}", userService.GetUser)    // todo: change the service func

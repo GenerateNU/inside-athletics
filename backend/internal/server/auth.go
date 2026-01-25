@@ -75,7 +75,8 @@ func AuthMiddleware(c *fiber.Ctx) error {
             "error": "Unable to extract user ID",
         })
     }
-    
+
     c.Locals("user_id", userID)
+    c.SetUserContext(context.WithValue(c.UserContext(), "user_id", userID))
     return c.Next()
 }

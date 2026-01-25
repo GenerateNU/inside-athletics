@@ -38,3 +38,18 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		Body: response,
 	}, err
 }
+
+func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetCurrentUserIDResponse], error) {
+	respBody := &utils.ResponseBody[GetCurrentUserIDResponse]{}
+
+	userID, err := u.userDB.GetCurrentUserID(ctx)
+	if err != nil {
+		return respBody, err
+	}
+
+	respBody.Body = &GetCurrentUserIDResponse{
+		ID: userID,
+	}
+
+	return respBody, nil
+}
