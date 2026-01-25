@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/MicahParks/keyfunc/v3"
@@ -16,8 +18,14 @@ and injecting userID into context for use across all API
 endpoints
 */
 func AuthMiddleware(c *fiber.Ctx) error {
-
-	  jwksURL := "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
+    env := os.Getenv("APP_ENV") 
+    var jwksURL string
+    if env == "production" {
+		jwksURL = "https://zhhniddxrmfqqracjrlc.supabase.co/auth/v1/.well-known/jwks.json"
+	} else {
+		jwksURL = "http://localhost:54321/auth/v1/.well-known/jwks.json"
+	}
+    
     bgContext := context.Background()
     
 	key, err := keyfunc.NewDefaultCtx(bgContext, []string{jwksURL})
@@ -29,6 +37,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 
     authHeader := c.Get("Authorization")
+    log.Print(authHeader)
     if authHeader == "" {
         return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
             "error": "Authorization header not in request",
@@ -36,6 +45,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
     }
     
     headerComponents := strings.Split(authHeader, " ")
+    log.Print(headerComponents)
     if len(headerComponents) != 2 || headerComponents[0] != "Bearer" {
         return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
             "error": "Bearer not included in Authorization header",
@@ -46,6 +56,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
     
     parsed, parseErr := jwt.Parse(token, key.Keyfunc, jwt.WithValidMethods([]string{"ES256"}))
     if parseErr != nil || !parsed.Valid {
+        log.Print(parseErr)
         return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
             "error": "Token is not valid",
         })
