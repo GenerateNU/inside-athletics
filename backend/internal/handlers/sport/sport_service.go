@@ -12,41 +12,41 @@ type SportService struct {
 // connect to DB and create a new sport
 func (u *SportService) CreateSport(ctx context.Context, input *struct {
 	Body CreateSportRequest
-}) (*utils.ResponseBody[CreateSportResponse], error) {
+}) (*utils.ResponseBody[SportResponse], error) {
 	body != &input.Body
 	sport, err := u.sportDB.CreateSport(body)
-	respBody := &utils.ResponseBody[CreateSportResponse]{}
+	respBody := &utils.ResponseBody[SportResponse]{}
 
 	if err != nil {
 		return respBody, err
 	}
 
-	response := &CreateSportResponse{
+	response := &SportResponse{
 		ID:   sport.ID,
 		Name: sport.Name,
 	}
 
-	return &utils.ResponseBody[CreateSportResponse]{
+	return &utils.ResponseBody[SportResponse]{
 		Body: response,
 	}, nil
 }
 
 // connect to DB and get a sport by name
-func (u *SportService) GetSportByName(ctx context.Context, input *GetSportByNameParams) (*utils.ResponseBody[GetSportResponse], error) {
+func (u *SportService) GetSportByName(ctx context.Context, input *GetSportByNameParams) (*utils.ResponseBody[SportResponse], error) {
 	name := input.Name
 	sport, err := u.sportDB.GetSportByName(name)
-	respBody := &utils.ResponseBody[GetSportResponse]{}
+	respBody := &utils.ResponseBody[SportResponse]{}
 
 	if err != nil {
 		return respBody, err
 	}
 
-	response := &GetSportResponse{
+	response := &SportResponse{
 		ID:   sport.ID,
 		Name: sport.Name,
 	}
 
-	return &utils.ResponseBody[GetSportResponse]{
+	return &utils.ResponseBody[SportResponse]{
 		Body: response,
 	}, err
 }
@@ -70,21 +70,21 @@ func (u *SportService) GetAllSports(ctx context.Context, input *GetAllSportsPara
 }
 
 //connect to DB and get sport by ID
-func (u *SportService) GetSportByID(ctx context.Context, input *GetSportByIDParams) (*utils.ResponseBody[GetSportResponse], error) {
+func (u *SportService) GetSportByID(ctx context.Context, input *GetSportByIDParams) (*utils.ResponseBody[SportResponse], error) {
 	id := input.ID
 	sport, err := u.sportDB.GetSportById(id)
-	respBody := &utils.ResponseBody[GetSportResponse]{}
+	respBody := &utils.ResponseBody[SportResponse]{}
 
 	if err != nil {
 		return respBody, err
 	}
 
-	response := &GetSportResponse{
+	response := &SportResponse{
 		ID:   sport.ID,
 		Name: sport.Name,
 	}
 
-	return &utils.ResponseBody[GetSportResponse]{
+	return &utils.ResponseBody[SportResponse]{
 		Body: response,
 	}, nil
 }
@@ -92,21 +92,21 @@ func (u *SportService) GetSportByID(ctx context.Context, input *GetSportByIDPara
 // Connect to DB and update existing sport
 func (u *SportService) UpdateSport(ctx context.Context, input *struct {
     Body UpdateSportRequest 
-}) (*utils.ResponseBody[UpdateSportResponse], error) {
+}) (*utils.ResponseBody[SportResponse], error) {
     body := &input.Body
     sport, err := u.sportDB.UpdateSport(body.ID, body.Name)
-    respBody := &utils.ResponseBody[UpdateSportResponse]{}
+    respBody := &utils.ResponseBody[SportResponse]{}
 
     if err != nil {
         return respBody, err
     }
 
-    response := &UpdateSportResponse{
+    response := &SportResponse{
         ID:   sport.ID,
         Name: sport.Name,
     }
 
-    return &utils.ResponseBody[UpdateSportResponse]{
+    return &utils.ResponseBody[SportResponse]{
         Body: response,
     }, nil
 }

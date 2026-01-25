@@ -18,11 +18,6 @@ func NewSportHandler(db *gorm.DB) *SportHandler {
 	}
 }
 
-type CreateSportRequest struct {
-	Name       string `json:"name" binding:"required"`
-	Popularity int32  `json:"popularity" binding:"required"`
-}
-
 func (h *SportHandler) CreateSport(c *gin.Context) {
 	var req CreateSportRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

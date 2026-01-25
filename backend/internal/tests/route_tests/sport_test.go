@@ -11,63 +11,108 @@ func TestCreateSport(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token",)
+	body := map[string]any{
+    "name":       "Women's Basketball",
+    "popularity": 100000,
+	}
 
-	var health health.HealthResponse
+	resp := api.Post("/api/v1/sport/", body, "Authorization: Bearer mock-token",)
+	var sport sport.SportResponse
+	DecodeTo(&sport, resp)
 
-	DecodeTo(&health, resp)
+	if sport.Name != "Women's Basketball" {
+    	t.Errorf("expected name Women's Basketball, got %s", sport.Name)
+	}
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+	if sport.Popularity != 100000 {
+		t.Errorf("expected popularity 10, got %d", sport.Popularity)
 	}
 }
 
 func TestGetSportById(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
+    testDB := SetupTestDB(t)
+    defer testDB.Teardown(t)
+    api := testDB.API
 
-	resp := api.Get("/api/v1/sport/", "Authorization: Bearer mock-token",)
+    createdSport, err := api.CreateSport("Women's Basketball", 100000)
+    if err != nil {
+        t.Fatalf("failed to create sport", err)
+    }
 
-	var sport health.HealthResponse
+    resp := api.Get("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
+    if resp.Code != http.StatusOK {
+        t.Fatalf("expected status 200, got %d", resp.Code)
+    }
 
-	DecodeTo(&health, resp)
+    var sport sport.SportResponse
+    DecodeTo(&sport, resp)
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
-	}
+    if sport.Name != "Women's Basketball" {
+        t.Errorf("expected name Women's Basketball, got %s", sport.Name)
+    }
+
+    if sport.Popularity != 100000 {
+        t.Errorf("expected popularity 100000, got %d", sport.Popularity)
+    }
 }
 
 func TestGetSportByName(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
+    testDB := SetupTestDB(t)
+    defer testDB.Teardown(t)
+    api := testDB.API
 
-	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token",)
+    createdSport, err := api.CreateSport("Women's Basketball", 100000)
+    if err != nil {
+        t.Fatalf("failed to create sport", err)
+    }
 
-	var health health.HealthResponse
+    resp := api.Get("/api/v1/sport/" + createdSport.Name.String(), "Authorization: Bearer mock-token")
+    if resp.Code != http.StatusOK {
+        t.Fatalf("expected status 200, got %d", resp.Code)
+    }
 
-	DecodeTo(&health, resp)
+    var sport sport.SportResponse
+    DecodeTo(&sport, resp)
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
-	}
+    if sport.Name != "Women's Basketball" {
+        t.Errorf("expected name Women's Basketball, got %s", sport.Name)
+    }
+
+    if sport.Popularity != 100000 {
+        t.Errorf("expected popularity 100000, got %d", sport.Popularity)
+    }
 }
 
 func TestGetAllSports(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
+    testDB := SetupTestDB(t)
+    defer testDB.Teardown(t)
+    api := testDB.API
 
-	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token",)
+    createdSport1, err1 := api.CreateSport("Basketball", 100000)
+    if err1 != nil {
+        t.Fatalf("failed to create sport 1", err)
+    }
 
-	var health health.HealthResponse
+	createdSport2, err2 := api.CreateSport("Hockey", 100000)
+    if err2 != nil {
+        t.Fatalf("failed to create sport 1", err)
+    }
 
-	DecodeTo(&health, resp)
+    resp := api.Get("/api/v1/sport/" + createdSport.ID.String() "Authorization: Bearer mock-token")
+    if resp.Code != http.StatusOK {
+        t.Fatalf("expected status 200, got %d", resp.Code)
+    }
 
-	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
-	}
+    var sport sport.SportResponse
+    DecodeTo(&sport, resp)
+
+    if sport.Name != "Basketball" {
+        t.Errorf("expected name Basketball, got %s", sport.Name)
+    }
+
+    if sport.Popularity != 100000 {
+        t.Errorf("expected popularity 100000, got %d", sport.Popularity)
+    }
 }
 
 func TestUpdateSport(t *testing.T) {
