@@ -45,7 +45,7 @@ func main() {
 		if err := sqlDB.Close(); err != nil {
 			fmt.Fprintf(os.Stderr, "failed to close DB: %v", err)
 		}
-	}()	
+	}()
 
 	app := server.CreateApp(db)
 
@@ -53,8 +53,8 @@ func main() {
 	app.Server.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Server is running! 🚀")
 	})
-	
-	listenErr := app.Server.Listen("localhost:8080")
+
+	listenErr := app.Server.Listen(":8080")
 	if listenErr != nil {
 		fmt.Fprintf(os.Stderr, "Unable to start server: %v", listenErr)
 	}
