@@ -6,6 +6,7 @@ import (
 	"inside-athletics/internal/utils"
 )
 
+// Contains business logic for colleges
 type CollegeService struct {
 	collegeDB *CollegeDB
 }
@@ -18,11 +19,13 @@ func StringPtrOrNil(s string) *string {
 	return &s
 }
 
+// Retrieves single college by ID
 func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams) (*utils.ResponseBody[GetCollegeResponse], error) {
 	id := input.ID
-	college, err := u.collegeDB.GetCollege(id)
-	respBody := &utils.ResponseBody[GetCollegeResponse]{}
 
+	college, err := u.collegeDB.GetCollege(id)
+
+	respBody := &utils.ResponseBody[GetCollegeResponse]{}
 	if err != nil {
 		return respBody, err
 	}
@@ -43,6 +46,7 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	}, err
 }
 
+// Creates a single college
 func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollegeInput) (*utils.ResponseBody[CreateCollegeResponse], error) {
 	college := &models.College{
 		Name:         input.Body.Name,
@@ -55,14 +59,15 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 	if input.Body.Website != nil {
 		college.Website = *input.Body.Website
 	}
+
 	college.AcademicRank = input.Body.AcademicRank
 	if input.Body.Logo != nil {
 		college.Logo = *input.Body.Logo
 	}
 
 	createdCollege, err := u.collegeDB.CreateCollege(college)
-	respBody := &utils.ResponseBody[CreateCollegeResponse]{}
 
+	respBody := &utils.ResponseBody[CreateCollegeResponse]{}
 	if err != nil {
 		return respBody, err
 	}
@@ -83,6 +88,7 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 	}, err
 }
 
+// Updates fields inputted in request
 func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollegeInput) (*utils.ResponseBody[UpdateCollegeResponse], error) {
 	id := input.ID
 	updates := make(map[string]interface{})
@@ -111,8 +117,8 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	}
 
 	college, err := u.collegeDB.UpdateCollege(id, updates)
-	respBody := &utils.ResponseBody[UpdateCollegeResponse]{}
 
+	respBody := &utils.ResponseBody[UpdateCollegeResponse]{}
 	if err != nil {
 		return respBody, err
 	}
@@ -133,11 +139,12 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	}, err
 }
 
+// Removes a single college by ID
 func (u *CollegeService) DeleteCollege(ctx context.Context, input *DeleteCollegeParams) (*utils.ResponseBody[DeleteCollegeResponse], error) {
 	id := input.ID
 	err := u.collegeDB.DeleteCollege(id)
-	respBody := &utils.ResponseBody[DeleteCollegeResponse]{}
 
+	respBody := &utils.ResponseBody[DeleteCollegeResponse]{}
 	if err != nil {
 		return respBody, err
 	}

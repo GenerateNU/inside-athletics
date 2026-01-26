@@ -23,6 +23,7 @@ func TestGetCollege(t *testing.T) {
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
 
+	// make sure college was added to db
 	if err != nil {
 		t.Fatalf("Unable to add college to table: %s", err.Error())
 	}
@@ -85,7 +86,7 @@ func TestUpdateCollege(t *testing.T) {
 		t.Fatalf("Unable to add college to table: %s", err.Error())
 	}
 
-	// updating
+	// updating - these are the only fields that should change
 	newName := "Northeastern University - Updated"
 	newState := "MA"
 	requestBody := h.UpdateCollegeRequest{
@@ -115,6 +116,8 @@ func TestUpdateCollege(t *testing.T) {
 	if response.State != "MA" {
 		t.Fatalf("Unexpected state: got %s, expected MA", response.State)
 	}
+
+	// also validate other fields did not change
 	if response.City != "Boston" {
 		t.Fatalf("Unexpected city: got %s, expected Boston", response.City)
 	}
