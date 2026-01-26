@@ -45,7 +45,7 @@ revert-single-prod:
 .PHONY: revert-dev
 # reverts single migration for dev
 revert-single-dev:
-	doppler run --comand="atlas migrate down --env dev"
+	doppler run --command="atlas migrate down --env dev"
 
 VERBOSE ?=
 V_FLAG := $(if $(filter true,$(VERBOSE)),-v,)
