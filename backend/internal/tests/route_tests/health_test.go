@@ -11,13 +11,13 @@ func TestGetGreeting(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token",)
+	resp := api.Get("/api/v1/health/", "Authorization: Bearer mock-token")
 
 	var health health.HealthResponse
 
 	DecodeTo(&health, resp)
 
-	if !strings.Contains(health.Name, "Welcome to Inside Athletics API Version 1.0.0") {
+	if !strings.Contains(health.Message, "Welcome to Inside Athletics API Version 1.0.0") {
 		t.Fatalf("Unexpected response: %s", resp.Body.String())
 	}
 }

@@ -1,166 +1,229 @@
 package routeTests
 
 import (
-    "inside-athletics/internal/handlers/sport"
-    "net/http"
-    "testing"
+	"inside-athletics/internal/handlers/sport"
+	"inside-athletics/internal/models"
+	"net/http"
+	"testing"
 )
 
 func TestCreateSport(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
+
+	if err := testDB.DB.AutoMigrate(&models.Sport{}); err != nil {
+		t.Fatalf("failed to migrate sports table: %v", err)
+	}
+
+	sport.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
+	popularity := int32(100000)
 	body := map[string]any{
-    "name":       "Women's Basketball",
-    "popularity": 100000,
+		"name":       "Women's Basketball",
+		"popularity": popularity,
 	}
 
-	resp := api.Post("/api/v1/sport/", body, "Authorization: Bearer mock-token",)
-	var sport sport.SportResponse
-	DecodeTo(&sport, resp)
+	resp := api.Post("/api/v1/sport/", body, "Authorization: Bearer mock-token")
 
-	if sport.Name != "Women's Basketball" {
-    	t.Errorf("expected name Women's Basketball, got %s", sport.Name)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	if sport.Popularity != 100000 {
-		t.Errorf("expected popularity 10, got %d", sport.Popularity)
+	var result sport.SportResponse
+	DecodeTo(&result, resp)
+
+	if result.Name != "Women's Basketball" {
+		t.Errorf("expected name Women's Basketball, got %s", result.Name)
+	}
+
+	if result.Popularity == nil || *result.Popularity != 100000 {
+		t.Errorf("expected popularity 100000, got %v", result.Popularity)
 	}
 }
 
 func TestGetSportById(t *testing.T) {
-    testDB := SetupTestDB(t)
-    defer testDB.Teardown(t)
-    api := testDB.API
-    sportDB := &SportDB{db: testDB.DB}
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
 
-    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
-    if err != nil {
-        t.Fatalf("failed to create sport", err)
-    }
+	if err := testDB.DB.AutoMigrate(&models.Sport{}); err != nil {
+		t.Fatalf("failed to migrate sports table: %v", err)
+	}
 
-    resp := api.Get("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
+	sport.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	sportDB := sport.NewSportDB(testDB.DB)
 
-    var sport sport.SportResponse
-    DecodeTo(&sport, resp)
+	popularity := int32(100000)
+	createdSport, err := sportDB.CreateSport("Women's Basketball", &popularity)
+	if err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
 
-    if sport.Name != "Women's Basketball" {
-        t.Errorf("expected name Women's Basketball, got %s", sport.Name)
-    }
+	resp := api.Get("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
 
-    if sport.Popularity != 100000 {
-        t.Errorf("expected popularity 100000, got %d", sport.Popularity)
-    }
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result sport.SportResponse
+	DecodeTo(&result, resp)
+
+	if result.Name != "Women's Basketball" {
+		t.Errorf("expected name Women's Basketball, got %s", result.Name)
+	}
+
+	if result.Popularity == nil || *result.Popularity != 100000 {
+		t.Errorf("expected popularity 100000, got %v", result.Popularity)
+	}
 }
 
 func TestGetSportByName(t *testing.T) {
-    testDB := SetupTestDB(t)
-    defer testDB.Teardown(t)
-    api := testDB.API
-	sportDB := &SportDB{db: testDB.DB}
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
 
-    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
-    if err != nil {
-        t.Fatalf("failed to create sport", err)
-    }
+	if err := testDB.DB.AutoMigrate(&models.Sport{}); err != nil {
+		t.Fatalf("failed to migrate sports table: %v", err)
+	}
 
-    resp := api.Get("/api/v1/sport/" + createdSport.Name.String(), "Authorization: Bearer mock-token")
+	sport.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	sportDB := sport.NewSportDB(testDB.DB)
 
-    var sport sport.SportResponse
-    DecodeTo(&sport, resp)
+	popularity := int32(100000)
+	_, err := sportDB.CreateSport("Women's Basketball", &popularity)
+	if err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
 
-    if sport.Name != "Women's Basketball" {
-        t.Errorf("expected name Women's Basketball, got %s", sport.Name)
-    }
+	resp := api.Get("/api/v1/sport/by-name/Women's Basketball", "Authorization: Bearer mock-token")
 
-    if sport.Popularity != 100000 {
-        t.Errorf("expected popularity 100000, got %d", sport.Popularity)
-    }
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result sport.SportResponse
+	DecodeTo(&result, resp)
+
+	if result.Name != "Women's Basketball" {
+		t.Errorf("expected name Women's Basketball, got %s", result.Name)
+	}
+
+	if result.Popularity == nil || *result.Popularity != 100000 {
+		t.Errorf("expected popularity 100000, got %v", result.Popularity)
+	}
 }
 
 func TestGetAllSports(t *testing.T) {
-    testDB := SetupTestDB(t)
-    defer testDB.Teardown(t)
-    api := testDB.API
-	sportDB := &SportDB{db: testDB.DB}
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
 
-    createdSport1, err1 := sportDB.CreateSport("Women's Basketball", 100000)
-    if err1 != nil {
-        t.Fatalf("failed to create sport 1", err1)
-    }
+	if err := testDB.DB.AutoMigrate(&models.Sport{}); err != nil {
+		t.Fatalf("failed to migrate sports table: %v", err)
+	}
 
-	createdSport2, err2 := sportDB.CreateSport("Women's Hockey", 200000)
-    if err2 != nil {
-        t.Fatalf("failed to create sport 2", err2)
-    }
+	sport.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	sportDB := sport.NewSportDB(testDB.DB)
 
-    resp := api.Get("/api/v1/sports/", "Authorization: Bearer mock-token")
+	pop1 := int32(100000)
+	pop2 := int32(200000)
+	_, err1 := sportDB.CreateSport("Women's Basketball", &pop1)
+	if err1 != nil {
+		t.Fatalf("failed to create sport 1: %v", err1)
+	}
 
-    var sports []sport.SportResponse
-    DecodeTo(&sports, resp)
+	_, err2 := sportDB.CreateSport("Women's Hockey", &pop2)
+	if err2 != nil {
+		t.Fatalf("failed to create sport 2: %v", err2)
+	}
 
-    if sports[0].Name != createdSport1.Name {
-        t.Errorf("expected name Basketball, got %s", sports[0].Name)
-    }
+	resp := api.Get("/api/v1/sports/", "Authorization: Bearer mock-token")
 
-    if sports[0].Popularity != createdSport1.Popularity {
-        t.Errorf("expected popularity 100000, got %d", sports[0].Popularity)
-    }
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
 
-	if sports[1].Name != createdSport2.Name {
-        t.Errorf("expected name Basketball, got %s", sports[1].Name)
-    }
+	var result sport.GetAllSportsResponse
+	DecodeTo(&result, resp)
 
-    if sports[1].Popularity != createdSport2.Popularity {
-        t.Errorf("expected popularity 100000, got %d", sports[1].Popularity)
-    }
+	if result.Total < 2 {
+		t.Errorf("expected at least 2 sports, got %d", result.Total)
+	}
+
+	if len(result.Sports) < 2 {
+		t.Errorf("expected at least 2 sports in response, got %d", len(result.Sports))
+	}
 }
 
 func TestUpdateSport(t *testing.T) {
-    testDB := SetupTestDB(t)
-    defer testDB.Teardown(t)
-    api := testDB.API
-	sportDB := &SportDB{db: testDB.DB}
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
 
-    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
-    if err != nil {
-        t.Fatalf("failed to create sport", err)
-    }
+	if err := testDB.DB.AutoMigrate(&models.Sport{}); err != nil {
+		t.Fatalf("failed to migrate sports table: %v", err)
+	}
 
-    resp := api.Patch("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
+	sport.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	sportDB := sport.NewSportDB(testDB.DB)
 
-    var sport sport.SportResponse
-    DecodeTo(&sport, resp)
+	popularity := int32(100000)
+	createdSport, err := sportDB.CreateSport("Women's Basketball", &popularity)
+	if err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
 
-    if sport.Name != "Men's Basketball" {
-        t.Errorf("expected name Men's Basketball, got %s", sport.Name)
-    }
+	updateBody := map[string]any{
+		"name":       "Men's Basketball",
+		"popularity": int32(200000),
+	}
 
-    if sport.Popularity != 200000 {
-        t.Errorf("expected popularity 200000, got %d", sport.Popularity)
-    }
+	resp := api.Patch("/api/v1/sport/"+createdSport.ID.String(), updateBody, "Authorization: Bearer mock-token")
+
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result sport.SportResponse
+	DecodeTo(&result, resp)
+
+	if result.Name != "Men's Basketball" {
+		t.Errorf("expected name Men's Basketball, got %s", result.Name)
+	}
+
+	if result.Popularity == nil || *result.Popularity != 200000 {
+		t.Errorf("expected popularity 200000, got %v", result.Popularity)
+	}
 }
 
 func TestDeleteSport(t *testing.T) {
-    testDB := SetupTestDB(t)
-    defer testDB.Teardown(t)
-    api := testDB.API
-	sportDB := &SportDB{db: testDB.DB}
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
 
-    createdSport, err := sportDB.CreateSport("Women's Basketball", 100000)
-    if err != nil {
-        t.Fatalf("failed to create sport", err)
-    }
+	if err := testDB.DB.AutoMigrate(&models.Sport{}); err != nil {
+		t.Fatalf("failed to migrate sports table: %v", err)
+	}
 
-    resp := api.Delete("/api/v1/sport/" + createdSport.ID.String(), "Authorization: Bearer mock-token")
+	sport.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	sportDB := sport.NewSportDB(testDB.DB)
 
-    var sport sport.SportResponse
-    DecodeTo(&sport, resp)
+	popularity := int32(100000)
+	createdSport, err := sportDB.CreateSport("Women's Basketball", &popularity)
+	if err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
 
-	resp = api.Get("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
-    if resp.Code != http.StatusNotFound {
-        t.Errorf("expected 404 after delete, got %d", resp.Code)
-    }
- 
+	resp := api.Delete("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
+
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	// Verify the sport is deleted
+	getResp := api.Get("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
+	if getResp.Code != http.StatusNotFound {
+		t.Errorf("expected 404 after delete, got %d", getResp.Code)
+	}
 }
