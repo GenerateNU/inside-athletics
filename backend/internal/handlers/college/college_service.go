@@ -43,21 +43,21 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	}, err
 }
 
-func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollegeRequest) (*utils.ResponseBody[CreateCollegeResponse], error) {
+func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollegeInput) (*utils.ResponseBody[CreateCollegeResponse], error) {
 	college := &models.College{
-		Name:         input.Name,
-		State:        input.State,
-		City:         input.City,
-		DivisionRank: input.DivisionRank,
+		Name:         input.Body.Name,
+		State:        input.Body.State,
+		City:         input.Body.City,
+		DivisionRank: input.Body.DivisionRank,
 	}
 
 	// If provided in request, use them, otherwise leave as empty string/nil
-	if input.Website != nil {
-		college.Website = *input.Website
+	if input.Body.Website != nil {
+		college.Website = *input.Body.Website
 	}
-	college.AcademicRank = input.AcademicRank
-	if input.Logo != nil {
-		college.Logo = *input.Logo
+	college.AcademicRank = input.Body.AcademicRank
+	if input.Body.Logo != nil {
+		college.Logo = *input.Body.Logo
 	}
 
 	createdCollege, err := u.collegeDB.CreateCollege(college)
@@ -88,26 +88,26 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	updates := make(map[string]interface{})
 
 	// Only include fields that are provided
-	if input.Name != nil {
-		updates["name"] = *input.Name
+	if input.Body.Name != nil {
+		updates["name"] = *input.Body.Name
 	}
-	if input.State != nil {
-		updates["state"] = *input.State
+	if input.Body.State != nil {
+		updates["state"] = *input.Body.State
 	}
-	if input.City != nil {
-		updates["city"] = *input.City
+	if input.Body.City != nil {
+		updates["city"] = *input.Body.City
 	}
-	if input.Website != nil {
-		updates["website"] = *input.Website
+	if input.Body.Website != nil {
+		updates["website"] = *input.Body.Website
 	}
-	if input.AcademicRank != nil {
-		updates["academic_rank"] = *input.AcademicRank
+	if input.Body.AcademicRank != nil {
+		updates["academic_rank"] = *input.Body.AcademicRank
 	}
-	if input.DivisionRank != nil {
-		updates["division_rank"] = *input.DivisionRank
+	if input.Body.DivisionRank != nil {
+		updates["division_rank"] = *input.Body.DivisionRank
 	}
-	if input.Logo != nil {
-		updates["logo"] = *input.Logo
+	if input.Body.Logo != nil {
+		updates["logo"] = *input.Body.Logo
 	}
 
 	college, err := u.collegeDB.UpdateCollege(id, updates)

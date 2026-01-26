@@ -1,6 +1,7 @@
 package routeTests
 
 import (
+	"bytes"
 	"encoding/json"
 	h "inside-athletics/internal/handlers/college"
 	"inside-athletics/internal/models"
@@ -56,7 +57,8 @@ func TestCreateCollege(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json", string(jsonBody))
+	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+		bytes.NewReader(jsonBody))
 
 	var response h.CreateCollegeResponse
 	DecodeTo(&response, resp)
@@ -96,7 +98,10 @@ func TestUpdateCollege(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Put("/api/v1/college/"+college.ID.String(), "Authorization: Bearer mock-token", "Content-Type: application/json", string(jsonBody))
+	resp := api.Put("/api/v1/college/"+college.ID.String(),
+		"Authorization: Bearer mock-token",
+		"Content-Type: application/json",
+		bytes.NewReader(jsonBody))
 
 	var response h.UpdateCollegeResponse
 	DecodeTo(&response, resp)

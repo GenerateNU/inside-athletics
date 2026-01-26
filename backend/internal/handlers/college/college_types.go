@@ -38,8 +38,8 @@ type CreateCollegeResponse struct {
 	Logo         *string   `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
 }
 
-type UpdateCollegeParams struct {
-	ID uuid.UUID `path:"id" example:"1" doc:"ID of the college"`
+type CreateCollegeInput struct {
+	Body CreateCollegeRequest
 }
 
 type UpdateCollegeRequest struct {
@@ -54,8 +54,8 @@ type UpdateCollegeRequest struct {
 
 // Combined input for Update (path params + body)
 type UpdateCollegeInput struct {
-	UpdateCollegeParams
-	UpdateCollegeRequest
+	ID   uuid.UUID `path:"id" example:"1" doc:"ID of the college"`
+	Body UpdateCollegeRequest
 }
 
 type UpdateCollegeResponse struct {
