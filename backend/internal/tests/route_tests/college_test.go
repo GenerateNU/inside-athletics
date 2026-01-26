@@ -13,9 +13,14 @@ func TestGetCollege(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	college := models.College{Name: "Northeastern University"}
-	userResp := testDB.DB.Create(&college)
-	_, err := utils.HandleDBError(&college, userResp.Error)
+	college := models.College{
+		Name:         "Northeastern University",
+		State:        "Massachusetts",
+		City:         "Boston",
+		DivisionRank: 1,
+	}
+	collegeResp := testDB.DB.Create(&college)
+	_, err := utils.HandleDBError(&college, collegeResp.Error)
 
 	if err != nil {
 		t.Fatalf("Unable to add college to table: %s", err.Error())
