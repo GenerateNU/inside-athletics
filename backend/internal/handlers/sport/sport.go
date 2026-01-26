@@ -1,10 +1,10 @@
 package sport
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -14,86 +14,127 @@ type SportHandler struct {
 
 func NewSportHandler(db *gorm.DB) *SportHandler {
 	return &SportHandler{
-		db: &SportDB{db: db},
+		db: NewSportDB(db),
 	}
+}
+
+// Error response helpers
+func (h *SportHandler) respondWithError(c *gin.Context, statusCode int, message string) {
+	c.JSON(statusCode, gin.H{"error": message})
+}
+
+func (h *SportHandler) handleDBError(c *gin.Context, err error) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		h.respondWithError(c, http.StatusNotFound, "Sport not found")
+		return
+	}
+	h.respondWithError(c, http.StatusInternalServerError, err.Error())
 }
 
 func (h *SportHandler) CreateSport(c *gin.Context) {
 	var req CreateSportRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		h.respondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	sport, err := h.db.CreateSport(req.Name, req.Popularity)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		h.handleDBError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, sport)
+	c.JSON(http.StatusCreated, ToSportResponse(sport))
 }
 
-func (h *SportHandler) GetSportById(c *gin.Context) {
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
+func (h *SportHandler) GetSportByID(c *gin.Context) {
+	var params GetSportByIDParams
+	if err := c.ShouldBindUri(&params); err != nil {
+		h.respondWithError(c, http.StatusBadRequest, "Invalid sport ID")
 		return
 	}
 
-	sport, err := h.db.GetSportById(id)
+	sport, err := h.db.GetSportByID(params.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		h.handleDBError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, sport)
+	c.JSON(http.StatusOK, ToSportResponse(sport))
 }
 
 func (h *SportHandler) GetAllSports(c *gin.Context) {
-	sports, err := h.db.GetAllSports()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	var params GetAllSportsParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		h.respondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, sports)
+	sports, total, err := h.db.GetAllSports(params.Limit, params.Offset)
+	if err != nil {
+		h.handleDBError(c, err)
+		return
+	}
+
+	sportResponses := make([]SportResponse, 0, len(sports))
+	for i := range sports {
+		sportResponses = append(sportResponses, *ToSportResponse(&sports[i]))
+	}
+
+	c.JSON(http.StatusOK, GetAllSportsResponse{
+		Sports: sportResponses,
+		Total:  int(total),
+	})
 }
 
 func (h *SportHandler) UpdateSport(c *gin.Context) {
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
+	var params GetSportByIDParams
+	if err := c.ShouldBindUri(&params); err != nil {
+		h.respondWithError(c, http.StatusBadRequest, "Invalid sport ID")
 		return
 	}
 
-	var req CreateSportRequest
+	var req UpdateSportRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		h.respondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	sport, err := h.db.UpdateSport(id, req.Name, req.Popularity)
+	existingSport, err := h.db.GetSportByID(params.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		h.handleDBError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, sport)
+	// Apply partial updates
+	if req.Name != nil {
+		existingSport.Name = *req.Name
+	}
+	if req.Popularity != nil {
+		existingSport.Popularity = req.Popularity
+	}
+
+	sport, err := h.db.UpdateSport(existingSport)
+	if err != nil {
+		h.handleDBError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, ToSportResponse(sport))
 }
 
 func (h *SportHandler) DeleteSport(c *gin.Context) {
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
+	var params DeleteSportRequest
+	if err := c.ShouldBindUri(&params); err != nil {
+		h.respondWithError(c, http.StatusBadRequest, "Invalid sport ID")
 		return
 	}
 
-	sport, err := h.db.DeleteSport(id)
+	err := h.db.DeleteSport(params.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		h.handleDBError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, sport)
+	c.JSON(http.StatusNoContent, nil)
 }

@@ -2,131 +2,141 @@ package sport
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"inside-athletics/internal/utils"
+
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type SportService struct {
 	sportDB *SportDB
 }
 
-// connect to DB and create a new sport
-func (u *SportService) CreateSport(ctx context.Context, input *struct {
-	Body CreateSportRequest
-}) (*utils.ResponseBody[SportResponse], error) {
-	body != &input.Body
-	sport, err := u.sportDB.CreateSport(body)
-	respBody := &utils.ResponseBody[SportResponse]{}
+// NewSportService creates a new SportService instance
+func NewSportService(db *gorm.DB) *SportService {
+	return &SportService{
+		sportDB: NewSportDB(db),
+	}
+}
 
-	if err != nil {
-		return respBody, err
+func (s *SportService) CreateSport(ctx context.Context, input *struct{ Body CreateSportRequest }) (*utils.ResponseBody[SportResponse], error) {
+	// Validate business rules
+	if input.Body.Name == "" {
+		return nil, fmt.Errorf("name cannot be empty")
+	}
+	if input.Body.Popularity != nil && *input.Body.Popularity < 0 {
+		return nil, fmt.Errorf("popularity cannot be negative")
 	}
 
-	response := &SportResponse{
-		ID:   sport.ID,
-		Name: sport.Name,
+	sport, err := s.sportDB.CreateSport(input.Body.Name, input.Body.Popularity)
+	if err != nil {
+		return nil, err
 	}
 
 	return &utils.ResponseBody[SportResponse]{
-		Body: response,
+		Body: ToSportResponse(sport),
 	}, nil
 }
 
-// connect to DB and get a sport by name
-func (u *SportService) GetSportByName(ctx context.Context, input *GetSportByNameParams) (*utils.ResponseBody[SportResponse], error) {
-	name := input.Name
-	sport, err := u.sportDB.GetSportByName(name)
-	respBody := &utils.ResponseBody[SportResponse]{}
-
+func (s *SportService) GetSportByName(ctx context.Context, input *GetSportByNameParams) (*utils.ResponseBody[SportResponse], error) {
+	sport, err := s.sportDB.GetSportByName(input.Name)
 	if err != nil {
-		return respBody, err
-	}
-
-	response := &SportResponse{
-		ID:   sport.ID,
-		Name: sport.Name,
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, huma.Error404NotFound("sport not found")
+		}
+		return nil, err
 	}
 
 	return &utils.ResponseBody[SportResponse]{
-		Body: response,
-	}, err
+		Body: ToSportResponse(sport),
+	}, nil
 }
 
-// connect to DB and get all sports
-func (u *SportService) GetAllSports(ctx context.Context, input *GetAllSportsParams) (*utils.ResponseBody[GetAllSportsResponse], error) {
-	sports, err := u.sportDB.GetAllSports()
-	respBody := &utils.ResponseBody[GetAllSportsResponse]{}
-
+func (s *SportService) GetAllSports(ctx context.Context, input *GetAllSportsParams) (*utils.ResponseBody[GetAllSportsResponse], error) {
+	sports, total, err := s.sportDB.GetAllSports(input.Limit, input.Offset)
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 
-	response := &GetAllSportsResponse{
-		Sports: sports,
+	sportResponses := make([]SportResponse, 0, len(sports))
+	for i := range sports {
+		sportResponses = append(sportResponses, *ToSportResponse(&sports[i]))
 	}
 
 	return &utils.ResponseBody[GetAllSportsResponse]{
-		Body: response,
+		Body: &GetAllSportsResponse{
+			Sports: sportResponses,
+			Total:  int(total),
+		},
 	}, nil
 }
 
-//connect to DB and get sport by ID
-func (u *SportService) GetSportByID(ctx context.Context, input *GetSportByIDParams) (*utils.ResponseBody[SportResponse], error) {
-	id := input.ID
-	sport, err := u.sportDB.GetSportById(id)
-	respBody := &utils.ResponseBody[SportResponse]{}
-
+func (s *SportService) GetSportByID(ctx context.Context, input *GetSportByIDParams) (*utils.ResponseBody[SportResponse], error) {
+	sport, err := s.sportDB.GetSportByID(input.ID)
 	if err != nil {
-		return respBody, err
-	}
-
-	response := &SportResponse{
-		ID:   sport.ID,
-		Name: sport.Name,
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, huma.Error404NotFound("sport not found")
+		}
+		return nil, err
 	}
 
 	return &utils.ResponseBody[SportResponse]{
-		Body: response,
+		Body: ToSportResponse(sport),
 	}, nil
 }
 
-// Connect to DB and update existing sport
-func (u *SportService) UpdateSport(ctx context.Context, input *struct {
-    Body UpdateSportRequest 
+func (s *SportService) UpdateSport(ctx context.Context, input *struct {
+	ID   uuid.UUID `path:"id"`
+	Body UpdateSportRequest
 }) (*utils.ResponseBody[SportResponse], error) {
-    body := &input.Body
-    sport, err := u.sportDB.UpdateSport(body.ID, body.Name)
-    respBody := &utils.ResponseBody[SportResponse]{}
+	sport, err := s.sportDB.GetSportByID(input.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, huma.Error404NotFound("sport not found")
+		}
+		return nil, err
+	}
 
-    if err != nil {
-        return respBody, err
-    }
+	// Apply partial updates
+	if input.Body.Name != nil {
+		if *input.Body.Name == "" {
+			return nil, fmt.Errorf("name cannot be empty")
+		}
+		sport.Name = *input.Body.Name
+	}
 
-    response := &SportResponse{
-        ID:   sport.ID,
-        Name: sport.Name,
-    }
+	if input.Body.Popularity != nil {
+		if *input.Body.Popularity < 0 {
+			return nil, fmt.Errorf("popularity cannot be negative")
+		}
+		sport.Popularity = input.Body.Popularity
+	}
 
-    return &utils.ResponseBody[SportResponse]{
-        Body: response,
-    }, nil
+	updatedSport, err := s.sportDB.UpdateSport(sport)
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[SportResponse]{
+		Body: ToSportResponse(updatedSport),
+	}, nil
 }
 
-// Connect to DB and delete sport
-func (u *SportService) DeleteSport(ctx context.Context, input *struct {
-	Body DeleteSportRequest
-}) (*utils.ResponseBody[DeleteSportResponse], error) {
-	err := u.sportDB.DeleteSport(input.Body.ID)
-	respBody := &utils.ResponseBody[DeleteSportResponse]{}
-
+func (s *SportService) DeleteSport(ctx context.Context, input *DeleteSportRequest) (*utils.ResponseBody[map[string]string], error) {
+	err := s.sportDB.DeleteSport(input.ID)
 	if err != nil {
-		return respBody, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, huma.Error404NotFound("sport not found")
+		}
+		return nil, err
 	}
 
-	response := &DeleteSportResponse{
-		ID: input.Body.ID,
-	}
-
-	return &utils.ResponseBody[DeleteSportResponse]{
-		Body: response,
+	return &utils.ResponseBody[map[string]string]{
+		Body: &map[string]string{
+			"message": "Sport deleted successfully",
+		},
 	}, nil
 }
