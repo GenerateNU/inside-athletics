@@ -1,8 +1,8 @@
 package goat
 
 import (
-    "context"
-    "inside-athletics/internal/utils"
+	"context"
+	"inside-athletics/internal/utils"
 )
 
 type GoatService struct {
@@ -30,7 +30,7 @@ func (g *GoatService) GetGoat(ctx context.Context, input *GetGoatParams) (*utils
 	}
 
 	resp.Body = &GoatResponse{
-		Id:   int8(goat.ID),
+		Id:   int8(id),
 		Name: goat.Name,
 		Age:  goat.Age,
 	}
