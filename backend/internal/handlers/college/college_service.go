@@ -10,6 +10,14 @@ type CollegeService struct {
 	collegeDB *CollegeDB
 }
 
+// Convert empty string to nil pointer
+func StringPtrOrNil(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
+}
+
 func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams) (*utils.ResponseBody[GetCollegeResponse], error) {
 	id := input.ID
 	college, err := u.collegeDB.GetCollege(id)
@@ -24,10 +32,10 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 		Name:         college.Name,
 		State:        college.State,
 		City:         college.City,
-		Website:      &college.Website,
+		Website:      StringPtrOrNil(college.Website),
 		AcademicRank: college.AcademicRank,
 		DivisionRank: college.DivisionRank,
-		Logo:         &college.Logo,
+		Logo:         StringPtrOrNil(college.Logo),
 	}
 
 	return &utils.ResponseBody[GetCollegeResponse]{
@@ -43,6 +51,15 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 		DivisionRank: input.DivisionRank,
 	}
 
+	// If provided in request, use them, otherwise leave as empty string/nil
+	if input.Website != nil {
+		college.Website = *input.Website
+	}
+	college.AcademicRank = input.AcademicRank
+	if input.Logo != nil {
+		college.Logo = *input.Logo
+	}
+
 	createdCollege, err := u.collegeDB.CreateCollege(college)
 	respBody := &utils.ResponseBody[CreateCollegeResponse]{}
 
@@ -55,10 +72,10 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 		Name:         createdCollege.Name,
 		State:        createdCollege.State,
 		City:         createdCollege.City,
-		Website:      &createdCollege.Website,
+		Website:      StringPtrOrNil(createdCollege.Website),
 		AcademicRank: createdCollege.AcademicRank,
 		DivisionRank: createdCollege.DivisionRank,
-		Logo:         &createdCollege.Logo,
+		Logo:         StringPtrOrNil(createdCollege.Logo),
 	}
 
 	return &utils.ResponseBody[CreateCollegeResponse]{
@@ -69,6 +86,29 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollegeInput) (*utils.ResponseBody[UpdateCollegeResponse], error) {
 	id := input.ID
 	updates := make(map[string]interface{})
+
+	// Only include fields that are provided
+	if input.Name != nil {
+		updates["name"] = *input.Name
+	}
+	if input.State != nil {
+		updates["state"] = *input.State
+	}
+	if input.City != nil {
+		updates["city"] = *input.City
+	}
+	if input.Website != nil {
+		updates["website"] = *input.Website
+	}
+	if input.AcademicRank != nil {
+		updates["academic_rank"] = *input.AcademicRank
+	}
+	if input.DivisionRank != nil {
+		updates["division_rank"] = *input.DivisionRank
+	}
+	if input.Logo != nil {
+		updates["logo"] = *input.Logo
+	}
 
 	college, err := u.collegeDB.UpdateCollege(id, updates)
 	respBody := &utils.ResponseBody[UpdateCollegeResponse]{}
@@ -82,10 +122,10 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 		Name:         college.Name,
 		State:        college.State,
 		City:         college.City,
-		Website:      &college.Website,
+		Website:      StringPtrOrNil(college.Website),
 		AcademicRank: college.AcademicRank,
 		DivisionRank: college.DivisionRank,
-		Logo:         &college.Logo,
+		Logo:         StringPtrOrNil(college.Logo),
 	}
 
 	return &utils.ResponseBody[UpdateCollegeResponse]{
