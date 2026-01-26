@@ -80,7 +80,7 @@ func TestCreateUser(t *testing.T) {
 		ExpectedGradYear:      2027,
 		VerifiedAthleteStatus: "pending",
 		College:               strPtr("Northeastern University"),
-		Division:              uint8Ptr(1),
+		Division:              uintPtr(1),
 	}
 
 	resp := api.Post("/api/v1/user/", "Authorization: Bearer "+userID, payload)
@@ -161,6 +161,6 @@ func strPtr(v string) *string {
 	return &v
 }
 
-func uint8Ptr(v uint8) *uint8 {
+func uintPtr(v uint) *uint {
 	return &v
 }

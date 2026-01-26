@@ -24,7 +24,7 @@ type User struct {
 	Expected_Grad_Year      uint       `json:"expected_grad_year" example:"2027" doc:"The user's grad year" gorm:"type:unint8;"`       //nullable
 	Verified_Athlete_Status string     `json:"verified_athelete_status" example:"pending" doc:"" gorm:"type:varchar(100);not null"`
 	College                 *string    `json:"college" example:"Northeastern University" doc:"The college of a user" gorm:"type:varchar(100);"`
-	Division                *uint8     `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint8;"`
+	Division                *uint      `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint;"`
 }
 
 // Validate the user

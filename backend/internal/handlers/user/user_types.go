@@ -30,7 +30,7 @@ type CreateUserBody struct {
 	ExpectedGradYear         uint     `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus   string   `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
 	College                 *string  `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
-	Division                *uint8   `json:"division,omitempty" example:"1" doc:"The division of their college"`
+	Division                *uint    `json:"division,omitempty" example:"1" doc:"The division of their college"`
 }
 
 type CreateUserResponse struct {
@@ -54,7 +54,7 @@ type UpdateUserBody struct {
 	ExpectedGradYear      *uint     `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus *string   `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`
 	College               *string   `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
-	Division              *uint8    `json:"division,omitempty" example:"1" doc:"The division of their college"`
+	Division              *uint     `json:"division,omitempty" example:"1" doc:"The division of their college"`
 }
 
 type UpdateUserResponse struct {
