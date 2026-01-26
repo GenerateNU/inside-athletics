@@ -15,9 +15,6 @@ import (
 // contextKey is a private type to avoid collisions in context keys.
 type contextKey string
 
-// Optionally define a key constant to use when storing/retrieving the user id.
-const userIDContextKey contextKey = "user_id"
-
 /**
 Middleware used for verifying JWT in Authorization header
 and injecting userID into context for use across all API
