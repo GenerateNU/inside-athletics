@@ -14,6 +14,16 @@ CREATE TABLE "public"."users" (
   "created_at" timestamptz NULL,
   "updated_at" timestamptz NULL,
   "deleted_at" timestamptz NULL,
-  "name" character varying(100) NOT NULL,
+  "first_name" character varying(100) NOT NULL,
+  "last_name" character varying(100) NOT NULL,
+  "email" character varying(100) NOT NULL,
+  "username" character varying(100) NOT NULL,
+  "bio" character varying(100) NULL,
+  "account_type" boolean NOT NULL,
+  "sport" jsonb NULL,
+  "expected_grad_year" smallint NULL,
+  "verified_athlete_status" character varying(100) NOT NULL,
+  "college" character varying(100) NULL,
+  "division" smallint NULL,
   PRIMARY KEY ("id")
 );

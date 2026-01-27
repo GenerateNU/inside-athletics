@@ -1,16 +1,19 @@
 package server
 
 import (
-	"context"
-	"log"
-	"net/http"
-	"os"
-	"strings"
+    "context"
+    "log"
+    "net/http"
+    "os"
+    "strings"
 
-	"github.com/MicahParks/keyfunc/v3"
-	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
+    "github.com/MicahParks/keyfunc/v3"
+    "github.com/gofiber/fiber/v2"
+    "github.com/golang-jwt/jwt/v5"
 )
+
+// contextKey is a private type to avoid collisions in context keys.
+type contextKey string
 
 /**
 Middleware used for verifying JWT in Authorization header
@@ -75,7 +78,8 @@ func AuthMiddleware(c *fiber.Ctx) error {
             "error": "Unable to extract user ID",
         })
     }
-    
+
     c.Locals("user_id", userID)
+    c.SetUserContext(context.WithValue(c.UserContext(), contextKey("user_id"), userID))
     return c.Next()
 }
