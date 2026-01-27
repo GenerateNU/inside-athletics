@@ -18,6 +18,7 @@ func TestGetCollege(t *testing.T) {
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
 		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
 		DivisionRank: 1,
 	}
 	collegeResp := testDB.DB.Create(&college)
@@ -49,6 +50,7 @@ func TestCreateCollege(t *testing.T) {
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
 		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
 		DivisionRank: 1,
 	}
 
@@ -78,6 +80,7 @@ func TestUpdateCollege(t *testing.T) {
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
 		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
 		DivisionRank: 1,
 	}
 	collegeResp := testDB.DB.Create(&college)
@@ -135,6 +138,7 @@ func TestDeleteCollege(t *testing.T) {
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
 		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
 		DivisionRank: 1,
 	}
 	collegeResp := testDB.DB.Create(&college)
@@ -148,50 +152,136 @@ func TestDeleteCollege(t *testing.T) {
 	var response h.DeleteCollegeResponse
 	DecodeTo(&response, resp)
 
-	if response.Message != "College deleted successfully" {
-		t.Fatalf("Unexpected message: got %s, expected College deleted successfully", response.Message)
+	expectedMessage := "College " + college.ID.String() + " deleted successfully"
+	if response.Message != expectedMessage {
+		t.Fatalf("Unexpected message: got %s, expected %s", response.Message, expectedMessage)
+	}
+	if response.ID != college.ID {
+		t.Fatalf("Unexpected ID: got %s, expected %s", response.ID.String(), college.ID.String())
 	}
 }
 
-func TestStringPtrOrNil(t *testing.T) {
-	tests := []struct {
-		name  string
-		input string
-	}{
-		{
-			name:  "empty string returns nil",
-			input: "",
-		},
-		{
-			name:  "non-empty string returns pointer to string",
-			input: "https://www.northeastern.edu",
-		},
-		{
-			name:  "string with spaces returns pointer",
-			input: "  ",
-		},
-		{
-			name:  "single character returns pointer",
-			input: "a",
-		},
+func TestCreateCollegeMissingName(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	requestBody := h.CreateCollegeRequest{
+		State:        "Massachusetts",
+		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
+		DivisionRank: 1,
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := h.StringPtrOrNil(tt.input)
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatalf("Unable to marshal request body: %s", err.Error())
+	}
 
-			if tt.input == "" {
-				if result != nil {
-					t.Fatalf("expected nil for empty string, got %v", result)
-				}
-			} else {
-				if result == nil {
-					t.Fatalf("expected pointer to %s, got nil", tt.input)
-				}
-				if *result != tt.input {
-					t.Fatalf("expected %s, got %s", tt.input, *result)
-				}
-			}
-		})
+	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+		bytes.NewReader(jsonBody))
+
+	if resp.Code < 400 {
+		t.Fatalf("Expected error response for missing name, got status %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestCreateCollegeMissingState(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	requestBody := h.CreateCollegeRequest{
+		Name:         "Northeastern University",
+		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
+		DivisionRank: 1,
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatalf("Unable to marshal request body: %s", err.Error())
+	}
+
+	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+		bytes.NewReader(jsonBody))
+
+	if resp.Code < 400 {
+		t.Fatalf("Expected error response for missing state, got status %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestCreateCollegeMissingCity(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	requestBody := h.CreateCollegeRequest{
+		Name:         "Northeastern University",
+		State:        "Massachusetts",
+		Website:      "https://www.northeastern.edu",
+		DivisionRank: 1,
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatalf("Unable to marshal request body: %s", err.Error())
+	}
+
+	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+		bytes.NewReader(jsonBody))
+
+	if resp.Code < 400 {
+		t.Fatalf("Expected error response for missing city, got status %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestCreateCollegeMissingDivisionRank(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	requestBody := h.CreateCollegeRequest{
+		Name:    "Northeastern University",
+		State:   "Massachusetts",
+		City:    "Boston",
+		Website: "https://www.northeastern.edu",
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatalf("Unable to marshal request body: %s", err.Error())
+	}
+
+	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+		bytes.NewReader(jsonBody))
+
+	if resp.Code < 400 {
+		t.Fatalf("Expected error response for missing division rank, got status %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestCreateCollegeMissingWebsite(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	requestBody := h.CreateCollegeRequest{
+		Name:         "Northeastern University",
+		State:        "Massachusetts",
+		City:         "Boston",
+		DivisionRank: 1,
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatalf("Unable to marshal request body: %s", err.Error())
+	}
+
+	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+		bytes.NewReader(jsonBody))
+
+	if resp.Code < 400 {
+		t.Fatalf("Expected error response for missing website, got status %d: %s", resp.Code, resp.Body.String())
 	}
 }

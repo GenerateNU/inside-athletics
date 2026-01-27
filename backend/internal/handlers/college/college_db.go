@@ -46,8 +46,9 @@ func (c *CollegeDB) UpdateCollege(id uuid.UUID, updates map[string]interface{}) 
 		return nil, handleErr
 	}
 
-	// Reload to get updated data
-	if err := c.db.Where("id = ?", id).First(&college).Error; err != nil {
+	// Reload to get updated data - GORM's Updates() only updates the database,
+	// not the struct fields, so we need to query again to get the persisted state
+	if err := c.db.First(&college, id).Error; err != nil {
 		_, handleErr := utils.HandleDBError(&college, err)
 		return nil, handleErr
 	}

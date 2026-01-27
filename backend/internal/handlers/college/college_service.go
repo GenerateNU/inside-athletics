@@ -2,6 +2,7 @@ package college
 
 import (
 	"context"
+	"fmt"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 )
@@ -17,6 +18,35 @@ func StringPtrOrNil(s string) *string {
 		return nil
 	}
 	return &s
+}
+
+// Creates a map of non-nil fields to update
+func buildUpdateMap(body *UpdateCollegeRequest) map[string]interface{} {
+	updates := make(map[string]interface{})
+
+	if body.Name != nil {
+		updates["name"] = *body.Name
+	}
+	if body.State != nil {
+		updates["state"] = *body.State
+	}
+	if body.City != nil {
+		updates["city"] = *body.City
+	}
+	if body.Website != nil {
+		updates["website"] = *body.Website
+	}
+	if body.AcademicRank != nil {
+		updates["academic_rank"] = *body.AcademicRank
+	}
+	if body.DivisionRank != nil {
+		updates["division_rank"] = *body.DivisionRank
+	}
+	if body.Logo != nil {
+		updates["logo"] = *body.Logo
+	}
+
+	return updates
 }
 
 // Retrieves single college by ID
@@ -35,7 +65,7 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 		Name:         college.Name,
 		State:        college.State,
 		City:         college.City,
-		Website:      StringPtrOrNil(college.Website),
+		Website:      college.Website,
 		AcademicRank: college.AcademicRank,
 		DivisionRank: college.DivisionRank,
 		Logo:         StringPtrOrNil(college.Logo),
@@ -52,15 +82,10 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 		Name:         input.Body.Name,
 		State:        input.Body.State,
 		City:         input.Body.City,
+		Website:      input.Body.Website,
 		DivisionRank: input.Body.DivisionRank,
+		AcademicRank: input.Body.AcademicRank,
 	}
-
-	// If provided in request, use them, otherwise leave as empty string/nil
-	if input.Body.Website != nil {
-		college.Website = *input.Body.Website
-	}
-
-	college.AcademicRank = input.Body.AcademicRank
 	if input.Body.Logo != nil {
 		college.Logo = *input.Body.Logo
 	}
@@ -77,7 +102,7 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 		Name:         createdCollege.Name,
 		State:        createdCollege.State,
 		City:         createdCollege.City,
-		Website:      StringPtrOrNil(createdCollege.Website),
+		Website:      createdCollege.Website,
 		AcademicRank: createdCollege.AcademicRank,
 		DivisionRank: createdCollege.DivisionRank,
 		Logo:         StringPtrOrNil(createdCollege.Logo),
@@ -91,30 +116,7 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 // Updates fields inputted in request
 func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollegeInput) (*utils.ResponseBody[UpdateCollegeResponse], error) {
 	id := input.ID
-	updates := make(map[string]interface{})
-
-	// Only include fields that are provided
-	if input.Body.Name != nil {
-		updates["name"] = *input.Body.Name
-	}
-	if input.Body.State != nil {
-		updates["state"] = *input.Body.State
-	}
-	if input.Body.City != nil {
-		updates["city"] = *input.Body.City
-	}
-	if input.Body.Website != nil {
-		updates["website"] = *input.Body.Website
-	}
-	if input.Body.AcademicRank != nil {
-		updates["academic_rank"] = *input.Body.AcademicRank
-	}
-	if input.Body.DivisionRank != nil {
-		updates["division_rank"] = *input.Body.DivisionRank
-	}
-	if input.Body.Logo != nil {
-		updates["logo"] = *input.Body.Logo
-	}
+	updates := buildUpdateMap(&input.Body)
 
 	college, err := u.collegeDB.UpdateCollege(id, updates)
 
@@ -128,7 +130,7 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 		Name:         college.Name,
 		State:        college.State,
 		City:         college.City,
-		Website:      StringPtrOrNil(college.Website),
+		Website:      college.Website,
 		AcademicRank: college.AcademicRank,
 		DivisionRank: college.DivisionRank,
 		Logo:         StringPtrOrNil(college.Logo),
@@ -150,7 +152,8 @@ func (u *CollegeService) DeleteCollege(ctx context.Context, input *DeleteCollege
 	}
 
 	response := &DeleteCollegeResponse{
-		Message: "College deleted successfully",
+		Message: fmt.Sprintf("College %s deleted successfully", id.String()),
+		ID:      id,
 	}
 
 	return &utils.ResponseBody[DeleteCollegeResponse]{
