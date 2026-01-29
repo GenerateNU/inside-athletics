@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CollegeDB struct {
@@ -33,22 +34,15 @@ func (c *CollegeDB) CreateCollege(college *models.College) (*models.College, err
 func (c *CollegeDB) UpdateCollege(id uuid.UUID, updates map[string]interface{}) (*models.College, error) {
 	var college models.College
 
-	// First check if college exists
-	if err := c.db.Where("id = ?", id).First(&college).Error; err != nil {
-		_, handleErr := utils.HandleDBError(&college, err)
-		return nil, handleErr
-	}
+	dbResponse := c.db.
+		Model(&models.College{}).
+		Where("id = ?", id).
+		Clauses(clause.Returning{}).
+		Updates(updates).
+		Scan(&college)
 
-	// Update the college
-	dbResponse := c.db.Model(&college).Updates(updates)
 	if dbResponse.Error != nil {
 		_, handleErr := utils.HandleDBError(&college, dbResponse.Error)
-		return nil, handleErr
-	}
-
-	// Reload to get updated data
-	if err := c.db.First(&college, id).Error; err != nil {
-		_, handleErr := utils.HandleDBError(&college, err)
 		return nil, handleErr
 	}
 
