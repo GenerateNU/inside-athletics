@@ -1,6 +1,10 @@
 package user
 
-import "github.com/google/uuid"
+import (
+	models "inside-athletics/internal/models"
+
+	"github.com/google/uuid"
+)
 
 type GetUserParams struct {
 	ID uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID to identify the user"`
@@ -28,9 +32,9 @@ type CreateUserBody struct {
 	AccountType             bool     `json:"account_type" example:"true" doc:"If the user has access to premium features"`
 	Sport                   []string `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear         uint     `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
-	VerifiedAthleteStatus   string   `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
+	VerifiedAthleteStatus   models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
 	College                 *string  `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
-	Division                *uint    `json:"division,omitempty" example:"1" doc:"The division of their college"`
+	Division                *models.Division `json:"division,omitempty" example:"1" doc:"The division of their college"`
 }
 
 type CreateUserResponse struct {
@@ -52,9 +56,9 @@ type UpdateUserBody struct {
 	AccountType           *bool     `json:"account_type,omitempty" example:"true" doc:"If the user has access to premium features"`
 	Sport                 *[]string `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear      *uint     `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
-	VerifiedAthleteStatus *string   `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`
+	VerifiedAthleteStatus *models.VerifiedAthleteStatus `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`
 	College               *string   `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
-	Division              *uint     `json:"division,omitempty" example:"1" doc:"The division of their college"`
+	Division              *models.Division `json:"division,omitempty" example:"1" doc:"The division of their college"`
 }
 
 type UpdateUserResponse struct {

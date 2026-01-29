@@ -7,6 +7,7 @@ import (
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/google/uuid"
 )
 
 type UserService struct {
@@ -46,7 +47,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetCurrentUserIDResponse], error) {
 	respBody := &utils.ResponseBody[GetCurrentUserIDResponse]{}
 
-	userID, err := u.userDB.GetCurrentUserID(ctx)
+	userID, err := u.getCurrentUserID(ctx)
 	if err != nil {
 		return respBody, err
 	}
@@ -61,7 +62,7 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*utils.ResponseBody[CreateUserResponse], error) {
 	respBody := &utils.ResponseBody[CreateUserResponse]{}
 
-	currentUserID, err := u.userDB.GetCurrentUserID(ctx)
+	currentUserID, err := u.getCurrentUserID(ctx)
 	if err != nil {
 		return respBody, err
 	}
@@ -183,4 +184,23 @@ func marshalSport(sport []string) ([]byte, error) {
 		return nil, huma.Error400BadRequest("Invalid sport values", err)
 	}
 	return sportJSON, nil
+}
+
+func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
+	rawID := ctx.Value("user_id")
+	if rawID == nil {
+		return uuid.Nil, huma.Error401Unauthorized("User not authenticated")
+	}
+
+	userID, ok := rawID.(string)
+	if !ok {
+		return uuid.Nil, huma.Error500InternalServerError("Invalid user ID in context")
+	}
+
+	parsedID, err := uuid.Parse(userID)
+	if err != nil {
+		return uuid.Nil, huma.Error400BadRequest("Invalid user ID", err)
+	}
+
+	return parsedID, nil
 }

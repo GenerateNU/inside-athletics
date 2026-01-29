@@ -24,7 +24,7 @@ func TestGetUser(t *testing.T) {
 		Email:                   "suli@example.com",
 		Username:                "suli",
 		Account_Type:            false,
-		Verified_Athlete_Status: "pending",
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -78,9 +78,9 @@ func TestCreateUser(t *testing.T) {
 		AccountType:           true,
 		Sport:                 []string{"hockey"},
 		ExpectedGradYear:      2027,
-		VerifiedAthleteStatus: "pending",
+		VerifiedAthleteStatus: models.VerifiedAthleteStatusPending,
 		College:               strPtr("Northeastern University"),
-		Division:              uintPtr(1),
+		Division:              divisionPtr(models.DivisionI),
 	}
 
 	resp := api.Post("/api/v1/user/", "Authorization: Bearer "+userID, payload)
@@ -105,7 +105,7 @@ func TestUpdateUser(t *testing.T) {
 		Email:                   "suli@example.com",
 		Username:                "suli",
 		Account_Type:            false,
-		Verified_Athlete_Status: "pending",
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -139,7 +139,7 @@ func TestDeleteUser(t *testing.T) {
 		Email:                   "suli@example.com",
 		Username:                "suli",
 		Account_Type:            false,
-		Verified_Athlete_Status: "pending",
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -161,6 +161,6 @@ func strPtr(v string) *string {
 	return &v
 }
 
-func uintPtr(v uint) *uint {
+func divisionPtr(v models.Division) *models.Division {
 	return &v
 }
