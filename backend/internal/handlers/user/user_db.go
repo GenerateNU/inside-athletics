@@ -29,18 +29,18 @@ func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
 	return utils.HandleDBError(user, dbResponse.Error)
 }
 
-func (u *UserDB) UpdateUser(user *models.User) (*models.User, error) {
+func (u *UserDB) UpdateUser(id uuid.UUID, updates map[string]interface{}) (*models.User, error) {
 	dbResponse := u.db.Model(&models.User{}).
-		Where("id = ?", user.ID).
-		Select("*").
-		Updates(user)
+		Where("id = ?", id).
+		Updates(updates)
 	if dbResponse.Error != nil {
-		return utils.HandleDBError(user, dbResponse.Error)
+		_, err := utils.HandleDBError(&models.User{}, dbResponse.Error)
+		return nil, err
 	}
 	if dbResponse.RowsAffected == 0 {
 		return nil, huma.Error404NotFound("Resource not found")
 	}
-	return user, nil
+	return u.GetUser(id)
 }
 
 func (u *UserDB) DeleteUser(id uuid.UUID) error {

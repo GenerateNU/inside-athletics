@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"reflect"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -129,51 +131,12 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*utils.ResponseBody[UpdateUserResponse], error) {
 	respBody := &utils.ResponseBody[UpdateUserResponse]{}
 
-	user, err := u.userDB.GetUser(input.ID)
+	updates, err := buildUserUpdates(input.Body)
 	if err != nil {
 		return respBody, err
 	}
 
-	body := input.Body
-	if body.FirstName != nil {
-		user.FirstName = *body.FirstName
-	}
-	if body.LastName != nil {
-		user.LastName = *body.LastName
-	}
-	if body.Email != nil {
-		user.Email = *body.Email
-	}
-	if body.Username != nil {
-		user.Username = *body.Username
-	}
-	if body.Bio != nil {
-		user.Bio = body.Bio
-	}
-	if body.AccountType != nil {
-		user.Account_Type = *body.AccountType
-	}
-	if body.Sport != nil {
-		sportJSON, err := marshalSport(*body.Sport)
-		if err != nil {
-			return respBody, err
-		}
-		user.Sport = sportJSON
-	}
-	if body.ExpectedGradYear != nil {
-		user.Expected_Grad_Year = *body.ExpectedGradYear
-	}
-	if body.VerifiedAthleteStatus != nil {
-		user.Verified_Athlete_Status = *body.VerifiedAthleteStatus
-	}
-	if body.College != nil {
-		user.College = body.College
-	}
-	if body.Division != nil {
-		user.Division = body.Division
-	}
-
-	updatedUser, err := u.userDB.UpdateUser(user)
+	updatedUser, err := u.userDB.UpdateUser(input.ID, updates)
 	if err != nil {
 		return respBody, err
 	}
@@ -199,6 +162,46 @@ func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*ut
 	}
 
 	return respBody, nil
+}
+
+func buildUserUpdates(body UpdateUserBody) (map[string]interface{}, error) {
+	updates := make(map[string]interface{})
+	val := reflect.ValueOf(body)
+	typ := reflect.TypeOf(body)
+
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		tag := field.Tag.Get("json")
+		if tag == "" || tag == "-" {
+			continue
+		}
+		name := strings.Split(tag, ",")[0]
+		if name == "" {
+			continue
+		}
+
+		fieldVal := val.Field(i)
+		if fieldVal.IsNil() {
+			continue
+		}
+
+		if name == "sport" {
+			sport, ok := fieldVal.Elem().Interface().([]string)
+			if !ok {
+				return nil, huma.Error400BadRequest("Invalid sport values", nil)
+			}
+			sportJSON, err := marshalSport(sport)
+			if err != nil {
+				return nil, err
+			}
+			updates[name] = sportJSON
+			continue
+		}
+
+		updates[name] = fieldVal.Elem().Interface()
+	}
+
+	return updates, nil
 }
 
 func marshalSport(sport []string) ([]byte, error) {
