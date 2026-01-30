@@ -35,8 +35,18 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	// we do this so we can control what values are
 	// returned by the API
 	response := &GetUserResponse{
-		ID:   user.ID,
-		Name: user.FirstName,
+		ID:                    user.ID,
+		FirstName:             user.FirstName,
+		LastName:              user.LastName,
+		Email:                 user.Email,
+		Username:              user.Username,
+		Bio:                   user.Bio,
+		AccountType:           user.Account_Type,
+		Sport:                 user.Sport,
+		ExpectedGradYear:      user.Expected_Grad_Year,
+		VerifiedAthleteStatus: user.Verified_Athlete_Status,
+		College:               user.College,
+		Division:              user.Division,
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -52,8 +62,24 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 		return respBody, err
 	}
 
+	user, err := u.userDB.GetUser(userID)
+	if err != nil {
+		return respBody, err
+	}
+
 	respBody.Body = &GetCurrentUserIDResponse{
-		ID: userID,
+		ID:                    user.ID,
+		FirstName:             user.FirstName,
+		LastName:              user.LastName,
+		Email:                 user.Email,
+		Username:              user.Username,
+		Bio:                   user.Bio,
+		AccountType:           user.Account_Type,
+		Sport:                 user.Sport,
+		ExpectedGradYear:      user.Expected_Grad_Year,
+		VerifiedAthleteStatus: user.Verified_Athlete_Status,
+		College:               user.College,
+		Division:              user.Division,
 	}
 
 	return respBody, nil

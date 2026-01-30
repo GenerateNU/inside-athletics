@@ -41,9 +41,14 @@ func TestGetUser(t *testing.T) {
 	var u h.GetUserResponse
 
 	DecodeTo(&u, resp)
-
-	if u.Name != "Suli" {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+	if u.ID != user.ID ||
+		u.FirstName != "Suli" ||
+		u.LastName != "Test" ||
+		u.Email != "suli@example.com" ||
+		u.Username != "suli" ||
+		u.AccountType != false ||
+		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusPending {
+		t.Fatalf("Unexpected response: %+v", u)
 	}
 }
 
@@ -52,14 +57,35 @@ func TestGetCurrentUserID(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	userID := uuid.NewString()
-	resp := api.Get("/api/v1/user/current", "Authorization: Bearer "+userID)
+	userID := uuid.New()
+	user := models.User{
+		ID:                      userID,
+		FirstName:               "Suli",
+		LastName:                "Test",
+		Email:                   "suli@example.com",
+		Username:                "suli",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	userResp := testDB.DB.Create(&user)
+	_, err := utils.HandleDBError(&user, userResp.Error)
+	if err != nil {
+		t.Fatalf("Unable to add user to table: %s", err.Error())
+	}
+
+	resp := api.Get("/api/v1/user/current", "Authorization: Bearer "+userID.String())
 
 	var u h.GetCurrentUserIDResponse
 	DecodeTo(&u, resp)
 
-	if u.ID.String() != userID {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+	if u.ID != user.ID ||
+		u.FirstName != "Suli" ||
+		u.LastName != "Test" ||
+		u.Email != "suli@example.com" ||
+		u.Username != "suli" ||
+		u.AccountType != false ||
+		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusPending {
+		t.Fatalf("Unexpected response: %+v", u)
 	}
 }
 
@@ -87,9 +113,8 @@ func TestCreateUser(t *testing.T) {
 
 	var u h.CreateUserResponse
 	DecodeTo(&u, resp)
-
 	if u.ID.String() != userID || u.Name != "Suli" {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+		t.Fatalf("Unexpected response: %+v", u)
 	}
 }
 
@@ -121,9 +146,8 @@ func TestUpdateUser(t *testing.T) {
 
 	var u h.UpdateUserResponse
 	DecodeTo(&u, resp)
-
 	if u.Name != "Updated" {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+		t.Fatalf("Unexpected response: %+v", u)
 	}
 }
 
