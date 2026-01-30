@@ -30,6 +30,7 @@ type User struct {
 type VerifiedAthleteStatus string
 
 const (
+	VerifiedAthleteStatusNone     VerifiedAthleteStatus = "none"
 	VerifiedAthleteStatusPending  VerifiedAthleteStatus = "pending"
 	VerifiedAthleteStatusVerified VerifiedAthleteStatus = "verified"
 )

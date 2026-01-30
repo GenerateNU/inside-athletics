@@ -118,6 +118,33 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
+func TestCreateUserWithNoneStatus(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	userID := uuid.NewString()
+	payload := h.CreateUserBody{
+		FirstName:             "Suli",
+		LastName:              "Test",
+		Email:                 "suli@example.com",
+		Username:              "suli",
+		Bio:                   strPtr("My bio"),
+		AccountType:           true,
+		Sport:                 []string{"hockey"},
+		ExpectedGradYear:      2027,
+		VerifiedAthleteStatus: models.VerifiedAthleteStatusNone,
+	}
+
+	resp := api.Post("/api/v1/user/", "Authorization: Bearer "+userID, payload)
+
+	var u h.CreateUserResponse
+	DecodeTo(&u, resp)
+	if u.ID.String() != userID || u.Name != "Suli" {
+		t.Fatalf("Unexpected response: %+v", u)
+	}
+}
+
 func TestUpdateUser(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
