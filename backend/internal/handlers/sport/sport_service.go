@@ -3,7 +3,6 @@ package sport
 import (
 	"context"
 	"errors"
-	"fmt"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
