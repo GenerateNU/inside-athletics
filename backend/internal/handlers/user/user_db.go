@@ -7,6 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserDB struct {
@@ -29,10 +30,13 @@ func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
 	return utils.HandleDBError(user, dbResponse.Error)
 }
 
-func (u *UserDB) UpdateUser(id uuid.UUID, updates map[string]interface{}) (*models.User, error) {
+func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User, error) {
+	var updatedUser models.User
 	dbResponse := u.db.Model(&models.User{}).
+		Clauses(clause.Returning{}).
 		Where("id = ?", id).
-		Updates(updates)
+		Updates(updates).
+		Scan(&updatedUser)
 	if dbResponse.Error != nil {
 		_, err := utils.HandleDBError(&models.User{}, dbResponse.Error)
 		return nil, err
@@ -40,7 +44,7 @@ func (u *UserDB) UpdateUser(id uuid.UUID, updates map[string]interface{}) (*mode
 	if dbResponse.RowsAffected == 0 {
 		return nil, huma.Error404NotFound("Resource not found")
 	}
-	return u.GetUser(id)
+	return &updatedUser, nil
 }
 
 func (u *UserDB) DeleteUser(id uuid.UUID) error {

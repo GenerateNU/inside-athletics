@@ -76,7 +76,7 @@ type UpdateUserBody struct {
 	Username              *string   `json:"username,omitempty" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string   `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
 	AccountType           *bool     `json:"account_type,omitempty" example:"true" doc:"If the user has access to premium features"`
-	Sport                 *[]string `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
+	Sport                 *[]string `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in" gorm:"type:jsonb;serializer:json"`
 	ExpectedGradYear      *uint     `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus *models.VerifiedAthleteStatus `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`
 	College               *string   `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`

@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
-	"reflect"
-	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -131,12 +129,7 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*utils.ResponseBody[UpdateUserResponse], error) {
 	respBody := &utils.ResponseBody[UpdateUserResponse]{}
 
-	updates, err := buildUserUpdates(input.Body)
-	if err != nil {
-		return respBody, err
-	}
-
-	updatedUser, err := u.userDB.UpdateUser(input.ID, updates)
+	updatedUser, err := u.userDB.UpdateUser(input.ID, input.Body)
 	if err != nil {
 		return respBody, err
 	}
@@ -162,46 +155,6 @@ func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*ut
 	}
 
 	return respBody, nil
-}
-
-func buildUserUpdates(body UpdateUserBody) (map[string]interface{}, error) {
-	updates := make(map[string]interface{})
-	val := reflect.ValueOf(body)
-	typ := reflect.TypeOf(body)
-
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
-		}
-		name := strings.Split(tag, ",")[0]
-		if name == "" {
-			continue
-		}
-
-		fieldVal := val.Field(i)
-		if fieldVal.IsNil() {
-			continue
-		}
-
-		if name == "sport" {
-			sport, ok := fieldVal.Elem().Interface().([]string)
-			if !ok {
-				return nil, huma.Error400BadRequest("Invalid sport values", nil)
-			}
-			sportJSON, err := marshalSport(sport)
-			if err != nil {
-				return nil, err
-			}
-			updates[name] = sportJSON
-			continue
-		}
-
-		updates[name] = fieldVal.Elem().Interface()
-	}
-
-	return updates, nil
 }
 
 func marshalSport(sport []string) ([]byte, error) {
