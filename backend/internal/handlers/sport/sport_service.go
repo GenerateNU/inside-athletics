@@ -25,10 +25,10 @@ func NewSportService(db *gorm.DB) *SportService {
 func (s *SportService) CreateSport(ctx context.Context, input *struct{ Body CreateSportRequest }) (*utils.ResponseBody[SportResponse], error) {
 	// Validate business rules
 	if input.Body.Name == "" {
-		return nil, huma.Error404NotFound("name cannot be empty")
+		return nil, huma.Error422UnprocessableEntity("name cannot be empty")
 	}
 	if input.Body.Popularity != nil && *input.Body.Popularity < 0 {
-		return nil, huma.Error404NotFound("popularity cannot be negative")
+		return nil, huma.Error422UnprocessableEntity("popularity cannot be negative")
 	}
 
 	sport, err := s.sportDB.CreateSport(input.Body.Name, input.Body.Popularity)
@@ -103,14 +103,14 @@ func (s *SportService) UpdateSport(ctx context.Context, input *struct {
 	// Apply partial updates
 	if input.Body.Name != nil {
 		if *input.Body.Name == "" {
-			return nil, fmt.Errorf("name cannot be empty")
+			return nil, huma.Error422UnprocessableEntity("name cannot be empty")
 		}
 		sport.Name = *input.Body.Name
 	}
 
 	if input.Body.Popularity != nil {
 		if *input.Body.Popularity < 0 {
-			return nil, fmt.Errorf("popularity cannot be negative")
+			return nil, huma.Error422UnprocessableEntity("popularity cannot be negative")
 		}
 		sport.Popularity = input.Body.Popularity
 	}
