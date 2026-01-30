@@ -2,6 +2,7 @@ package sport
 
 import (
 	models "inside-athletics/internal/models"
+	"inside-athletics/internal/utils"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -18,34 +19,26 @@ func NewSportDB(db *gorm.DB) *SportDB {
 
 // CreateSport creates a new sport in the database
 func (s *SportDB) CreateSport(name string, popularity *int32) (*models.Sport, error) {
-	sport := &models.Sport{
+	sport := models.Sport{
 		Name:       name,
 		Popularity: popularity,
 	}
-
-	if err := s.db.Create(sport).Error; err != nil {
-		return nil, err
-	}
-
-	return sport, nil
+	dbResponse := s.db.Create(&sport)
+	return utils.HandleDBError(&sport, dbResponse.Error) 
 }
 
 // GetSportByID retrieves a sport by its ID
 func (s *SportDB) GetSportByID(id uuid.UUID) (*models.Sport, error) {
 	var sport models.Sport
-	if err := s.db.First(&sport, "id = ?", id).Error; err != nil {
-		return nil, err
-	}
-	return &sport, nil
+	dbResponse := s.db.First(&sport, "id = ?", id)
+	return utils.HandleDBError(&sport, dbResponse.Error)
 }
 
 // GetSportByName retrieves a sport by its name
 func (s *SportDB) GetSportByName(name string) (*models.Sport, error) {
 	var sport models.Sport
-	if err := s.db.Where("name = ?", name).First(&sport).Error; err != nil {
-		return nil, err
-	}
-	return &sport, nil
+	dbResponse := s.db.Where("name = ?", name).First(&sport)
+	return utils.HandleDBError(&sport, dbResponse.Error)
 }
 
 // GetAllSports retrieves all sports with optional pagination
@@ -68,10 +61,8 @@ func (s *SportDB) GetAllSports(limit, offset int) ([]models.Sport, int64, error)
 
 // UpdateSport updates an existing sport
 func (s *SportDB) UpdateSport(sport *models.Sport) (*models.Sport, error) {
-	if err := s.db.Save(sport).Error; err != nil {
-		return nil, err
-	}
-	return sport, nil
+	dbResponse := s.db.Save(sport)
+	return utils.HandleDBError(sport, dbResponse.Error)
 }
 
 // DeleteSport soft deletes a sport by ID
