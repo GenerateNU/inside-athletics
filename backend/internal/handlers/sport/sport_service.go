@@ -25,10 +25,10 @@ func NewSportService(db *gorm.DB) *SportService {
 func (s *SportService) CreateSport(ctx context.Context, input *struct{ Body CreateSportRequest }) (*utils.ResponseBody[SportResponse], error) {
 	// Validate business rules
 	if input.Body.Name == "" {
-		return nil, fmt.Errorf("name cannot be empty")
+		return nil, huma.Error404NotFound("name cannot be empty")
 	}
 	if input.Body.Popularity != nil && *input.Body.Popularity < 0 {
-		return nil, fmt.Errorf("popularity cannot be negative")
+		return nil, huma.Error404NotFound("popularity cannot be negative")
 	}
 
 	sport, err := s.sportDB.CreateSport(input.Body.Name, input.Body.Popularity)
