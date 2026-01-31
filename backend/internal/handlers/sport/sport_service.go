@@ -32,7 +32,7 @@ func (s *SportService) CreateSport(ctx context.Context, input *struct{ Body Crea
 
 	sport, err := s.sportDB.CreateSport(input.Body.Name, input.Body.Popularity)
 	if err != nil {
-		return nil, utils.DBHandleError(err)
+		return nil, err
 	}
 
 	return &utils.ResponseBody[SportResponse]{
