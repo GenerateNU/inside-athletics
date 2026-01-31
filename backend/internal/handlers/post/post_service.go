@@ -1,4 +1,5 @@
 package post
+<<<<<<< HEAD
 
 import (
 	"context"
@@ -47,3 +48,5 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 		Body: ToPostResponse(post),
 	}, nil
 }
+=======
+>>>>>>> acd49d2 (IsAnanymous)
