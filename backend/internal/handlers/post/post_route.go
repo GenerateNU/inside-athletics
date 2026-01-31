@@ -19,6 +19,6 @@ func Route(api huma.API, db *gorm.DB) {
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/posts")
-		huma.Get(grp, "/", postService.GetAllPosts) // Read posts
+		huma.Get(grp, "/", postService.GetAllPosts) // Read all posts
 	}
 }
