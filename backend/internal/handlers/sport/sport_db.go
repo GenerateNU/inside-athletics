@@ -24,14 +24,17 @@ func (s *SportDB) CreateSport(name string, popularity *int32) (*models.Sport, er
 		Popularity: popularity,
 	}
 	dbResponse := s.db.Create(&sport)
-	return utils.HandleDBError(&sport, dbResponse.Error) 
+	return utils.HandleDBError(&sport, dbResponse.Error)
 }
 
 // GetSportByID retrieves a sport by its ID
 func (s *SportDB) GetSportByID(id uuid.UUID) (*models.Sport, error) {
 	var sport models.Sport
-	dbResponse := s.db.First(&sport, "id = ?", id)
-	return utils.HandleDBError(&sport, dbResponse.Error)
+	result := s.db.First(&sport, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &sport, nil
 }
 
 // GetSportByName retrieves a sport by its name

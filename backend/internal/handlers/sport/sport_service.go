@@ -115,7 +115,14 @@ func (s *SportService) UpdateSport(ctx context.Context, input *struct {
 }
 
 func (s *SportService) DeleteSport(ctx context.Context, input *DeleteSportRequest) (*utils.ResponseBody[SportResponse], error) {
+	// First get the sport to return it
 	sport, err := utils.HandleDBError(s.sportDB.GetSportByID(input.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	// Actually delete it
+	err = s.sportDB.DeleteSport(input.ID)
 	if err != nil {
 		return nil, err
 	}
