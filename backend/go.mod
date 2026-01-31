@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/testcontainers/testcontainers-go v0.40.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.40.0
+	gorm.io/datatypes v1.2.6
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.31.1
 )
@@ -119,7 +120,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.5.7 // indirect
 	gorm.io/driver/sqlite v1.6.0 // indirect
-	gorm.io/driver/sqlserver v1.5.4 // indirect
+	gorm.io/driver/sqlserver v1.6.0 // indirect
 )
 
 require (
