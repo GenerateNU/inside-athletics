@@ -30,9 +30,18 @@ func (u *TagDB) CreateTag(tag *models.Tag) (*models.Tag, error) {
 	return utils.HandleDBError(tag, dbResponse.Error)
 }
 
-func (u *TagDB) UpdateTag(tag *models.Tag) (*models.Tag, error) {
-	dbResponse := u.db.Save(tag)
-	return utils.HandleDBError(tag, dbResponse.Error)
+func (u *TagDB) UpdateTag(id uuid.UUID, updates map[string]interface{}) (*models.Tag, error) {
+	dbResponse := u.db.Model(&models.Tag{}).
+		Where("id = ?", id).
+		Updates(updates)
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError(&models.User{}, dbResponse.Error)
+		return nil, err
+	}
+	if dbResponse.RowsAffected == 0 {
+		return nil, huma.Error404NotFound("Resource not found")
+	}
+	return u.GetTagByID(id)
 }
 
 func (u *TagDB) DeleteTag(id uuid.UUID) error {
