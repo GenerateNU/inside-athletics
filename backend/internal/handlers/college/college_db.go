@@ -31,15 +31,13 @@ func (c *CollegeDB) CreateCollege(college *models.College) (*models.College, err
 }
 
 // Updates an existing college with the provided fields
-func (c *CollegeDB) UpdateCollege(id uuid.UUID, updates map[string]interface{}) (*models.College, error) {
-	var college models.College
+func (c *CollegeDB) UpdateCollege(id uuid.UUID, update *UpdateCollegeRequest) (*models.College, error) {
+	college := models.College{ID: id}
 
 	dbResponse := c.db.
-		Model(&models.College{}).
-		Where("id = ?", id).
+		Model(&college).
 		Clauses(clause.Returning{}).
-		Updates(updates).
-		Scan(&college)
+		Updates(update)
 
 	if dbResponse.Error != nil {
 		_, handleErr := utils.HandleDBError(&college, dbResponse.Error)

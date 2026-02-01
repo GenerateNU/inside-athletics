@@ -20,35 +20,6 @@ func StringPtrOrNil(s string) *string {
 	return &s
 }
 
-// Creates a map of non-nil fields to update
-func buildUpdateMap(body *UpdateCollegeRequest) map[string]interface{} {
-	updates := make(map[string]interface{})
-
-	if body.Name != nil {
-		updates["name"] = *body.Name
-	}
-	if body.State != nil {
-		updates["state"] = *body.State
-	}
-	if body.City != nil {
-		updates["city"] = *body.City
-	}
-	if body.Website != nil {
-		updates["website"] = *body.Website
-	}
-	if body.AcademicRank != nil {
-		updates["academic_rank"] = *body.AcademicRank
-	}
-	if body.DivisionRank != nil {
-		updates["division_rank"] = *body.DivisionRank
-	}
-	if body.Logo != nil {
-		updates["logo"] = *body.Logo
-	}
-
-	return updates
-}
-
 // Retrieves single college by ID
 func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams) (*utils.ResponseBody[GetCollegeResponse], error) {
 	id := input.ID
@@ -116,9 +87,8 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 // Updates fields inputted in request
 func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollegeInput) (*utils.ResponseBody[UpdateCollegeResponse], error) {
 	id := input.ID
-	updates := buildUpdateMap(&input.Body)
 
-	college, err := u.collegeDB.UpdateCollege(id, updates)
+	college, err := u.collegeDB.UpdateCollege(id, &input.Body)
 
 	respBody := &utils.ResponseBody[UpdateCollegeResponse]{}
 	if err != nil {
