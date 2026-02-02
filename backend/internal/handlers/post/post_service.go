@@ -9,13 +9,13 @@ import (
 )
 
 type PostService struct {
-	postDB *postDB
+	postDB *PostDB
 }
 
 // NewPostService creates a new PostService instance
 func NewPostService(db *gorm.DB) *PostService {
 	return &PostService{
-		PostDB: NewPostDB(db),
+		postDB: NewPostDB(db),
 	}
 }
 
@@ -33,11 +33,11 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 	if input.Body.Content == "" {
 		return nil, huma.Error422UnprocessableEntity("Content cannot be empty")
 	}
-	if input.Body.isAnonymous == nil {
+	if isnil.IsNil(input.Body.IsAnonymous) {
 		return nil, huma.Error422UnprocessableEntity("isAnonymous cannot be null")
 	}
 
-	post, err := utils.HandleDBError(s.postDB.CreatePost(input.Body.AuthorId, input.Body.SportId, input.Body.Title, input.Body.Content, input.Body.isAnonymous))
+	post, err := utils.HandleDBError(s.postDB.CreatePost(input.Body.AuthorId, input.Body.SportId, input.Body.Title, input.Body.Content, input.Body.IsAnonymous))
 	if err != nil {
 		return nil, err
 	}
