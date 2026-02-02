@@ -115,16 +115,14 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 	_, filename, _, _ := runtime.Caller(0)
 	// Go up from current file to project root
-	backendDir := filepath.Join(filepath.Dir(filename), "..", "..", "..")
-	migrationDir := filepath.Join("internal", "migrations")
+	backendDir := filepath.Join(filepath.Dir(filename), "..", "..")
+	migrationDir := filepath.Join(backendDir, "migrations")
 
 	// Run Atlas migrations using exec
 	cmd := exec.Command("atlas", "migrate", "apply",
-		"--dir", fmt.Sprintf("file://%s", migrationDir), //
+		"--dir", fmt.Sprintf("file://%s", migrationDir),
 		"--url", connStr,
 	)
-
-	cmd.Dir = backendDir
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
