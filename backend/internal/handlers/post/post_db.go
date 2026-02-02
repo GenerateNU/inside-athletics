@@ -4,15 +4,16 @@ import (
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type postDB struct {
+type PostDB struct {
 	db *gorm.DB
 }
 
-// NewPostDB creates a new postDB instance
+// NewPostDB creates a new PostDB instance
 func NewPostDB(db *gorm.DB) *PostDB {
 	return &PostDB{db: db}
 }
@@ -44,11 +45,11 @@ func (s *PostDB) CreatePost(uuid.UUID author_id, uuid.UUID sport_id, ) (*models.
 	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
-// GetSportByID retrieves a sport by its ID
-func (s *SportDB) GetSportByID(id uuid.UUID) (*models.Sport, error) {
-	var sport models.Sport
-	dbResponse := s.db.First(&sport, "id = ?", id)
-	return utils.HandleDBError(&sport, dbResponse.Error)
+// GetPostByID retrieves a post by its ID
+func (p *PostDB) GetPostByID(id uuid.UUID) (*models.Post, error) {
+	var post models.Post
+	dbResponse := p.db.First(&post, "id = ?", id)
+	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
 // GetPostByAuthorID retrieves a post by its author ID
