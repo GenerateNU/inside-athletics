@@ -111,11 +111,15 @@ func buildTagUpdates(body UpdateTagBody) (map[string]interface{}, error) {
 		}
 
 		fieldVal := val.Field(i)
-		if fieldVal.IsNil() {
+		if fieldVal.Kind() == reflect.Ptr {
+			if fieldVal.IsNil() {
+				continue
+			}
+			updates[name] = fieldVal.Elem().Interface()
 			continue
 		}
 
-		updates[name] = fieldVal.Elem().Interface()
+		updates[name] = fieldVal.Interface()
 	}
 
 	return updates, nil

@@ -77,7 +77,7 @@ func TestCreateTag(t *testing.T) {
 		Name: "Basketball",
 	}
 
-	resp := api.Post("/api/v1/user/", "Authorization: Bearer mock-token", payload)
+	resp := api.Post("/api/v1/tag/", "Authorization: Bearer mock-token", payload)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}

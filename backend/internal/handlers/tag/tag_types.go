@@ -31,7 +31,7 @@ type CreateTagResponse struct {
 }
 
 type UpdateTagInput struct {
-	ID   uuid.UUID `json:"id" example:"1" doc:"ID of the tag to update"`
+	ID   uuid.UUID `path:"id" example:"1" doc:"ID of the tag to update"`
 	Body UpdateTagBody
 }
 
