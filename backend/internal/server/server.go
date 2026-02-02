@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/health"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
@@ -90,4 +89,3 @@ func setupApp() *fiber.App {
 
 	return app
 }
-
