@@ -18,14 +18,13 @@ func NewPostDB(db *gorm.DB) *PostDB {
 }
 
 // CreatePost creates a new sport in the database
-func (s *PostDB) CreatePost(author_id uuid.UUID, sport_id uuid.UUID, title string, content string, isAnonymous bool) (*models.Post, error) {
+func (s *PostDB) CreatePost(author_id uuid.UUID, sport_id uuid.UUID, title string, content string, is_anonymous bool) (*models.Post, error) {
 	post := models.Post{
 		AuthorId:   author_id,
 		SportId:    sport_id,
 		Title:      title,
 		Content:    content,
-		Likes: 0,
-		IsAnonymous: isAnonymous,
+		IsAnonymous: is_anonymous,
 	}
 	dbResponse := s.db.Create(&post)
 	return utils.HandleDBError(&post, dbResponse.Error) 

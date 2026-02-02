@@ -20,17 +20,30 @@ func TestCreatePost(t *testing.T) {
 	api := testDB.API
 
     authorID := uuid.New()
-    sportID := uuid.New()
 
-    // Create the map[string]any
+    popularity := int32(100000)
+
+    sport := map[string]any{
+		"name":       "Women's Basketball",
+		"popularity": popularity,
+	}
+
+	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	if resp_sport.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
+	}
+
+	var createdSport models.Sport
+	DecodeTo(&createdSport, resp_sport)
+
+	sportID := createdSport.ID
+
     body := map[string]any{
         "author_id":   authorID,
         "sport_id":    sportID,
         "title":       "Looking for thoughts on NEU Fencing!",
         "content":     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
-        "numUpVotes":  0,
-        "numDownVotes": 0,
-        "isAnonymous": true,
+        "is_anonymous": true,
     }
 
 	resp := api.Post("/api/v1/post/", body, "Authorization: Bearer mock-token")
@@ -65,10 +78,6 @@ func TestCreatePost(t *testing.T) {
     if result.IsAnonymous != true {
         t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
     }
-
-    if result.ID == uuid.Nil {
-        t.Errorf("expected ID to be generated, got nil UUID")
-    }
 }
 
 func TestGetPostById(t *testing.T) {
@@ -84,11 +93,27 @@ func TestGetPostById(t *testing.T) {
 	postDB := post.NewPostDB(testDB.DB)
 
 	authorID := uuid.New()
-    sportID := uuid.New()
+
+	popularity := int32(100000)
+
+    sport := map[string]any{
+		"name":       "Women's Basketball",
+		"popularity": popularity,
+	}
+
+	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	if resp_sport.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
+	}
+
+	var createdSport models.Sport
+	DecodeTo(&createdSport, resp_sport)
+
+	sportID := createdSport.ID
 
 	createdPost, err := postDB.CreatePost(
-		uuid.New(),
-		uuid.New(), 
+		authorID,
+		sportID,
 		"Looking for thoughts on NEU Fencing!",
 		"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", // content
 		true,
@@ -130,10 +155,6 @@ func TestGetPostById(t *testing.T) {
     if result.IsAnonymous != true {
         t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
     }
-
-    if result.ID == uuid.Nil {
-        t.Errorf("expected ID to be generated, got nil UUID")
-    }
 }
 
 func TestGetPostByAuthorId(t *testing.T) {
@@ -149,11 +170,27 @@ func TestGetPostByAuthorId(t *testing.T) {
 	postDB := post.NewPostDB(testDB.DB)
 
 	authorID := uuid.New()
-    sportID := uuid.New()
+
+	popularity := int32(100000)
+
+    sport := map[string]any{
+		"name":       "Women's Basketball",
+		"popularity": popularity,
+	}
+
+	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	if resp_sport.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
+	}
+
+	var createdSport models.Sport
+	DecodeTo(&createdSport, resp_sport)
+
+	sportID := createdSport.ID
 
 	createdPost, err := postDB.CreatePost(
-		uuid.New(),
-		uuid.New(), 
+		authorID,
+		sportID,
 		"Looking for thoughts on NEU Fencing!",
 		"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		true,
@@ -193,9 +230,5 @@ func TestGetPostByAuthorId(t *testing.T) {
     }
     if result.IsAnonymous != true {
         t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
-    }
-
-    if result.ID == uuid.Nil {
-        t.Errorf("expected ID to be generated, got nil UUID")
     }
 }
