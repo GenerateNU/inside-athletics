@@ -200,7 +200,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
-	resp := api.Get("/api/v1/post/"+createdPost.AuthorId.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/by-author/"+createdPost.AuthorId.String(), "Authorization: Bearer mock-token")
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
