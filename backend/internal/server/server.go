@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
 	"strings"
 
@@ -15,7 +16,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/middleware/skip"
-
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
@@ -35,18 +35,18 @@ func CreateApp(db *gorm.DB) *App {
 	router := setupApp()
 	config := huma.DefaultConfig("Inside Athletics API", "1.0.0")
 	config.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
-    "Authorization": {
-        Type:         "http",
-        Scheme:       "bearer",
-        BearerFormat: "JWT",
-    },
+		"Authorization": {
+			Type:         "http",
+			Scheme:       "bearer",
+			BearerFormat: "JWT",
+		},
 	}
-	config.Security = []map[string][]string {
+	config.Security = []map[string][]string{
 		{
 			"Authorization": {},
 		},
 	}
-	
+
 	var api = humafiber.New(router, config)
 	CreateRoutes(db, api)
 	return &App{
@@ -57,7 +57,7 @@ func CreateApp(db *gorm.DB) *App {
 
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
-	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route}
+	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, post.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
@@ -76,7 +76,7 @@ func setupApp() *fiber.App {
 	}))
 
 	app.Use(skip.New(AuthMiddleware, func(ctx *fiber.Ctx) bool {
-		return strings.HasPrefix(ctx.Path(), "/docs") || strings.HasPrefix(ctx.Path(), "/openapi.yaml")|| ctx.Path() == "/"
+		return strings.HasPrefix(ctx.Path(), "/docs") || strings.HasPrefix(ctx.Path(), "/openapi.yaml") || ctx.Path() == "/"
 	}))
 	app.Use(favicon.New())
 	app.Use(compress.New(compress.Config{

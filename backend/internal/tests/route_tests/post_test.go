@@ -1,0 +1,214 @@
+package routeTests
+
+import (
+	"inside-athletics/internal/handlers/post"
+	"inside-athletics/internal/models"
+	"net/http"
+	"testing"
+	"github.com/google/uuid"
+)
+
+func TestCreatePost(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
+		t.Fatalf("failed to migrate posts table: %v", err)
+	}
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+    authorID := uuid.New()
+    sportID := uuid.New()
+
+    // Create the map[string]any
+    body := map[string]any{
+        "author_id":   authorID,
+        "sport_id":    sportID,
+        "title":       "Looking for thoughts on NEU Fencing!",
+        "content":     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
+        "numUpVotes":  0,
+        "numDownVotes": 0,
+        "isAnonymous": true,
+    }
+
+	resp := api.Post("/api/v1/post/", body, "Authorization: Bearer mock-token")
+
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result post.PostResponse
+	DecodeTo(&result, resp)
+
+    if result.AuthorId != authorID {
+        t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+    }
+
+    if result.SportId != sportID {
+        t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+    }
+
+    if result.Title != "Looking for thoughts on NEU Fencing!" {
+        t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+    }
+
+    if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+        t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+    }
+
+    if result.UpVotes != 0 {
+        t.Errorf("expected UpVotes 0, got %d", result.UpVotes)
+    }
+
+    if result.DownVotes != 0 {
+        t.Errorf("expected DownVotes 0, got %d", result.DownVotes)
+    }
+
+    if result.IsAnonymous != true {
+        t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+    }
+
+    if result.ID == uuid.Nil {
+        t.Errorf("expected ID to be generated, got nil UUID")
+    }
+}
+
+func TestGetPostById(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
+		t.Fatalf("failed to migrate posts table: %v", err)
+	}
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	postDB := post.NewPostDB(testDB.DB)
+
+	authorID := uuid.New()
+    sportID := uuid.New()
+
+	createdPost, err := postDB.CreatePost(
+		uuid.New(),
+		uuid.New(), 
+		"Looking for thoughts on NEU Fencing!",
+		"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", // content
+		true,
+	)
+
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/post/"+createdPost.ID.String(), "Authorization: Bearer mock-token")
+
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result post.PostResponse
+	DecodeTo(&result, resp)
+
+    if result.AuthorId != authorID {
+        t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+    }
+
+    if result.SportId != sportID {
+        t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+    }
+
+    if result.Title != "Looking for thoughts on NEU Fencing!" {
+        t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+    }
+
+    if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+        t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+    }
+
+    if result.UpVotes != 0 {
+        t.Errorf("expected UpVotes 0, got %d", result.UpVotes)
+    }
+
+    if result.DownVotes != 0 {
+        t.Errorf("expected DownVotes 0, got %d", result.DownVotes)
+    }
+
+    if result.IsAnonymous != true {
+        t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+    }
+
+    if result.ID == uuid.Nil {
+        t.Errorf("expected ID to be generated, got nil UUID")
+    }
+}
+
+func TestGetPostByAuthorId(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
+		t.Fatalf("failed to migrate posts table: %v", err)
+	}
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	postDB := post.NewPostDB(testDB.DB)
+
+	authorID := uuid.New()
+    sportID := uuid.New()
+
+	createdPost, err := postDB.CreatePost(
+		uuid.New(),
+		uuid.New(), 
+		"Looking for thoughts on NEU Fencing!",
+		"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
+		true,
+	)
+
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/post/"+createdPost.AuthorId.String(), "Authorization: Bearer mock-token")
+
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result post.PostResponse
+	DecodeTo(&result, resp)
+
+    if result.AuthorId != authorID {
+        t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+    }
+
+    if result.SportId != sportID {
+        t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+    }
+
+    if result.Title != "Looking for thoughts on NEU Fencing!" {
+        t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+    }
+
+    if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+        t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+    }
+
+    if result.UpVotes != 0 {
+        t.Errorf("expected UpVotes 0, got %d", result.UpVotes)
+    }
+
+    if result.DownVotes != 0 {
+        t.Errorf("expected DownVotes 0, got %d", result.DownVotes)
+    }
+
+    if result.IsAnonymous != true {
+        t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+    }
+
+    if result.ID == uuid.Nil {
+        t.Errorf("expected ID to be generated, got nil UUID")
+    }
+}
