@@ -24,9 +24,8 @@ func (s *PostDB) CreatePost(author_id uuid.UUID, sport_id uuid.UUID, title strin
 		SportId:     sport_id,
 		Title:       title,
 		Content:     content,
-		UpVotes:     0, //default 0
-		DownVotes:   0, //default 0
-		IsAnonymous: is_anonymous,
+		Likes:       0,
+		IsAnonymous: isAnonymous,
 	}
 	dbResponse := s.db.Create(&post)
 	return utils.HandleDBError(&post, dbResponse.Error)
