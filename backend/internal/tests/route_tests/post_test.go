@@ -58,12 +58,8 @@ func TestCreatePost(t *testing.T) {
         t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
     }
 
-    if result.UpVotes != 0 {
-        t.Errorf("expected UpVotes 0, got %d", result.UpVotes)
-    }
-
-    if result.DownVotes != 0 {
-        t.Errorf("expected DownVotes 0, got %d", result.DownVotes)
+    if result.Likes != 0 {
+        t.Errorf("expected UpVotes 0, got %d", result.Likes)
     }
 
     if result.IsAnonymous != true {
@@ -127,12 +123,8 @@ func TestGetPostById(t *testing.T) {
         t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
     }
 
-    if result.UpVotes != 0 {
-        t.Errorf("expected UpVotes 0, got %d", result.UpVotes)
-    }
-
-    if result.DownVotes != 0 {
-        t.Errorf("expected DownVotes 0, got %d", result.DownVotes)
+    if result.Likes != 0 {
+        t.Errorf("expected UpVotes 0, got %d", result.Likes)
     }
 
     if result.IsAnonymous != true {
@@ -196,14 +188,9 @@ func TestGetPostByAuthorId(t *testing.T) {
         t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
     }
 
-    if result.UpVotes != 0 {
-        t.Errorf("expected UpVotes 0, got %d", result.UpVotes)
+    if result.Likes != 0 {
+        t.Errorf("expected Likes 0, got %d", result.Likes)
     }
-
-    if result.DownVotes != 0 {
-        t.Errorf("expected DownVotes 0, got %d", result.DownVotes)
-    }
-
     if result.IsAnonymous != true {
         t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
     }
