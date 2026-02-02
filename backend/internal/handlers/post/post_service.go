@@ -108,7 +108,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 	}
 
 	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post),
+		Body: ToPostResponse(updatedPost),
 	}, nil
 }
 
