@@ -89,4 +89,3 @@ func setupApp() *fiber.App {
 
 	return app
 }
-
