@@ -10,8 +10,8 @@ import (
 // Post represents a post entity in the system
 type Post struct {
 	ID          uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	AuthorId    uuid.UUID      `json:"author_id" type:"uuid" default:"gen_random_uuid()"`
-	SportId     uuid.UUID      `json:"sport_id" type:"uuid" default:"gen_random_uuid()"`
+	AuthorId    uuid.UUID      `json:"author_id" type:"uuid"`
+	SportId     uuid.UUID      `json:"sport_id" type:"uuid"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
