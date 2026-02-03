@@ -35,7 +35,7 @@ func (u *TagDB) UpdateTag(id uuid.UUID, updates map[string]interface{}) (*models
 		Where("id = ?", id).
 		Updates(updates)
 	if dbResponse.Error != nil {
-		_, err := utils.HandleDBError(&models.User{}, dbResponse.Error)
+		_, err := utils.HandleDBError(&models.Tag{}, dbResponse.Error)
 		return nil, err
 	}
 	if dbResponse.RowsAffected == 0 {
