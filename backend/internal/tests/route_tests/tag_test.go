@@ -1,7 +1,6 @@
 package routeTests
 
 import (
-	"fmt"
 	tagPackage "inside-athletics/internal/handlers/tag"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -28,7 +27,6 @@ func TestGetTagByName(t *testing.T) {
 	}
 
 	resp := api.Get("/api/v1/tag/name/Hockey", "Authorization: Bearer mock-token")
-	fmt.Println("Raw Response:", resp.Body.String())
 
 	var response tagPackage.GetTagResponse
 
@@ -57,7 +55,6 @@ func TestGetTagByID(t *testing.T) {
 	}
 
 	resp := api.Get("/api/v1/tag/"+newID.String(), "Authorization: Bearer mock-token")
-	fmt.Println("Raw Response:", resp.Body.String())
 
 	var response tagPackage.GetTagResponse
 
