@@ -169,8 +169,6 @@ func TestGetPostByAuthorId(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
-	authorID := uuid.New()
-
 	popularity := int32(100000)
 
     sport := map[string]any{
@@ -187,6 +185,30 @@ func TestGetPostByAuthorId(t *testing.T) {
 	DecodeTo(&createdSport, resp_sport)
 
 	sportID := createdSport.ID
+
+	user := map[string]any{
+	"first_name": "Joe",
+	"last_name": "Bob",
+	"email": "bobjoe123@email.com",
+	"username": "bjproathlete",
+	"bio": "My name is Bob and I'm a pro athlete",
+	"account_type": true,
+	"sport": []string{"hockey"},
+	"expected_grad_year": 2027,
+	"verified_athlete_status": "pending",
+	"college": "Northeastern University",
+	"division": 1,
+	}
+
+	resp_user := api.Post("/api/v1/user/", user, "Authorization: Bearer mock-token")
+	if resp_user.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp_user.Code, resp_user.Body.String())
+	}
+
+	var createdUser models.User
+	DecodeTo(&createdUser, resp_user)
+
+	authorID := createdUser.ID
 
 	createdPost, err := postDB.CreatePost(
 		authorID,
