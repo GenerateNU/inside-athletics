@@ -5,6 +5,7 @@ import (
 	"inside-athletics/internal/handlers/health"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
+	"inside-athletics/internal/handlers/post"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
