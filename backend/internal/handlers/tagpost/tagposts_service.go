@@ -117,6 +117,7 @@ func (u *TagPostService) UpdateTagPost(cts context.Context, input *UpdateTagPost
 	return respBody, nil
 }
 
+// helper for UpdateTagPost
 func buildTagUpdates(body UpdateTagPostBody) (map[string]interface{}, error) {
 	updates := make(map[string]interface{})
 	val := reflect.ValueOf(body)
