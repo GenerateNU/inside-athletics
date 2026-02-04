@@ -7,12 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// Like represents a like entity in the system
-type Like struct {
+// A CommentLike represents a like on a comment in the system
+type CommentLike struct {
 	ID        uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 
-	PostID uuid.UUID `json:"post_id" gorm:"foreignKey;type:uuid"`
+	UserID uuid.UUID `json:"user_id" gorm:"foreignKey;type:uuid"`
+	CommentID uuid.UUID `json:"comment_id" gorm:"foreignKey;type:uuid"`
 }
