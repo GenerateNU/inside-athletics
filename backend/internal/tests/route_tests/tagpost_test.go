@@ -63,12 +63,12 @@ func TestGetTagsByPost(t *testing.T) {
 
 	resp := api.Get("/api/v1/tagpost/post/"+postId.String(), "Authorization: Bearer mock-token")
 
-	var response tagpostPackage.GetPostsbyTagResponse
+	var response tagpostPackage.GetTagsByPostResponse
 
 	DecodeTo(&response, resp)
 
 	tagIds := []uuid.UUID{tagId}
-	if !reflect.DeepEqual(response.PostIDs, tagIds) {
+	if !reflect.DeepEqual(response.TagIDs, tagIds) {
 		t.Fatalf("Unexpected response: %s", resp.Body.String())
 	}
 }
@@ -174,7 +174,7 @@ func TestDeleteTagPost(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Delete("/api/v1/tag/"+tagpost.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/tagpost/"+tagpost.ID.String(), "Authorization: Bearer mock-token")
 
 	var response tagpostPackage.DeleteTagPostResponse
 	DecodeTo(&response, resp)

@@ -18,12 +18,12 @@ type GetTagPostByIdParam struct {
 
 type GetTagsByPostResponse struct {
 	PostID uuid.UUID   `json:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
-	TagIDs []uuid.UUID `json:"tag_ids" example:"[123e4567-e89b-12d3-a456-426614174000, 123e4567-e89b-12d3-a456-426614174001]" doc:"The tag ids associated with a post"`
+	TagIDs []uuid.UUID `json:"tag_ids" example:"[\"123e4567-e89b-12d3-a456-426614174000\",\"123e4567-e89b-12d3-a456-426614174001\"]" doc:"The tag ids associated with a post"`
 }
 
 type GetPostsbyTagResponse struct {
 	TagID   uuid.UUID   `json:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
-	PostIDs []uuid.UUID `json:"post_ids" example:"[123e4567-e89b-12d3-a456-426614174000, 123e4567-e89b-12d3-a456-426614174001]" doc:"The post ids associated with a tag"`
+	PostIDs []uuid.UUID `json:"post_ids" example:"[\"123e4567-e89b-12d3-a456-426614174000\",\"123e4567-e89b-12d3-a456-426614174001\"]" doc:"The post ids associated with a tag"`
 }
 
 type GetTagPostByIDResponse struct {
