@@ -30,7 +30,7 @@ func (u *TagDB) CreateTag(tag *models.Tag) (*models.Tag, error) {
 	return utils.HandleDBError(tag, dbResponse.Error)
 }
 
-func (u *TagDB) UpdateTag(id uuid.UUID, updates map[string]interface{}) (*models.Tag, error) {
+func (u *TagDB) UpdateTag(id uuid.UUID, updates *UpdateTagBody) (*models.Tag, error) {
 	dbResponse := u.db.Model(&models.Tag{}).
 		Where("id = ?", id).
 		Updates(updates)

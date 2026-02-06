@@ -4,8 +4,6 @@ import (
 	"context"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
-	"reflect"
-	"strings"
 )
 
 type TagService struct {
@@ -76,12 +74,7 @@ func (u *TagService) CreateTag(ctx context.Context, input *CreateTagInput) (*uti
 func (u *TagService) UpdateTag(cts context.Context, input *UpdateTagInput) (*utils.ResponseBody[UpdateTagResponse], error) {
 	respBody := &utils.ResponseBody[UpdateTagResponse]{}
 
-	updates, err := buildTagUpdates(input.Body)
-	if err != nil {
-		return respBody, err
-	}
-
-	updatedTag, err := u.tagDB.UpdateTag(input.ID, updates)
+	updatedTag, err := u.tagDB.UpdateTag(input.ID, &input.Body)
 	if err != nil {
 		return respBody, err
 	}
@@ -92,37 +85,6 @@ func (u *TagService) UpdateTag(cts context.Context, input *UpdateTagInput) (*uti
 	}
 
 	return respBody, nil
-}
-
-func buildTagUpdates(body UpdateTagBody) (map[string]interface{}, error) {
-	updates := make(map[string]interface{})
-	val := reflect.ValueOf(body)
-	typ := reflect.TypeOf(body)
-
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
-		}
-		name := strings.Split(tag, ",")[0]
-		if name == "" {
-			continue
-		}
-
-		fieldVal := val.Field(i)
-		if fieldVal.Kind() == reflect.Ptr {
-			if fieldVal.IsNil() {
-				continue
-			}
-			updates[name] = fieldVal.Elem().Interface()
-			continue
-		}
-
-		updates[name] = fieldVal.Interface()
-	}
-
-	return updates, nil
 }
 
 func (u *TagService) DeleteTag(ctx context.Context, input *GetTagByIDParams) (*utils.ResponseBody[DeleteTagResponse], error) {

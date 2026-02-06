@@ -4,14 +4,13 @@ import (
 	"context"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
-	"reflect"
-	"strings"
 )
 
 type TagPostService struct {
 	tagpostDB *TagPostDB
 }
 
+// Returns an array of tag ids that are tagged on a unique post, determined by the post id.
 func (u *TagPostService) GetTagsByPost(ctx context.Context, input *GetTagsByPostParam) (*utils.ResponseBody[GetTagsByPostResponse], error) {
 	postID := input.PostID
 	tags, err := u.tagpostDB.GetTagsByPost(postID)
@@ -31,6 +30,7 @@ func (u *TagPostService) GetTagsByPost(ctx context.Context, input *GetTagsByPost
 	}, err
 }
 
+// Returns an array of post ids that are tagged with a unique tag, determined by the tag id.
 func (u *TagPostService) GetPostsByTag(ctx context.Context, input *GetPostsByTagParam) (*utils.ResponseBody[GetPostsbyTagResponse], error) {
 	tagID := input.TagID
 	posts, err := u.tagpostDB.GetPostsByTag(tagID)
@@ -98,12 +98,7 @@ func (u *TagPostService) CreateTagPost(ctx context.Context, input *CreateTagPost
 func (u *TagPostService) UpdateTagPost(cts context.Context, input *UpdateTagPostInput) (*utils.ResponseBody[UpdateTagPostResponse], error) {
 	respBody := &utils.ResponseBody[UpdateTagPostResponse]{}
 
-	updates, err := buildTagUpdates(input.Body)
-	if err != nil {
-		return respBody, err
-	}
-
-	updatedTagPost, err := u.tagpostDB.UpdateTagPost(input.ID, updates)
+	updatedTagPost, err := u.tagpostDB.UpdateTagPost(input.ID, &input.Body)
 	if err != nil {
 		return respBody, err
 	}
@@ -115,38 +110,6 @@ func (u *TagPostService) UpdateTagPost(cts context.Context, input *UpdateTagPost
 	}
 
 	return respBody, nil
-}
-
-// helper for UpdateTagPost
-func buildTagUpdates(body UpdateTagPostBody) (map[string]interface{}, error) {
-	updates := make(map[string]interface{})
-	val := reflect.ValueOf(body)
-	typ := reflect.TypeOf(body)
-
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
-		}
-		name := strings.Split(tag, ",")[0]
-		if name == "" {
-			continue
-		}
-
-		fieldVal := val.Field(i)
-		if fieldVal.Kind() == reflect.Ptr {
-			if fieldVal.IsNil() {
-				continue
-			}
-			updates[name] = fieldVal.Elem().Interface()
-			continue
-		}
-
-		updates[name] = fieldVal.Interface()
-	}
-
-	return updates, nil
 }
 
 func (u *TagPostService) DeleteTagPost(ctx context.Context, input *GetTagPostByIdParam) (*utils.ResponseBody[DeleteTagPostResponse], error) {

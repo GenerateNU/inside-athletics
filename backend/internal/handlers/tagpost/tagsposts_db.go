@@ -40,7 +40,7 @@ func (u *TagPostDB) CreateTagPost(tagpost *models.TagPost) (*models.TagPost, err
 	return utils.HandleDBError(tagpost, dbResponse.Error)
 }
 
-func (u *TagPostDB) UpdateTagPost(id uuid.UUID, updates map[string]interface{}) (*models.TagPost, error) {
+func (u *TagPostDB) UpdateTagPost(id uuid.UUID, updates *UpdateTagPostBody) (*models.TagPost, error) {
 	dbResponse := u.db.Model(&models.TagPost{}).
 		Where("id = ?", id).
 		Updates(updates)
