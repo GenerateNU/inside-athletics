@@ -33,12 +33,7 @@ type GetPostByIDParams struct {
 
 // GetPostByAuthorIDParams defines parameters for getting a post by author ID
 type GetPostByAuthorIDParams struct {
-	ID uuid.UUID `path:"id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
-}
-
-// GetPostBySportIDParams defines parameters for getting a post by sport ID
-type GetPostBySportIDParams struct {
-	ID uuid.UUID `path:"id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
+	AuthorID uuid.UUID `path:"author_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the author"`
 }
 
 // ToPostResponse converts a Post model to a postResponse
@@ -79,5 +74,5 @@ type GetAllPostsResponse struct {
 type UpdatePostRequest struct {
 	Title       *string `json:"title" binding:"omitempty,min=1,max=100" example:"Updated Title" doc:"Title of the post"`
 	Content     *string `json:"content" binding:"omitempty,min=1,max=5000" example:"Updated content" doc:"Content of the post"`
-	IsAnonymous *bool   `json:"isAnonymous" doc:"Whether the post is anonymous"`
+	IsAnonymous *bool   `json:"is_anonymous,omitempty" required:"false" doc:"Whether the post is anonymous"`
 }

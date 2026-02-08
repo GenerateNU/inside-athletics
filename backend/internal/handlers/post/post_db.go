@@ -63,30 +63,6 @@ func (s *PostDB) GetPostByAuthorID(author_id uuid.UUID) (*models.Post, error) {
 	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
-// GetAllPosts retrieves all posts with pagination
-func (s *PostDB) GetAllPosts(limit, offset int) ([]models.Post, int64, error) {
-	var posts []models.Post
-	var total int64
-
-	// Get total count
-	if err := s.db.Model(&models.Post{}).Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	// Get paginated results
-	if err := s.db.Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return posts, total, nil
-}
-
-// UpdatePost updates an existing post
-func (p *PostDB) UpdatePost(post *models.Post) (*models.Post, error) {
-	dbResponse := p.db.Save(post)
-	return utils.HandleDBError(post, dbResponse.Error)
-}
-
 // DeletePost soft deletes a post by ID
 func (p *PostDB) DeletePost(id uuid.UUID) error {
 	dbResponse := p.db.Delete(&models.Post{}, "id = ?", id)
@@ -98,4 +74,46 @@ func (p *PostDB) DeletePost(id uuid.UUID) error {
 		return huma.Error404NotFound("Resource not found")
 	}
 	return nil
+}
+
+// GetAllPosts retrieves all posts with pagination
+func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) {
+	var posts []models.Post
+	var total int64
+
+	// Get total count
+	if err := p.db.Model(&models.Post{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated posts
+	dbResponse := p.db.Limit(limit).Offset(offset).Find(&posts)
+	if dbResponse.Error != nil {
+		return nil, 0, dbResponse.Error
+	}
+
+	return posts, int(total), nil
+}
+
+// UpdatePost updates an existing post
+func (p *PostDB) UpdatePost(id uuid.UUID, title *string, content *string, is_anonymous *bool) (*models.Post, error) {
+	var post models.Post
+	if err := p.db.First(&post, "id = ?", id).Error; err != nil {
+		return utils.HandleDBError(&post, err)
+	}
+
+	// Update only provided fields
+	updates := make(map[string]interface{})
+	if title != nil {
+		updates["title"] = *title
+	}
+	if content != nil {
+		updates["content"] = *content
+	}
+	if is_anonymous != nil {
+		updates["is_anonymous"] = *is_anonymous
+	}
+
+	dbResponse := p.db.Model(&post).Updates(updates)
+	return utils.HandleDBError(&post, dbResponse.Error)
 }
