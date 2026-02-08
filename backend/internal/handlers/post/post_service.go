@@ -124,7 +124,7 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 }
 
 func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostBySportIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostBySportID((input.ID)))
+	post, err := utils.HandleDBError(s.postDB.GetPostBySportID((input.SportID)))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostBySpor
 }
 
 func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostByAuthorIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByAuthorID((input.ID)))
+	post, err := utils.HandleDBError(s.postDB.GetPostByAuthorID((input.AuthorID)))
 	if err != nil {
 		return nil, err
 	}
