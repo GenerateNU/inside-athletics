@@ -8,8 +8,8 @@ import (
 
 // CreatePostRequest defines the request body for creating a new post
 type CreatePostRequest struct {
-	AuthorId    uuid.UUID `json:"author_id" type:"uuid""`
-	SportId     uuid.UUID `json:"sport_id" type:"uuid""`
+	AuthorId    uuid.UUID `json:"author_id" type:"uuid"`
+	SportId     uuid.UUID `json:"sport_id" type:"uuid"`
 	Title       string    `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content     string    `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
 	IsAnonymous bool      `json:"is_anonymous"`
