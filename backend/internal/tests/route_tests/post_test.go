@@ -13,10 +13,6 @@ func TestCreatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
-
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
@@ -84,10 +80,6 @@ func TestCreatePost(t *testing.T) {
 func TestGetPostById(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
-
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
 
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
@@ -261,10 +253,6 @@ func TestGetPostsBySportId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
-
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
@@ -330,10 +318,6 @@ func TestGetPostsBySportId(t *testing.T) {
 func TestGetAllPosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
-
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
 
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
@@ -401,10 +385,6 @@ func TestUpdatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
-
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
@@ -467,10 +447,6 @@ func TestUpdatePost(t *testing.T) {
 func TestDeletePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
-
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
 
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
