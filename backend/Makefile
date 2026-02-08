@@ -46,6 +46,7 @@ start-prod:
 lint:
 	doppler run --command="golangci-lint run --timeout=5m"
 
+
 # reverts single migration for prod
 .PHONY: revert-prod
 revert-single-prod:
