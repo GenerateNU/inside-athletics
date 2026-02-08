@@ -21,14 +21,14 @@ func NewPostDB(db *gorm.DB) *PostDB {
 // CreatePost creates a new sport in the database
 func (s *PostDB) CreatePost(author_id uuid.UUID, sport_id uuid.UUID, title string, content string, is_anonymous bool) (*models.Post, error) {
 	post := models.Post{
-		AuthorId:   author_id,
-		SportId:    sport_id,
-		Title:      title,
-		Content:    content,
+		AuthorId:    author_id,
+		SportId:     sport_id,
+		Title:       title,
+		Content:     content,
 		IsAnonymous: is_anonymous,
 	}
 	dbResponse := s.db.Create(&post)
-	return utils.HandleDBError(&post, dbResponse.Error) 
+	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
 // GetPostByID retrieves a post by its ID
@@ -43,13 +43,19 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]mode
 	var posts []models.Post
 	var total int64
 
-	// Get total count
-	if err := s.db.Where("sport_id = ?", sportID).Find(&posts).Error; err != nil {
+	// Count total matching posts
+	if err := s.db.Model(&models.Post{}).
+		Where("sport_id = ?", sportID).
+		Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// Get paginated results
-	if err := s.db.Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
+	if err := s.db.
+		Where("sport_id = ?", sportID).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -57,10 +63,27 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]mode
 }
 
 // GetPostByAuthorID retrieves a post by its author ID
-func (s *PostDB) GetPostByAuthorID(author_id uuid.UUID) (*models.Post, error) {
-	var post models.Post
-	dbResponse := s.db.First(&post, "author_id = ?", author_id)
-	return utils.HandleDBError(&post, dbResponse.Error)
+func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+
+	// Count total matching posts
+	if err := s.db.Model(&models.Post{}).
+		Where("author_id = ?", authorID).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated results
+	if err := s.db.
+		Where("author_id = ?", authorID).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return posts, total, nil
 }
 
 // DeletePost soft deletes a post by ID
@@ -96,24 +119,7 @@ func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) 
 }
 
 // UpdatePost updates an existing post
-func (p *PostDB) UpdatePost(id uuid.UUID, title *string, content *string, is_anonymous *bool) (*models.Post, error) {
-	var post models.Post
-	if err := p.db.First(&post, "id = ?", id).Error; err != nil {
-		return utils.HandleDBError(&post, err)
-	}
-
-	// Update only provided fields
-	updates := make(map[string]interface{})
-	if title != nil {
-		updates["title"] = *title
-	}
-	if content != nil {
-		updates["content"] = *content
-	}
-	if is_anonymous != nil {
-		updates["is_anonymous"] = *is_anonymous
-	}
-
-	dbResponse := p.db.Model(&post).Updates(updates)
-	return utils.HandleDBError(&post, dbResponse.Error)
+func (p *PostDB) UpdatePost(post *models.Post) (*models.Post, error) {
+	dbResponse := p.db.Save(post)
+	return utils.HandleDBError(post, dbResponse.Error)
 }

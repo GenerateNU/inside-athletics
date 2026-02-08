@@ -4,9 +4,6 @@ import (
 	"context"
 	"inside-athletics/internal/utils"
 
-	"github.com/danielgtaylor/huma/v2"
-	"gitlab.com/golang-utils/isnil"
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -23,23 +20,6 @@ func NewPostService(db *gorm.DB) *PostService {
 }
 
 func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[PostResponse], error) {
-	// Validate business rules
-	if isnil.IsNil(input.Body.AuthorId) {
-		return nil, huma.Error422UnprocessableEntity("Author ID cannot be null")
-	}
-	if isnil.IsNil(input.Body.SportId) {
-		return nil, huma.Error422UnprocessableEntity("Sport ID cannot be null")
-	}
-	if input.Body.Title == "" {
-		return nil, huma.Error422UnprocessableEntity("Title cannot be empty")
-	}
-	if input.Body.Content == "" {
-		return nil, huma.Error422UnprocessableEntity("Content cannot be empty")
-	}
-	if isnil.IsNil(input.Body.IsAnonymous) {
-		return nil, huma.Error422UnprocessableEntity("isAnonymous cannot be null")
-	}
-
 	post, err := utils.HandleDBError(
 		s.postDB.CreatePost(
 			input.Body.AuthorId,
@@ -102,7 +82,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 		post.IsAnonymous = *input.Body.IsAnonymous
 	}
 
-	updatedPost, err := utils.HandleDBError(s.postDB.UpdatePost(post))
+	updatedPost, err := s.postDB.UpdatePost(post)
 	if err != nil {
 		return nil, err
 	}
@@ -123,25 +103,41 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 	}, nil
 }
 
-func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostBySportIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostBySportID((input.ID)))
+func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySportIDParams) (*utils.ResponseBody[GetPostsBySportIDResponse], error) {
+	posts, total, err := s.postDB.GetPostsBySportID(input.Limit, input.Offset, input.SportId)
 	if err != nil {
 		return nil, err
 	}
 
-	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post),
+	postResponses := make([]PostResponse, 0, len(posts))
+	for i := range posts {
+		postResponses = append(postResponses, *ToPostResponse(&posts[i]))
+	}
+
+	return &utils.ResponseBody[GetPostsBySportIDResponse]{
+		Body: &GetPostsBySportIDResponse{
+			Posts: postResponses,
+			Total: int(total),
+		},
 	}, nil
 }
 
-func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostByAuthorIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByAuthorID((input.ID)))
+func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostsByAuthorIDParams) (*utils.ResponseBody[GetPostsByAuthorIDResponse], error) {
+	posts, total, err := s.postDB.GetPostsByAuthorID(input.Limit, input.Offset, input.AuthorID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post),
+	postResponses := make([]PostResponse, 0, len(posts))
+	for i := range posts {
+		postResponses = append(postResponses, *ToPostResponse(&posts[i]))
+	}
+
+	return &utils.ResponseBody[GetPostsByAuthorIDResponse]{
+		Body: &GetPostsByAuthorIDResponse{
+			Posts: postResponses,
+			Total: int(total),
+		},
 	}, nil
 }
 

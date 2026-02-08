@@ -32,8 +32,15 @@ type GetPostByIDParams struct {
 }
 
 // GetPostByAuthorIDParams defines parameters for getting a post by author ID
-type GetPostByAuthorIDParams struct {
+type GetPostsByAuthorIDParams struct {
 	AuthorID uuid.UUID `path:"author_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the author"`
+	Limit   int       `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
+	Offset  int       `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
+}
+
+type GetPostsByAuthorIDResponse struct {
+	Posts []PostResponse `json:"posts" doc:"List of posts for the author"`
+	Total int            `json:"total" example:"25" doc:"Total number of posts for this author"`
 }
 
 // ToPostResponse converts a Post model to a postResponse
@@ -47,13 +54,13 @@ func ToPostResponse(post *models.Post) *PostResponse {
 	}
 }
 
-type GetPostBySportIdParams struct {
+type GetPostsBySportIDParams struct {
 	SportId uuid.UUID `path:"sport_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Sport ID to filter posts"`
 	Limit   int       `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
 	Offset  int       `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
 }
 
-type GetPostBySportIdResponse struct {
+type GetPostsBySportIDResponse struct {
 	Posts []PostResponse `json:"posts" doc:"List of posts for the sport"`
 	Total int            `json:"total" example:"25" doc:"Total number of posts for this sport"`
 }
