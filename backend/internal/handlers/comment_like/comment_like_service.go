@@ -52,3 +52,27 @@ func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *Delet
 		Body: &DeleteCommentLikeResponse{Message: "Like was deleted successfully"},
 	}, nil
 }
+
+// GetLikeCount returns the total number of likes for a comment
+func (u *CommentLikeService) GetLikeCount(ctx context.Context, input *GetLikeCountParams) (*utils.ResponseBody[GetLikeCountResponse], error) {
+	count, err := u.commentLikeDB.GetLikeCount(input.CommentID)
+	respBody := &utils.ResponseBody[GetLikeCountResponse]{}
+	if err != nil {
+		return respBody, err
+	}
+	return &utils.ResponseBody[GetLikeCountResponse]{
+		Body: &GetLikeCountResponse{Total: int(count)},
+	}, nil
+}
+
+// CheckUserLikedComment returns whether the given user has liked the comment
+func (u *CommentLikeService) CheckUserLikedComment(ctx context.Context, input *CheckUserLikedCommentParams) (*utils.ResponseBody[CheckUserLikedCommentResponse], error) {
+	liked, err := u.commentLikeDB.CheckUserLikedComment(input.UserID, input.CommentID)
+	respBody := &utils.ResponseBody[CheckUserLikedCommentResponse]{}
+	if err != nil {
+		return respBody, err
+	}
+	return &utils.ResponseBody[CheckUserLikedCommentResponse]{
+		Body: &CheckUserLikedCommentResponse{Liked: liked},
+	}, nil
+}

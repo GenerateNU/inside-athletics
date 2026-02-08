@@ -36,3 +36,19 @@ func (u *PostLikeDB) DeletePostLike(id uuid.UUID) error {
 	}
 	return nil
 }
+
+// GetLikeCount returns the number of likes for a post
+func (u *PostLikeDB) GetLikeCount(postID uuid.UUID) (int64, error) {
+	var count int64
+	err := u.db.Model(&models.PostLike{}).Where("post_id = ?", postID).Count(&count).Error
+	return count, err
+}
+
+// CheckUserLikedPost returns true if the user has liked the post
+func (u *PostLikeDB) CheckUserLikedPost(userID, postID uuid.UUID) (bool, error) {
+	var count int64
+	err := u.db.Model(&models.PostLike{}).
+		Where("user_id = ? AND post_id = ?", userID, postID).
+		Count(&count).Error
+	return count > 0, err
+}

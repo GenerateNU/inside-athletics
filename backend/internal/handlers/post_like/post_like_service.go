@@ -19,7 +19,7 @@ func (u *PostLikeService) GetPostLike(ctx context.Context, input *GetPostLikePar
 	}
 	return &utils.ResponseBody[GetPostLikeResponse]{
 		Body: &GetPostLikeResponse{
-			UserID:    like.UserID,
+			UserID: like.UserID,
 			PostID: like.PostID,
 		},
 	}, nil
@@ -28,7 +28,7 @@ func (u *PostLikeService) GetPostLike(ctx context.Context, input *GetPostLikePar
 // CreatePostLike creates a like on a post
 func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostLikeRequest) (*utils.ResponseBody[CreatePostLikeResponse], error) {
 	postLike := &models.PostLike{
-		UserID:    input.UserID,
+		UserID: input.UserID,
 		PostID: input.PostID,
 	}
 	created, err := u.postLikeDB.CreatePostLike(postLike)
@@ -50,5 +50,29 @@ func (u *PostLikeService) DeletePostLike(ctx context.Context, input *DeletePostL
 	}
 	return &utils.ResponseBody[DeletePostLikeResponse]{
 		Body: &DeletePostLikeResponse{Message: "Like was deleted successfully"},
+	}, nil
+}
+
+// GetLikeCount returns the total number of likes for a post
+func (u *PostLikeService) GetLikeCount(ctx context.Context, input *GetLikeCountParams) (*utils.ResponseBody[GetLikeCountResponse], error) {
+	count, err := u.postLikeDB.GetLikeCount(input.PostID)
+	respBody := &utils.ResponseBody[GetLikeCountResponse]{}
+	if err != nil {
+		return respBody, err
+	}
+	return &utils.ResponseBody[GetLikeCountResponse]{
+		Body: &GetLikeCountResponse{Total: int(count)},
+	}, nil
+}
+
+// CheckUserLikedPost returns whether the given user has liked the post
+func (u *PostLikeService) CheckUserLikedPost(ctx context.Context, input *CheckUserLikedPostParams) (*utils.ResponseBody[CheckUserLikedPostResponse], error) {
+	liked, err := u.postLikeDB.CheckUserLikedPost(input.UserID, input.PostID)
+	respBody := &utils.ResponseBody[CheckUserLikedPostResponse]{}
+	if err != nil {
+		return respBody, err
+	}
+	return &utils.ResponseBody[CheckUserLikedPostResponse]{
+		Body: &CheckUserLikedPostResponse{Liked: liked},
 	}, nil
 }

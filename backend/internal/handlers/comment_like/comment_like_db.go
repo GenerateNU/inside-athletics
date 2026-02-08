@@ -36,3 +36,19 @@ func (u *CommentLikeDB) DeleteCommentLike(id uuid.UUID) error {
 	}
 	return nil
 }
+
+// GetLikeCount returns number of likes for a comment
+func (u *CommentLikeDB) GetLikeCount(commentID uuid.UUID) (int64, error) {
+	var count int64
+	err := u.db.Model(&models.CommentLike{}).Where("comment_id = ?", commentID).Count(&count).Error
+	return count, err
+}
+
+// CheckUserLikedComment returns true if user has liked the comment
+func (u *CommentLikeDB) CheckUserLikedComment(userID, commentID uuid.UUID) (bool, error) {
+	var count int64
+	err := u.db.Model(&models.CommentLike{}).
+		Where("user_id = ? AND comment_id = ?", userID, commentID).
+		Count(&count).Error
+	return count > 0, err
+}

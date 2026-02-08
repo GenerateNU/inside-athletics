@@ -13,5 +13,7 @@ func Route(api huma.API, db *gorm.DB) {
 		huma.Post(grp, "/", postLikeService.CreatePostLike)
 		huma.Get(grp, "/{id}", postLikeService.GetPostLike)
 		huma.Delete(grp, "/{id}", postLikeService.DeletePostLike)
+		huma.Get(grp, "/post/{post_id}/like-count", postLikeService.GetLikeCount)
+		huma.Get(grp, "/post/{post_id}/check-like", postLikeService.CheckUserLikedPost)
 	}
 }
