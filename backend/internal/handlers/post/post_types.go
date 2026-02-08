@@ -79,5 +79,5 @@ type GetAllPostsResponse struct {
 type UpdatePostRequest struct {
 	Title       *string `json:"title" binding:"omitempty,min=1,max=100" example:"Updated Title" doc:"Title of the post"`
 	Content     *string `json:"content" binding:"omitempty,min=1,max=5000" example:"Updated content" doc:"Content of the post"`
-	IsAnonymous *bool   `json:"isAnonymous" doc:"Whether the post is anonymous"`
+	IsAnonymous *bool   `json:"is_anonymous,omitempty" required:"false" doc:"Whether the post is anonymous"`
 }

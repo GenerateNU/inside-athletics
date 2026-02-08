@@ -84,7 +84,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 	ID   uuid.UUID `path:"id"`
 	Body UpdatePostRequest
 }) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByID(input.ID))
+	post, err := s.postDB.GetPostByID(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 		post.IsAnonymous = *input.Body.IsAnonymous
 	}
 
-	updatedPost, err := utils.HandleDBError(s.postDB.UpdatePost(post))
+	updatedPost, err := s.postDB.UpdatePost(post)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 }
 
 func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByID((input.ID)))
+	post, err := s.postDB.GetPostByID(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 }
 
 func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostBySportIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostBySportID((input.SportID)))
+	post, err := s.postDB.GetPostBySportID(input.SportID)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostBySpor
 }
 
 func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostByAuthorIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByAuthorID((input.AuthorID)))
+	post, err := s.postDB.GetPostByAuthorID(input.AuthorID)
 	if err != nil {
 		return nil, err
 	}
