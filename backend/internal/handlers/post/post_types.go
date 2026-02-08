@@ -33,7 +33,7 @@ type GetPostByIDParams struct {
 
 // GetPostByAuthorIDParams defines parameters for getting a post by author ID
 type GetPostByAuthorIDParams struct {
-	ID uuid.UUID `path:"id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
+	AuthorID uuid.UUID `path:"author_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the author"`
 }
 
 // ToPostResponse converts a Post model to a postResponse
