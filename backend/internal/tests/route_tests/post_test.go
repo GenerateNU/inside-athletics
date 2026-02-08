@@ -5,6 +5,7 @@ import (
 	"inside-athletics/internal/models"
 	"net/http"
 	"testing"
+
 	"github.com/google/uuid"
 )
 
@@ -19,11 +20,11 @@ func TestCreatePost(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-    authorID := uuid.New()
+	authorID := uuid.New()
 
-    popularity := int32(100000)
+	popularity := int32(100000)
 
-    sport := map[string]any{
+	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
@@ -38,13 +39,13 @@ func TestCreatePost(t *testing.T) {
 
 	sportID := createdSport.ID
 
-    body := map[string]any{
-        "author_id":   authorID,
-        "sport_id":    sportID,
-        "title":       "Looking for thoughts on NEU Fencing!",
-        "content":     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
-        "is_anonymous": true,
-    }
+	body := map[string]any{
+		"author_id":    authorID,
+		"sport_id":     sportID,
+		"title":        "Looking for thoughts on NEU Fencing!",
+		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
+		"is_anonymous": true,
+	}
 
 	resp := api.Post("/api/v1/post/", body, "Authorization: Bearer mock-token")
 
@@ -55,29 +56,29 @@ func TestCreatePost(t *testing.T) {
 	var result post.PostResponse
 	DecodeTo(&result, resp)
 
-    if result.AuthorId != authorID {
-        t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
-    }
+	if result.AuthorId != authorID {
+		t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+	}
 
-    if result.SportId != sportID {
-        t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
-    }
+	if result.SportId != sportID {
+		t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+	}
 
-    if result.Title != "Looking for thoughts on NEU Fencing!" {
-        t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
-    }
+	if result.Title != "Looking for thoughts on NEU Fencing!" {
+		t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+	}
 
-    if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
-        t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
-    }
+	if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+		t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+	}
 
-    if result.Likes != 0 {
-        t.Errorf("expected UpVotes 0, got %d", result.Likes)
-    }
+	if result.Likes != 0 {
+		t.Errorf("expected UpVotes 0, got %d", result.Likes)
+	}
 
-    if result.IsAnonymous != true {
-        t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
-    }
+	if result.IsAnonymous != true {
+		t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+	}
 }
 
 func TestGetPostById(t *testing.T) {
@@ -96,7 +97,7 @@ func TestGetPostById(t *testing.T) {
 
 	popularity := int32(100000)
 
-    sport := map[string]any{
+	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
@@ -132,29 +133,29 @@ func TestGetPostById(t *testing.T) {
 	var result post.PostResponse
 	DecodeTo(&result, resp)
 
-    if result.AuthorId != authorID {
-        t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
-    }
+	if result.AuthorId != authorID {
+		t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+	}
 
-    if result.SportId != sportID {
-        t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
-    }
+	if result.SportId != sportID {
+		t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+	}
 
-    if result.Title != "Looking for thoughts on NEU Fencing!" {
-        t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
-    }
+	if result.Title != "Looking for thoughts on NEU Fencing!" {
+		t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+	}
 
-    if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
-        t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
-    }
+	if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+		t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+	}
 
-    if result.Likes != 0 {
-        t.Errorf("expected UpVotes 0, got %d", result.Likes)
-    }
+	if result.Likes != 0 {
+		t.Errorf("expected UpVotes 0, got %d", result.Likes)
+	}
 
-    if result.IsAnonymous != true {
-        t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
-    }
+	if result.IsAnonymous != true {
+		t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+	}
 }
 
 func TestGetPostByAuthorId(t *testing.T) {
@@ -171,7 +172,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 
 	popularity := int32(100000)
 
-    sport := map[string]any{
+	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
@@ -186,21 +187,24 @@ func TestGetPostByAuthorId(t *testing.T) {
 
 	sportID := createdSport.ID
 
+	// Generate a UUID for the user that will be used in the Authorization header
+	userID := uuid.New()
+
 	user := map[string]any{
-	"first_name": "Joe",
-	"last_name": "Bob",
-	"email": "bobjoe123@email.com",
-	"username": "bjproathlete",
-	"bio": "My name is Bob and I'm a pro athlete",
-	"account_type": true,
-	"sport": []string{"hockey"},
-	"expected_grad_year": 2027,
-	"verified_athlete_status": "pending",
-	"college": "Northeastern University",
-	"division": 1,
+		"first_name":              "Joe",
+		"last_name":               "Bob",
+		"email":                   "bobjoe123@email.com",
+		"username":                "bjproathlete",
+		"bio":                     "My name is Bob and I'm a pro athlete",
+		"account_type":            true,
+		"sport":                   []string{"hockey"},
+		"expected_grad_year":      2027,
+		"verified_athlete_status": "pending",
+		"college":                 "Northeastern University",
+		"division":                1,
 	}
 
-	resp_user := api.Post("/api/v1/user/", user, "Authorization: Bearer mock-token")
+	resp_user := api.Post("/api/v1/user/", user, "Authorization: Bearer "+userID.String())
 	if resp_user.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_user.Code, resp_user.Body.String())
 	}
@@ -231,26 +235,26 @@ func TestGetPostByAuthorId(t *testing.T) {
 	var result post.PostResponse
 	DecodeTo(&result, resp)
 
-    if result.AuthorId != authorID {
-        t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
-    }
+	if result.AuthorId != authorID {
+		t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+	}
 
-    if result.SportId != sportID {
-        t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
-    }
+	if result.SportId != sportID {
+		t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+	}
 
-    if result.Title != "Looking for thoughts on NEU Fencing!" {
-        t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
-    }
+	if result.Title != "Looking for thoughts on NEU Fencing!" {
+		t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+	}
 
-    if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
-        t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
-    }
+	if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+		t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+	}
 
-    if result.Likes != 0 {
-        t.Errorf("expected Likes 0, got %d", result.Likes)
-    }
-    if result.IsAnonymous != true {
-        t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
-    }
+	if result.Likes != 0 {
+		t.Errorf("expected Likes 0, got %d", result.Likes)
+	}
+	if result.IsAnonymous != true {
+		t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+	}
 }
