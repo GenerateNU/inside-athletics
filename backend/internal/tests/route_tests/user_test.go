@@ -25,6 +25,7 @@ func TestGetUser(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -66,6 +67,7 @@ func TestGetCurrentUserID(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -158,6 +160,7 @@ func TestUpdateUser(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -191,6 +194,7 @@ func TestDeleteUser(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)

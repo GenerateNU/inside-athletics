@@ -98,6 +98,11 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		return respBody, err
 	}
 
+	roleID, err := u.userDB.GetRoleIDByName(models.RoleUser)
+	if err != nil {
+		return respBody, err
+	}
+
 	user := &models.User{
 		ID:                      currentUserID,
 		FirstName:               input.Body.FirstName,
@@ -111,6 +116,7 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Verified_Athlete_Status: input.Body.VerifiedAthleteStatus,
 		College:                 input.Body.College,
 		Division:                input.Body.Division,
+		RoleID:                  roleID,
 	}
 
 	createdUser, err := u.userDB.CreateUser(user)

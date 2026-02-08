@@ -24,7 +24,7 @@ func TestCreateSport(t *testing.T) {
 		"popularity": popularity,
 	}
 
-	resp := api.Post("/api/v1/sport/", body, "Authorization: Bearer mock-token")
+	resp := api.Post("/api/v1/sport/", body, authHeader())
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -60,7 +60,7 @@ func TestGetSportById(t *testing.T) {
 		t.Fatalf("failed to create sport: %v", err)
 	}
 
-	resp := api.Get("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/sport/"+createdSport.ID.String(), authHeader())
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -96,7 +96,7 @@ func TestGetSportByName(t *testing.T) {
 		t.Fatalf("failed to create sport: %v", err)
 	}
 
-	resp := api.Get("/api/v1/sport/by-name/Women's Basketball", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/sport/by-name/Women's Basketball", authHeader())
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -138,7 +138,7 @@ func TestGetAllSports(t *testing.T) {
 		t.Fatalf("failed to create sport 2: %v", err2)
 	}
 
-	resp := api.Get("/api/v1/sports/", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/sports/", authHeader())
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -179,7 +179,7 @@ func TestUpdateSport(t *testing.T) {
 		"popularity": int32(200000),
 	}
 
-	resp := api.Patch("/api/v1/sport/"+createdSport.ID.String(), updateBody, "Authorization: Bearer mock-token")
+	resp := api.Patch("/api/v1/sport/"+createdSport.ID.String(), updateBody, authHeader())
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -215,14 +215,14 @@ func TestDeleteSport(t *testing.T) {
 		t.Fatalf("failed to create sport: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/sport/"+createdSport.ID.String(), authHeader())
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
 	// Verify the sport is deleted
-	getResp := api.Get("/api/v1/sport/"+createdSport.ID.String(), "Authorization: Bearer mock-token")
+	getResp := api.Get("/api/v1/sport/"+createdSport.ID.String(), authHeader())
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}

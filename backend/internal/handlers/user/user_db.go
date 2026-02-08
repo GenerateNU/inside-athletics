@@ -30,6 +30,17 @@ func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
 	return utils.HandleDBError(user, dbResponse.Error)
 }
 
+func (u *UserDB) GetRoleIDByName(name models.RoleName) (uuid.UUID, error) {
+	var role models.Role
+	if err := u.db.Select("id").Where("name = ?", name).First(&role).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return uuid.Nil, huma.Error500InternalServerError("Default role not found")
+		}
+		return uuid.Nil, huma.Error500InternalServerError("Database error", err)
+	}
+	return role.ID, nil
+}
+
 func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User, error) {
 	var updatedUser models.User
 	dbResponse := u.db.Model(&models.User{}).
