@@ -180,9 +180,7 @@ func resolveResourceAndAction(method, path, userID, pathID string) (string, stri
 }
 
 func resolveResourceFromPath(path string) string {
-	if strings.HasPrefix(path, "/api/v1/") {
-		path = strings.TrimPrefix(path, "/api/v1/")
-	}
+	path = strings.TrimPrefix(path, "/api/v1/")
 	segment := strings.SplitN(path, "/", 2)[0]
 	switch segment {
 	case "user", "users":

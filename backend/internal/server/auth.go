@@ -80,8 +80,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	c.Locals("user_id", userID)
-	ctx := context.WithValue(c.UserContext(), contextKey("user_id"), userID)
-	ctx = context.WithValue(ctx, "user_id", userID)
+    ctx := context.WithValue(c.UserContext(), contextKey("user_id"), userID)
 	c.SetUserContext(ctx)
 	return c.Next()
 }
