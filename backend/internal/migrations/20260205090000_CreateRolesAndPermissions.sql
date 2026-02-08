@@ -35,3 +35,20 @@ INSERT INTO "public"."roles" ("name") VALUES
   ('user'),
   ('admin'),
   ('moderator');
+
+-- Seed admin permissions (roles + permissions management)
+INSERT INTO "public"."permissions" ("action", "resource") VALUES
+  ('create', 'role'),
+  ('update', 'role'),
+  ('delete', 'role'),
+  ('create', 'permission'),
+  ('update', 'permission'),
+  ('delete', 'permission');
+
+-- Assign admin role permissions
+INSERT INTO "public"."role_permissions" ("role_id", "permission_id")
+SELECT r."id", p."id"
+FROM "public"."roles" r
+JOIN "public"."permissions" p
+  ON p."resource" IN ('role', 'permission')
+WHERE r."name" = 'admin';
