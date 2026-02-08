@@ -33,6 +33,10 @@ type RouteFN func(api huma.API, db *gorm.DB)
 func CreateApp(db *gorm.DB) *App {
 
 	router := setupApp()
+	router.Use("/api/v1/role", AdminOnlyMiddleware(db))
+	router.Use("/api/v1/roles", AdminOnlyMiddleware(db))
+	router.Use("/api/v1/permission", AdminOnlyMiddleware(db))
+	router.Use("/api/v1/permissions", AdminOnlyMiddleware(db))
 	config := huma.DefaultConfig("Inside Athletics API", "1.0.0")
 	config.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"Authorization": {
@@ -57,6 +61,7 @@ func CreateApp(db *gorm.DB) *App {
 
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
+	api.UseMiddleware(PermissionHumaMiddleware(api, db))
 	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)

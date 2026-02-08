@@ -1,5 +1,6 @@
-h1:NYXVaGXTgKqYcpYculiRLVrizpnbvuK7IsxZmO9HlhY=
+h1:2S2JgcqkhfkUVmak6bnTPgzttCjU6mVf0nIz7zXgszs=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
 20260131201229_CreateSportsTable.sql h1:L0JKj/lfu2le2ogmZoL/Y9ZbqsLGu/3uX8ttxMkgCe4=
+20260205090000_CreateRolesAndPermissions.sql h1:alT55onoQl1euit78/0tzbfx6CFfKC269fmKhMENhds=

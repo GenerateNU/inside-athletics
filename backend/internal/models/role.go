@@ -1,0 +1,25 @@
+package models
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type RoleName string
+
+const (
+	RoleUser      RoleName = "user"
+	RoleAdmin     RoleName = "admin"
+	RoleModerator RoleName = "moderator"
+)
+
+type Role struct {
+	ID          uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
+	Name        RoleName       `json:"name" gorm:"type:varchar(50);not null;unique"`
+	Permissions []Permission   `json:"permissions,omitempty" gorm:"many2many:role_permissions;"`
+}
