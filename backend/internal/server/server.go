@@ -2,8 +2,8 @@ package server
 
 import (
 	"encoding/json"
-	"inside-athletics/internal/handlers/college"
 	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
 	"strings"
@@ -57,7 +57,7 @@ func CreateApp(db *gorm.DB) *App {
 
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
-	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route}
+	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
