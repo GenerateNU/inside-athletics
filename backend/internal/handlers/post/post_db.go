@@ -7,6 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PostDB struct {
@@ -119,7 +120,19 @@ func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) 
 }
 
 // UpdatePost updates an existing post
-func (p *PostDB) UpdatePost(post *models.Post) (*models.Post, error) {
-	dbResponse := p.db.Save(post)
-	return utils.HandleDBError(post, dbResponse.Error)
+func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest) (*models.Post, error) {
+	var updatedPost models.Post
+	dbResponse := p.db.Model(&models.Post{}).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
+		Updates(updates).
+		Scan(&updatedPost)
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError(&models.Post{}, dbResponse.Error)
+		return nil, err
+	}
+	if dbResponse.RowsAffected == 0 {
+		return nil, huma.Error404NotFound("Resource not found")
+	}
+	return &updatedPost, nil
 }

@@ -64,25 +64,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 	ID   uuid.UUID `path:"id"`
 	Body UpdatePostRequest
 }) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByID(input.ID))
-	if err != nil {
-		return nil, err
-	}
-
-	// Apply partial updates
-	if input.Body.Title != nil {
-		post.Title = *input.Body.Title
-	}
-
-	if input.Body.Content != nil {
-		post.Content = *input.Body.Content
-	}
-
-	if input.Body.IsAnonymous != nil {
-		post.IsAnonymous = *input.Body.IsAnonymous
-	}
-
-	updatedPost, err := s.postDB.UpdatePost(post)
+	updatedPost, err := s.postDB.UpdatePost(input.ID, input.Body)
 	if err != nil {
 		return nil, err
 	}
