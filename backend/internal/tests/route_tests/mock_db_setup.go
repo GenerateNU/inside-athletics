@@ -112,7 +112,6 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 	// Go up from current file to project root
 	backendDir := filepath.Join(filepath.Dir(filename), "..", "..", "..")
 	migrationDir := filepath.Join("internal", "migrations")
-	// migrationDir := filepath.Join(backendDir, "migrations")
 
 	// Run Atlas migrations using exec
 	cmd := exec.Command("atlas", "migrate", "apply",
@@ -130,9 +129,7 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 // GENERIC HELPER FUNCS
 
-/*
-Decode the given response JSON into the given struct entity. Reads the value into the struct
-*/
+// Decode the given response JSON into the given struct entity.
 func DecodeTo[T any](entity *T, resp *httptest.ResponseRecorder) {
 	dec := json.NewDecoder(resp.Body)
 
@@ -141,9 +138,7 @@ func DecodeTo[T any](entity *T, resp *httptest.ResponseRecorder) {
 	}
 }
 
-/*
-Create API routing with test DB connection based on given dbUrl
-*/
+// Create API routing with test DB connection based on given dbUrl
 func SetupTestAPI(t *testing.T, dbUrl string) (humatest.TestAPI, *gorm.DB) {
 	_, api := humatest.New(t) // setup test API
 

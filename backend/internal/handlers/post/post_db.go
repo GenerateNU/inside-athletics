@@ -38,11 +38,22 @@ func (s *PostDB) GetPostByID(id uuid.UUID) (*models.Post, error) {
 	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
-// GetPostBySportID retrieves a post by its sport ID
-func (s *PostDB) GetPostBySportID(sport_id uuid.UUID) (*models.Post, error) {
-	var post models.Post
-	dbResponse := s.db.First(&post, "sport_id = ?", sport_id)
-	return utils.HandleDBError(&post, dbResponse.Error)
+// GetPostsBySportID retrieves all posts with the given sport ID
+func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+
+	// Get total count
+	if err := s.db.Where("sport_id = ?", sportID).Find(&posts).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated results
+	if err := s.db.Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return posts, total, nil
 }
 
 // GetPostByAuthorID retrieves a post by its author ID
@@ -53,17 +64,17 @@ func (s *PostDB) GetPostByAuthorID(author_id uuid.UUID) (*models.Post, error) {
 }
 
 // GetAllPosts retrieves all posts with pagination
-func (p *PostDB) GetAllPosts(limit, offset int) ([]models.Post, int64, error) {
+func (s *PostDB) GetAllPosts(limit, offset int) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
 	// Get total count
-	if err := p.db.Model(&models.Post{}).Count(&total).Error; err != nil {
+	if err := s.db.Model(&models.Post{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// Get paginated results
-	if err := p.db.Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
+	if err := s.db.Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
 		return nil, 0, err
 	}
 
