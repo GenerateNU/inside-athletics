@@ -1,36 +1,35 @@
-import { AppState, Platform } from 'react-native'
-import { createClient, processLock } from '@supabase/supabase-js'
-import { secureStorage } from '../secure-storage'
+"use client";
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
+import { createBrowserClient } from "@supabase/ssr";
 
-/**
- * Creates a supabase client that writes tokens to keychain and can be used
- * to handle any authorization requests
- */
-export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
-  auth: {
-    ...(Platform.OS !== "web" ? { storage: secureStorage } : {}),
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-    lock: processLock,
-  },
-})
-// Tells Supabase Auth to continuously refresh the session automatically
-// if the app is in the foreground. When this is added, you will continue
-// to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
-// `SIGNED_OUT` event if the user's session is terminated. This should
-// only be registered once.
-if (Platform.OS !== "web") {
-  AppState.addEventListener('change', (state:any) => {
-    if (state === 'active') {
-      supabase.auth.startAutoRefresh()
-    } else {
-      supabase.auth.stopAutoRefresh()
-    }
-  })
+export function createSupabaseClient() {
+    return createBrowserClient(
+        process.env.NODE_ENV === "production"
+            ? process.env.NEXT_PUBLIC_SUPABASE_URL!
+            : process.env.NEXT_PUBLIC_DEV_SUPABASE_URL!,
+        process.env.NODE_ENV === "production"
+            ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+            : process.env.NEXT_PUBLIC_SUPABASE_DEV_PUBLISHABLE_KEY!
+    );
 }
 
+/**
+ * Get the current auth token from Supabase session (client-side)
+ * @returns Promise<string> The access token
+ * @throws Error if token is missing
+ */
+export async function getAuthToken(): Promise<string> {
+    const supabase = createSupabaseClient();
+    ("@ts-expect-error");
+    const { data, error } = await supabase.auth.getSession();
 
+    if (error) {
+        throw new Error(`Failed to get session: ${error.message}`);
+    }
+
+    if (!data.session?.access_token) {
+        throw new Error("Authorization token is missing.");
+    }
+
+    return data.session.access_token;
+}
