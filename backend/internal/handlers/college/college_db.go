@@ -31,7 +31,6 @@ func (c *CollegeDB) CreateCollege(college *models.College) (*models.College, err
 }
 
 // Updates an existing college with the provided fields
-<<<<<<< HEAD
 func (c *CollegeDB) UpdateCollege(id uuid.UUID, update *UpdateCollegeRequest) (*models.College, error) {
 	college := models.College{ID: id}
 
@@ -40,33 +39,11 @@ func (c *CollegeDB) UpdateCollege(id uuid.UUID, update *UpdateCollegeRequest) (*
 		Clauses(clause.Returning{}).
 		Updates(update)
 
-=======
-func (c *CollegeDB) UpdateCollege(id uuid.UUID, updates map[string]interface{}) (*models.College, error) {
-	var college models.College
-
-	// First check if college exists
-	if err := c.db.Where("id = ?", id).First(&college).Error; err != nil {
-		_, handleErr := utils.HandleDBError(&college, err)
-		return nil, handleErr
-	}
-
-	// Update the college
-	dbResponse := c.db.Model(&college).Updates(updates)
->>>>>>> c3b62ae (finalized schema, created db methods and updated types for requests)
 	if dbResponse.Error != nil {
 		_, handleErr := utils.HandleDBError(&college, dbResponse.Error)
 		return nil, handleErr
 	}
 
-<<<<<<< HEAD
-=======
-	// Reload to get updated data
-	if err := c.db.Where("id = ?", id).First(&college).Error; err != nil {
-		_, handleErr := utils.HandleDBError(&college, err)
-		return nil, handleErr
-	}
-
->>>>>>> c3b62ae (finalized schema, created db methods and updated types for requests)
 	return &college, nil
 }
 
