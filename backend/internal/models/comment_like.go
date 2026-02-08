@@ -13,6 +13,6 @@ type CommentLike struct {
 	CreatedAt time.Time      `json:"created_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 
-	UserID uuid.UUID `json:"user_id" gorm:"foreignKey;type:uuid"`
+	UserID    uuid.UUID `json:"user_id" gorm:"foreignKey;type:uuid"`
 	CommentID uuid.UUID `json:"comment_id" gorm:"foreignKey;type:uuid"`
 }

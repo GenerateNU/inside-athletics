@@ -5,7 +5,7 @@ import (
 )
 
 type GetCommentLikeParams struct {
-	ID uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID to identify the user"`
+	ID uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID of the like"`
 }
 
 type GetCommentLikeResponse struct {
