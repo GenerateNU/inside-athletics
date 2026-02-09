@@ -1,4 +1,4 @@
-package like
+package post_like
 
 import (
 	"github.com/google/uuid"
@@ -13,12 +13,15 @@ type GetPostLikeResponse struct {
 	PostID uuid.UUID `json:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"PostID of the like"`
 }
 
-type CreatePostLikeRequest struct {
+type CreatePostLikeInput struct {
+	Body CreatePostLikeBody
+}
+
+type CreatePostLikeBody struct {
 	UserID uuid.UUID `json:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"UserID of the like"`
 	PostID uuid.UUID `json:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"PostID of the like"`
 }
 
-// Maybe we should also return the userID and postID of the like, not sure
 type CreatePostLikeResponse struct {
 	ID uuid.UUID `json:"id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the like"`
 }
@@ -31,22 +34,14 @@ type DeletePostLikeResponse struct {
 	Message string `json:"message" example:"Like was deleted successfully" doc:"Message to display"`
 }
 
-// Retrieves all likes from post as int
-type GetLikeCountParams struct {
-	PostID uuid.UUID `path:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"PostID to count likes for"`
+// For the single endpoint that returns like count and whether the user has liked.
+type GetPostLikeInfoParams struct {
+	PostID uuid.UUID `path:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Post to get like info for"`
+	UserID uuid.UUID `query:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Optional; if provided, response includes whether this user has liked"`
 }
 
-// Response body for retrieving all likes from post as int
-type GetLikeCountResponse struct {
-	Total int `json:"total" example:"25" doc:"Total number of likes on post"`
-}
-
-// Checks if given user has liked the post
-type CheckUserLikedPostParams struct {
-	UserID uuid.UUID `query:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"User to check"`
-	PostID uuid.UUID `path:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Post to check"`
-}
-
-type CheckUserLikedPostResponse struct {
-	Liked bool `json:"liked" example:"true" doc:"Whether user liked the post"`
+// Retrieves like count and whether the current user has liked.
+type GetPostLikeInfoResponse struct {
+	Total int  `json:"total" example:"25" doc:"Total number of likes on the post"`
+	Liked bool `json:"liked" example:"true" doc:"Whether the requested user has liked the post"`
 }

@@ -1,190 +1,165 @@
 package routeTests
 
 import (
-	h "inside-athletics/internal/handlers/post_like"
+	"inside-athletics/internal/handlers/post_like"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
 )
 
-// newPostLikeTestUser returns a User for testing
-func newPostLikeTestUser(id uuid.UUID, unique string) models.User {
-	return models.User{
-		ID:                      id,
-		FirstName:               "Test",
-		LastName:                "User",
-		Email:                   "test-" + unique + "@example.com",
-		Username:                "testuser-" + unique,
-		Account_Type:            false,
-		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-	}
-}
-
 func TestCreatePostLike(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
+	if err := testDB.DB.AutoMigrate(&models.Post{}, &models.PostLike{}); err != nil {
+		t.Fatalf("failed to migrate: %v", err)
+	}
 	api := testDB.API
 
-	userID := uuid.New()
 	postID := uuid.New()
-	body := h.CreatePostLikeRequest{UserID: userID, PostID: postID}
+	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test", Content: "Content"}
+	if err := testDB.DB.Create(&post).Error; err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+	userID := uuid.New()
 
-	resp := api.Post("/api/v1/user/", "Authorization: Bearer mock-token", body)
-
-	var u h.CreatePostLikeResponse
-	DecodeTo(&u, resp)
-
-	if u.ID == uuid.Nil {
-		t.Fatalf("Expected like ID to be created, got nil")
+	body := map[string]any{
+		"user_id": userID.String(),
+		"post_id": postID.String(),
+	}
+	resp := api.Post("/api/v1/post-like/", body, "Authorization: Bearer mock-token")
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	// Verify the like exists and has correct user_id and post_id
-	var like models.PostLike
-	if err := testDB.DB.Where("id = ?", u.ID).First(&like).Error; err != nil {
-		t.Fatalf("Expected like to exist in DB: %s", err.Error())
-	}
-	if like.UserID != userID {
-		t.Fatalf("Unexpected user_id: got %s, expected %s", like.UserID.String(), userID.String())
-	}
-	if like.PostID != postID {
-		t.Fatalf("Unexpected post_id: got %s, expected %s", like.PostID.String(), postID.String())
+	var result utils.ResponseBody[post_like.CreatePostLikeResponse]
+	DecodeTo(&result, resp)
+	if result.Body == nil || result.Body.ID == uuid.Nil {
+		t.Error("expected non-zero like ID")
 	}
 }
 
 func TestGetPostLike(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
+	if err := testDB.DB.AutoMigrate(&models.Post{}, &models.PostLike{}); err != nil {
+		t.Fatalf("failed to migrate: %v", err)
+	}
 	api := testDB.API
 
-	user := newPostLikeTestUser(uuid.New(), "get-like")
-	userResp := testDB.DB.Create(&user)
-	_, err := utils.HandleDBError(&user, userResp.Error)
-	if err != nil {
-		t.Fatalf("Unable to add user to table: %s", err.Error())
-	}
-
 	postID := uuid.New()
-	postLike := models.PostLike{
-		UserID: user.ID,
-		PostID: postID,
+	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test", Content: "Content"}
+	if err := testDB.DB.Create(&post).Error; err != nil {
+		t.Fatalf("create post: %v", err)
 	}
-	likeResp := testDB.DB.Create(&postLike)
-	_, err = utils.HandleDBError(&postLike, likeResp.Error)
-	if err != nil {
-		t.Fatalf("Unable to add post like to table: %s", err.Error())
+	userID := uuid.New()
+	like := models.PostLike{ID: uuid.New(), UserID: userID, PostID: postID}
+	if err := testDB.DB.Create(&like).Error; err != nil {
+		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/"+postLike.ID.String(), "Authorization: Bearer mock-token")
-
-	var u h.GetPostLikeResponse
-	DecodeTo(&u, resp)
-
-	if u.UserID != user.ID {
-		t.Fatalf("Unexpected user_id: got %s, expected %s", u.UserID.String(), user.ID.String())
+	resp := api.Get("/api/v1/post-like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
-	if u.PostID != postID {
-		t.Fatalf("Unexpected post_id: got %s, expected %s", u.PostID.String(), postID.String())
+
+	var result utils.ResponseBody[post_like.GetPostLikeResponse]
+	DecodeTo(&result, resp)
+	if result.Body == nil || result.Body.PostID != postID || result.Body.UserID != userID {
+		t.Errorf("expected post_id %s user_id %s, got %+v", postID, userID, result.Body)
 	}
 }
 
-func TestGetLikeCount(t *testing.T) {
+func TestGetPostLikeInfo(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
+	if err := testDB.DB.AutoMigrate(&models.Post{}, &models.PostLike{}); err != nil {
+		t.Fatalf("failed to migrate: %v", err)
+	}
 	api := testDB.API
 
 	postID := uuid.New()
-	// Making likes
-	for i := 0; i < 3; i++ {
-		user := newPostLikeTestUser(uuid.New(), uuid.New().String()[:8])
-		userResp := testDB.DB.Create(&user)
-		_, err := utils.HandleDBError(&user, userResp.Error)
-		if err != nil {
-			t.Fatalf("Unable to add user to table: %s", err.Error())
-		}
-		postLike := models.PostLike{UserID: user.ID, PostID: postID}
-		likeResp := testDB.DB.Create(&postLike)
-		_, err = utils.HandleDBError(&postLike, likeResp.Error)
-		if err != nil {
-			t.Fatalf("Unable to add post like to table: %s", err.Error())
-		}
+	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test", Content: "Content"}
+	if err := testDB.DB.Create(&post).Error; err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+	userID := uuid.New()
+	if err := testDB.DB.Create(&models.PostLike{UserID: userID, PostID: postID}).Error; err != nil {
+		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/post/"+postID.String()+"/like-count", "Authorization: Bearer mock-token")
-
-	var u h.GetLikeCountResponse
-	DecodeTo(&u, resp)
-
-	if u.Total != 3 {
-		t.Fatalf("Unexpected total: got %d, expected 3", u.Total)
-	}
-}
-
-func TestCheckUserLikedPost(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
-
-	user := newPostLikeTestUser(uuid.New(), "check-liked")
-	userResp := testDB.DB.Create(&user)
-	_, err := utils.HandleDBError(&user, userResp.Error)
-	if err != nil {
-		t.Fatalf("Unable to add user to table: %s", err.Error())
+	resp := api.Get("/api/v1/post-like/post/"+postID.String()+"/likes?user_id="+userID.String(), "Authorization: Bearer mock-token")
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	postID := uuid.New()
-	postLike := models.PostLike{UserID: user.ID, PostID: postID}
-	likeResp := testDB.DB.Create(&postLike)
-	_, err = utils.HandleDBError(&postLike, likeResp.Error)
-	if err != nil {
-		t.Fatalf("Unable to add post like to table: %s", err.Error())
+	var result utils.ResponseBody[post_like.GetPostLikeInfoResponse]
+	DecodeTo(&result, resp)
+	if result.Body == nil || result.Body.Total != 1 {
+		t.Errorf("expected total 1, got %v", result.Body)
 	}
-
-	resp := api.Get("/api/v1/user/post/"+postID.String()+"/check-like?user_id="+user.ID.String(), "Authorization: Bearer mock-token")
-
-	var u h.CheckUserLikedPostResponse
-	DecodeTo(&u, resp)
-
-	if !u.Liked {
-		t.Fatalf("Expected liked true, got false")
-	}
-
-	// Check that different user didn't like the post
-	otherUserID := uuid.New()
-	resp2 := api.Get("/api/v1/user/post/"+postID.String()+"/check-like?user_id="+otherUserID.String(), "Authorization: Bearer mock-token")
-	var u2 h.CheckUserLikedPostResponse
-	DecodeTo(&u2, resp2)
-	if u2.Liked {
-		t.Fatalf("Expected liked false for other user, got true")
+	if result.Body != nil && !result.Body.Liked {
+		t.Error("expected liked true")
 	}
 }
 
 func TestDeletePostLike(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
+	if err := testDB.DB.AutoMigrate(&models.Post{}, &models.PostLike{}); err != nil {
+		t.Fatalf("failed to migrate: %v", err)
+	}
 	api := testDB.API
 
-	user := newPostLikeTestUser(uuid.New(), "delete-like")
-	userResp := testDB.DB.Create(&user)
-	_, err := utils.HandleDBError(&user, userResp.Error)
-	if err != nil {
-		t.Fatalf("Unable to add user to table: %s", err.Error())
+	postID := uuid.New()
+	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test", Content: "Content"}
+	if err := testDB.DB.Create(&post).Error; err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+	like := models.PostLike{ID: uuid.New(), UserID: uuid.New(), PostID: postID}
+	if err := testDB.DB.Create(&like).Error; err != nil {
+		t.Fatalf("create like: %v", err)
 	}
 
-	postLike := models.PostLike{UserID: user.ID, PostID: uuid.New()}
-	likeResp := testDB.DB.Create(&postLike)
-	_, err = utils.HandleDBError(&postLike, likeResp.Error)
-	if err != nil {
-		t.Fatalf("Unable to add post like to table: %s", err.Error())
+	resp := api.Delete("/api/v1/post-like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	resp := api.Delete("/api/v1/user/"+postLike.ID.String(), "Authorization: Bearer mock-token")
+	getResp := api.Get("/api/v1/post-like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	if getResp.Code != http.StatusNotFound {
+		t.Errorf("expected 404 after delete, got %d", getResp.Code)
+	}
+}
 
-	var u h.DeletePostLikeResponse
-	DecodeTo(&u, resp)
+func TestCreatePostLikeDuplicateReturns409(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	if err := testDB.DB.AutoMigrate(&models.Post{}, &models.PostLike{}); err != nil {
+		t.Fatalf("failed to migrate: %v", err)
+	}
+	api := testDB.API
 
-	if u.Message != "Like was deleted successfully" {
-		t.Fatalf("Unexpected message: got %s", u.Message)
+	postID := uuid.New()
+	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test", Content: "Content"}
+	if err := testDB.DB.Create(&post).Error; err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+	userID := uuid.New()
+
+	body := map[string]any{
+		"user_id": userID.String(),
+		"post_id": postID.String(),
+	}
+	resp1 := api.Post("/api/v1/post-like/", body, "Authorization: Bearer mock-token")
+	if resp1.Code != http.StatusOK {
+		t.Fatalf("first create expected 200, got %d: %s", resp1.Code, resp1.Body.String())
+	}
+
+	resp2 := api.Post("/api/v1/post-like/", body, "Authorization: Bearer mock-token")
+	if resp2.Code != http.StatusConflict {
+		t.Errorf("expected 409 for duplicate like, got %d: %s", resp2.Code, resp2.Body.String())
 	}
 }

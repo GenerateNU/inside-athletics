@@ -1,4 +1,4 @@
-package like
+package comment_like
 
 import (
 	"github.com/danielgtaylor/huma/v2"
@@ -6,14 +6,13 @@ import (
 )
 
 func Route(api huma.API, db *gorm.DB) {
-	var commentLikeDB = &CommentLikeDB{db}               // create object storing all database level functions for like
-	var commentLikeService = &CommentLikeService{commentLikeDB} // create object with like functionality
+	var commentLikeDB = &CommentLikeDB{db: db}
+	var commentLikeService = &CommentLikeService{commentLikeDB}
 	{
-		grp := huma.NewGroup(api, "/api/v1/user")
-		huma.Post(grp, "/", commentLikeService.CreateCommentLike)
-		huma.Get(grp, "/{id}", commentLikeService.GetCommentLike)
-		huma.Delete(grp, "/{id}", commentLikeService.DeleteCommentLike)
-		huma.Get(grp, "/comment/{comment_id}/like-count", commentLikeService.GetLikeCount)
-		huma.Get(grp, "/comment/{comment_id}/check-like", commentLikeService.CheckUserLikedComment)
+		grp := huma.NewGroup(api, "/api/v1/comment-like")
+		huma.Post(grp, "/", commentLikeService.CreateCommentLike)                    // Create like
+		huma.Get(grp, "/{id}", commentLikeService.GetCommentLike)                    // Get like by ID
+		huma.Delete(grp, "/{id}", commentLikeService.DeleteCommentLike)               // Delete like
+		huma.Get(grp, "/comment/{comment_id}/likes", commentLikeService.GetCommentLikeInfo) // Like count and whether user liked
 	}
 }

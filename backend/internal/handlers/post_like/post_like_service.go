@@ -1,21 +1,22 @@
-package like
+package post_like
 
 import (
 	"context"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type PostLikeService struct {
 	postLikeDB *PostLikeDB
 }
 
-// GetPostLike retrieves a like given an id
+// Retrieves a like by ID.
 func (u *PostLikeService) GetPostLike(ctx context.Context, input *GetPostLikeParams) (*utils.ResponseBody[GetPostLikeResponse], error) {
 	like, err := u.postLikeDB.GetPostLike(input.ID)
-	respBody := &utils.ResponseBody[GetPostLikeResponse]{}
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 	return &utils.ResponseBody[GetPostLikeResponse]{
 		Body: &GetPostLikeResponse{
@@ -25,54 +26,46 @@ func (u *PostLikeService) GetPostLike(ctx context.Context, input *GetPostLikePar
 	}, nil
 }
 
-// CreatePostLike creates a like on a post
-func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostLikeRequest) (*utils.ResponseBody[CreatePostLikeResponse], error) {
+// Creates a like on a post. Returns 409 if the user has already liked the post.
+func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostLikeInput) (*utils.ResponseBody[CreatePostLikeResponse], error) {
+	_, liked, err := u.postLikeDB.GetPostLikeInfo(input.Body.PostID, input.Body.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if liked {
+		return nil, huma.Error409Conflict("User has already liked this post")
+	}
 	postLike := &models.PostLike{
-		UserID: input.UserID,
-		PostID: input.PostID,
+		UserID: input.Body.UserID,
+		PostID: input.Body.PostID,
 	}
 	created, err := u.postLikeDB.CreatePostLike(postLike)
-	respBody := &utils.ResponseBody[CreatePostLikeResponse]{}
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 	return &utils.ResponseBody[CreatePostLikeResponse]{
 		Body: &CreatePostLikeResponse{ID: created.ID},
 	}, nil
 }
 
-// DeletePostLike deletes a like on a post
+// Deletes a like by ID.
 func (u *PostLikeService) DeletePostLike(ctx context.Context, input *DeletePostLikeParams) (*utils.ResponseBody[DeletePostLikeResponse], error) {
 	err := u.postLikeDB.DeletePostLike(input.ID)
-	respBody := &utils.ResponseBody[DeletePostLikeResponse]{}
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 	return &utils.ResponseBody[DeletePostLikeResponse]{
 		Body: &DeletePostLikeResponse{Message: "Like was deleted successfully"},
 	}, nil
 }
 
-// GetLikeCount returns the total number of likes for a post
-func (u *PostLikeService) GetLikeCount(ctx context.Context, input *GetLikeCountParams) (*utils.ResponseBody[GetLikeCountResponse], error) {
-	count, err := u.postLikeDB.GetLikeCount(input.PostID)
-	respBody := &utils.ResponseBody[GetLikeCountResponse]{}
+// Retrieves like count and whether the user has liked the post.
+func (u *PostLikeService) GetPostLikeInfo(ctx context.Context, input *GetPostLikeInfoParams) (*utils.ResponseBody[GetPostLikeInfoResponse], error) {
+	count, liked, err := u.postLikeDB.GetPostLikeInfo(input.PostID, input.UserID)
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
-	return &utils.ResponseBody[GetLikeCountResponse]{
-		Body: &GetLikeCountResponse{Total: int(count)},
-	}, nil
-}
-
-// CheckUserLikedPost returns whether the given user has liked the post
-func (u *PostLikeService) CheckUserLikedPost(ctx context.Context, input *CheckUserLikedPostParams) (*utils.ResponseBody[CheckUserLikedPostResponse], error) {
-	liked, err := u.postLikeDB.CheckUserLikedPost(input.UserID, input.PostID)
-	respBody := &utils.ResponseBody[CheckUserLikedPostResponse]{}
-	if err != nil {
-		return respBody, err
-	}
-	return &utils.ResponseBody[CheckUserLikedPostResponse]{
-		Body: &CheckUserLikedPostResponse{Liked: liked},
+	return &utils.ResponseBody[GetPostLikeInfoResponse]{
+		Body: &GetPostLikeInfoResponse{Total: int(count), Liked: liked},
 	}, nil
 }

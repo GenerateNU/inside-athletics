@@ -1,21 +1,22 @@
-package like
+package comment_like
 
 import (
 	"context"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type CommentLikeService struct {
 	commentLikeDB *CommentLikeDB
 }
 
-// GetCommentLike retrieves a like given an id
+// Retrieves a like by ID.
 func (u *CommentLikeService) GetCommentLike(ctx context.Context, input *GetCommentLikeParams) (*utils.ResponseBody[GetCommentLikeResponse], error) {
 	like, err := u.commentLikeDB.GetCommentLike(input.ID)
-	respBody := &utils.ResponseBody[GetCommentLikeResponse]{}
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 	return &utils.ResponseBody[GetCommentLikeResponse]{
 		Body: &GetCommentLikeResponse{
@@ -25,54 +26,46 @@ func (u *CommentLikeService) GetCommentLike(ctx context.Context, input *GetComme
 	}, nil
 }
 
-// CreateCommentLike creates a like on a comment
-func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *CreateCommentLikeRequest) (*utils.ResponseBody[CreateCommentLikeResponse], error) {
+// Creates a like on a comment. Returns 409 if the user has already liked the comment.
+func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *CreateCommentLikeInput) (*utils.ResponseBody[CreateCommentLikeResponse], error) {
+	_, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, input.Body.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if liked {
+		return nil, huma.Error409Conflict("User has already liked this comment")
+	}
 	commentLike := &models.CommentLike{
-		UserID:    input.UserID,
-		CommentID: input.CommentID,
+		UserID:    input.Body.UserID,
+		CommentID: input.Body.CommentID,
 	}
 	created, err := u.commentLikeDB.CreateCommentLike(commentLike)
-	respBody := &utils.ResponseBody[CreateCommentLikeResponse]{}
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 	return &utils.ResponseBody[CreateCommentLikeResponse]{
 		Body: &CreateCommentLikeResponse{ID: created.ID},
 	}, nil
 }
 
-// DeleteCommentLike deletes a like on a comment
+// Deletes a like by ID.
 func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *DeleteCommentLikeParams) (*utils.ResponseBody[DeleteCommentLikeResponse], error) {
 	err := u.commentLikeDB.DeleteCommentLike(input.ID)
-	respBody := &utils.ResponseBody[DeleteCommentLikeResponse]{}
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
 	return &utils.ResponseBody[DeleteCommentLikeResponse]{
 		Body: &DeleteCommentLikeResponse{Message: "Like was deleted successfully"},
 	}, nil
 }
 
-// GetLikeCount returns the total number of likes for a comment
-func (u *CommentLikeService) GetLikeCount(ctx context.Context, input *GetLikeCountParams) (*utils.ResponseBody[GetLikeCountResponse], error) {
-	count, err := u.commentLikeDB.GetLikeCount(input.CommentID)
-	respBody := &utils.ResponseBody[GetLikeCountResponse]{}
+// Retrieves like count and whether the user has liked the comment.
+func (u *CommentLikeService) GetCommentLikeInfo(ctx context.Context, input *GetCommentLikeInfoParams) (*utils.ResponseBody[GetCommentLikeInfoResponse], error) {
+	count, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.CommentID, input.UserID)
 	if err != nil {
-		return respBody, err
+		return nil, err
 	}
-	return &utils.ResponseBody[GetLikeCountResponse]{
-		Body: &GetLikeCountResponse{Total: int(count)},
-	}, nil
-}
-
-// CheckUserLikedComment returns whether the given user has liked the comment
-func (u *CommentLikeService) CheckUserLikedComment(ctx context.Context, input *CheckUserLikedCommentParams) (*utils.ResponseBody[CheckUserLikedCommentResponse], error) {
-	liked, err := u.commentLikeDB.CheckUserLikedComment(input.UserID, input.CommentID)
-	respBody := &utils.ResponseBody[CheckUserLikedCommentResponse]{}
-	if err != nil {
-		return respBody, err
-	}
-	return &utils.ResponseBody[CheckUserLikedCommentResponse]{
-		Body: &CheckUserLikedCommentResponse{Liked: liked},
+	return &utils.ResponseBody[GetCommentLikeInfoResponse]{
+		Body: &GetCommentLikeInfoResponse{Total: int(count), Liked: liked},
 	}, nil
 }
