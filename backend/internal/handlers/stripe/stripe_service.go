@@ -1,4 +1,4 @@
-package stripe_product
+package stripe
 
 import (
 	"context"

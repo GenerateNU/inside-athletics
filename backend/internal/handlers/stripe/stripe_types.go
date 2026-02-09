@@ -1,4 +1,4 @@
-package stripe_product
+package stripe
 
 import (
 	models "inside-athletics/internal/models"
