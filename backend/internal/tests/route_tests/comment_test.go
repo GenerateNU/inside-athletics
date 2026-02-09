@@ -9,20 +9,47 @@ import (
 	"github.com/google/uuid"
 )
 
+// newCommentTestUser returns a User with only required fields for comment tests
+func newCommentTestUser(id uuid.UUID, unique string) models.User {
+	return models.User{
+		ID:                      id,
+		FirstName:               "Test",
+		LastName:                "User",
+		Email:                   "test-" + unique + "@example.com",
+		Username:                "testuser-" + unique,
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+}
+
+// seedUserAndPost creates a User and a Post (with that user as author) for comment tests
+func seedUserAndPost(t *testing.T, testDB *TestDatabase, unique string) (models.User, models.Post) {
+	t.Helper()
+	user := newCommentTestUser(uuid.New(), unique)
+	if err := testDB.DB.Create(&user).Error; err != nil {
+		t.Fatalf("failed to create user: %v", err)
+	}
+	post := models.Post{
+		AuthorId: user.ID,
+		SportId:  uuid.New(),
+		Title:    "Test Post",
+		Content:  "Test content",
+	}
+	if err := testDB.DB.Create(&post).Error; err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+	return user, post
+}
+
 func TestCreateComment(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
-	userID := uuid.New()
+	user, post := seedUserAndPost(t, testDB, "create-comment")
 
 	body := map[string]any{
-		"user_id":      userID.String(),
-		"post_id":      postID.String(),
+		"user_id":      user.ID.String(),
+		"post_id":      post.ID.String(),
 		"description":  "A test comment",
 		"is_anonymous": false,
 	}
@@ -35,12 +62,12 @@ func TestCreateComment(t *testing.T) {
 	var result comment.CommentResponse
 	DecodeTo(&result, resp)
 	if result.Description != "A test comment" {
-		t.Errorf("expected description A test comment, got %s", result.Description)
+		t.Errorf("expected description 'A test comment', got %s", result.Description)
 	}
-	if result.PostID != postID {
-		t.Errorf("expected post_id %s, got %s", postID, result.PostID)
+	if result.PostID != post.ID {
+		t.Errorf("expected post_id %s, got %s", post.ID, result.PostID)
 	}
-	if result.UserID == nil || *result.UserID != userID {
+	if result.UserID == nil || *result.UserID != user.ID {
 		t.Errorf("expected user_id for non-anonymous comment, got %v", result.UserID)
 	}
 }
@@ -50,16 +77,11 @@ func TestCreateCommentAnonymous(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
-	userID := uuid.New()
+	user, post := seedUserAndPost(t, testDB, "create-anon")
 
 	body := map[string]any{
-		"user_id":      userID.String(),
-		"post_id":      postID.String(),
+		"user_id":      user.ID.String(),
+		"post_id":      post.ID.String(),
 		"description":  "Anonymous comment",
 		"is_anonymous": true,
 	}
@@ -83,14 +105,9 @@ func TestGetComment(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
+	user, post := seedUserAndPost(t, testDB, "get-comment")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	userID := uuid.New()
-	c := &models.Comment{UserID: userID, PostID: postID, Description: "Get me"}
+	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Get me"}
 	created, err := commentDB.CreateComment(c)
 	if err != nil {
 		t.Fatalf("failed to create comment: %v", err)
@@ -112,25 +129,21 @@ func TestGetCommentsByPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
+	user, post := seedUserAndPost(t, testDB, "get-by-post")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	userID := uuid.New()
 	for _, desc := range []string{"First", "Second"} {
-		c := &models.Comment{UserID: userID, PostID: postID, Description: desc}
+		c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: desc}
 		if _, err := commentDB.CreateComment(c); err != nil {
 			t.Fatalf("failed to create comment: %v", err)
 		}
 	}
 
-	resp := api.Get("/api/v1/post/"+postID.String()+"/comments", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/"+post.ID.String()+"/comments", "Authorization: Bearer mock-token")
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
+	// checking for 2 comments in post
 	var result []comment.CommentResponse
 	DecodeTo(&result, resp)
 	if len(result) < 2 {
@@ -142,19 +155,14 @@ func TestGetReplies(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
+	user, post := seedUserAndPost(t, testDB, "get-replies")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	userID := uuid.New()
-	parent := &models.Comment{UserID: userID, PostID: postID, Description: "Parent"}
+	parent := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Parent"}
 	createdParent, err := commentDB.CreateComment(parent)
 	if err != nil {
 		t.Fatalf("failed to create parent: %v", err)
 	}
-	reply := &models.Comment{UserID: userID, PostID: postID, ParentCommentID: &createdParent.ID, Description: "Reply"}
+	reply := &models.Comment{UserID: user.ID, PostID: post.ID, ParentCommentID: &createdParent.ID, Description: "Reply"}
 	if _, err := commentDB.CreateComment(reply); err != nil {
 		t.Fatalf("failed to create reply: %v", err)
 	}
@@ -178,14 +186,9 @@ func TestUpdateComment(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
+	user, post := seedUserAndPost(t, testDB, "update-comment")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	userID := uuid.New()
-	c := &models.Comment{UserID: userID, PostID: postID, Description: "Original"}
+	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Original"}
 	created, err := commentDB.CreateComment(c)
 	if err != nil {
 		t.Fatalf("failed to create comment: %v", err)
@@ -208,14 +211,9 @@ func TestDeleteComment(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
+	user, post := seedUserAndPost(t, testDB, "delete-comment")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	userID := uuid.New()
-	c := &models.Comment{UserID: userID, PostID: postID, Description: "To delete"}
+	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "To delete"}
 	created, err := commentDB.CreateComment(c)
 	if err != nil {
 		t.Fatalf("failed to create comment: %v", err)
@@ -236,27 +234,22 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	postID := uuid.New()
-	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
-	if err := testDB.DB.Create(&post).Error; err != nil {
-		t.Fatalf("failed to create post: %v", err)
-	}
+	user, post := seedUserAndPost(t, testDB, "reply-to-reply")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	userID := uuid.New()
-	parent := &models.Comment{UserID: userID, PostID: postID, Description: "Parent"}
+	parent := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Parent"}
 	createdParent, err := commentDB.CreateComment(parent)
 	if err != nil {
 		t.Fatalf("failed to create parent: %v", err)
 	}
-	reply := &models.Comment{UserID: userID, PostID: postID, ParentCommentID: &createdParent.ID, Description: "Reply"}
+	reply := &models.Comment{UserID: user.ID, PostID: post.ID, ParentCommentID: &createdParent.ID, Description: "Reply"}
 	createdReply, err := commentDB.CreateComment(reply)
 	if err != nil {
 		t.Fatalf("failed to create reply: %v", err)
 	}
 
 	body := map[string]any{
-		"user_id":           userID.String(),
-		"post_id":           postID.String(),
+		"user_id":           user.ID.String(),
+		"post_id":           post.ID.String(),
 		"parent_comment_id": createdReply.ID.String(),
 		"description":       "Reply to reply",
 		"is_anonymous":      false,
