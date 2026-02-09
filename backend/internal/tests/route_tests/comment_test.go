@@ -14,7 +14,7 @@ func TestCreateComment(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -51,7 +51,7 @@ func TestCreateCommentAnonymous(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -84,7 +84,7 @@ func TestGetComment(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -113,7 +113,7 @@ func TestGetCommentsByPost(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -143,7 +143,7 @@ func TestGetReplies(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -179,7 +179,7 @@ func TestUpdateComment(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -209,7 +209,7 @@ func TestDeleteComment(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -237,7 +237,7 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 	postID := uuid.New()
-	post := models.Post{ID: postID, UserID: uuid.New(), Title: "Test Post", Content: "Test content"}
+	post := models.Post{ID: postID, AuthorId: uuid.New(), Title: "Test Post", Content: "Test content"}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
