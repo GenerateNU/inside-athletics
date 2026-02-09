@@ -131,10 +131,10 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 // Decode the given response JSON into the given struct entity.
 func DecodeTo[T any](entity *T, resp *httptest.ResponseRecorder) {
+	var body = resp.Body.String()
 	dec := json.NewDecoder(resp.Body)
-
 	if err := dec.Decode(entity); err != nil {
-		log.Fatalf("decode error: %v", err)
+		log.Fatalf("decode error: %v. \nResp.Body is: %s", err, body)
 	}
 }
 
