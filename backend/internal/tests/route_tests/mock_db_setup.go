@@ -3,7 +3,6 @@ package routeTests
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"inside-athletics/internal/server"
 	"log"
 	"net/http/httptest"
@@ -58,7 +57,6 @@ func SetupTestDB(t *testing.T) *TestDatabase {
 
 	// Verify connection
 	sqlDb, err := db.DB()
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,14 +83,11 @@ func (td *TestDatabase) Teardown(t *testing.T) {
 
 	if td.DB != nil {
 		sqlDb, err := td.DB.DB()
-
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		err = sqlDb.Close()
-
-		if err != nil {
+		if err := sqlDb.Close(); err != nil {
 			t.Fatalf("Unable to close DB connection %s", err.Error())
 		}
 	}
@@ -115,14 +110,16 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 	_, filename, _, _ := runtime.Caller(0)
 	// Go up from current file to project root
-	backendDir := filepath.Join(filepath.Dir(filename), "..", "..")
-	migrationDir := filepath.Join(backendDir, "migrations")
+	backendDir := filepath.Join(filepath.Dir(filename), "..", "..", "..")
+	migrationDir := filepath.Join("internal", "migrations")
 
 	// Run Atlas migrations using exec
 	cmd := exec.Command("atlas", "migrate", "apply",
-		"--dir", fmt.Sprintf("file://%s", migrationDir),
+		"--dir", "file://"+filepath.ToSlash(migrationDir),
 		"--url", connStr,
 	)
+
+	cmd.Dir = backendDir
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -132,28 +129,22 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 // GENERIC HELPER FUNCS
 
-/*
-Decode the given response JSON into the given struct entity. Reads the value into the struct
-*/
+// Decode the given response JSON into the given struct entity.
 func DecodeTo[T any](entity *T, resp *httptest.ResponseRecorder) {
 	dec := json.NewDecoder(resp.Body)
 
-	err := dec.Decode(entity)
-	if err != nil {
+	if err := dec.Decode(entity); err != nil {
 		log.Fatalf("decode error: %v", err)
 	}
 }
 
-/*
-Create API routing with test DB connection based on given dbUrl
-*/
+// Create API routing with test DB connection based on given dbUrl
 func SetupTestAPI(t *testing.T, dbUrl string) (humatest.TestAPI, *gorm.DB) {
 	_, api := humatest.New(t) // setup test API
 
 	api.UseMiddleware(MockAuthMiddleware(api))
 
 	db, err := gorm.Open(gormPostgres.Open(dbUrl), &gorm.Config{})
-
 	if err != nil {
 		t.Errorf("Unable to connect to DB: %v", err)
 	}
