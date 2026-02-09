@@ -47,6 +47,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
+		Role:                  toUserRoleResponse(&user.Role),
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -80,6 +81,7 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
+		Role:                  toUserRoleResponse(&user.Role),
 	}
 
 	return respBody, nil
@@ -191,4 +193,15 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	}
 
 	return parsedID, nil
+}
+
+func toUserRoleResponse(role *models.Role) *UserRoleResponse {
+	if role == nil || role.ID == uuid.Nil {
+		return nil
+	}
+
+	return &UserRoleResponse{
+		ID:   role.ID,
+		Name: role.Name,
+	}
 }

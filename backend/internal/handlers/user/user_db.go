@@ -21,7 +21,7 @@ which allows us to interact with the database without having to write raw SQL qu
 */
 func (u *UserDB) GetUser(id uuid.UUID) (*models.User, error) {
 	var user models.User
-	dbResponse := u.db.Where("id = ?", id).First(&user)
+	dbResponse := u.db.Preload("Role").Where("id = ?", id).First(&user)
 	return utils.HandleDBError(&user, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 
