@@ -13,11 +13,13 @@ const (
 	Year  Interval = "year"
 )
 
-// CreateStripeProductRequest defines the request body for creating a new product
-// NOTE: stripe offers a usage_type parameter where you can bill based on usage, and it hasn't been included for now
 type CreateStripeProductRequest struct {
-	Name          string   `json:"name" binding:"required,min=1,max=100" example:"Premium Plan"`
-	Description   string   `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
+	Name          string        `json:"name" binding:"required,min=1,max=100" example:"Premium Plan"`
+	Description   string        `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
+}
+
+type CreateStripePriceRequest struct {
+	product_ID    string   `json:"id" example:"product_123" doc:"ID of the product"`
 	UnitAmount    float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
 	Interval      Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
@@ -26,17 +28,44 @@ type CreateStripeProductRequest struct {
 type UpdateStripeProductRequest struct {
 	Name          *string   `json:"name" binding:"required,min=1,max=100" example:"Premium Plan"`
 	Description   *string   `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
+}
+
+type UpdateStripePriceRequest struct {
 	UnitAmount    *float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
 	Interval      *Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount *int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
 
-type GetAllStripeProductsResponse struct {
-	StripeProducts []StripeProductResponse `json:"stripe_products" doc:"List of stripe products"`
-	Total          int                     `json:"total" example:"25" doc:"Total number of sports"`
+type GetStripeProductByIDParams struct {
+	ID            string   `json:"id" example:"product_123" doc:"ID of the product"`
 }
 
-type DeleteStripeResponseRequest struct {
+type GetStripePriceByIDParams struct {
+	ID            string   `json:"id" example:"price_123" doc:"ID of the product"`
+}
+
+type GetAllStripeProductsRequest struct {
+}
+
+type GetAllStripePricesRequest struct {
+	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+}
+
+type GetAllStripeProductsResponse struct {
+	StripeProducts []StripeProductResponse `json:"stripe_products" doc:"List of stripe products"`
+	Total          int                     `json:"total" example:"25" doc:"Total number of products"`
+}
+
+type GetAllStripePricesResponse struct {
+	StripePrices []StripePriceResponse `json:"stripe_products" doc:"List of stripe products"`
+	Total          int                 `json:"total" example:"25" doc:"Total number of prices"`
+}
+
+type ArchiveStripeProductRequest struct {
+	ID string `json:"id" example:"product_123" doc:"ID of the product"`
+}
+
+type ArchiveStripePriceRequest struct {
 	ID string `json:"id" example:"price_123" doc:"ID of the product"`
 }
 
@@ -44,18 +73,29 @@ type StripeProductResponse struct {
 	ID            string   `json:"id" example:"price_123" doc:"ID of the product"`
 	Name          string   `json:"name" binding:"required,min=1,max=100" example:"Premium Plan"`
 	Description   string   `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
+}
+
+type StripePriceResponse struct {
+	ID            string   `json:"id" example:"price_123" doc:"ID of the product"`
 	UnitAmount    float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
 	Interval      Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
 
-// ToSportResponse converts a Sport model to a SportResponse
 func ToStripeProductResponse(stripe_product *models.StripeProduct) *StripeProductResponse {
 	return &StripeProductResponse{
 		ID:            stripe_product.ID,
 		Name:          stripe_product.Name,
-		UnitAmount:    stripe_product.UnitAmount,
-		Interval:      Interval(stripe_product.Interval),
-		IntervalCount: stripe_product.IntervalCount,
+		Description:   stripe_product.Description,
 	}
 }
+
+func ToStripePriceResponse(stripe_price *models.StripePrice) *StripePriceResponse {
+	return &StripePriceResponse{
+		ID:            stripe_price.ID,
+		UnitAmount:    stripe_price.UnitAmount,
+		Interval:      Interval(stripe_price.Interval),
+		IntervalCount: stripe_price.IntervalCount,
+	}
+}
+
