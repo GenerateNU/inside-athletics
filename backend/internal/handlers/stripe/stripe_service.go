@@ -2,15 +2,16 @@ package stripe
 
 import (
 	"context"
+	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"log"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/product"
 	"github.com/stripe/stripe-go/v72/price"
+	"github.com/stripe/stripe-go/v72/product"
 )
 
 type StripeProductService struct {
@@ -46,7 +47,7 @@ func (s *StripeProductService) CreateStripeProduct(ctx context.Context, input *s
 	}
 
 	product_params := &stripe.ProductParams{
-    Name: stripe.String(input.Body.Name),
+		Name: stripe.String(input.Body.Name),
 	}
 
 	stripe_product, err := utils.HandleDBError(product.New(product_params))
@@ -57,11 +58,11 @@ func (s *StripeProductService) CreateStripeProduct(ctx context.Context, input *s
 	price_params = &stripe.PriceParams{
 		Product:    stripe.String(stripe_product.ID),
 		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount) * 100), // multiply by 100 since stripe does not take floats
-		Currency:   stripe.String(string(stripe.CurrencyUSD)), //hardcoded USD
-		Recurring: &stripe.PriceRecurringParams {
-			Interval: stripe.String(string(input.Body.Interval)),
-			IntervalCount: stripe.Int64(int64(input.Body.IntervalCount))
-		}
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),        //hardcoded USD
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(input.Body.Interval)),
+			IntervalCount: stripe.Int64(int64(input.Body.IntervalCount)),
+		},
 	}
 
 	stripe_price, err := price.New(price_params)
@@ -73,7 +74,6 @@ func (s *StripeProductService) CreateStripeProduct(ctx context.Context, input *s
 		Body: ToStripeProductResponse(stripe_product),
 	}, nil
 }
-
 
 func (s *StripeProductService) GetStripeProductByID(ctx context.Context, input *GetStripeProductByIDParams) (*utils.ResponseBody[StripeProductResponse], error) {
 	stripe_product, err := utils.HandleDBError(product.Get(input.Body.ID, nil))
@@ -89,15 +89,15 @@ func (s *StripeProductService) GetStripeProductByID(ctx context.Context, input *
 // UpdatePost updates an existing post
 func (s *StripeProductService) UpdateStripeProduct(id String, updates UpdateStripeProductRequest) (*models.StripeProduct, error) {
 	params := &stripe.ProductParams{
-    	Name: stripe.String(input.Body.Name),
+		Name:        stripe.String(input.Body.Name),
 		Description: stripe.String(input.Body.Description),
-		UnitAmount: stripe.int(input.Body.UnitAmount),
-		Recurring: &stripe.PriceRecurringParams {
-			Interval: stripe.String(input.Body.Interval),
+		UnitAmount:  stripe.int(input.Body.UnitAmount),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(input.Body.Interval),
 			IntervalCount: stripe.String(input.Body.IntervalCount),
-		}
+		},
 	}
-	
+
 	stripe_product, err := product.Update("prod_NWjs8kKbJWmuuc", params)
 
 	if err != nil {
@@ -119,13 +119,13 @@ func (s *StripeProductService) GetAllStripeProducts(ctx context.Context, input *
 	}
 
 	if err := iter.Err(); err != nil {
-    log.Fatalf("Error during pagination: %v", err)
+		log.Fatalf("Error during pagination: %v", err)
 	}
 
 	return &utils.ResponseBody[GetAllStripeProductsResponse]{
 		Body: &GetAllStripeProductsResponse{
 			StripeProducts: stripeProductResponses,
-			Total:  int(total),
+			Total:          int(total),
 		},
 	}, nil
 }

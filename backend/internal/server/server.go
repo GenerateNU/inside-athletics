@@ -5,8 +5,8 @@ import (
 	"inside-athletics/internal/handlers/college"
 	"inside-athletics/internal/handlers/health"
 	"inside-athletics/internal/handlers/sport"
+	"inside-athletics/internal/handlers/stripe"
 	"inside-athletics/internal/handlers/user"
-	"inside-athletics/internal/handlers/stripe_product"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -58,7 +58,7 @@ func CreateApp(db *gorm.DB) *App {
 
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
-	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route, stripe_product.Route}
+	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route, stripe.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
