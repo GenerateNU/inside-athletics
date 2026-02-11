@@ -27,6 +27,9 @@ go.work.sum
 # env file
 .env
 
+# Generated seed data files
+backend/scripts/seed/data/*.json
+
 # Editor/IDE
 # .idea/
 # .vscode/
