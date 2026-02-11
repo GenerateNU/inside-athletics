@@ -21,13 +21,24 @@ which allows us to interact with the database without having to write raw SQL qu
 */
 func (u *UserDB) GetUser(id uuid.UUID) (*models.User, error) {
 	var user models.User
-	dbResponse := u.db.Preload("Role").Where("id = ?", id).First(&user)
+	dbResponse := u.db.Preload("Roles").Where("id = ?", id).First(&user)
 	return utils.HandleDBError(&user, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 
 func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
 	dbResponse := u.db.Create(user)
 	return utils.HandleDBError(user, dbResponse.Error)
+}
+
+func (u *UserDB) AddUserRole(userID, roleID uuid.UUID) error {
+	userRole := models.UserRole{
+		UserID: userID,
+		RoleID: roleID,
+	}
+	if err := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).FirstOrCreate(&userRole).Error; err != nil {
+		return huma.Error500InternalServerError("Failed to assign role to user", err)
+	}
+	return nil
 }
 
 func (u *UserDB) GetRoleIDByName(name models.RoleName) (uuid.UUID, error) {

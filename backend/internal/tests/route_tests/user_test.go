@@ -25,7 +25,6 @@ func TestGetUser(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -33,6 +32,7 @@ func TestGetUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	// Need to authenticate each request by passing an authorization header like this
 	// when we start making endpoints that require a user-id you should add the user-id
@@ -67,13 +67,13 @@ func TestGetCurrentUserID(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
 	if err != nil {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	resp := api.Get("/api/v1/user/current", "Authorization: Bearer "+userID.String())
 
@@ -160,13 +160,13 @@ func TestUpdateUser(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
 	if err != nil {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	update := h.UpdateUserBody{
 		FirstName: strPtr("Updated"),
@@ -194,13 +194,13 @@ func TestDeleteUser(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  getRoleID(t, testDB.DB, models.RoleUser),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
 	if err != nil {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	resp := api.Delete("/api/v1/user/"+user.ID.String(), "Authorization: Bearer "+uuid.NewString())
 

@@ -27,11 +27,12 @@ func seedUserWithRoleAndPermissions(t *testing.T, db *gorm.DB, roleName models.R
 		Username:                "testuser",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  roleID,
 	}
 	if err := db.Create(&user).Error; err != nil {
 		t.Fatalf("failed to create test user: %v", err)
 	}
+
+	assignRoleToUser(t, db, userID, roleID)
 
 	for _, perm := range perms {
 		ensurePermissionForRole(t, db, roleID, perm.Action, perm.Resource)
@@ -57,5 +58,17 @@ func ensurePermissionForRole(t *testing.T, db *gorm.DB, roleID uuid.UUID, action
 	}
 	if err := db.Where("role_id = ? AND permission_id = ?", roleID, permission.ID).FirstOrCreate(&rolePermission).Error; err != nil {
 		t.Fatalf("failed to ensure role permission: %v", err)
+	}
+}
+
+func assignRoleToUser(t *testing.T, db *gorm.DB, userID, roleID uuid.UUID) {
+	t.Helper()
+
+	userRole := models.UserRole{
+		UserID: userID,
+		RoleID: roleID,
+	}
+	if err := db.Create(&userRole).Error; err != nil {
+		t.Fatalf("failed to assign role to user: %v", err)
 	}
 }

@@ -23,11 +23,11 @@ func TestPermissionMiddleware_DeniesWithoutRolePermission(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  roleID,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, userID, roleID)
 
 	permission := models.Permission{
 		Action:   models.PermissionCreate,
@@ -63,11 +63,11 @@ func TestPermissionMiddleware_AllowsWithRolePermission(t *testing.T) {
 		Username:                "suli",
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  roleID,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, userID, roleID)
 
 	permission := models.Permission{
 		Action:   models.PermissionCreate,

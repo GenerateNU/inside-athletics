@@ -24,11 +24,11 @@ func TestPermissionCRUD(t *testing.T) {
 		Username:                "admin",
 		Account_Type:            true,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  adminRoleID,
 	}
 	if err := testDB.DB.Create(&adminUser).Error; err != nil {
 		t.Fatalf("failed to create admin user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, adminUserID, adminRoleID)
 
 	createBody := permission.CreatePermissionRequest{
 		Action:   "create",

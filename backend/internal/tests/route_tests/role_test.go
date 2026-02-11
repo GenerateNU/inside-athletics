@@ -24,11 +24,11 @@ func TestRoleCRUD(t *testing.T) {
 		Username:                "admin",
 		Account_Type:            true,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
-		RoleID:                  adminRoleID,
 	}
 	if err := testDB.DB.Create(&adminUser).Error; err != nil {
 		t.Fatalf("failed to create admin user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, adminUserID, adminRoleID)
 
 	createBody := role.CreateRoleRequest{Name: "coach"}
 	createResp := api.Post("/api/v1/role/", createBody, "Authorization: Bearer "+adminUserID.String())

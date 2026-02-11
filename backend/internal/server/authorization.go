@@ -36,13 +36,23 @@ func AdminOnlyMiddleware(db *gorm.DB) fiber.Handler {
 		}
 
 		var user models.User
-		if err := db.Preload("Role").First(&user, "id = ?", parsedUserID).Error; err != nil {
+		if err := db.Select("id").First(&user, "id = ?", parsedUserID).Error; err != nil {
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 				"error": "User not found",
 			})
 		}
 
-		if user.Role.Name != models.RoleAdmin {
+		var count int64
+		if err := db.Table("user_roles").
+			Joins("JOIN roles r ON r.id = user_roles.role_id").
+			Where("user_roles.user_id = ? AND r.name = ?", user.ID, models.RoleAdmin).
+			Count(&count).Error; err != nil {
+			return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Unable to check admin role",
+			})
+		}
+
+		if count == 0 {
 			return c.Status(http.StatusForbidden).JSON(fiber.Map{
 				"error": "Admin privileges required",
 			})
@@ -128,14 +138,15 @@ func authorizeByPermission(db *gorm.DB, userID, method, path, pathID string) (bo
 	}
 
 	var user models.User
-	if err := db.Select("role_id").First(&user, "id = ?", parsedUserID).Error; err != nil {
+	if err := db.Select("id").First(&user, "id = ?", parsedUserID).Error; err != nil {
 		return false, http.StatusUnauthorized, "User not found"
 	}
 
 	var count int64
-	if err := db.Table("role_permissions").
-		Joins("JOIN permissions p ON p.id = role_permissions.permission_id").
-		Where("role_permissions.role_id = ? AND p.action = ? AND p.resource = ?", user.RoleID, action, resource).
+	if err := db.Table("user_roles").
+		Joins("JOIN role_permissions rp ON rp.role_id = user_roles.role_id").
+		Joins("JOIN permissions p ON p.id = rp.permission_id").
+		Where("user_roles.user_id = ? AND p.action = ? AND p.resource = ?", user.ID, action, resource).
 		Count(&count).Error; err != nil {
 		return false, http.StatusInternalServerError, "Unable to check permissions"
 	}
@@ -179,6 +190,7 @@ func resolveResourceAndAction(method, path, userID, pathID string) (string, stri
 	return resource, action
 }
 
+// change this to map so that you can just change the map if you need to update
 func resolveResourceFromPath(path string) string {
 	path = strings.TrimPrefix(path, "/api/v1/")
 	segment := strings.SplitN(path, "/", 2)[0]

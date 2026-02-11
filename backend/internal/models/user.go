@@ -25,8 +25,8 @@ type User struct {
 	Verified_Athlete_Status VerifiedAthleteStatus `json:"verified_athelete_status" example:"pending" doc:"" gorm:"type:varchar(100);not null"`
 	College                 *string        `json:"college" example:"Northeastern University" doc:"The college of a user" gorm:"type:varchar(100);"`
 	Division                *Division      `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint;"`
-	RoleID                  uuid.UUID      `json:"role_id" gorm:"type:uuid;not null;index"`
-	Role                    Role           `json:"role" gorm:"constraint:OnUpdate:NO ACTION,OnDelete:RESTRICT;"`
+	UserRoles               []UserRole     `json:"user_roles,omitempty" gorm:"foreignKey:UserID"`
+	Roles                   []Role         `json:"roles,omitempty" gorm:"many2many:user_roles;"`
 }
 
 type VerifiedAthleteStatus string

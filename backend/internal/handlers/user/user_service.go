@@ -47,7 +47,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
-		Role:                  toUserRoleResponse(&user.Role),
+		Roles:                 toUserRoleResponses(user.Roles),
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -81,7 +81,7 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
-		Role:                  toUserRoleResponse(&user.Role),
+		Roles:                 toUserRoleResponses(user.Roles),
 	}
 
 	return respBody, nil
@@ -118,11 +118,14 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Verified_Athlete_Status: input.Body.VerifiedAthleteStatus,
 		College:                 input.Body.College,
 		Division:                input.Body.Division,
-		RoleID:                  roleID,
 	}
 
 	createdUser, err := u.userDB.CreateUser(user)
 	if err != nil {
+		return respBody, err
+	}
+
+	if err := u.userDB.AddUserRole(createdUser.ID, roleID); err != nil {
 		return respBody, err
 	}
 
@@ -195,13 +198,25 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	return parsedID, nil
 }
 
-func toUserRoleResponse(role *models.Role) *UserRoleResponse {
-	if role == nil || role.ID == uuid.Nil {
+func toUserRoleResponses(roles []models.Role) []UserRoleResponse {
+	if len(roles) == 0 {
 		return nil
 	}
 
-	return &UserRoleResponse{
-		ID:   role.ID,
-		Name: role.Name,
+	responses := make([]UserRoleResponse, 0, len(roles))
+	for _, role := range roles {
+		if role.ID == uuid.Nil {
+			continue
+		}
+		responses = append(responses, UserRoleResponse{
+			ID:   role.ID,
+			Name: role.Name,
+		})
 	}
+
+	if len(responses) == 0 {
+		return nil
+	}
+
+	return responses
 }
