@@ -35,10 +35,12 @@ func TestGetUser(t *testing.T) {
 	}
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
+
 	// Need to authenticate each request by passing an authorization header like this
 	// when we start making endpoints that require a user-id you should add the user-id
 	// you need here
-	resp := api.Get("/api/v1/user/"+user.ID.String(), "Authorization: Bearer "+uuid.NewString())
+	resp := api.Get("/api/v1/user/"+user.ID.String(), authHeader)
 
 	var u h.GetUserResponse
 
@@ -169,11 +171,15 @@ func TestUpdateUser(t *testing.T) {
 	}
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionUpdate, Resource: "user"},
+	})
+
 	update := h.UpdateUserBody{
 		FirstName: strPtr("Updated"),
 	}
 
-	resp := api.Patch("/api/v1/user/"+user.ID.String(), "Authorization: Bearer "+uuid.NewString(), update)
+	resp := api.Patch("/api/v1/user/"+user.ID.String(), authHeader, update)
 
 	var u h.UpdateUserResponse
 	DecodeTo(&u, resp)
@@ -203,7 +209,11 @@ func TestDeleteUser(t *testing.T) {
 	}
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
-	resp := api.Delete("/api/v1/user/"+user.ID.String(), "Authorization: Bearer "+uuid.NewString())
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "user"},
+	})
+
+	resp := api.Delete("/api/v1/user/"+user.ID.String(), authHeader)
 
 	var u h.DeleteUserResponse
 	DecodeTo(&u, resp)

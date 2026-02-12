@@ -41,6 +41,11 @@ func seedUserWithRoleAndPermissions(t *testing.T, db *gorm.DB, roleName models.R
 	return userID, "Authorization: Bearer " + userID.String()
 }
 
+func authHeaderWithPermissions(t *testing.T, db *gorm.DB, perms []permissionSpec) string {
+	_, header := seedUserWithRoleAndPermissions(t, db, models.RoleAdmin, perms)
+	return header
+}
+
 func ensurePermissionForRole(t *testing.T, db *gorm.DB, roleID uuid.UUID, action models.PermissionAction, resource string) {
 	t.Helper()
 

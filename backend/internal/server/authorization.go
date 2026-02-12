@@ -37,6 +37,10 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 			next(ctx)
 			return
 		}
+		if resource == "user" && action == models.PermissionCreate {
+			next(ctx)
+			return
+		}
 
 		allowed, status, msg := authorizeByPermission(db, userID, action, resource)
 		if !allowed {
