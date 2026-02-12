@@ -62,10 +62,18 @@ func (s *SportDB) GetAllSports(limit, offset int) ([]models.Sport, int64, error)
 	return sports, total, nil
 }
 
-// UpdateSport updates an existing sport
-func (s *SportDB) UpdateSport(sport *models.Sport) (*models.Sport, error) {
-	dbResponse := s.db.Save(sport)
-	return utils.HandleDBError(sport, dbResponse.Error)
+// UpdateSport updates an existing sport by ID
+func (s *SportDB) UpdateSport(id uuid.UUID, updates UpdateSportRequest) (*models.Sport, error) {
+	dbResponse := s.db.Model(&models.Sport{}).
+		Where("id = ?", id).
+		Updates(updates)
+	if dbResponse.Error != nil {
+		return nil, dbResponse.Error
+	}
+	if dbResponse.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return s.GetSportByID(id)
 }
 
 // DeleteSport soft deletes a sport by ID
