@@ -34,6 +34,7 @@ type App struct {
 
 type RouteFN func(api huma.API, db *gorm.DB)
 
+// CreateApp initializes the Fiber app and returns the assembled App (server + Huma API).
 func CreateApp(db *gorm.DB) *App {
 
 	router := setupApp()
@@ -59,6 +60,7 @@ func CreateApp(db *gorm.DB) *App {
 	}
 }
 
+// CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
 	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route, college.Route, tag.Route, tagpost.Route, comment.Route}
@@ -67,7 +69,7 @@ func CreateRoutes(db *gorm.DB, api huma.API) {
 	}
 }
 
-// Initialize Fiber app with middlewares / configs
+// setupApp initializes the Fiber app with middleware and returns the configured instance.
 func setupApp() *fiber.App {
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,

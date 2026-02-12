@@ -51,10 +51,19 @@ func (c *CommentDB) GetReplies(commentID uuid.UUID) ([]models.Comment, error) {
 	return comments, nil
 }
 
-// Updates an existing comment
-func (c *CommentDB) UpdateComment(comment *models.Comment) (*models.Comment, error) {
-	dbResponse := c.db.Save(comment)
-	return utils.HandleDBError(comment, dbResponse.Error)
+// Updates an existing comment by ID
+func (c *CommentDB) UpdateComment(id uuid.UUID, updates UpdateCommentBody) (*models.Comment, error) {
+	dbResponse := c.db.Model(&models.Comment{}).
+		Where("id = ?", id).
+		Updates(updates)
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError((*models.Comment)(nil), dbResponse.Error)
+		return nil, err
+	}
+	if dbResponse.RowsAffected == 0 {
+		return nil, huma.Error404NotFound("Resource not found")
+	}
+	return c.GetCommentByID(id)
 }
 
 // Soft deletes a comment by ID
