@@ -27,6 +27,7 @@ func (u *CommentLikeService) GetCommentLike(ctx context.Context, input *GetComme
 }
 
 // Creates a like on a comment. Returns 409 if the user has already liked the comment.
+// Response includes total likes on the comment and liked=true for the requesting user.
 func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *CreateCommentLikeInput) (*utils.ResponseBody[CreateCommentLikeResponse], error) {
 	_, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, input.Body.UserID)
 	if err != nil {
@@ -43,19 +44,40 @@ func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *Creat
 	if err != nil {
 		return nil, err
 	}
+	total, _, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, input.Body.UserID)
+	if err != nil {
+		return nil, err
+	}
 	return &utils.ResponseBody[CreateCommentLikeResponse]{
-		Body: &CreateCommentLikeResponse{ID: created.ID},
+		Body: &CreateCommentLikeResponse{
+			ID:    created.ID,
+			Total: int(total),
+			Liked: true,
+		},
 	}, nil
 }
 
-// Deletes a like by ID.
+// Deletes a like by ID. Response includes updated total likes on the comment and if user liked comment.
 func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *DeleteCommentLikeParams) (*utils.ResponseBody[DeleteCommentLikeResponse], error) {
-	err := u.commentLikeDB.DeleteCommentLike(input.ID)
+	like, err := u.commentLikeDB.GetCommentLike(input.ID)
+	if err != nil {
+		return nil, err
+	}
+	commentID := like.CommentID
+	err = u.commentLikeDB.DeleteCommentLike(input.ID)
+	if err != nil {
+		return nil, err
+	}
+	total, liked, err := u.commentLikeDB.GetCommentLikeInfo(commentID, input.UserID)
 	if err != nil {
 		return nil, err
 	}
 	return &utils.ResponseBody[DeleteCommentLikeResponse]{
-		Body: &DeleteCommentLikeResponse{Message: "Like was deleted successfully"},
+		Body: &DeleteCommentLikeResponse{
+			Message: "Like was deleted successfully",
+			Total:   int(total),
+			Liked:   liked,
+		},
 	}, nil
 }
 
