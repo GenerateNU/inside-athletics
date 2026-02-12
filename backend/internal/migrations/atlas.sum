@@ -5,3 +5,5 @@ h1:x2HjRF2pWHqEMQQH/QGN3MmMS6DbUB5mOVWcm3+VSkU=
 20260130221229_Create-Tag-Table.sql h1:ejU6CsNYrzfQ5OXt+cJMGtUOobD9amJHuzi68sktDQ4=
 20260131201229_CreateSportsTable.sql h1:NLLyHaKw25DFycNkpjKD3pvGmhE4a7ADWB/gof8qk5A=
 20260202233427_CreateTagPostTable.sql h1:AerhmK0WHGw6qnHWm862voyD4t0AN+WQ0Krs+snQvjU=
+20260208163126_create_post_table.sql h1:mItgOBi+wio/M2aTvhGbnfkgorROHioR1P5yDpNehFw=
+20260209175859_AddCommentsTable.sql h1:iHsOgP4kBI4SP0KxVrfvil0iZX+qUYe709tCcOIdC6I=
