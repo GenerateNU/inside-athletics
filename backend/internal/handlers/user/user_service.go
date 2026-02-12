@@ -55,7 +55,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	}, err
 }
 
-func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetCurrentUserIDResponse], error) {
+func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetCurrentUserIDResponse], error) {
 	respBody := &utils.ResponseBody[GetCurrentUserIDResponse]{}
 
 	userID, err := u.getCurrentUserID(ctx)
