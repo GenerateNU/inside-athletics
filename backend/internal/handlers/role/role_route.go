@@ -11,6 +11,7 @@ func Route(api huma.API, db *gorm.DB) {
 	{
 		grp := huma.NewGroup(api, "/api/v1/role")
 		huma.Post(grp, "/", roleService.CreateRole)
+		huma.Post(grp, "/basic", roleService.CreateRoleNameOnly)
 		huma.Get(grp, "/{id}", roleService.GetRoleByID)
 		huma.Patch(grp, "/{id}", roleService.UpdateRole)
 		huma.Delete(grp, "/{id}", roleService.DeleteRole)
