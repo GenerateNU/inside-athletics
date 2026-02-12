@@ -4,6 +4,7 @@ import (
 	h "inside-athletics/internal/handlers/user"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
@@ -209,6 +210,59 @@ func TestDeleteUser(t *testing.T) {
 
 	if u.ID != user.ID {
 		t.Fatalf("Unexpected response: %s", resp.Body.String())
+	}
+}
+
+func TestAssignRoleToUser(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	adminRoleID := getRoleID(t, testDB.DB, models.RoleAdmin)
+	adminUserID := uuid.New()
+	adminUser := models.User{
+		ID:                      adminUserID,
+		FirstName:               "Admin",
+		LastName:                "User",
+		Email:                   "admin@example.com",
+		Username:                "admin",
+		Account_Type:            true,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&adminUser).Error; err != nil {
+		t.Fatalf("failed to create admin user: %v", err)
+	}
+	assignRoleToUser(t, testDB.DB, adminUserID, adminRoleID)
+	ensurePermissionForRole(t, testDB.DB, adminRoleID, models.PermissionCreate, "user")
+
+	targetUserID := uuid.New()
+	targetUser := models.User{
+		ID:                      targetUserID,
+		FirstName:               "Target",
+		LastName:                "User",
+		Email:                   "target@example.com",
+		Username:                "target",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&targetUser).Error; err != nil {
+		t.Fatalf("failed to create target user: %v", err)
+	}
+
+	moderatorRoleID := getRoleID(t, testDB.DB, models.RoleModerator)
+	body := map[string]any{
+		"role_id": moderatorRoleID,
+	}
+
+	resp := api.Post("/api/v1/user/"+targetUserID.String()+"/roles", body, "Authorization: Bearer "+adminUserID.String())
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var assigned h.AssignRoleResponse
+	DecodeTo(&assigned, resp)
+	if assigned.UserID != targetUserID || assigned.Role.ID != moderatorRoleID {
+		t.Fatalf("unexpected role assignment response: %+v", assigned)
 	}
 }
 
