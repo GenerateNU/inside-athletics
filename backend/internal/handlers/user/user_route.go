@@ -23,5 +23,6 @@ func Route(api huma.API, db *gorm.DB) {
 		huma.Get(grp, "/{id}", userService.GetUser)
 		huma.Patch(grp, "/{id}", userService.UpdateUser)
 		huma.Delete(grp, "/{id}", userService.DeleteUser)
+		huma.Post(grp, "/{id}/roles", userService.AssignRole)
 	}
 }

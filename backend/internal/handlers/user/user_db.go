@@ -41,6 +41,17 @@ func (u *UserDB) AddUserRole(userID, roleID uuid.UUID) error {
 	return nil
 }
 
+func (u *UserDB) GetRoleByID(id uuid.UUID) (*models.Role, error) {
+	var role models.Role
+	if err := u.db.Where("id = ?", id).First(&role).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, huma.Error404NotFound("Role not found")
+		}
+		return nil, huma.Error500InternalServerError("Database error", err)
+	}
+	return &role, nil
+}
+
 func (u *UserDB) GetRoleIDByName(name models.RoleName) (uuid.UUID, error) {
 	var role models.Role
 	if err := u.db.Select("id").Where("name = ?", name).First(&role).Error; err != nil {

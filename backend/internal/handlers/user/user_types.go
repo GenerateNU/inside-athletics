@@ -98,3 +98,17 @@ type UpdateUserResponse struct {
 type DeleteUserResponse struct {
 	ID uuid.UUID `json:"id" example:"1" doc:"ID of the deleted user"`
 }
+
+type AssignRoleInput struct {
+	ID   uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID of the user"`
+	Body AssignRoleRequest
+}
+
+type AssignRoleRequest struct {
+	RoleID uuid.UUID `json:"role_id" example:"1" doc:"ID of the role to assign"`
+}
+
+type AssignRoleResponse struct {
+	UserID uuid.UUID       `json:"user_id" example:"1" doc:"ID of the user"`
+	Role   UserRoleResponse `json:"role" doc:"Assigned role"`
+}

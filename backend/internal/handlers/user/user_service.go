@@ -168,6 +168,36 @@ func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*ut
 	return respBody, nil
 }
 
+func (u *UserService) AssignRole(ctx context.Context, input *AssignRoleInput) (*utils.ResponseBody[AssignRoleResponse], error) {
+	if input.Body.RoleID == uuid.Nil {
+		return nil, huma.Error422UnprocessableEntity("role_id cannot be empty")
+	}
+
+	_, err := u.userDB.GetUser(input.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	role, err := u.userDB.GetRoleByID(input.Body.RoleID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.userDB.AddUserRole(input.ID, input.Body.RoleID); err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[AssignRoleResponse]{
+		Body: &AssignRoleResponse{
+			UserID: input.ID,
+			Role: UserRoleResponse{
+				ID:   role.ID,
+				Name: role.Name,
+			},
+		},
+	}, nil
+}
+
 func marshalSport(sport []string) ([]byte, error) {
 	if sport == nil {
 		return nil, nil
