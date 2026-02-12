@@ -32,12 +32,10 @@ func TestHasPermission(t *testing.T) {
 		{
 			name: "matching permission",
 			role: &models.Role{
-				RolePermissions: []models.RolePermission{
+				Permissions: []models.Permission{
 					{
-						Permission: models.Permission{
-							Action:   models.PermissionCreate,
-							Resource: "sport",
-						},
+						Action:   models.PermissionCreate,
+						Resource: "sport",
 					},
 				},
 			},
@@ -48,12 +46,10 @@ func TestHasPermission(t *testing.T) {
 		{
 			name: "non-matching resource",
 			role: &models.Role{
-				RolePermissions: []models.RolePermission{
+				Permissions: []models.Permission{
 					{
-						Permission: models.Permission{
-							Action:   models.PermissionCreate,
-							Resource: "post",
-						},
+						Action:   models.PermissionCreate,
+						Resource: "post",
 					},
 				},
 			},
@@ -64,12 +60,10 @@ func TestHasPermission(t *testing.T) {
 		{
 			name: "non-matching action",
 			role: &models.Role{
-				RolePermissions: []models.RolePermission{
+				Permissions: []models.Permission{
 					{
-						Permission: models.Permission{
-							Action:   models.PermissionUpdate,
-							Resource: "sport",
-						},
+						Action:   models.PermissionUpdate,
+						Resource: "sport",
 					},
 				},
 			},
@@ -80,18 +74,14 @@ func TestHasPermission(t *testing.T) {
 		{
 			name: "multiple permissions includes match",
 			role: &models.Role{
-				RolePermissions: []models.RolePermission{
+				Permissions: []models.Permission{
 					{
-						Permission: models.Permission{
-							Action:   models.PermissionCreate,
-							Resource: "post",
-						},
+						Action:   models.PermissionCreate,
+						Resource: "post",
 					},
 					{
-						Permission: models.Permission{
-							Action:   models.PermissionDelete,
-							Resource: "sport",
-						},
+						Action:   models.PermissionDelete,
+						Resource: "sport",
 					},
 				},
 			},

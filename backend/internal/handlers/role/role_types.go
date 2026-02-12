@@ -45,13 +45,13 @@ type GetAllRolesResponse struct {
 }
 
 // HasPermission checks whether the given role grants the action/resource.
-// It expects RolePermissions with Permission preloaded.
+// It expects Permissions to be preloaded on the role.
 func HasPermission(role *models.Role, action models.PermissionAction, resource string) bool {
 	if role == nil {
 		return false
 	}
-	for _, rp := range role.RolePermissions {
-		if rp.Permission.Action == action && rp.Permission.Resource == resource {
+	for _, perm := range role.Permissions {
+		if perm.Action == action && perm.Resource == resource {
 			return true
 		}
 	}
