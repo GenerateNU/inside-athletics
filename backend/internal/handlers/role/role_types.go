@@ -1,14 +1,15 @@
 package role
 
 import (
+	"inside-athletics/internal/handlers/permission"
 	"inside-athletics/internal/models"
 
 	"github.com/google/uuid"
 )
 
 type CreateRoleRequest struct {
-	Name        string                 `json:"name" example:"moderator" doc:"Name of the role"`
-	Permissions []PermissionSpecInput  `json:"permissions,omitempty" doc:"Permissions to attach to the role"`
+	Name        string                `json:"name" example:"moderator" doc:"Name of the role"`
+	Permissions []PermissionSpecInput `json:"permissions,omitempty" doc:"Permissions to attach to the role"`
 }
 
 type PermissionSpecInput struct {
@@ -22,8 +23,9 @@ type UpdateRoleRequest struct {
 }
 
 type RoleResponse struct {
-	ID   uuid.UUID       `json:"id" example:"1" doc:"ID of the role"`
-	Name models.RoleName `json:"name" example:"admin" doc:"Name of the role"`
+	ID          uuid.UUID                       `json:"id" example:"1" doc:"ID of the role"`
+	Name        models.RoleName                 `json:"name" example:"admin" doc:"Name of the role"`
+	Permissions []permission.PermissionResponse `json:"permissions,omitempty" doc:"Permissions attached to the role"`
 }
 
 type GetRoleByIDParams struct {

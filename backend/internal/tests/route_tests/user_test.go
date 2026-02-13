@@ -80,7 +80,7 @@ func TestGetCurrentUserID(t *testing.T) {
 
 	resp := api.Get("/api/v1/user/current", "Authorization: Bearer "+userID.String())
 
-	var u h.GetCurrentUserIDResponse
+	var u h.GetUserResponse
 	DecodeTo(&u, resp)
 
 	if u.ID != user.ID ||

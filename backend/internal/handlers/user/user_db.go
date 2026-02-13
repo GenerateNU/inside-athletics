@@ -30,37 +30,30 @@ func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
 	return utils.HandleDBError(user, dbResponse.Error)
 }
 
+// This function creates a link between a user and a role in the user_roles table
+// We use FirstOrCreate to avoid duplicate entries if the user already has the role
 func (u *UserDB) AddUserRole(userID, roleID uuid.UUID) error {
 	userRole := models.UserRole{
 		UserID: userID,
 		RoleID: roleID,
 	}
-	if err := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).FirstOrCreate(&userRole).Error; err != nil {
+	if err := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).Find(&userRole).Error; err != nil {
 		return huma.Error500InternalServerError("Failed to assign role to user", err)
 	}
 	return nil
 }
 
-func (u *UserDB) GetRoleByID(id uuid.UUID) (*models.Role, error) {
-	var role models.Role
-	if err := u.db.Where("id = ?", id).First(&role).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, huma.Error404NotFound("Role not found")
-		}
-		return nil, huma.Error500InternalServerError("Database error", err)
+func (u *UserDB) GetAllRolesForUser(userID uuid.UUID) (*[]models.Role, error) {
+	var userRoles []models.Role
+	conds := struct{ id uuid.UUID }{id: userID}
+	dbResponse := u.db.Preload("Roles").Find(&userRoles, conds)
+	if dbResponse.Error != nil {
+		return nil, huma.Error500InternalServerError("Failed to get user roles", dbResponse.Error)
 	}
-	return &role, nil
-}
-
-func (u *UserDB) GetRoleIDByName(name models.RoleName) (uuid.UUID, error) {
-	var role models.Role
-	if err := u.db.Select("id").Where("name = ?", name).First(&role).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return uuid.Nil, huma.Error500InternalServerError("Default role not found")
-		}
-		return uuid.Nil, huma.Error500InternalServerError("Database error", err)
-	}
-	return role.ID, nil
+	err := u.db.Joins("JOIN user_roles ON user_roles.role_id = roles.id").
+		Where("user_roles.user_id = ?", userID).
+		Find(&userRoles).Error
+	return utils.HandleDBError(&userRoles, err)
 }
 
 func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User, error) {

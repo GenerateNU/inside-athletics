@@ -1,6 +1,8 @@
 package user
 
 import (
+	"inside-athletics/internal/handlers/role"
+
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
@@ -14,8 +16,9 @@ Groups together all of the User routes. Huma is a wrapper here that automaticall
     error status code
 */
 func Route(api huma.API, db *gorm.DB) {
-	var userDB = &UserDB{db}               // create object storing all database level functions for user
-	var userService = &UserService{userDB} // create object with user functionality
+	var userDB = &UserDB{db}
+	var roleDB = role.NewRoleDB(db)                // create object storing all database level functions for user
+	var userService = &UserService{userDB, roleDB} // create object with user functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/user")
 		huma.Get(grp, "/current", userService.GetCurrentUser)

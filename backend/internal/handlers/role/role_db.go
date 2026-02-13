@@ -70,6 +70,17 @@ func (r *RoleDB) GetRoleByID(id uuid.UUID) (*models.Role, error) {
 	return utils.HandleDBError(&role, dbResponse.Error)
 }
 
+func (u *RoleDB) GetRoleIDByName(name models.RoleName) (uuid.UUID, error) {
+	var role models.Role
+	if err := u.db.Select("id").Where("name = ?", name).First(&role).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return uuid.Nil, huma.Error500InternalServerError("Default role not found")
+		}
+		return uuid.Nil, huma.Error500InternalServerError("Database error", err)
+	}
+	return role.ID, nil
+}
+
 func (r *RoleDB) GetAllRoles(limit, offset int) ([]models.Role, int64, error) {
 	if limit == 0 {
 		limit = 20
@@ -89,6 +100,8 @@ func (r *RoleDB) GetAllRoles(limit, offset int) ([]models.Role, int64, error) {
 
 	return roles, total, nil
 }
+
+func (r *RoleDB) GetAllPermissionsForRole()
 
 func (r *RoleDB) UpdateRole(role *models.Role) (*models.Role, error) {
 	dbResponse := r.db.Save(role)

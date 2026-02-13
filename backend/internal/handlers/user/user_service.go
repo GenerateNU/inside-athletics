@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -12,6 +13,7 @@ import (
 
 type UserService struct {
 	userDB *UserDB
+	roleDB *role.RoleDB
 }
 
 /*
@@ -31,6 +33,11 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		return respBody, err
 	}
 
+	userRoles, err := u.userDB.GetAllRolesForUser(id)
+	if err != nil {
+		return nil, err
+	}
+
 	// mapping to correct response type
 	// we do this so we can control what values are
 	// returned by the API
@@ -47,7 +54,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
-		Roles:                 toUserRoleResponses(user.Roles),
+		Roles:                 userRoles,
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -55,8 +62,8 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	}, err
 }
 
-func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetCurrentUserIDResponse], error) {
-	respBody := &utils.ResponseBody[GetCurrentUserIDResponse]{}
+func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetUserResponse], error) {
+	respBody := &utils.ResponseBody[GetUserResponse]{}
 
 	userID, err := u.getCurrentUserID(ctx)
 	if err != nil {
@@ -68,7 +75,12 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		return respBody, err
 	}
 
-	respBody.Body = &GetCurrentUserIDResponse{
+	userRoles, err := u.userDB.GetAllRolesForUser(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	respBody.Body = &GetUserResponse{
 		ID:                    user.ID,
 		FirstName:             user.FirstName,
 		LastName:              user.LastName,
@@ -81,7 +93,7 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
-		Roles:                 toUserRoleResponses(user.Roles),
+		Roles:                 userRoles,
 	}
 
 	return respBody, nil
@@ -100,7 +112,7 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		return respBody, err
 	}
 
-	roleID, err := u.userDB.GetRoleIDByName(models.RoleUser)
+	roleID, err := u.roleDB.GetRoleIDByName(models.RoleUser)
 	if err != nil {
 		return respBody, err
 	}
@@ -178,7 +190,7 @@ func (u *UserService) AssignRole(ctx context.Context, input *AssignRoleInput) (*
 		return nil, err
 	}
 
-	role, err := u.userDB.GetRoleByID(input.Body.RoleID)
+	role, err := u.roleDB.GetRoleByID(input.Body.RoleID)
 	if err != nil {
 		return nil, err
 	}

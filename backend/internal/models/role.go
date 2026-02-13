@@ -21,8 +21,6 @@ type Role struct {
 	UpdatedAt       time.Time        `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt   `json:"deleted_at,omitempty" gorm:"index"`
 	Name            RoleName         `json:"name" gorm:"type:varchar(50);not null;unique"`
-	Permissions     []Permission     `json:"permissions,omitempty" gorm:"many2many:role_permissions;"`
-	RolePermissions []RolePermission `json:"role_permissions,omitempty" gorm:"foreignKey:RoleID"`
 }
 
 type RolePermission struct {
