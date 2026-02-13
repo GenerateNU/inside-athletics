@@ -12,7 +12,6 @@ import (
 	"github.com/stripe/stripe-go/v72/price"
 	"github.com/stripe/stripe-go/v72/product"
 
-	"github.com/google/uuid"
 	"github.com/stripe/stripe-go/v72/customer"
 )
 
@@ -365,6 +364,7 @@ func (s *StripeService) ArchiveStripePrice(ctx context.Context, input *ArchiveSt
 		Body: ToStripePriceResponse(&final),
 	}, nil
 }
+
 func (s *StripeService) RegisterStripeCustomer(ctx context.Context, input *RegisterStripeCustomerInput) (*utils.ResponseBody[RegisterStripeCustomerResponse], error) {
 	params := &stripe.CustomerParams{
 		Name:        input.Body.Name,
@@ -379,7 +379,7 @@ func (s *StripeService) RegisterStripeCustomer(ctx context.Context, input *Regis
 	}
 	return &utils.ResponseBody[RegisterStripeCustomerResponse]{
 		Body: &RegisterStripeCustomerResponse{
-			ID: uuid.MustParse(result.ID),
+			ID: result.ID,
 		},
 	}, nil
 }
@@ -388,7 +388,7 @@ func (s *StripeService) GetStripeCustomer(ctx context.Context, input *GetStripeC
 	id := input.ID
 
 	params := &stripe.CustomerParams{}
-	result, err := customer.Get(id.String(), params)
+	result, err := customer.Get(id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -422,7 +422,7 @@ func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateS
 		}
 	}
 
-	result, err := customer.Get(id.String(), params)
+	result, err := customer.Update(id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -431,6 +431,7 @@ func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateS
 	}, nil
 }
 
+/**
 func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteStripeCustomerInput) (*utils.ResponseBody[DeleteStripeCustomerResponse], error) {
 	id := input.ID
 
@@ -449,6 +450,7 @@ func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteS
 		Body: respBody,
 	}, nil
 }
+*/
 
 func mapStripeCustomerToModel(c *stripe.Customer) *GetStripeCustomerResponse {
 	customer := &GetStripeCustomerResponse{
@@ -496,3 +498,5 @@ func mapStripeCustomerToModel(c *stripe.Customer) *GetStripeCustomerResponse {
 
 	return customer
 }
+
+// Checkout Sessions CRUD

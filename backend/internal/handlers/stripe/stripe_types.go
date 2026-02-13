@@ -2,8 +2,6 @@ package stripe
 
 import (
 	models "inside-athletics/internal/models"
-
-	"github.com/google/uuid"
 )
 
 type Interval string
@@ -102,7 +100,7 @@ func ToStripePriceResponse(stripe_price *models.StripePrice) *StripePriceRespons
 }
 
 type GetStripeCustomerInput struct {
-	ID uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID to identify the stripe user"`
+	ID string `path:"id" maxLength:"36" example:"1" doc:"ID to identify the stripe user"`
 }
 
 type GetStripeCustomerResponse struct {
@@ -148,11 +146,11 @@ type RegisterStripeCustomerBody struct {
 }
 
 type RegisterStripeCustomerResponse struct {
-	ID uuid.UUID `json:"id" example:"1" doc:"ID of the user on stripe"`
+	ID string `json:"id" example:"1" doc:"ID of the user on stripe"`
 }
 
 type UpdateStripeCustomerInput struct {
-	ID   uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID to identify the stripe user"`
+	ID   string `path:"id" maxLength:"36" example:"1" doc:"ID to identify the stripe user"`
 	Body UpdateStripeCustomerBody
 }
 
@@ -176,7 +174,7 @@ type CustomField struct {
 }
 
 type DeleteStripeCustomerInput struct {
-	ID uuid.UUID `json:"path" maxLength:"36" example:"1" doc:"ID of the user on stripe"`
+	ID string `json:"path" maxLength:"36" example:"1" doc:"ID of the user on stripe"`
 }
 
 type DeleteStripeCustomerResponse struct {

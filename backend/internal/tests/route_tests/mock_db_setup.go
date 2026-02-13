@@ -7,6 +7,7 @@ import (
 	"inside-athletics/internal/server"
 	"log"
 	"net/http/httptest"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2/humatest"
+	"github.com/stripe/stripe-go/v72"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -31,6 +33,8 @@ type TestDatabase struct {
 // SetupTestDB creates a new PostgreSQL container and returns a connection
 func SetupTestDB(t *testing.T) *TestDatabase {
 	ctx := context.Background()
+
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	// Create PostgreSQL container
 	postgresContainer, err := postgres.Run(ctx,
