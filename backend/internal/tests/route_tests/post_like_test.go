@@ -1,9 +1,8 @@
 package routeTests
 
 import (
-	h "inside-athletics/internal/handlers/post_like"
+	"inside-athletics/internal/handlers/post_like"
 	"inside-athletics/internal/models"
-	"inside-athletics/internal/utils"
 	"net/http"
 	"testing"
 
@@ -26,15 +25,16 @@ func TestCreatePostLike(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.CreatePostLikeResponse]
+	var result post_like.CreatePostLikeResponse
+
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.ID == uuid.Nil {
+	if result.ID == uuid.Nil {
 		t.Error("expected non-zero like ID")
 	}
-	if result.Body != nil && result.Body.Total != 1 {
-		t.Errorf("expected total 1, got %d", result.Body.Total)
+	if result.Total != 1 {
+		t.Errorf("expected total 1, got %d", result.Total)
 	}
-	if result.Body != nil && !result.Body.Liked {
+	if !result.Liked {
 		t.Error("expected liked true after create")
 	}
 }
@@ -54,10 +54,11 @@ func TestGetPostLike(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.GetPostLikeResponse]
+	var result post_like.GetPostLikeResponse
+
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.PostID != post.ID || result.Body.UserID != user.ID {
-		t.Errorf("expected post_id %s user_id %s, got %+v", post.ID, user.ID, result.Body)
+	if result.PostID != post.ID || result.UserID != user.ID {
+		t.Errorf("expected post_id %s user_id %s, got %+v", post.ID, user.ID, result)
 	}
 }
 
@@ -75,12 +76,13 @@ func TestGetPostLikeInfo(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.GetPostLikeInfoResponse]
+	var result post_like.GetPostLikeInfoResponse
+
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.Total != 1 {
-		t.Errorf("expected total 1, got %v", result.Body)
+	if result.Total != 1 {
+		t.Errorf("expected total 1, got %v", result)
 	}
-	if result.Body != nil && !result.Body.Liked {
+	if !result.Liked {
 		t.Error("expected liked true")
 	}
 }
@@ -100,15 +102,16 @@ func TestDeletePostLike(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.DeletePostLikeResponse]
+	var result post_like.DeletePostLikeResponse
+
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.Message != "Like was deleted successfully" {
-		t.Errorf("expected success message, got %+v", result.Body)
+	if result.Message != "Like was deleted successfully" {
+		t.Errorf("expected success message, got %+v", result)
 	}
-	if result.Body != nil && result.Body.Total != 0 {
-		t.Errorf("expected total 0 after delete, got %d", result.Body.Total)
+	if result.Total != 0 {
+		t.Errorf("expected total 0 after delete, got %d", result.Total)
 	}
-	if result.Body != nil && result.Body.Liked {
+	if result.Liked {
 		t.Error("expected liked false after delete")
 	}
 

@@ -1,9 +1,8 @@
 package routeTests
 
 import (
-	h "inside-athletics/internal/handlers/comment_like"
+	"inside-athletics/internal/handlers/comment_like"
 	"inside-athletics/internal/models"
-	"inside-athletics/internal/utils"
 	"net/http"
 	"testing"
 
@@ -40,15 +39,16 @@ func TestCreateCommentLike(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.CreateCommentLikeResponse]
+	var result comment_like.CreateCommentLikeResponse
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.ID == uuid.Nil {
+
+	if result.ID == uuid.Nil {
 		t.Error("expected non-zero like ID")
 	}
-	if result.Body != nil && result.Body.Total != 1 {
-		t.Errorf("expected total 1, got %d", result.Body.Total)
+	if result.Total != 1 {
+		t.Errorf("expected total 1, got %d", result.Total)
 	}
-	if result.Body != nil && !result.Body.Liked {
+	if !result.Liked {
 		t.Error("expected liked true after create")
 	}
 }
@@ -68,10 +68,10 @@ func TestGetCommentLike(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.GetCommentLikeResponse]
+	var result comment_like.GetCommentLikeResponse
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.CommentID != comment.ID || result.Body.UserID != user.ID {
-		t.Errorf("expected comment_id %s user_id %s, got %+v", comment.ID, user.ID, result.Body)
+	if result.CommentID != comment.ID || result.UserID != user.ID {
+		t.Errorf("expected comment_id %s user_id %s, got %+v", comment.ID, user.ID, result)
 	}
 }
 
@@ -89,12 +89,12 @@ func TestGetCommentLikeInfo(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.GetCommentLikeInfoResponse]
+	var result comment_like.GetCommentLikeInfoResponse
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.Total != 1 {
-		t.Errorf("expected total 1, got %v", result.Body)
+	if result.Total != 1 {
+		t.Errorf("expected total 1, got %v", result)
 	}
-	if result.Body != nil && !result.Body.Liked {
+	if !result.Liked {
 		t.Error("expected liked true")
 	}
 }
@@ -114,15 +114,15 @@ func TestDeleteCommentLike(t *testing.T) {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result utils.ResponseBody[h.DeleteCommentLikeResponse]
+	var result comment_like.DeleteCommentLikeResponse
 	DecodeTo(&result, resp)
-	if result.Body == nil || result.Body.Message != "Like was deleted successfully" {
-		t.Errorf("expected success message, got %+v", result.Body)
+	if result.Message != "Like was deleted successfully" {
+		t.Errorf("expected success message, got %+v", result)
 	}
-	if result.Body != nil && result.Body.Total != 0 {
-		t.Errorf("expected total 0 after delete, got %d", result.Body.Total)
+	if result.Total != 0 {
+		t.Errorf("expected total 0 after delete, got %d", result.Total)
 	}
-	if result.Body != nil && result.Body.Liked {
+	if result.Liked {
 		t.Error("expected liked false after delete")
 	}
 
