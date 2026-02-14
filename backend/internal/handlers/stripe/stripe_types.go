@@ -1,9 +1,5 @@
 package stripe
 
-import (
-	models "inside-athletics/internal/models"
-)
-
 type Interval string
 
 const (

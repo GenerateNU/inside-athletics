@@ -2,12 +2,76 @@ package routeTests
 
 import (
 	s "inside-athletics/internal/handlers/stripe"
+	"inside-athletics/internal/utils"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/customer"
+	"github.com/stripe/stripe-go/v72/product"
+	// "github.com/stripe/stripe-go/v72/price"
 )
+
+func TestCreateProduct(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	name := "Premium Plan"
+	description := "Get premium content with this subscription"
+
+	body := s.CreateStripeProductRequest{
+		Name:        name,
+		Description: description,
+	}
+
+	resp := api.Post("/api/v1/stripe_product/", body, "Authorization: Bearer "+uuid.NewString())
+	var product stripe.Product
+	DecodeTo(&product, resp)
+
+	if product.Name != "Premium Plan" {
+		t.Errorf("expected Name to be 'Premium Plan', got %s", product.Name)
+	}
+	if product.Description != "Get premium content with this subscription" {
+		t.Errorf("expected Description to be 'Get premium content...', got %s", product.Description)
+	}
+}
+
+func TestGetProductByID(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	name := "Premium Plan"
+	description := "Get premium content with this subscription"
+
+	product_params := &stripe.ProductParams{
+		Name:        stripe.String(name),
+		Description: stripe.String(description),
+	}
+
+	resp, _ := utils.HandleDBError(product.New(product_params))
+
+	body := s.GetStripeProductByIDParams{
+		ID: resp.ID,
+	}
+
+	resp_recieved := api.Get("/api/v1/stripe_product/"+resp.ID, body, "Authorization: Bearer "+uuid.NewString())
+	var product stripe.Product
+	DecodeTo(&product, resp_recieved)
+
+	if product.Name != "Premium Plan" {
+		t.Errorf("expected Name to be 'Premium Plan', got %s", product.Name)
+	}
+	if product.Description != "Get premium content with this subscription" {
+		t.Errorf("expected Description to be 'Get premium content...', got %s", product.Description)
+	}
+}
 
 func TestGetCustomer(t *testing.T) {
 	testDB := SetupTestDB(t)

@@ -34,6 +34,7 @@ func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ 
 
 	product_params := &stripe.ProductParams{
 		Name: stripe.String(input.Body.Name),
+		Description: stripe.String(input.Body.Description),
 	}
 
 	stripe_product, err := utils.HandleDBError(product.New(product_params))
