@@ -6,6 +6,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
+	"fmt"
 
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/price"
@@ -49,7 +50,7 @@ func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ 
 
 func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Body CreateStripePriceRequest }) (*utils.ResponseBody[stripe.Price], error) {
 	// Validate business rules
-	if input.Body.product_ID == "" {
+	if input.Body.Product_ID == "" {
 		return nil, huma.Error422UnprocessableEntity("ID cannot be empty.")
 	}
 	if input.Body.UnitAmount <= 0 {
@@ -65,8 +66,8 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 	}
 
 	price_params := &stripe.PriceParams{
-		Product:    stripe.String(input.Body.product_ID),
-		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount) * 100), // multiply by 100 since stripe does not take floats
+		Product:    stripe.String(input.Body.Product_ID),
+		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount) / 100), // multiply by 100 since stripe does not take floats
 		Currency:   stripe.String(string(stripe.CurrencyUSD)),        //hardcoded USD
 		Recurring: &stripe.PriceRecurringParams{
 			Interval:      stripe.String(string(input.Body.Interval)),
@@ -85,6 +86,10 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 }
 
 func (s *StripeService) GetStripeProductByID(ctx context.Context, input *GetStripeProductByIDParams) (*utils.ResponseBody[stripe.Product], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("product ID is empty")
+	}
+
 	stripe_product, err := product.Get(input.ID, nil)
 	if err != nil {
 		return nil, err
@@ -96,6 +101,9 @@ func (s *StripeService) GetStripeProductByID(ctx context.Context, input *GetStri
 }
 
 func (s *StripeService) GetStripePriceByID(ctx context.Context, input *GetStripePriceByIDParams) (*utils.ResponseBody[stripe.Price], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("price ID is empty")
+	}
 	stripe_price, err := price.Get(input.ID, nil)
 	if err != nil {
 		return nil, err
@@ -110,6 +118,9 @@ func (s *StripeService) UpdateStripeProduct(ctx context.Context, input *struct {
 	ID   string `path:"id"`
 	Body UpdateStripeProductRequest
 }) (*utils.ResponseBody[stripe.Product], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("product ID is empty")
+	}
 
 	product_params := &stripe.ProductParams{
 		Name:        input.Body.Name,
@@ -130,6 +141,9 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 	ID   string `path:"id"`
 	Body UpdateStripePriceRequest
 }) (*utils.ResponseBody[stripe.Price], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("price ID is empty")
+	}
 
 	price_params := &stripe.PriceParams{
 		UnitAmount: stripe.Int64(int64(*input.Body.UnitAmount) * 100), // multiply by 100 since stripe does not take floats
@@ -168,6 +182,9 @@ func (s *StripeService) GetAllStripeProducts(ctx context.Context, input *GetAllS
 }
 
 func (s *StripeService) GetAllStripePrices(ctx context.Context, input *GetAllStripePricesRequest) (*utils.ResponseBody[[]*stripe.Price], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("product ID is empty")
+	}
 	params := &stripe.PriceListParams{
 		Product: stripe.String(input.ID),
 	}
@@ -192,6 +209,9 @@ func (s *StripeService) GetAllStripePrices(ctx context.Context, input *GetAllStr
 // apparently you can't delete a product due to historical billing data, but you can archive it
 // archiving a product automatically archives all the prices associated with it
 func (s *StripeService) ArchiveStripeProduct(ctx context.Context, input *ArchiveStripeProductRequest) (*utils.ResponseBody[*stripe.Product], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("product ID is empty")
+	}
 	params := &stripe.ProductParams{
 		Active: stripe.Bool(false),
 	}
@@ -224,6 +244,9 @@ func (s *StripeService) ArchiveStripeProduct(ctx context.Context, input *Archive
 }
 
 func (s *StripeService) ArchiveStripePrice(ctx context.Context, input *ArchiveStripePriceRequest) (*utils.ResponseBody[*stripe.Price], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("price ID is empty")
+	}
 	params := &stripe.PriceParams{
 		Active: stripe.Bool(false),
 	}

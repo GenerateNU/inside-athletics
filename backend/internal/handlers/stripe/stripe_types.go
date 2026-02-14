@@ -15,8 +15,8 @@ type CreateStripeProductRequest struct {
 }
 
 type CreateStripePriceRequest struct {
-	product_ID    string   `json:"id" example:"product_123" doc:"ID of the product"`
-	UnitAmount    float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
+	Product_ID    string   `json:"id" example:"product_123" doc:"ID of the product"`
+	UnitAmount    int  `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
@@ -27,17 +27,17 @@ type UpdateStripeProductRequest struct {
 }
 
 type UpdateStripePriceRequest struct {
-	UnitAmount    *float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
+	UnitAmount    *int  `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      *Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount *int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
 
 type GetStripeProductByIDParams struct {
-	ID string `json:"id" example:"product_123" doc:"ID of the product"`
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
 type GetStripePriceByIDParams struct {
-	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
 type GetAllStripeProductsRequest struct {
