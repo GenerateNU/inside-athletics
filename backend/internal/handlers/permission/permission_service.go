@@ -24,6 +24,9 @@ func (p *PermissionService) CreatePermission(ctx context.Context, input *struct{
 	if input.Body.Action == "" || input.Body.Resource == "" {
 		return nil, huma.Error422UnprocessableEntity("action and resource are required")
 	}
+	if !models.IsValidPermissionAction(models.PermissionAction(input.Body.Action)) {
+		return nil, huma.Error422UnprocessableEntity("invalid permission action")
+	}
 
 	perm, err := p.permissionDB.CreatePermission(input.Body.Action, input.Body.Resource)
 	if err != nil {
@@ -31,7 +34,7 @@ func (p *PermissionService) CreatePermission(ctx context.Context, input *struct{
 	}
 
 	return &utils.ResponseBody[PermissionResponse]{
-		Body: toPermissionResponse(perm),
+		Body: ToPermissionResponse(perm),
 	}, nil
 }
 
@@ -42,7 +45,7 @@ func (p *PermissionService) GetPermissionByID(ctx context.Context, input *GetPer
 	}
 
 	return &utils.ResponseBody[PermissionResponse]{
-		Body: toPermissionResponse(perm),
+		Body: ToPermissionResponse(perm),
 	}, nil
 }
 
@@ -54,7 +57,7 @@ func (p *PermissionService) GetAllPermissions(ctx context.Context, input *GetAll
 
 	responses := make([]PermissionResponse, 0, len(perms))
 	for i := range perms {
-		responses = append(responses, *toPermissionResponse(&perms[i]))
+		responses = append(responses, *ToPermissionResponse(&perms[i]))
 	}
 
 	return &utils.ResponseBody[GetAllPermissionsResponse]{
@@ -73,6 +76,9 @@ func (p *PermissionService) UpdatePermission(ctx context.Context, input *struct 
 		if *input.Body.Action == "" {
 			return nil, huma.Error422UnprocessableEntity("action cannot be empty")
 		}
+		if !models.IsValidPermissionAction(models.PermissionAction(*input.Body.Action)) {
+			return nil, huma.Error422UnprocessableEntity("invalid permission action")
+		}
 	}
 	if input.Body.Resource != nil {
 		if *input.Body.Resource == "" {
@@ -86,7 +92,7 @@ func (p *PermissionService) UpdatePermission(ctx context.Context, input *struct 
 	}
 
 	return &utils.ResponseBody[PermissionResponse]{
-		Body: toPermissionResponse(updated),
+		Body: ToPermissionResponse(updated),
 	}, nil
 }
 
@@ -101,14 +107,6 @@ func (p *PermissionService) DeletePermission(ctx context.Context, input *DeleteP
 	}
 
 	return &utils.ResponseBody[PermissionResponse]{
-		Body: toPermissionResponse(perm),
+		Body: ToPermissionResponse(perm),
 	}, nil
-}
-
-func toPermissionResponse(perm *models.Permission) *PermissionResponse {
-	return &PermissionResponse{
-		ID:       perm.ID,
-		Action:   perm.Action,
-		Resource: perm.Resource,
-	}
 }

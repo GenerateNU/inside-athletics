@@ -30,7 +30,8 @@ func TestRoleCRUD(t *testing.T) {
 	}
 	assignRoleToUser(t, testDB.DB, adminUserID, adminRoleID)
 
-	createBody := role.CreateRoleRequest{Name: "coach"}
+	roleName := "coach_" + uuid.NewString()
+	createBody := role.CreateRoleRequest{Name: roleName}
 	createResp := api.Post("/api/v1/role/", createBody, "Authorization: Bearer "+adminUserID.String())
 	if createResp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", createResp.Code, createResp.Body.String())
@@ -38,7 +39,7 @@ func TestRoleCRUD(t *testing.T) {
 
 	var created role.RoleResponse
 	DecodeTo(&created, createResp)
-	if created.Name != "coach" {
+	if string(created.Name) != roleName {
 		t.Fatalf("unexpected role name: %+v", created)
 	}
 
@@ -49,7 +50,7 @@ func TestRoleCRUD(t *testing.T) {
 
 	var fetched role.RoleResponse
 	DecodeTo(&fetched, getResp)
-	if fetched.ID != created.ID || fetched.Name != "coach" {
+	if fetched.ID != created.ID || string(fetched.Name) != roleName {
 		t.Fatalf("unexpected role response: %+v", fetched)
 	}
 

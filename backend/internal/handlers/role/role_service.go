@@ -30,6 +30,9 @@ func (r *RoleService) CreateRole(ctx context.Context, input *struct{ Body Create
 		if perm.Action == "" || perm.Resource == "" {
 			return nil, huma.Error422UnprocessableEntity("permissions must include action and resource")
 		}
+		if !models.IsValidPermissionAction(perm.Action) {
+			return nil, huma.Error422UnprocessableEntity("invalid permission action")
+		}
 		builder.WithPermission(perm.Action, perm.Resource)
 	}
 
@@ -108,6 +111,9 @@ func (r *RoleService) UpdateRole(ctx context.Context, input *struct {
 		for _, perm := range *input.Body.Permissions {
 			if perm.Action == "" || perm.Resource == "" {
 				return nil, huma.Error422UnprocessableEntity("permissions must include action and resource")
+			}
+			if !models.IsValidPermissionAction(perm.Action) {
+				return nil, huma.Error422UnprocessableEntity("invalid permission action")
 			}
 		}
 	}

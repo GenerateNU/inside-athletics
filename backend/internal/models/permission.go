@@ -17,6 +17,19 @@ const (
 	PermissionDeleteOwn PermissionAction = "delete_own"
 )
 
+var validPermissionActions = map[PermissionAction]struct{}{
+	PermissionCreate:    {},
+	PermissionUpdate:    {},
+	PermissionDelete:    {},
+	PermissionUpdateOwn: {},
+	PermissionDeleteOwn: {},
+}
+
+func IsValidPermissionAction(action PermissionAction) bool {
+	_, ok := validPermissionActions[action]
+	return ok
+}
+
 type Permission struct {
 	ID              uuid.UUID        `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	CreatedAt       time.Time        `json:"created_at"`

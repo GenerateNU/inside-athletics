@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"inside-athletics/internal/handlers/permission"
 	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -38,6 +39,11 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		return nil, err
 	}
 
+	roleResponses, err := u.mapRolesWithPermissions(userRoles)
+	if err != nil {
+		return nil, err
+	}
+
 	// mapping to correct response type
 	// we do this so we can control what values are
 	// returned by the API
@@ -54,7 +60,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
-		Roles:                 userRoles,
+		Roles:                 roleResponses,
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -80,6 +86,11 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		return nil, err
 	}
 
+	roleResponses, err := u.mapRolesWithPermissions(userRoles)
+	if err != nil {
+		return nil, err
+	}
+
 	respBody.Body = &GetUserResponse{
 		ID:                    user.ID,
 		FirstName:             user.FirstName,
@@ -93,7 +104,7 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
-		Roles:                 userRoles,
+		Roles:                 roleResponses,
 	}
 
 	return respBody, nil
@@ -240,25 +251,26 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	return parsedID, nil
 }
 
-func toUserRoleResponses(roles []models.Role) []UserRoleResponse {
-	if len(roles) == 0 {
-		return nil
+func (u *UserService) mapRolesWithPermissions(userRoles *[]models.Role) (*[]role.RoleResponse, error) {
+	if userRoles == nil {
+		return nil, nil
 	}
 
-	responses := make([]UserRoleResponse, 0, len(roles))
-	for _, role := range roles {
-		if role.ID == uuid.Nil {
-			continue
+	responses := make([]role.RoleResponse, 0, len(*userRoles))
+	for i := range *userRoles {
+		perms, err := u.roleDB.GetAllPermissionsForRole((*userRoles)[i].ID)
+		if err != nil {
+			return nil, err
 		}
-		responses = append(responses, UserRoleResponse{
-			ID:   role.ID,
-			Name: role.Name,
+
+		permResponses := permission.ToPermissionResponses(perms)
+
+		responses = append(responses, role.RoleResponse{
+			ID:          (*userRoles)[i].ID,
+			Name:        (*userRoles)[i].Name,
+			Permissions: permResponses,
 		})
 	}
 
-	if len(responses) == 0 {
-		return nil
-	}
-
-	return responses
+	return &responses, nil
 }

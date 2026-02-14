@@ -111,25 +111,25 @@ func resolveResourceAndAction(method, path, userID, pathID string) (models.Permi
 }
 
 // change this to map so that you can just change the map if you need to update
+var resourceByPathSegment = map[string]string{
+	"user":        "user",
+	"users":       "user",
+	"post":        "post",
+	"posts":       "post",
+	"sport":       "sport",
+	"sports":      "sport",
+	"college":     "college",
+	"colleges":    "college",
+	"role":        "role",
+	"roles":       "role",
+	"permission":  "permission",
+	"permissions": "permission",
+}
+
 func resolveResourceFromPath(path string) string {
 	path = strings.TrimPrefix(path, "/api/v1/")
 	segment := strings.SplitN(path, "/", 2)[0]
-	switch segment {
-	case "user", "users":
-		return "user"
-	case "post", "posts":
-		return "post"
-	case "sport", "sports":
-		return "sport"
-	case "college", "colleges":
-		return "college"
-	case "role", "roles":
-		return "role"
-	case "permission", "permissions":
-		return "permission"
-	default:
-		return ""
-	}
+	return resourceByPathSegment[segment]
 }
 
 func getUserIDFromContext(ctx context.Context) (string, bool) {

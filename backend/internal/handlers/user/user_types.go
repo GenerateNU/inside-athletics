@@ -1,6 +1,7 @@
 package user
 
 import (
+	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ type GetUserResponse struct {
 	VerifiedAthleteStatus models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
 	College               *string                      `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
 	Division              *models.Division             `json:"division,omitempty" example:"1" doc:"The division of their college"`
-	Roles                 *[]models.Role               `json:"roles,omitempty" doc:"Roles assigned to the user"`
+	Roles                 *[]role.RoleResponse         `json:"roles,omitempty" doc:"Roles assigned to the user"`
 }
 
 type UserRoleResponse struct {

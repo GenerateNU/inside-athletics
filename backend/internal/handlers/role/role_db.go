@@ -101,7 +101,24 @@ func (r *RoleDB) GetAllRoles(limit, offset int) ([]models.Role, int64, error) {
 	return roles, total, nil
 }
 
-func (r *RoleDB) GetAllPermissionsForRole()
+func (r *RoleDB) GetAllPermissionsForRole(roleID uuid.UUID) ([]models.Permission, error) {
+	var perms []models.Permission
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.
+			Joins("JOIN role_permissions ON role_permissions.permission_id = permissions.id").
+			Where("role_permissions.role_id = ?", roleID).
+			Find(&perms).Error; err != nil {
+			return huma.Error500InternalServerError("Failed to get role permissions", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return perms, nil
+}
 
 func (r *RoleDB) UpdateRole(role *models.Role) (*models.Role, error) {
 	dbResponse := r.db.Save(role)

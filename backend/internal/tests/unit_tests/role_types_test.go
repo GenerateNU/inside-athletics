@@ -10,33 +10,31 @@ import (
 func TestHasPermission(t *testing.T) {
 	tests := []struct {
 		name     string
-		role     *models.Role
+		perms    []models.Permission
 		action   models.PermissionAction
 		resource string
 		want     bool
 	}{
 		{
 			name:     "nil role",
-			role:     nil,
+			perms:    nil,
 			action:   models.PermissionCreate,
 			resource: "sport",
 			want:     false,
 		},
 		{
 			name:     "no permissions",
-			role:     &models.Role{},
+			perms:    []models.Permission{},
 			action:   models.PermissionCreate,
 			resource: "sport",
 			want:     false,
 		},
 		{
 			name: "matching permission",
-			role: &models.Role{
-				Permissions: []models.Permission{
-					{
-						Action:   models.PermissionCreate,
-						Resource: "sport",
-					},
+			perms: []models.Permission{
+				{
+					Action:   models.PermissionCreate,
+					Resource: "sport",
 				},
 			},
 			action:   models.PermissionCreate,
@@ -45,12 +43,10 @@ func TestHasPermission(t *testing.T) {
 		},
 		{
 			name: "non-matching resource",
-			role: &models.Role{
-				Permissions: []models.Permission{
-					{
-						Action:   models.PermissionCreate,
-						Resource: "post",
-					},
+			perms: []models.Permission{
+				{
+					Action:   models.PermissionCreate,
+					Resource: "post",
 				},
 			},
 			action:   models.PermissionCreate,
@@ -59,12 +55,10 @@ func TestHasPermission(t *testing.T) {
 		},
 		{
 			name: "non-matching action",
-			role: &models.Role{
-				Permissions: []models.Permission{
-					{
-						Action:   models.PermissionUpdate,
-						Resource: "sport",
-					},
+			perms: []models.Permission{
+				{
+					Action:   models.PermissionUpdate,
+					Resource: "sport",
 				},
 			},
 			action:   models.PermissionCreate,
@@ -73,16 +67,14 @@ func TestHasPermission(t *testing.T) {
 		},
 		{
 			name: "multiple permissions includes match",
-			role: &models.Role{
-				Permissions: []models.Permission{
-					{
-						Action:   models.PermissionCreate,
-						Resource: "post",
-					},
-					{
-						Action:   models.PermissionDelete,
-						Resource: "sport",
-					},
+			perms: []models.Permission{
+				{
+					Action:   models.PermissionCreate,
+					Resource: "post",
+				},
+				{
+					Action:   models.PermissionDelete,
+					Resource: "sport",
 				},
 			},
 			action:   models.PermissionDelete,
@@ -93,7 +85,7 @@ func TestHasPermission(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := role.HasPermission(tt.role, tt.action, tt.resource); got != tt.want {
+			if got := role.HasPermission(tt.perms, tt.action, tt.resource); got != tt.want {
 				t.Fatalf("HasPermission() = %v, want %v", got, tt.want)
 			}
 		})

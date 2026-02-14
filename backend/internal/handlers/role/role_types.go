@@ -46,13 +46,9 @@ type GetAllRolesResponse struct {
 	Total int            `json:"total" doc:"Total number of roles"`
 }
 
-// HasPermission checks whether the given role grants the action/resource.
-// It expects Permissions to be preloaded on the role.
-func HasPermission(role *models.Role, action models.PermissionAction, resource string) bool {
-	if role == nil {
-		return false
-	}
-	for _, perm := range role.Permissions {
+// HasPermission checks whether the given permission list grants the action/resource.
+func HasPermission(perms []models.Permission, action models.PermissionAction, resource string) bool {
+	for _, perm := range perms {
 		if perm.Action == action && perm.Resource == resource {
 			return true
 		}

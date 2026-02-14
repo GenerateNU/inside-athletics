@@ -45,15 +45,13 @@ func (u *UserDB) AddUserRole(userID, roleID uuid.UUID) error {
 
 func (u *UserDB) GetAllRolesForUser(userID uuid.UUID) (*[]models.Role, error) {
 	var userRoles []models.Role
-	conds := struct{ id uuid.UUID }{id: userID}
-	dbResponse := u.db.Preload("Roles").Find(&userRoles, conds)
-	if dbResponse.Error != nil {
-		return nil, huma.Error500InternalServerError("Failed to get user roles", dbResponse.Error)
-	}
 	err := u.db.Joins("JOIN user_roles ON user_roles.role_id = roles.id").
 		Where("user_roles.user_id = ?", userID).
 		Find(&userRoles).Error
-	return utils.HandleDBError(&userRoles, err)
+	if err != nil {
+		return nil, huma.Error500InternalServerError("Failed to get user roles", err)
+	}
+	return &userRoles, nil
 }
 
 func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User, error) {

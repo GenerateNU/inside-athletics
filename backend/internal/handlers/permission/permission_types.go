@@ -22,6 +22,25 @@ type PermissionResponse struct {
 	Resource string                  `json:"resource" example:"user" doc:"Resource for the permission"`
 }
 
+func ToPermissionResponse(perm *models.Permission) *PermissionResponse {
+	return &PermissionResponse{
+		ID:       perm.ID,
+		Action:   perm.Action,
+		Resource: perm.Resource,
+	}
+}
+
+func ToPermissionResponses(perms []models.Permission) []PermissionResponse {
+	if len(perms) == 0 {
+		return nil
+	}
+	responses := make([]PermissionResponse, 0, len(perms))
+	for i := range perms {
+		responses = append(responses, *ToPermissionResponse(&perms[i]))
+	}
+	return responses
+}
+
 type GetPermissionByIDParams struct {
 	ID uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID of the permission"`
 }
