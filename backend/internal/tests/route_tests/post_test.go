@@ -16,6 +16,11 @@ func TestCreatePost(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
 	authorID := uuid.New()
 
 	popularity := int32(100000)
@@ -25,7 +30,7 @@ func TestCreatePost(t *testing.T) {
 		"popularity": popularity,
 	}
 
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -43,7 +48,7 @@ func TestCreatePost(t *testing.T) {
 		"is_anonymous": true,
 	}
 
-	resp := api.Post("/api/v1/post/", body, "Authorization: Bearer mock-token")
+	resp := api.Post("/api/v1/post/", body, authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -85,6 +90,10 @@ func TestGetPostById(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	})
+
 	authorID := uuid.New()
 
 	popularity := int32(100000)
@@ -94,7 +103,7 @@ func TestGetPostById(t *testing.T) {
 		"popularity": popularity,
 	}
 
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -116,7 +125,7 @@ func TestGetPostById(t *testing.T) {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
-	resp := api.Get("/api/v1/post/"+createdPost.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/"+createdPost.ID.String(), authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -161,19 +170,21 @@ func TestBadValidation(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-	resp := api.Get("/api/v1/post/"+"random string", "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
+
+	resp := api.Get("/api/v1/post/"+"random string", authHeader)
 
 	if resp.Code == http.StatusOK {
 		t.Fatalf("expected status 422, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	resp = api.Get("/api/v1/posts/by-sport/"+"random string", "Authorization: Bearer mock-token")
+	resp = api.Get("/api/v1/posts/by-sport/"+"random string", authHeader)
 
 	if resp.Code == http.StatusOK {
 		t.Fatalf("expected status 422, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	resp = api.Get("/api/v1/posts/by-author/"+"random string", "Authorization: Bearer mock-token")
+	resp = api.Get("/api/v1/posts/by-author/"+"random string", authHeader)
 
 	if resp.Code == http.StatusOK {
 		t.Fatalf("expected status 422, got %d: %s", resp.Code, resp.Body.String())
@@ -192,13 +203,17 @@ func TestGetPostByAuthorId(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	})
+
 	// Create a sport first
 	popularity := int32(100000)
 	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -231,7 +246,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
 
-	resp := api.Get("/api/v1/posts/by-author/" + authorID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/posts/by-author/"+authorID.String(), authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -257,13 +272,17 @@ func TestGetPostsBySportId(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	})
+
 	// Create a sport first
 	popularity := int32(100000)
 	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -297,7 +316,7 @@ func TestGetPostsBySportId(t *testing.T) {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
 
-	resp := api.Get("/api/v1/posts/by-sport/" + sportID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/posts/by-sport/"+sportID.String(), authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -323,13 +342,17 @@ func TestGetAllPosts(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	})
+
 	// Create a sport first
 	popularity := int32(100000)
 	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -363,7 +386,7 @@ func TestGetAllPosts(t *testing.T) {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
 
-	resp := api.Get("/api/v1/posts/", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/posts/", authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -389,13 +412,18 @@ func TestUpdatePost(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionUpdate, Resource: "post"},
+	})
+
 	// Create a sport first
 	popularity := int32(100000)
 	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -422,7 +450,7 @@ func TestUpdatePost(t *testing.T) {
 		"content": "Updated content about the program",
 	}
 
-	resp := api.Patch("/api/v1/post/"+createdPost.ID.String(), updateBody, "Authorization: Bearer mock-token")
+	resp := api.Patch("/api/v1/post/"+createdPost.ID.String(), updateBody, authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -452,13 +480,18 @@ func TestDeletePost(t *testing.T) {
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionDelete, Resource: "post"},
+	})
+
 	// Create a sport first
 	popularity := int32(100000)
 	sport := map[string]any{
 		"name":       "Women's Basketball",
 		"popularity": popularity,
 	}
-	resp_sport := api.Post("/api/v1/sport/", sport, "Authorization: Bearer mock-token")
+	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
 	if resp_sport.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
 	}
@@ -480,14 +513,14 @@ func TestDeletePost(t *testing.T) {
 	}
 
 	// Delete the post
-	resp := api.Delete("/api/v1/post/"+createdPost.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/post/"+createdPost.ID.String(), authHeader)
 
 	if resp.Code != http.StatusNoContent {
 		t.Fatalf("expected status 204, got %d: %s", resp.Code, resp.Body.String())
 	}
 
 	// Verify the post is deleted by trying to get it
-	getResp := api.Get("/api/v1/post/"+createdPost.ID.String(), "Authorization: Bearer mock-token")
+	getResp := api.Get("/api/v1/post/"+createdPost.ID.String(), authHeader)
 	if getResp.Code != 500 {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}

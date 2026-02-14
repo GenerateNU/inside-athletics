@@ -21,13 +21,37 @@ which allows us to interact with the database without having to write raw SQL qu
 */
 func (u *UserDB) GetUser(id uuid.UUID) (*models.User, error) {
 	var user models.User
-	dbResponse := u.db.Where("id = ?", id).First(&user)
+	dbResponse := u.db.Preload("Roles").Where("id = ?", id).First(&user)
 	return utils.HandleDBError(&user, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 
 func (u *UserDB) CreateUser(user *models.User) (*models.User, error) {
 	dbResponse := u.db.Create(user)
 	return utils.HandleDBError(user, dbResponse.Error)
+}
+
+// This function creates a link between a user and a role in the user_roles table
+// We use FirstOrCreate to avoid duplicate entries if the user already has the role
+func (u *UserDB) AddUserRole(userID, roleID uuid.UUID) error {
+	userRole := models.UserRole{
+		UserID: userID,
+		RoleID: roleID,
+	}
+	if err := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).Find(&userRole).Error; err != nil {
+		return huma.Error500InternalServerError("Failed to assign role to user", err)
+	}
+	return nil
+}
+
+func (u *UserDB) GetAllRolesForUser(userID uuid.UUID) (*[]models.Role, error) {
+	var userRoles []models.Role
+	err := u.db.Joins("JOIN user_roles ON user_roles.role_id = roles.id").
+		Where("user_roles.user_id = ?", userID).
+		Find(&userRoles).Error
+	if err != nil {
+		return nil, huma.Error500InternalServerError("Failed to get user roles", err)
+	}
+	return &userRoles, nil
 }
 
 func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User, error) {

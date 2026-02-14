@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"inside-athletics/internal/handlers/permission"
+	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -12,6 +14,7 @@ import (
 
 type UserService struct {
 	userDB *UserDB
+	roleDB *role.RoleDB
 }
 
 /*
@@ -31,6 +34,16 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		return respBody, err
 	}
 
+	userRoles, err := u.userDB.GetAllRolesForUser(id)
+	if err != nil {
+		return nil, err
+	}
+
+	roleResponses, err := u.mapRolesWithPermissions(userRoles)
+	if err != nil {
+		return nil, err
+	}
+
 	// mapping to correct response type
 	// we do this so we can control what values are
 	// returned by the API
@@ -47,6 +60,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
+		Roles:                 roleResponses,
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -54,8 +68,8 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	}, err
 }
 
-func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetCurrentUserIDResponse], error) {
-	respBody := &utils.ResponseBody[GetCurrentUserIDResponse]{}
+func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetUserResponse], error) {
+	respBody := &utils.ResponseBody[GetUserResponse]{}
 
 	userID, err := u.getCurrentUserID(ctx)
 	if err != nil {
@@ -67,7 +81,17 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 		return respBody, err
 	}
 
-	respBody.Body = &GetCurrentUserIDResponse{
+	userRoles, err := u.userDB.GetAllRolesForUser(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	roleResponses, err := u.mapRolesWithPermissions(userRoles)
+	if err != nil {
+		return nil, err
+	}
+
+	respBody.Body = &GetUserResponse{
 		ID:                    user.ID,
 		FirstName:             user.FirstName,
 		LastName:              user.LastName,
@@ -80,6 +104,7 @@ func (u *UserService) GetCurrentUserID(ctx context.Context, input *utils.EmptyIn
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
+		Roles:                 roleResponses,
 	}
 
 	return respBody, nil
@@ -94,6 +119,11 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 	}
 
 	sportJSON, err := marshalSport(input.Body.Sport)
+	if err != nil {
+		return respBody, err
+	}
+
+	roleID, err := u.roleDB.GetRoleIDByName(models.RoleUser)
 	if err != nil {
 		return respBody, err
 	}
@@ -115,6 +145,10 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 
 	createdUser, err := u.userDB.CreateUser(user)
 	if err != nil {
+		return respBody, err
+	}
+
+	if err := u.userDB.AddUserRole(createdUser.ID, roleID); err != nil {
 		return respBody, err
 	}
 
@@ -157,6 +191,36 @@ func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*ut
 	return respBody, nil
 }
 
+func (u *UserService) AssignRole(ctx context.Context, input *AssignRoleInput) (*utils.ResponseBody[AssignRoleResponse], error) {
+	if input.Body.RoleID == uuid.Nil {
+		return nil, huma.Error422UnprocessableEntity("role_id cannot be empty")
+	}
+
+	_, err := u.userDB.GetUser(input.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	role, err := u.roleDB.GetRoleByID(input.Body.RoleID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.userDB.AddUserRole(input.ID, input.Body.RoleID); err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[AssignRoleResponse]{
+		Body: &AssignRoleResponse{
+			UserID: input.ID,
+			Role: UserRoleResponse{
+				ID:   role.ID,
+				Name: role.Name,
+			},
+		},
+	}, nil
+}
+
 func marshalSport(sport []string) ([]byte, error) {
 	if sport == nil {
 		return nil, nil
@@ -185,4 +249,28 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	}
 
 	return parsedID, nil
+}
+
+func (u *UserService) mapRolesWithPermissions(userRoles *[]models.Role) (*[]role.RoleResponse, error) {
+	if userRoles == nil {
+		return nil, nil
+	}
+
+	responses := make([]role.RoleResponse, 0, len(*userRoles))
+	for i := range *userRoles {
+		perms, err := u.roleDB.GetAllPermissionsForRole((*userRoles)[i].ID)
+		if err != nil {
+			return nil, err
+		}
+
+		permResponses := permission.ToPermissionResponses(perms)
+
+		responses = append(responses, role.RoleResponse{
+			ID:          (*userRoles)[i].ID,
+			Name:        (*userRoles)[i].Name,
+			Permissions: permResponses,
+		})
+	}
+
+	return &responses, nil
 }

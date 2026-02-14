@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"inside-athletics/internal/handlers/comment"
 	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/permission"
+	"inside-athletics/internal/handlers/role"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
@@ -59,7 +61,8 @@ func CreateApp(db *gorm.DB) *App {
 
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
-	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route, college.Route, comment.Route}
+	api.UseMiddleware(PermissionHumaMiddleware(api, db))
+	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, comment.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
