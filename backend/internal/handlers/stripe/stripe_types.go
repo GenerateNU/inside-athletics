@@ -53,16 +53,6 @@ type GetAllStripePricesRequest struct {
 	ID string `json:"id" example:"price_123" doc:"ID of the product"`
 }
 
-type GetAllStripeProductsResponse struct {
-	StripeProducts []StripeProductResponse `json:"stripe_products" doc:"List of stripe products"`
-	Total          int                     `json:"total" example:"25" doc:"Total number of products"`
-}
-
-type GetAllStripePricesResponse struct {
-	StripePrices []StripePriceResponse `json:"stripe_products" doc:"List of stripe products"`
-	Total        int                   `json:"total" example:"25" doc:"Total number of prices"`
-}
-
 type ArchiveStripeProductRequest struct {
 	ID string `json:"id" example:"product_123" doc:"ID of the product"`
 }
