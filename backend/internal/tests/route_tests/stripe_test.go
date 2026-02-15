@@ -16,8 +16,6 @@ func TestCreateProduct(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -43,9 +41,6 @@ func TestGetProductByID(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT") 
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -87,9 +82,6 @@ func TestUpdateStripeProduct(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT") 
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -137,9 +129,6 @@ func TestArchiveStripeProduct(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT") 
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
-
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
 
@@ -176,9 +165,6 @@ func TestGetAllProducts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT") 
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -225,8 +211,6 @@ func TestCreatePrice(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -278,8 +262,6 @@ func TestGetStripePriceByID(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -347,9 +329,6 @@ func TestUpdateStripePrice(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
@@ -425,9 +404,6 @@ func TestArchiveStripePrice(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
-
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
 
@@ -483,9 +459,6 @@ func TestGetAllStripePrices(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	name := "Premium Plan"
 	description := "Get premium content with this subscription"
