@@ -27,11 +27,11 @@ func (r *RoleService) CreateRole(ctx context.Context, input *struct{ Body Create
 
 	builder := models.NewRoleBuilder(models.RoleName(input.Body.Name))
 	for _, perm := range input.Body.Permissions {
-		if perm.Action == "" || perm.Resource == "" {
+		if err := models.ValidatePermissionSpec(perm.Action, perm.Resource); err != nil {
+			if err == models.ErrPermissionActionInvalid {
+				return nil, huma.Error422UnprocessableEntity("invalid permission action")
+			}
 			return nil, huma.Error422UnprocessableEntity("permissions must include action and resource")
-		}
-		if !models.IsValidPermissionAction(perm.Action) {
-			return nil, huma.Error422UnprocessableEntity("invalid permission action")
 		}
 		builder.WithPermission(perm.Action, perm.Resource)
 	}
@@ -109,11 +109,11 @@ func (r *RoleService) UpdateRole(ctx context.Context, input *struct {
 	}
 	if input.Body.Permissions != nil {
 		for _, perm := range *input.Body.Permissions {
-			if perm.Action == "" || perm.Resource == "" {
+			if err := models.ValidatePermissionSpec(perm.Action, perm.Resource); err != nil {
+				if err == models.ErrPermissionActionInvalid {
+					return nil, huma.Error422UnprocessableEntity("invalid permission action")
+				}
 				return nil, huma.Error422UnprocessableEntity("permissions must include action and resource")
-			}
-			if !models.IsValidPermissionAction(perm.Action) {
-				return nil, huma.Error422UnprocessableEntity("invalid permission action")
 			}
 		}
 	}

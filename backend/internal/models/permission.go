@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,9 +26,39 @@ var validPermissionActions = map[PermissionAction]struct{}{
 	PermissionDeleteOwn: {},
 }
 
+var (
+	ErrPermissionSpecInvalid    = errors.New("permission spec must include action and resource")
+	ErrPermissionActionInvalid  = errors.New("permission action is invalid")
+	ErrPermissionResourceInvalid = errors.New("permission resource is invalid")
+)
+
 func IsValidPermissionAction(action PermissionAction) bool {
 	_, ok := validPermissionActions[action]
 	return ok
+}
+
+func ValidatePermissionSpec(action PermissionAction, resource string) error {
+	if action == "" || resource == "" {
+		return ErrPermissionSpecInvalid
+	}
+	if !IsValidPermissionAction(action) {
+		return ErrPermissionActionInvalid
+	}
+	return nil
+}
+
+func ValidatePermissionAction(action PermissionAction) error {
+	if action == "" || !IsValidPermissionAction(action) {
+		return ErrPermissionActionInvalid
+	}
+	return nil
+}
+
+func ValidatePermissionResource(resource string) error {
+	if resource == "" {
+		return ErrPermissionResourceInvalid
+	}
+	return nil
 }
 
 type Permission struct {

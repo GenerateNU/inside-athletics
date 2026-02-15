@@ -21,11 +21,11 @@ func NewPermissionService(db *gorm.DB) *PermissionService {
 }
 
 func (p *PermissionService) CreatePermission(ctx context.Context, input *struct{ Body CreatePermissionRequest }) (*utils.ResponseBody[PermissionResponse], error) {
-	if input.Body.Action == "" || input.Body.Resource == "" {
+	if err := models.ValidatePermissionSpec(models.PermissionAction(input.Body.Action), input.Body.Resource); err != nil {
+		if err == models.ErrPermissionActionInvalid {
+			return nil, huma.Error422UnprocessableEntity("invalid permission action")
+		}
 		return nil, huma.Error422UnprocessableEntity("action and resource are required")
-	}
-	if !models.IsValidPermissionAction(models.PermissionAction(input.Body.Action)) {
-		return nil, huma.Error422UnprocessableEntity("invalid permission action")
 	}
 
 	perm, err := p.permissionDB.CreatePermission(input.Body.Action, input.Body.Resource)
@@ -73,15 +73,12 @@ func (p *PermissionService) UpdatePermission(ctx context.Context, input *struct 
 	Body UpdatePermissionRequest
 }) (*utils.ResponseBody[PermissionResponse], error) {
 	if input.Body.Action != nil {
-		if *input.Body.Action == "" {
-			return nil, huma.Error422UnprocessableEntity("action cannot be empty")
-		}
-		if !models.IsValidPermissionAction(models.PermissionAction(*input.Body.Action)) {
+		if err := models.ValidatePermissionAction(models.PermissionAction(*input.Body.Action)); err != nil {
 			return nil, huma.Error422UnprocessableEntity("invalid permission action")
 		}
 	}
 	if input.Body.Resource != nil {
-		if *input.Body.Resource == "" {
+		if err := models.ValidatePermissionResource(*input.Body.Resource); err != nil {
 			return nil, huma.Error422UnprocessableEntity("resource cannot be empty")
 		}
 	}
