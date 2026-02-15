@@ -1,6 +1,8 @@
 package routeTests
 
 import (
+	postPackage "inside-athletics/internal/handlers/post"
+	tagPackage "inside-athletics/internal/handlers/tag"
 	tagpostPackage "inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -30,9 +32,9 @@ func TestGetPostsByTag(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tagpost/tag/"+tagId.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/tag/"+tagId.String()+"/posts", "Authorization: Bearer mock-token")
 
-	var response tagpostPackage.GetPostsbyTagResponse
+	var response tagPackage.GetPostsByTagResponse
 
 	DecodeTo(&response, resp)
 
@@ -61,9 +63,9 @@ func TestGetTagsByPost(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tagpost/post/"+postId.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/"+postId.String()+"/tags", "Authorization: Bearer mock-token")
 
-	var response tagpostPackage.GetTagsByPostResponse
+	var response postPackage.GetTagsByPostResponse
 
 	DecodeTo(&response, resp)
 

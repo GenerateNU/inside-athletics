@@ -2,12 +2,14 @@ package tag
 
 import (
 	"context"
+	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 )
 
 type TagService struct {
-	tagDB *TagDB
+	tagDB     *TagDB
+	tagPostDB *tagpost.TagPostDB
 }
 
 func (u *TagService) GetTagByName(ctx context.Context, input *GetTagByNameParams) (*utils.ResponseBody[GetTagResponse], error) {
@@ -44,6 +46,25 @@ func (u *TagService) GetTagById(ctx context.Context, input *GetTagByIDParams) (*
 	}
 
 	return &utils.ResponseBody[GetTagResponse]{
+		Body: response,
+	}, err
+}
+
+// GetPostsByTag retrieves post IDs for a tag
+func (u *TagService) GetPostsByTag(ctx context.Context, input *GetPostsByTagParams) (*utils.ResponseBody[GetPostsByTagResponse], error) {
+	posts, err := u.tagPostDB.GetPostsByTag(input.TagID)
+	respBody := &utils.ResponseBody[GetPostsByTagResponse]{}
+
+	if err != nil {
+		return respBody, err
+	}
+
+	response := &GetPostsByTagResponse{
+		TagID:   input.TagID,
+		PostIDs: *posts,
+	}
+
+	return &utils.ResponseBody[GetPostsByTagResponse]{
 		Body: response,
 	}, err
 }

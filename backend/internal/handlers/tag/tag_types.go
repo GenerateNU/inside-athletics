@@ -12,6 +12,15 @@ type GetTagByNameParams struct {
 	Name string `path:"name" example:"Hockey" doc:"Name to identify tag"`
 }
 
+type GetPostsByTagParams struct {
+	TagID uuid.UUID `path:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
+}
+
+type GetPostsByTagResponse struct {
+	TagID   uuid.UUID   `json:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
+	PostIDs []uuid.UUID `json:"post_ids" example:"[\"123e4567-e89b-12d3-a456-426614174000\",\"123e4567-e89b-12d3-a456-426614174001\"]" doc:"The post ids associated with a tag"`
+}
+
 type GetTagResponse struct {
 	ID   uuid.UUID `json:"id" example:"1" doc:"ID of the tag"`
 	Name string    `json:"name" example:"Hockey" doc:"The name of the tag"`

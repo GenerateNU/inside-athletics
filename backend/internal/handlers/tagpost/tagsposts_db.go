@@ -13,6 +13,10 @@ type TagPostDB struct {
 	db *gorm.DB
 }
 
+func NewTagPostDB(db *gorm.DB) *TagPostDB {
+	return &TagPostDB{db: db}
+}
+
 func (u *TagPostDB) GetPostsByTag(tag_id uuid.UUID) (*[]uuid.UUID, error) {
 	var postIDs []uuid.UUID
 	dbResponse := u.db.Model(&models.TagPost{}).

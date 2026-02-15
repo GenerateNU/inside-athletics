@@ -31,11 +31,20 @@ type GetPostByIDParams struct {
 	ID uuid.UUID `path:"id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
 }
 
+type GetTagsByPostParams struct {
+	PostID uuid.UUID `path:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
+}
+
+type GetTagsByPostResponse struct {
+	PostID uuid.UUID   `json:"post_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the post"`
+	TagIDs []uuid.UUID `json:"tag_ids" example:"[\"123e4567-e89b-12d3-a456-426614174000\",\"123e4567-e89b-12d3-a456-426614174001\"]" doc:"The tag ids associated with a post"`
+}
+
 // GetPostByAuthorIDParams defines parameters for getting a post by author ID
 type GetPostsByAuthorIDParams struct {
 	AuthorID uuid.UUID `path:"author_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the author"`
-	Limit   int       `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
-	Offset  int       `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
+	Limit    int       `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
+	Offset   int       `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
 }
 
 type GetPostsByAuthorIDResponse struct {
