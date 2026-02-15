@@ -2,7 +2,6 @@ package routeTests
 
 import (
 	s "inside-athletics/internal/handlers/stripe"
-	"os"
 	"testing"
 
 	"github.com/google/uuid"
