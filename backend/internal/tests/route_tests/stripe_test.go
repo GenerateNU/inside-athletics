@@ -70,7 +70,6 @@ func TestGetProductByID(t *testing.T) {
 		"/api/v1/stripe_product/"+id, body,
 		"Authorization: Bearer "+uuid.NewString(),
 	)
-	
 
 	var stripeProduct stripe.Product
 	DecodeTo(&stripeProduct, resp)
@@ -170,6 +169,55 @@ func TestArchiveStripeProduct(t *testing.T) {
 
 	if stripeProduct.Active {
 		t.Errorf("expected product to be inactive after delete, but Active = true")
+	}
+}
+
+func TestGetAllProducts(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT") 
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	name := "Premium Plan"
+	description := "Get premium content with this subscription"
+
+	params := &stripe.ProductParams{
+		Name:        stripe.String(name),
+		Description: stripe.String(description),
+	}
+
+	_, err := product.New(params)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	name = "Basic Plan"
+	description = "Get basic content with this subscription"
+
+	params = &stripe.ProductParams{
+		Name:        stripe.String(name),
+		Description: stripe.String(description),
+	}
+
+	_, err = product.New(params)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	body := s.GetAllStripeProductsRequest{}
+
+	resp := api.Get(
+		"/api/v1/stripe_products/", body,
+		"Authorization: Bearer "+uuid.NewString(),
+	)
+
+	var stripeProducts []stripe.Product
+	DecodeTo(&stripeProducts, resp)
+
+	if len(stripeProducts) < 2{
+		t.Errorf("expected at least 2 products, got %d", len(stripeProducts))
 	}
 }
 
@@ -295,6 +343,212 @@ func TestGetStripePriceByID(t *testing.T) {
 	}
 }
 
+func TestUpdateStripePrice(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	name := "Premium Plan"
+	description := "Get premium content with this subscription"
+
+	productParams := &stripe.ProductParams{
+		Name:        stripe.String(name),
+		Description: stripe.String(description),
+	}
+
+	productResult, err := product.New(productParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	productID := productResult.ID
+
+	originalUnitAmount := 2550
+	originalInterval := s.Day
+	originalIntervalCount := 3
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(productID),
+		UnitAmount: stripe.Int64(int64(originalUnitAmount)),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(originalInterval)),
+			IntervalCount: stripe.Int64(int64(originalIntervalCount)),
+		},
+	}
+
+	originalPrice, err := price.New(priceParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	newUnitAmount := 3000
+	newInterval := s.Week
+	newIntervalCount := 2
+
+	body := s.UpdateStripePriceRequest{
+		UnitAmount:    &newUnitAmount,
+		Interval:      &newInterval,
+		IntervalCount: &newIntervalCount,
+	}
+
+	resp := api.Patch("/api/v1/stripe_price/"+originalPrice.ID, body, "Authorization: Bearer "+uuid.NewString())
+
+	var updatedPrice stripe.Price
+	DecodeTo(&updatedPrice, resp)
+
+	if updatedPrice.ID == originalPrice.ID {
+		t.Errorf("expected new price ID, but got same ID %s", updatedPrice.ID)
+	}
+	if updatedPrice.Product.ID != productID {
+		t.Errorf("expected product id to be %s, got %s", productID, updatedPrice.Product.ID)
+	}
+	if updatedPrice.UnitAmount != int64(newUnitAmount) {
+		t.Errorf("expected unit amount to be %d, got %d", newUnitAmount, updatedPrice.UnitAmount)
+	}
+	if updatedPrice.Recurring == nil || 
+		string(updatedPrice.Recurring.Interval) != string(newInterval) {
+		t.Errorf("expected interval to be %s, got %s", newInterval, updatedPrice.Recurring.Interval)
+	}
+	if updatedPrice.Recurring == nil || 
+		updatedPrice.Recurring.IntervalCount != int64(newIntervalCount) {
+		t.Errorf("expected interval count to be %d, got %d",
+			newIntervalCount, updatedPrice.Recurring.IntervalCount)
+	}
+}
+
+func TestArchiveStripePrice(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	name := "Premium Plan"
+	description := "Get premium content with this subscription"
+
+	productParams := &stripe.ProductParams{
+		Name:        stripe.String(name),
+		Description: stripe.String(description),
+	}
+
+	productResult, err := product.New(productParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	productID := productResult.ID
+
+	originalUnitAmount := 2550
+	originalInterval := s.Day
+	originalIntervalCount := 3
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(productID),
+		UnitAmount: stripe.Int64(int64(originalUnitAmount)),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(originalInterval)),
+			IntervalCount: stripe.Int64(int64(originalIntervalCount)),
+		},
+	}
+
+	originalPrice, err := price.New(priceParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	body := s.ArchiveStripePriceRequest{
+		ID: originalPrice.ID,
+	}
+
+	resp := api.Delete(
+		"/api/v1/stripe_price/"+originalPrice.ID, body,
+		"Authorization: Bearer "+uuid.NewString(),
+	)
+	
+	var archivedPrice stripe.Price
+	DecodeTo(&archivedPrice, resp)
+
+	if archivedPrice.Active {
+		t.Errorf("expected price to be inactive after delete, but Active = true")
+	}
+}
+
+func TestGetAllStripePrices(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	name := "Premium Plan"
+	description := "Get premium content with this subscription"
+
+	productParams := &stripe.ProductParams{
+		Name:        stripe.String(name),
+		Description: stripe.String(description),
+	}
+
+	productResult, err := product.New(productParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	productID := productResult.ID
+
+	originalUnitAmount := 2550
+	originalInterval := s.Day
+	originalIntervalCount := 3
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(productID),
+		UnitAmount: stripe.Int64(int64(originalUnitAmount)),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(originalInterval)),
+			IntervalCount: stripe.Int64(int64(originalIntervalCount)),
+		},
+	}
+
+	_, err = price.New(priceParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	priceParams = &stripe.PriceParams{
+	Product:    stripe.String(productID),
+	UnitAmount: stripe.Int64(int64(originalUnitAmount)),
+	Currency:   stripe.String(string(stripe.CurrencyUSD)),
+	Recurring: &stripe.PriceRecurringParams{
+		Interval:      stripe.String(string(originalInterval)),
+		IntervalCount: stripe.Int64(int64(originalIntervalCount)),
+	},
+	}
+
+	_, err = price.New(priceParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	body := s.GetAllStripePricesRequest{
+		ID: productID,
+	}
+
+	resp := api.Get("/api/v1/stripe_prices/", body, "Authorization: Bearer "+uuid.NewString())
+
+	var updatedPrices []stripe.Price
+	DecodeTo(&updatedPrices, resp)
+
+	if len(updatedPrices) < 2 {
+		t.Errorf("expected at least 2 prices, but got %d", len(updatedPrices))
+	}
+}
 
 func TestGetCustomer(t *testing.T) {
 	testDB := SetupTestDB(t)

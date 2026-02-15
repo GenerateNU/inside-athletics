@@ -145,21 +145,32 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 		return nil, fmt.Errorf("price ID is empty")
 	}
 
-	price_params := &stripe.PriceParams{
-		UnitAmount: stripe.Int64(int64(*input.Body.UnitAmount) * 100), // multiply by 100 since stripe does not take floats
+	oldPrice, err := price.Get(input.ID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	newPriceParams := &stripe.PriceParams{
+		Product:    stripe.String(oldPrice.Product.ID),
+		UnitAmount: stripe.Int64(int64(*input.Body.UnitAmount)),
+		Currency:   stripe.String(string(oldPrice.Currency)),
 		Recurring: &stripe.PriceRecurringParams{
 			Interval:      stripe.String(string(*input.Body.Interval)),
 			IntervalCount: stripe.Int64(int64(*input.Body.IntervalCount)),
 		},
 	}
 
-	stripe_price, err := price.Update(input.ID, price_params)
+	newPrice, err := price.New(newPriceParams)
 	if err != nil {
 		return nil, err
 	}
 
+	_, _ = price.Update(input.ID, &stripe.PriceParams{
+		Active: stripe.Bool(false),
+	})
+
 	return &utils.ResponseBody[stripe.Price]{
-		Body: stripe_price,
+		Body: newPrice,
 	}, nil
 }
 
