@@ -37,5 +37,4 @@ type Permission struct {
 	DeletedAt       gorm.DeletedAt   `json:"deleted_at,omitempty" gorm:"index"`
 	Action          PermissionAction `json:"action" gorm:"type:varchar(50);not null"`
 	Resource        string           `json:"resource" gorm:"type:varchar(50);not null"`
-	RolePermissions []RolePermission `json:"role_permissions,omitempty" gorm:"foreignKey:PermissionID"`
 }
