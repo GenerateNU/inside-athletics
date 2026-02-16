@@ -2,7 +2,6 @@ package routeTests
 
 import (
 	s "inside-athletics/internal/handlers/stripe"
-	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -808,7 +807,6 @@ func TestDeleteStripeCheckoutSession(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	// Create a checkout session to delete
 	sessionParams := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
@@ -833,23 +831,19 @@ func TestDeleteStripeCheckoutSession(t *testing.T) {
 		t.Fatalf("Unexpected response: %+v", err)
 	}
 
-	// Build request body
 	body := s.DeleteCheckoutSessionRequest{
 		ID: createdSession.ID,
 	}
 
-	// Call the DELETE endpoint using the exact URL
 	resp := api.Delete(
 		"/api/v1/checkout/sessions/"+createdSession.ID,
 		body,
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	// Decode directly into stripe.CheckoutSession
 	var deletedSession stripe.CheckoutSession
 	DecodeTo(&deletedSession, resp)
 
-	// Assertions
 	if deletedSession.ID != createdSession.ID {
 		t.Errorf("expected session ID %s, got %s", createdSession.ID, deletedSession.ID)
 	}
@@ -867,9 +861,6 @@ func TestGetAllStripeSessions(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	p, err := product.New(&stripe.ProductParams{
 		Name: stripe.String("Standard Plan"),
