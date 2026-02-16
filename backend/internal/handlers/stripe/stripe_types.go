@@ -26,6 +26,13 @@ type UpdateStripeProductRequest struct {
 	Description *string `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
 }
 
+type CreateStripeCheckoutSessionRequest struct {
+	PriceID    string `json:"price_id" binding:"required" example:"price_12345"`
+	SuccessURL string `json:"success_url" binding:"required,url" example:"https://example.com/success"`
+	CancelURL  string `json:"cancel_url" binding:"required,url" example:"https://example.com/cancel"`
+	Quantity   int64  `json:"quantity" binding:"required,min=1" example:"1"`
+}
+
 type UpdateStripePriceRequest struct {
 	UnitAmount    *int  `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      *Interval `json:"interval" example:"day" doc:"Interval between payments"`
@@ -40,6 +47,10 @@ type GetStripePriceByIDParams struct {
 	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
+type GetCheckoutSessionRequest struct {
+	ID string `uri:"id" binding:"required"`
+}
+
 type GetAllStripeProductsRequest struct {
 }
 
@@ -47,12 +58,22 @@ type GetAllStripePricesRequest struct {
 	ID string `json:"id" example:"price_123" doc:"ID of the product"`
 }
 
+type GetAllStripeSessionsRequest struct {
+	CustomerID string `form:"customer_id,omitempty"`
+	Limit      int64  `form:"limit,omitempty"`
+}
+
+
 type ArchiveStripeProductRequest struct {
 	ID string `json:"id" example:"product_123" doc:"ID of the product"`
 }
 
 type ArchiveStripePriceRequest struct {
 	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+}
+
+type DeleteCheckoutSessionRequest struct {
+	ID string `uri:"id" binding:"required"`
 }
 
 type GetStripeCustomerInput struct {

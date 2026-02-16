@@ -4,14 +4,16 @@ import (
 	"context"
 	"inside-athletics/internal/utils"
 
+	"fmt"
+
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
-	"fmt"
 
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/price"
 	"github.com/stripe/stripe-go/v72/product"
 
+	"github.com/stripe/stripe-go/v72/checkout/session"
 	"github.com/stripe/stripe-go/v72/customer"
 )
 
@@ -34,7 +36,7 @@ func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ 
 	}
 
 	product_params := &stripe.ProductParams{
-		Name: stripe.String(input.Body.Name),
+		Name:        stripe.String(input.Body.Name),
 		Description: stripe.String(input.Body.Description),
 	}
 
@@ -406,4 +408,114 @@ func mapStripeCustomerToModel(c *stripe.Customer) *GetStripeCustomerResponse {
 	return customer
 }
 
-// Checkout Sessions CRUD
+func (s *StripeService) CreateStripeCheckoutSession(
+	ctx context.Context,
+	input *struct {
+		Body CreateStripeCheckoutSessionRequest
+	},
+) (*utils.ResponseBody[stripe.CheckoutSession], error) {
+
+	// Validate business rules
+	if input.Body.PriceID == "" {
+		return nil, huma.Error422UnprocessableEntity("price_id cannot be empty.")
+	}
+
+	if input.Body.SuccessURL == "" {
+		return nil, huma.Error422UnprocessableEntity("success_url cannot be empty.")
+	}
+
+	if input.Body.CancelURL == "" {
+		return nil, huma.Error422UnprocessableEntity("cancel_url cannot be empty.")
+	}
+
+	if input.Body.Quantity <= 0 {
+		return nil, huma.Error422UnprocessableEntity("quantity must be greater than 0.")
+	}
+
+	params := &stripe.CheckoutSessionParams{
+		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL: stripe.String(input.Body.SuccessURL),
+		CancelURL:  stripe.String(input.Body.CancelURL),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(input.Body.PriceID),
+				Quantity: stripe.Int64(input.Body.Quantity),
+			},
+		},
+	}
+
+	stripeSession, err := utils.HandleDBError(session.New(params))
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[stripe.CheckoutSession]{
+		Body: stripeSession,
+	}, nil
+}
+
+func (s *StripeService) GetStripeCheckoutSession(ctx context.Context, input *GetCheckoutSessionRequest) (*utils.ResponseBody[stripe.CheckoutSession], error) {
+	params := &stripe.CheckoutSessionParams{}
+
+	checkoutSession, err := session.Get(input.ID, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[stripe.CheckoutSession]{
+		Body: checkoutSession,
+	}, nil
+}
+
+func (s *StripeService) DeleteStripeCheckoutSession(
+	ctx context.Context, input *DeleteCheckoutSessionRequest,
+) (*utils.ResponseBody[stripe.CheckoutSession], error) {
+
+	if input.ID == "" {
+		return nil, huma.Error422UnprocessableEntity("session id cannot be empty")
+	}
+
+	expired, err := session.Expire(input.ID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[stripe.CheckoutSession]{
+		Body: expired,
+	}, nil
+}
+
+func (s *StripeService) GetAllStripeSessions(
+	ctx context.Context, input *GetAllStripeSessionsRequest,
+) (*utils.ResponseBody[[]*stripe.CheckoutSession], error) {
+
+	limit := int64(50)
+	if input.Limit > 0 {
+		limit = input.Limit
+	}
+
+	params := &stripe.CheckoutSessionListParams{
+		ListParams: stripe.ListParams{
+			Limit: &limit,
+		},
+	}
+
+	if input.CustomerID != "" {
+		params.Customer = stripe.String(input.CustomerID)
+	}
+
+	i := session.List(params)
+
+	var sessions []*stripe.CheckoutSession
+	for i.Next() {
+		sessions = append(sessions, i.CheckoutSession())
+	}
+
+	if err := i.Err(); err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[[]*stripe.CheckoutSession]{
+		Body: &sessions,
+	}, nil
+}
