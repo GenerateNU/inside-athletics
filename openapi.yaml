@@ -1,0 +1,1420 @@
+components:
+  schemas:
+    CreateCollegeRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          maxLength: 100
+          minLength: 1
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          examples:
+            - 1
+          format: int32
+          maximum: 3
+          minimum: 1
+          type: integer
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          maxLength: 500
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          maxLength: 200
+          minLength: 1
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          maxLength: 100
+          minLength: 1
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          maxLength: 500
+          minLength: 1
+          type: string
+      required:
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    CreateCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          examples:
+            - 1
+          format: int32
+          maximum: 3
+          minimum: 1
+          type: integer
+        id:
+          description: ID of the college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    CreateSportRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSportRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          examples:
+            - Women's Soccer
+          type: string
+        popularity:
+          examples:
+            - 20000
+          format: int32
+          type:
+            - integer
+            - "null"
+      required:
+        - name
+        - popularity
+      type: object
+    CreateUserBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateUserBody.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          description: The college of a user
+          examples:
+            - Northeastern University
+          type: string
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          description: The sport(s) the user is interested in
+          examples:
+            - - hockey
+              - soccer
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      required:
+        - first_name
+        - last_name
+        - email
+        - username
+        - account_type
+        - verified_athlete_status
+      type: object
+    CreateUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the user
+          examples:
+            - "1"
+          type: string
+        name:
+          description: Name of the user
+          examples:
+            - Joe
+          type: string
+      required:
+        - id
+        - name
+      type: object
+    DeleteCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        message:
+          description: Success message
+          examples:
+            - College deleted successfully
+          type: string
+      required:
+        - message
+        - id
+      type: object
+    DeleteUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted user
+          examples:
+            - "1"
+          type: string
+      required:
+        - id
+      type: object
+    ErrorDetail:
+      additionalProperties: false
+      properties:
+        location:
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          type: string
+        message:
+          description: Error message text
+          type: string
+        value:
+          description: The value at the given location
+      type: object
+    ErrorModel:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ErrorModel.json
+          format: uri
+          readOnly: true
+          type: string
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem.
+          examples:
+            - Property foo is required but is missing.
+          type: string
+        errors:
+          description: Optional list of individual error details
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          type:
+            - array
+            - "null"
+        instance:
+          description: A URI reference that identifies the specific occurrence of the problem.
+          examples:
+            - https://example.com/error-log/abc123
+          format: uri
+          type: string
+        status:
+          description: HTTP status code
+          examples:
+            - 400
+          format: int64
+          type: integer
+        title:
+          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          examples:
+            - Bad Request
+          type: string
+        type:
+          default: about:blank
+          description: A URI reference to human-readable documentation for the error.
+          examples:
+            - https://example.com/errors/example
+          format: uri
+          type: string
+      type: object
+    GetAllSportsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllSportsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        sports:
+          description: List of sports
+          items:
+            $ref: "#/components/schemas/SportResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of sports
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - sports
+        - total
+      type: object
+    GetCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          examples:
+            - 1
+          format: int32
+          maximum: 3
+          minimum: 1
+          type: integer
+        id:
+          description: ID of the college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    GetCurrentUserIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCurrentUserIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          description: The college of a user
+          examples:
+            - Northeastern University
+          type: string
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        id:
+          description: ID of the currently authenticated user
+          examples:
+            - "1"
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          contentEncoding: base64
+          description: The sport(s) the user is interested in
+          examples:
+            - "[\"hockey\",\"soccer\"]"
+          type: string
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+        - username
+        - account_type
+        - verified_athlete_status
+      type: object
+    GetUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          description: The college of a user
+          examples:
+            - Northeastern University
+          type: string
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        id:
+          description: ID of the user
+          examples:
+            - "1"
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          contentEncoding: base64
+          description: The sport(s) the user is interested in
+          examples:
+            - "[\"hockey\",\"soccer\"]"
+          type: string
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+        - username
+        - account_type
+        - verified_athlete_status
+      type: object
+    HealthResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/HealthResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - Healthy!
+          type: string
+      required:
+        - message
+      type: object
+    SportResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SportResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        name:
+          description: Name of the sport
+          examples:
+            - Women's Soccer
+          type: string
+        popularity:
+          description: Number of players
+          examples:
+            - 20000
+          format: int32
+          type: integer
+      required:
+        - id
+        - name
+      type: object
+    UpdateCollegeRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateCollegeRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          maxLength: 100
+          type:
+            - string
+            - "null"
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          examples:
+            - 1
+          format: int32
+          maximum: 3
+          minimum: 1
+          type:
+            - integer
+            - "null"
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          maxLength: 500
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          maxLength: 200
+          type:
+            - string
+            - "null"
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          maxLength: 100
+          type:
+            - string
+            - "null"
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          maxLength: 500
+          type:
+            - string
+            - "null"
+      required:
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    UpdateCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          examples:
+            - 1
+          format: int32
+          maximum: 3
+          minimum: 1
+          type: integer
+        id:
+          description: ID of the college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    UpdateSportRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateSportRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          description: Name of the sport
+          examples:
+            - Women's Soccer
+          type:
+            - string
+            - "null"
+        popularity:
+          description: Number of players
+          examples:
+            - 20000
+          format: int32
+          type:
+            - integer
+            - "null"
+      required:
+        - name
+        - popularity
+      type: object
+    UpdateUserBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateUserBody.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          description: The college of a user
+          examples:
+            - Northeastern University
+          type: string
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          description: The sport(s) the user is interested in
+          examples:
+            - - hockey
+              - soccer
+          items:
+            type: string
+          type: array
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      type: object
+    UpdateUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the user
+          examples:
+            - "1"
+          type: string
+        name:
+          description: Name of the user
+          examples:
+            - Joe
+          type: string
+      required:
+        - id
+        - name
+      type: object
+  securitySchemes:
+    Authorization:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+info:
+  title: Inside Athletics API
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /api/v1/college:
+    post:
+      operationId: post-api-v1-college
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCollegeRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 college
+  /api/v1/college/{id}:
+    delete:
+      operationId: delete-api-v1-college-by-id
+      parameters:
+        - description: ID of the college
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college
+            examples:
+              - "1"
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 college by ID
+    get:
+      operationId: get-api-v1-college-by-id
+      parameters:
+        - description: ID of the college
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college
+            examples:
+              - "1"
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 college by ID
+    put:
+      operationId: put-api-v1-college-by-id
+      parameters:
+        - description: ID of the college
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college
+            examples:
+              - "1"
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCollegeRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Put API v1 college by ID
+  /api/v1/health/:
+    get:
+      operationId: get-api-v1-health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 health
+  /api/v1/health/healthcheck:
+    get:
+      operationId: get-api-v1-health-healthcheck
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 health healthcheck
+  /api/v1/sport/:
+    post:
+      operationId: post-api-v1-sport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 sport
+  /api/v1/sport/by-name/{name}:
+    get:
+      operationId: get-api-v1-sport-by-name-by-name
+      parameters:
+        - description: Name of the sport to retrieve
+          example: Women's Soccer
+          in: path
+          name: name
+          required: true
+          schema:
+            description: Name of the sport to retrieve
+            examples:
+              - Women's Soccer
+            maxLength: 100
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sport by name by name
+  /api/v1/sport/{id}:
+    delete:
+      operationId: delete-api-v1-sport-by-id
+      parameters:
+        - description: ID of the sport
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the sport
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 sport by ID
+    get:
+      operationId: get-api-v1-sport-by-id
+      parameters:
+        - description: ID of the sport
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the sport
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sport by ID
+    patch:
+      operationId: patch-api-v1-sport-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 sport by ID
+  /api/v1/sports/:
+    get:
+      operationId: get-api-v1-sports
+      parameters:
+        - description: Number of sports to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of sports to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of sports to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of sports to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllSportsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sports
+  /api/v1/user/:
+    post:
+      operationId: post-api-v1-user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user
+  /api/v1/user/current:
+    get:
+      operationId: get-api-v1-user-current
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCurrentUserIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user current
+  /api/v1/user/{id}:
+    delete:
+      operationId: delete-api-v1-user-by-id
+      parameters:
+        - description: ID to identify the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user by ID
+    get:
+      operationId: get-api-v1-user-by-id
+      parameters:
+        - description: ID to identify the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user by ID
+    patch:
+      operationId: patch-api-v1-user-by-id
+      parameters:
+        - description: ID to identify the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 user by ID
+security:
+  - Authorization: []
