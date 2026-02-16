@@ -6,10 +6,10 @@ import (
 )
 
 func Route(api huma.API, db *gorm.DB) {
-	var tagpostDB = &TagPostDB{db}
+	var tagpostDB = NewTagPostDB(db)
 	var tagService = &TagPostService{tagpostDB}
 	{
-		grp := huma.NewGroup(api, "/api/v1/tagpost")
+		grp := huma.NewGroup(api, "/api/v1/post/tag")
 		huma.Post(grp, "/", tagService.CreateTagPost)
 		huma.Get(grp, "/{id}", tagService.GetTagPostById)
 		huma.Patch(grp, "/{id}", tagService.UpdateTagPost)

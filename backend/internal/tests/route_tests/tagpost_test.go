@@ -93,7 +93,7 @@ func TestGetTagpostByID(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tagpost/"+newID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/tag/"+newID.String(), "Authorization: Bearer mock-token")
 
 	var response tagpostPackage.GetTagPostByIDResponse
 
@@ -116,7 +116,7 @@ func TestCreateTagPost(t *testing.T) {
 		PostID: postId,
 	}
 
-	resp := api.Post("/api/v1/tagpost/", "Authorization: Bearer mock-token", payload)
+	resp := api.Post("/api/v1/post/tag/", "Authorization: Bearer mock-token", payload)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -151,7 +151,7 @@ func TestUpdateTagPost(t *testing.T) {
 		PostID: updatedId,
 	}
 
-	resp := api.Patch("/api/v1/tagpost/"+tagpost.ID.String(), "Authorization: Bearer mock-token", update)
+	resp := api.Patch("/api/v1/post/tag/"+tagpost.ID.String(), "Authorization: Bearer mock-token", update)
 
 	var response tagpostPackage.UpdateTagPostResponse
 	DecodeTo(&response, resp)
@@ -176,7 +176,7 @@ func TestDeleteTagPost(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Delete("/api/v1/tagpost/"+tagpost.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/post/tag/"+tagpost.ID.String(), "Authorization: Bearer mock-token")
 
 	var response tagpostPackage.DeleteTagPostResponse
 	DecodeTo(&response, resp)
