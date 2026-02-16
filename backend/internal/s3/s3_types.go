@@ -26,3 +26,33 @@ type Config struct {
 
 // Default presigned URL TTL (1 hour).
 const DefaultPresignedURLExpiry = time.Hour
+
+// Content kind for premium hub (image, video, pdf).
+const (
+	ContentKindImage = "image"
+	ContentKindVideo = "video"
+	ContentKindPDF   = "pdf"
+)
+
+// Input for requesting a presigned upload URL.
+type GetUploadURLInput struct {
+	FileName    string // original filename (used in key and as documentId for confirm)
+	FileType    string // MIME type, e.g. image/jpeg, application/pdf
+	ContentKind string // image, video, or pdf
+	ContentID   string // optional; preferred for key path if set
+	UserID      string // optional; used for key path if ContentID empty
+}
+
+// Response after generating a presigned upload URL.
+type GetUploadURLResponse struct {
+	UploadURL  string `json:"upload_url"`
+	Key        string `json:"key"`
+	DocumentID string `json:"document_id"` // pass back on confirm
+	ExpiresIn  int    `json:"expires_in"` // seconds until URL expires
+}
+
+// Response after generating a presigned download URL (for PDF/image).
+type GetDownloadURLResponse struct {
+	DownloadURL string `json:"download_url"`
+	ExpiresIn   int    `json:"expires_in"` // seconds until URL expires
+}
