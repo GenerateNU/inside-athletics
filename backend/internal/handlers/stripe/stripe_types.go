@@ -59,10 +59,10 @@ type GetAllStripePricesRequest struct {
 }
 
 type GetAllStripeSessionsRequest struct {
-	CustomerID string `form:"customer_id,omitempty"`
-	Limit      int64  `form:"limit,omitempty"`
+    PriceID    string `query:"price_id" doc:"Filter sessions containing this price"`
+    CustomerID string `query:"customer_id" doc:"Filter by customer"`
+    Limit      int64  `query:"limit" doc:"Number of sessions to return"`
 }
-
 
 type ArchiveStripeProductRequest struct {
 	ID string `json:"id" example:"product_123" doc:"ID of the product"`
@@ -73,7 +73,7 @@ type ArchiveStripePriceRequest struct {
 }
 
 type DeleteCheckoutSessionRequest struct {
-	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+	ID string `path:"id" example:"cs_123" doc:"ID of the checkout session"`
 }
 
 type GetStripeCustomerInput struct {

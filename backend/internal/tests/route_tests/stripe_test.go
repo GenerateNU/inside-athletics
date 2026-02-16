@@ -803,59 +803,51 @@ func TestGetStripeCheckoutSessionByID(t *testing.T) {
 	}
 }
 
-func TestArchiveStripeCheckoutSession(t *testing.T) {
+func TestDeleteStripeCheckoutSession(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
-
-	// Create product and price
-	productParams := &stripe.ProductParams{
-		Name:        stripe.String("Premium Plan"),
-		Description: stripe.String("Get premium content with this subscription"),
-	}
-	productResult, _ := product.New(productParams)
-
-	priceParams := &stripe.PriceParams{
-		Product:    stripe.String(productResult.ID),
-		UnitAmount: stripe.Int64(2550),
-		Currency:   stripe.String(string(stripe.CurrencyUSD)),
-		Recurring: &stripe.PriceRecurringParams{
-			Interval:      stripe.String(string(stripe.PriceRecurringIntervalDay)),
-			IntervalCount: stripe.Int64(3),
-		},
-	}
-	priceResult, _ := price.New(priceParams)
-
-	// Create Checkout Session
+	// Create a checkout session to delete
 	sessionParams := &stripe.CheckoutSessionParams{
-		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
-		SuccessURL: stripe.String("https://example.com/success"),
-		CancelURL:  stripe.String("https://example.com/cancel"),
+		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
-				Price:    stripe.String(priceResult.ID),
-				Quantity: stripe.Int64(2),
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("usd"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String("Test Product"),
+					},
+					UnitAmount: stripe.Int64(1000),
+				},
+				Quantity: stripe.Int64(1),
 			},
 		},
+		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL: stripe.String("https://example.com/success"),
+		CancelURL:  stripe.String("https://example.com/cancel"),
 	}
-	createdSession, _ := session.New(sessionParams)
 
-	// DELETE via Huma
-	body := s.DeleteCheckoutSessionRequest{ID: createdSession.ID}
-	resp := api.Delete("/api/v1/checkout/sessions/"+createdSession.ID, body, "Authorization: Bearer "+uuid.NewString())
-
-	// Decode into map first
-	var temp map[string]any
-	DecodeTo(&temp, resp)
-
-	// Build Stripe struct manually
-	deletedSession := stripe.CheckoutSession{
-		ID:     temp["id"].(string),
-		Status: stripe.CheckoutSessionStatus(temp["status"].(string)), // force string conversion
+	createdSession, err := session.New(sessionParams)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
 	}
+
+	// Build request body
+	body := s.DeleteCheckoutSessionRequest{
+		ID: createdSession.ID,
+	}
+
+	// Call the DELETE endpoint using the exact URL
+	resp := api.Delete(
+		"/api/v1/checkout/sessions/"+createdSession.ID,
+		body,
+		"Authorization: Bearer "+uuid.NewString(),
+	)
+
+	// Decode directly into stripe.CheckoutSession
+	var deletedSession stripe.CheckoutSession
+	DecodeTo(&deletedSession, resp)
 
 	// Assertions
 	if deletedSession.ID != createdSession.ID {
@@ -863,6 +855,75 @@ func TestArchiveStripeCheckoutSession(t *testing.T) {
 	}
 
 	if deletedSession.Status != stripe.CheckoutSessionStatusExpired {
-		t.Errorf("expected session status to be expired, got %s", deletedSession.Status)
+		t.Errorf("expected session to be expired, got status %s", deletedSession.Status)
+	}
+
+	if deletedSession.ExpiresAt == 0 {
+		t.Errorf("expected ExpiresAt to be set, got 0")
+	}
+}
+
+func TestGetAllStripeSessions(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	p, err := product.New(&stripe.ProductParams{
+		Name: stripe.String("Standard Plan"),
+	})
+	if err != nil {
+		t.Fatalf("Failed to create product: %v", err)
+	}
+
+	pr, err := price.New(&stripe.PriceParams{
+		Product:    stripe.String(p.ID),
+		UnitAmount: stripe.Int64(1000),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+	})
+	if err != nil {
+		t.Fatalf("Failed to create price: %v", err)
+	}
+
+	sessionParams := &stripe.CheckoutSessionParams{
+		SuccessURL: stripe.String("https://example.com/success"),
+		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(pr.ID),
+				Quantity: stripe.Int64(1),
+			},
+		},
+	}
+	createdSession, err := session.New(sessionParams)
+	if err != nil {
+		t.Fatalf("Failed to create session: %v", err)
+	}
+
+	requestBody := s.GetAllStripeSessionsRequest{
+		PriceID: pr.ID,
+		Limit:   10,
+	}
+
+	resp := api.Get("/api/v1/checkout/sessions/", requestBody, "Authorization: Bearer "+uuid.NewString())
+	var sessionList []*stripe.CheckoutSession
+	DecodeTo(&sessionList, resp)
+
+	if len(sessionList) == 0 {
+		t.Fatalf("expected to find at least 1 session for price %s, but got 0", pr.ID)
+	}
+
+	found := false
+	for _, sess := range sessionList {
+		if sess.ID == createdSession.ID {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		t.Errorf("expected session %s to be in the filtered list, but it was not found", createdSession.ID)
 	}
 }

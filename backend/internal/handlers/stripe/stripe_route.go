@@ -40,12 +40,9 @@ func Route(api huma.API, db *gorm.DB) {
 		grp := huma.NewGroup(api, "/api/v1/checkout/sessions")
 
 		huma.Post(grp, "/", stripeService.CreateStripeCheckoutSession)        // CREATE checkout session
+		huma.Get(grp, "/", stripeService.GetAllStripeSessions)           // Get all sessions
 		huma.Get(grp, "/{id}", stripeService.GetStripeCheckoutSessionByID)        // READ checkout session by ID
 		//NOTE: the current stripe version doesn't support updating sessions, but even within the API version the ability to update is limited
 		huma.Delete(grp, "/{id}", stripeService.DeleteStripeCheckoutSession) // DELETE (expire) checkout session
-	}
-	{
-		grp := huma.NewGroup(api, "/api/v1/sessions")
-		huma.Get(grp, "/{id}", stripeService.GetAllStripeSessions) // Get all sessions
 	}
 }

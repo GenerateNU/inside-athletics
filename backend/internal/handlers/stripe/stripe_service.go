@@ -495,36 +495,53 @@ func (s *StripeService) DeleteStripeCheckoutSession(
 }
 
 func (s *StripeService) GetAllStripeSessions(
-	ctx context.Context, input *GetAllStripeSessionsRequest,
+    ctx context.Context, input *GetAllStripeSessionsRequest,
 ) (*utils.ResponseBody[[]*stripe.CheckoutSession], error) {
 
-	limit := int64(50)
-	if input.Limit > 0 {
-		limit = input.Limit
-	}
+    limit := int64(50)
+    if input.Limit > 0 {
+        limit = input.Limit
+    }
 
-	params := &stripe.CheckoutSessionListParams{
-		ListParams: stripe.ListParams{
-			Limit: &limit,
-		},
-	}
+    params := &stripe.CheckoutSessionListParams{
+        ListParams: stripe.ListParams{
+            Limit: &limit,
+        },
+    }
 
-	if input.CustomerID != "" {
-		params.Customer = stripe.String(input.CustomerID)
-	}
+    if input.PriceID != "" {
+        params.AddExpand("data.line_items")
+    }
 
-	i := session.List(params)
+    if input.CustomerID != "" {
+        params.Customer = stripe.String(input.CustomerID)
+    }
 
-	var sessions []*stripe.CheckoutSession
-	for i.Next() {
-		sessions = append(sessions, i.CheckoutSession())
-	}
+    i := session.List(params)
+    var sessions []*stripe.CheckoutSession
 
-	if err := i.Err(); err != nil {
-		return nil, err
-	}
+    for i.Next() {
+        sess := i.CheckoutSession()
+        if input.PriceID != "" {
+            match := false
+            for _, item := range sess.LineItems.Data {
+                if item.Price != nil && item.Price.ID == input.PriceID {
+                    match = true
+                    break
+                }
+            }
+            if !match {
+                continue
+            }
+        }
+        sessions = append(sessions, sess)
+    }
+
+    if err := i.Err(); err != nil {
+        return nil, err
+    }
 
 	return &utils.ResponseBody[[]*stripe.CheckoutSession]{
-		Body: &sessions,
+		Body: &sessions, 
 	}, nil
 }
