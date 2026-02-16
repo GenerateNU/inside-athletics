@@ -432,8 +432,15 @@ func (s *StripeService) CreateStripeCheckoutSession(
 		return nil, huma.Error422UnprocessableEntity("quantity must be greater than 0.")
 	}
 
+
 	params := &stripe.CheckoutSessionParams{
-		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
+		Params: stripe.Params{
+			Expand: []*string{
+				stripe.String("line_items"),
+				stripe.String("subscription"),
+			},
+		},
+		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
 		SuccessURL: stripe.String(input.Body.SuccessURL),
 		CancelURL:  stripe.String(input.Body.CancelURL),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
@@ -454,10 +461,12 @@ func (s *StripeService) CreateStripeCheckoutSession(
 	}, nil
 }
 
-func (s *StripeService) GetStripeCheckoutSession(ctx context.Context, input *GetCheckoutSessionRequest) (*utils.ResponseBody[stripe.CheckoutSession], error) {
-	params := &stripe.CheckoutSessionParams{}
+func (s *StripeService) GetStripeCheckoutSessionByID(ctx context.Context, input *GetStripeCheckoutSessionParams) (*utils.ResponseBody[stripe.CheckoutSession], error) {
+	if input.ID == "" {
+		return nil, fmt.Errorf("product ID is empty")
+	}
 
-	checkoutSession, err := session.Get(input.ID, params)
+	checkoutSession, err := session.Get(input.ID, nil)
 	if err != nil {
 		return nil, err
 	}

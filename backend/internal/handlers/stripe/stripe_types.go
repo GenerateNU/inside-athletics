@@ -47,8 +47,8 @@ type GetStripePriceByIDParams struct {
 	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
-type GetCheckoutSessionRequest struct {
-	ID string `uri:"id" binding:"required"`
+type GetStripeCheckoutSessionParams struct {
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
 type GetAllStripeProductsRequest struct {
@@ -73,7 +73,7 @@ type ArchiveStripePriceRequest struct {
 }
 
 type DeleteCheckoutSessionRequest struct {
-	ID string `uri:"id" binding:"required"`
+	ID string `json:"id" example:"price_123" doc:"ID of the product"`
 }
 
 type GetStripeCustomerInput struct {

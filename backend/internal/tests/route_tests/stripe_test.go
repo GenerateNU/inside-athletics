@@ -2,13 +2,15 @@ package routeTests
 
 import (
 	s "inside-athletics/internal/handlers/stripe"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stripe/stripe-go/v72"
+	"github.com/stripe/stripe-go/v72/checkout/session"
 	"github.com/stripe/stripe-go/v72/customer"
-	"github.com/stripe/stripe-go/v72/product"
 	"github.com/stripe/stripe-go/v72/price"
+	"github.com/stripe/stripe-go/v72/product"
 )
 
 func TestCreateProduct(t *testing.T) {
@@ -100,9 +102,8 @@ func TestUpdateStripeProduct(t *testing.T) {
 	newName := "Basic Plan"
 	newDescription := "The plan you get when you wanna miss out on premium content..."
 
-
 	body := s.UpdateStripeProductRequest{
-		Name: stripe.String(newName),
+		Name:        stripe.String(newName),
 		Description: stripe.String(newDescription),
 	}
 
@@ -110,7 +111,7 @@ func TestUpdateStripeProduct(t *testing.T) {
 		"/api/v1/stripe_product/"+id, body,
 		"Authorization: Bearer "+uuid.NewString(),
 	)
-	
+
 	var stripeProduct stripe.Product
 	DecodeTo(&stripeProduct, resp)
 
@@ -151,7 +152,7 @@ func TestArchiveStripeProduct(t *testing.T) {
 		"/api/v1/stripe_product/"+id, body,
 		"Authorization: Bearer "+uuid.NewString(),
 	)
-	
+
 	var stripeProduct stripe.Product
 	DecodeTo(&stripeProduct, resp)
 
@@ -201,7 +202,7 @@ func TestGetAllProducts(t *testing.T) {
 	var stripeProducts []stripe.Product
 	DecodeTo(&stripeProducts, resp)
 
-	if len(stripeProducts) < 2{
+	if len(stripeProducts) < 2 {
 		t.Errorf("expected at least 2 products, got %d", len(stripeProducts))
 	}
 }
@@ -215,7 +216,7 @@ func TestCreatePrice(t *testing.T) {
 	description := "Get premium content with this subscription"
 
 	product_params := &stripe.ProductParams{
-		Name: stripe.String(name),
+		Name:        stripe.String(name),
 		Description: stripe.String(description),
 	}
 
@@ -229,10 +230,10 @@ func TestCreatePrice(t *testing.T) {
 	interval := s.Day
 	intervalCount := 3
 
-	body := s.CreateStripePriceRequest {
-		Product_ID: id,
-		UnitAmount: unitAmount,
-		Interval: interval,
+	body := s.CreateStripePriceRequest{
+		Product_ID:    id,
+		UnitAmount:    unitAmount,
+		Interval:      interval,
 		IntervalCount: intervalCount,
 	}
 
@@ -266,7 +267,7 @@ func TestGetStripePriceByID(t *testing.T) {
 	description := "Get premium content with this subscription"
 
 	product_params := &stripe.ProductParams{
-		Name: stripe.String(name),
+		Name:        stripe.String(name),
 		Description: stripe.String(description),
 	}
 
@@ -281,13 +282,13 @@ func TestGetStripePriceByID(t *testing.T) {
 	intervalCount := 3
 
 	price_params := &stripe.PriceParams{
-		Product:    stripe.String(id),      
-		UnitAmount: stripe.Int64(int64(unitAmount)),   
-		Currency:   stripe.String(string(stripe.CurrencyUSD)), 
+		Product:    stripe.String(id),
+		UnitAmount: stripe.Int64(int64(unitAmount)),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
 
 		Recurring: &stripe.PriceRecurringParams{
-			Interval:      stripe.String(string(interval)), 
-			IntervalCount: stripe.Int64(int64(intervalCount)),  
+			Interval:      stripe.String(string(interval)),
+			IntervalCount: stripe.Int64(int64(intervalCount)),
 		},
 	}
 
@@ -298,8 +299,7 @@ func TestGetStripePriceByID(t *testing.T) {
 
 	price_id := price_result.ID
 
-
-	body := s.GetStripePriceByIDParams {
+	body := s.GetStripePriceByIDParams{
 		ID: price_id,
 	}
 
@@ -387,11 +387,11 @@ func TestUpdateStripePrice(t *testing.T) {
 	if updatedPrice.UnitAmount != int64(newUnitAmount) {
 		t.Errorf("expected unit amount to be %d, got %d", newUnitAmount, updatedPrice.UnitAmount)
 	}
-	if updatedPrice.Recurring == nil || 
+	if updatedPrice.Recurring == nil ||
 		string(updatedPrice.Recurring.Interval) != string(newInterval) {
 		t.Errorf("expected interval to be %s, got %s", newInterval, updatedPrice.Recurring.Interval)
 	}
-	if updatedPrice.Recurring == nil || 
+	if updatedPrice.Recurring == nil ||
 		updatedPrice.Recurring.IntervalCount != int64(newIntervalCount) {
 		t.Errorf("expected interval count to be %d, got %d",
 			newIntervalCount, updatedPrice.Recurring.IntervalCount)
@@ -445,7 +445,7 @@ func TestArchiveStripePrice(t *testing.T) {
 		"/api/v1/stripe_price/"+originalPrice.ID, body,
 		"Authorization: Bearer "+uuid.NewString(),
 	)
-	
+
 	var archivedPrice stripe.Price
 	DecodeTo(&archivedPrice, resp)
 
@@ -494,13 +494,13 @@ func TestGetAllStripePrices(t *testing.T) {
 	}
 
 	priceParams = &stripe.PriceParams{
-	Product:    stripe.String(productID),
-	UnitAmount: stripe.Int64(int64(originalUnitAmount)),
-	Currency:   stripe.String(string(stripe.CurrencyUSD)),
-	Recurring: &stripe.PriceRecurringParams{
-		Interval:      stripe.String(string(originalInterval)),
-		IntervalCount: stripe.Int64(int64(originalIntervalCount)),
-	},
+		Product:    stripe.String(productID),
+		UnitAmount: stripe.Int64(int64(originalUnitAmount)),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(originalInterval)),
+			IntervalCount: stripe.Int64(int64(originalIntervalCount)),
+		},
 	}
 
 	_, err = price.New(priceParams)
@@ -655,5 +655,214 @@ func TestUpdateCustomer(t *testing.T) {
 		*c.Phone != updatedPhone ||
 		*c.Description != updatedDecription {
 		t.Fatalf("Unexpected response: %+v", c)
+	}
+}
+
+func TestCreateCheckoutSession(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	productParams := &stripe.ProductParams{
+		Name:        stripe.String("Premium Plan"),
+		Description: stripe.String("Get premium content with this subscription"),
+	}
+
+	productResult, err := product.New(productParams)
+	if err != nil {
+		t.Fatalf("Failed to create product: %+v", err)
+	}
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(productResult.ID),
+		UnitAmount: stripe.Int64(2550),
+		Currency:   stripe.String("usd"),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(stripe.PriceRecurringIntervalDay)),
+			IntervalCount: stripe.Int64(3),
+		},
+	}
+
+	priceResult, err := price.New(priceParams)
+	if err != nil {
+		t.Fatalf("Failed to create price: %+v", err)
+	}
+
+	reqBody := s.CreateStripeCheckoutSessionRequest{
+		PriceID:    priceResult.ID,
+		SuccessURL: "https://example.com/success",
+		CancelURL:  "https://example.com/cancel",
+		Quantity:   2,
+	}
+
+	resp := api.Post("/api/v1/checkout/sessions/", reqBody, "Authorization: Bearer "+uuid.NewString())
+
+	var session stripe.CheckoutSession
+	DecodeTo(&session, resp)
+
+	if session.ID == "" {
+		t.Errorf("expected checkout session ID to be set, got empty string")
+	}
+
+	if len(session.LineItems.Data) == 0 {
+		t.Errorf("expected at least one line item, got 0")
+	} else {
+		lineItem := session.LineItems.Data[0]
+		if lineItem.Price == nil || lineItem.Price.ID != priceResult.ID {
+			t.Errorf("expected line item price ID to be %s, got %v", priceResult.ID, lineItem.Price)
+		}
+		if lineItem.Quantity != reqBody.Quantity {
+			t.Errorf("expected quantity to be %d, got %d", reqBody.Quantity, lineItem.Quantity)
+		}
+	}
+
+	if session.SuccessURL != reqBody.SuccessURL {
+		t.Errorf("expected success URL to be %s, got %s", reqBody.SuccessURL, session.SuccessURL)
+	}
+
+	if session.CancelURL != reqBody.CancelURL {
+		t.Errorf("expected cancel URL to be %s, got %s", reqBody.CancelURL, session.CancelURL)
+	}
+
+	if string(session.Mode) != string(stripe.CheckoutSessionModeSubscription) {
+		t.Errorf("expected mode to be subscription, got %s", session.Mode)
+	}
+}
+
+func TestGetStripeCheckoutSessionByID(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	productParams := &stripe.ProductParams{
+		Name:        stripe.String("Premium Plan"),
+		Description: stripe.String("Get premium content with this subscription"),
+	}
+	productResult, err := product.New(productParams)
+	if err != nil {
+		t.Fatalf("Failed to create product: %+v", err)
+	}
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(productResult.ID),
+		UnitAmount: stripe.Int64(2550),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(stripe.PriceRecurringIntervalDay)),
+			IntervalCount: stripe.Int64(3),
+		},
+	}
+	priceResult, err := price.New(priceParams)
+	if err != nil {
+		t.Fatalf("Failed to create price: %+v", err)
+	}
+
+	sessionParams := &stripe.CheckoutSessionParams{
+		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
+		SuccessURL: stripe.String("https://example.com/success"),
+		CancelURL:  stripe.String("https://example.com/cancel"),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(priceResult.ID),
+				Quantity: stripe.Int64(2),
+			},
+		},
+	}
+	createdSession, err := session.New(sessionParams)
+	if err != nil {
+		t.Fatalf("Failed to create checkout session: %+v", err)
+	}
+
+	body := s.GetStripeCheckoutSessionParams{
+		ID: createdSession.ID,
+	}
+
+	getResp := api.Get(
+		"/api/v1/checkout/sessions/"+createdSession.ID,
+		body,
+		"Authorization: Bearer "+uuid.NewString(),
+	)
+
+	var fetchedSession stripe.CheckoutSession
+	DecodeTo(&fetchedSession, getResp)
+
+	if fetchedSession.ID != createdSession.ID {
+		t.Errorf("expected session ID %s, got %s", createdSession.ID, fetchedSession.ID)
+	}
+
+	if fetchedSession.SuccessURL != *sessionParams.SuccessURL {
+		t.Errorf("expected success URL %s, got %s", *sessionParams.SuccessURL, fetchedSession.SuccessURL)
+	}
+
+	if fetchedSession.CancelURL != *sessionParams.CancelURL {
+		t.Errorf("expected cancel URL %s, got %s", *sessionParams.CancelURL, fetchedSession.CancelURL)
+	}
+
+	if string(fetchedSession.Mode) != string(stripe.CheckoutSessionModeSubscription) {
+		t.Errorf("expected mode to be subscription, got %s", fetchedSession.Mode)
+	}
+}
+
+func TestArchiveStripeCheckoutSession(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	t.Setenv("STRIPE_TEST_KEY", "sk_test_51SyjYFLGVwetm7oJsQ1yKE7vYFJoQxAXNoGqhgrIRcCpjYuMZbVwPkXsuZnfMmNgyDRaE32bAMFDYhXiHRuunYBd00LFwWupaT")
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+
+	// Create product and price
+	productParams := &stripe.ProductParams{
+		Name:        stripe.String("Premium Plan"),
+		Description: stripe.String("Get premium content with this subscription"),
+	}
+	productResult, _ := product.New(productParams)
+
+	priceParams := &stripe.PriceParams{
+		Product:    stripe.String(productResult.ID),
+		UnitAmount: stripe.Int64(2550),
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),
+		Recurring: &stripe.PriceRecurringParams{
+			Interval:      stripe.String(string(stripe.PriceRecurringIntervalDay)),
+			IntervalCount: stripe.Int64(3),
+		},
+	}
+	priceResult, _ := price.New(priceParams)
+
+	// Create Checkout Session
+	sessionParams := &stripe.CheckoutSessionParams{
+		Mode:       stripe.String(string(stripe.CheckoutSessionModeSubscription)),
+		SuccessURL: stripe.String("https://example.com/success"),
+		CancelURL:  stripe.String("https://example.com/cancel"),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(priceResult.ID),
+				Quantity: stripe.Int64(2),
+			},
+		},
+	}
+	createdSession, _ := session.New(sessionParams)
+
+	// DELETE via Huma
+	body := s.DeleteCheckoutSessionRequest{ID: createdSession.ID}
+	resp := api.Delete("/api/v1/checkout/sessions/"+createdSession.ID, body, "Authorization: Bearer "+uuid.NewString())
+
+	// Decode into map first
+	var temp map[string]any
+	DecodeTo(&temp, resp)
+
+	// Build Stripe struct manually
+	deletedSession := stripe.CheckoutSession{
+		ID:     temp["id"].(string),
+		Status: stripe.CheckoutSessionStatus(temp["status"].(string)), // force string conversion
+	}
+
+	// Assertions
+	if deletedSession.ID != createdSession.ID {
+		t.Errorf("expected session ID %s, got %s", createdSession.ID, deletedSession.ID)
+	}
+
+	if deletedSession.Status != stripe.CheckoutSessionStatusExpired {
+		t.Errorf("expected session status to be expired, got %s", deletedSession.Status)
 	}
 }
