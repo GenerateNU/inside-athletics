@@ -33,3 +33,7 @@ make generate-seed-data
 ```
 
 Generates both the college and the sports data (basically runs the two commmands above)
+
+---
+
+**Note:** Python dependencies (pandas, kagglehub) are automatically installed when running any of these commands.
