@@ -59,7 +59,6 @@ type GetAllStripePricesRequest struct {
 }
 
 type GetAllStripeSessionsRequest struct {
-    PriceID    string `query:"price_id" doc:"Filter sessions containing this price"`
     CustomerID string `query:"customer_id" doc:"Filter by customer"`
     Limit      int64  `query:"limit" doc:"Number of sessions to return"`
 }

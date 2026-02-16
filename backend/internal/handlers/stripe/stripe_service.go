@@ -509,9 +509,9 @@ func (s *StripeService) GetAllStripeSessions(
         },
     }
 
-    if input.PriceID != "" {
-        params.AddExpand("data.line_items")
-    }
+    // if input.PriceID != "" {
+    //     params.AddExpand("data.line_items")
+    // }
 
     if input.CustomerID != "" {
         params.Customer = stripe.String(input.CustomerID)
@@ -519,21 +519,9 @@ func (s *StripeService) GetAllStripeSessions(
 
     i := session.List(params)
     var sessions []*stripe.CheckoutSession
-
+	
     for i.Next() {
         sess := i.CheckoutSession()
-        if input.PriceID != "" {
-            match := false
-            for _, item := range sess.LineItems.Data {
-                if item.Price != nil && item.Price.ID == input.PriceID {
-                    match = true
-                    break
-                }
-            }
-            if !match {
-                continue
-            }
-        }
         sessions = append(sessions, sess)
     }
 

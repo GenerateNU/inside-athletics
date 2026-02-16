@@ -894,7 +894,6 @@ func TestGetAllStripeSessions(t *testing.T) {
 	}
 
 	requestBody := s.GetAllStripeSessionsRequest{
-		PriceID: pr.ID,
 		Limit:   10,
 	}
 
