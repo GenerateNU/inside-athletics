@@ -15,11 +15,7 @@ import (
 // contextKey is a private type to avoid collisions in context keys.
 type contextKey string
 
-/**
-Middleware used for verifying JWT in Authorization header
-and injecting userID into context for use across all API
-endpoints
-*/
+// AuthMiddleware verifies the JWT, injects user ID into context, and returns an error response when auth fails.
 func AuthMiddleware(c *fiber.Ctx) error {
     env := os.Getenv("APP_ENV") 
     var jwksURL string
