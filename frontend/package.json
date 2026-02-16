@@ -10,11 +10,20 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
+    "@tanstack/react-query": "^5.90.21",
+    "ajv": "^8.18.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@kubb/cli": "^4.23.0",
+    "@kubb/core": "^4.23.0",
+    "@kubb/plugin-client": "^4.23.0",
+    "@kubb/plugin-oas": "^4.23.0",
+    "@kubb/plugin-react-query": "^4.23.0",
+    "@kubb/plugin-ts": "^4.23.0",
+    "@kubb/plugin-zod": "^4.23.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
