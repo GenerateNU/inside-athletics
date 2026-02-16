@@ -21,14 +21,14 @@ func NewPermissionService(db *gorm.DB) *PermissionService {
 }
 
 func (p *PermissionService) CreatePermission(ctx context.Context, input *struct{ Body CreatePermissionRequest }) (*utils.ResponseBody[PermissionResponse], error) {
-	if err := models.ValidatePermissionSpec(models.PermissionAction(input.Body.Action), input.Body.Resource); err != nil {
+	if err := models.ValidatePermissionSpec(input.Body.Action, input.Body.Resource); err != nil {
 		if err == models.ErrPermissionActionInvalid {
 			return nil, huma.Error422UnprocessableEntity("invalid permission action")
 		}
 		return nil, huma.Error422UnprocessableEntity("action and resource are required")
 	}
 
-	perm, err := p.permissionDB.CreatePermission(input.Body.Action, input.Body.Resource)
+	perm, err := p.permissionDB.CreatePermission(string(input.Body.Action), input.Body.Resource)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (p *PermissionService) UpdatePermission(ctx context.Context, input *struct 
 	Body UpdatePermissionRequest
 }) (*utils.ResponseBody[PermissionResponse], error) {
 	if input.Body.Action != nil {
-		if err := models.ValidatePermissionAction(models.PermissionAction(*input.Body.Action)); err != nil {
+		if err := models.ValidatePermissionAction(*input.Body.Action); err != nil {
 			return nil, huma.Error422UnprocessableEntity("invalid permission action")
 		}
 	}

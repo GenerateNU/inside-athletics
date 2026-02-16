@@ -7,13 +7,13 @@ import (
 )
 
 type CreatePermissionRequest struct {
-	Action   string `json:"action" example:"create" doc:"Action for the permission"`
-	Resource string `json:"resource" example:"user" doc:"Resource for the permission"`
+	Action   models.PermissionAction `json:"action" example:"create" doc:"Action for the permission"`
+	Resource string                  `json:"resource" example:"user" doc:"Resource for the permission"`
 }
 
 type UpdatePermissionRequest struct {
-	Action   *string `json:"action,omitempty" example:"update" doc:"Action for the permission"`
-	Resource *string `json:"resource,omitempty" example:"user" doc:"Resource for the permission"`
+	Action   *models.PermissionAction `json:"action,omitempty" example:"update" doc:"Action for the permission"`
+	Resource *string                  `json:"resource,omitempty" example:"user" doc:"Resource for the permission"`
 }
 
 type PermissionResponse struct {
