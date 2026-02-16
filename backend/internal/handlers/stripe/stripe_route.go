@@ -31,9 +31,9 @@ func Route(api huma.API, db *gorm.DB) {
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/stripe_customers")
-		huma.Post(grp, "/", stripeService.RegisterStripeCustomer)    // Register a new customer
-		huma.Get(grp, "/{id}", stripeService.GetStripeCustomer)      // Get a customer
-		huma.Patch(grp, "/{id}", stripeService.UpdateStripeCustomer) // Update a customer
-		//huma.Delete(grp, "/{id}", stripeService.DeleteStripeCustomer) // Delete a customer
+		huma.Post(grp, "/", stripeService.RegisterStripeCustomer)     // Register a new customer
+		huma.Get(grp, "/{id}", stripeService.GetStripeCustomer)       // Get a customer
+		huma.Patch(grp, "/{id}", stripeService.UpdateStripeCustomer)  // Update a customer
+		huma.Delete(grp, "/{id}", stripeService.DeleteStripeCustomer) // Delete a customer
 	}
 }

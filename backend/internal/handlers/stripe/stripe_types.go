@@ -180,5 +180,5 @@ type DeleteStripeCustomerInput struct {
 type DeleteStripeCustomerResponse struct {
 	ID      string `gorm:"primaryKey;column:id" json:"id" example:"cus_NffrFeUfNV2Hib" doc:"Stripe customer ID"`
 	Object  string `gorm:"column:object" json:"object" example:"customer" doc:"Object type"`
-	Deleted bool   `gorm:"column:deleted" json:"deleted" example:"True" doc:"Object bool"`
+	Deleted bool   `gorm:"column:deleted" json:"deleted" example:"true" doc:"Object bool"`
 }

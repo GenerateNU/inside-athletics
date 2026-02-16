@@ -431,13 +431,12 @@ func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateS
 	}, nil
 }
 
-/**
 func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteStripeCustomerInput) (*utils.ResponseBody[DeleteStripeCustomerResponse], error) {
 	id := input.ID
 
 	params := &stripe.CustomerParams{}
 
-	results, err := customer.Del(id.String(), params)
+	results, err := customer.Del(id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -450,7 +449,6 @@ func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteS
 		Body: respBody,
 	}, nil
 }
-*/
 
 func mapStripeCustomerToModel(c *stripe.Customer) *GetStripeCustomerResponse {
 	customer := &GetStripeCustomerResponse{
