@@ -56,7 +56,7 @@ func TestPermissionCRUD(t *testing.T) {
 		t.Fatalf("unexpected permission response: %+v", fetched)
 	}
 
-	updateAction := "update"
+	updateAction := models.PermissionUpdate
 	updateResource := "post"
 	updateBody := permission.UpdatePermissionRequest{
 		Action:   &updateAction,
