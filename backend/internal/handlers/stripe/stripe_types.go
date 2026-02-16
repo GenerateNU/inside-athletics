@@ -1,9 +1,5 @@
 package stripe
 
-import (
-	models "inside-athletics/internal/models"
-)
-
 type Interval string
 
 const (
@@ -19,8 +15,8 @@ type CreateStripeProductRequest struct {
 }
 
 type CreateStripePriceRequest struct {
-	product_ID    string   `json:"id" example:"product_123" doc:"ID of the product"`
-	UnitAmount    float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
+	Product_ID    string   `json:"id" example:"product_123" doc:"ID of the product"`
+	UnitAmount    int  `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
@@ -30,18 +26,29 @@ type UpdateStripeProductRequest struct {
 	Description *string `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
 }
 
+type CreateStripeCheckoutSessionRequest struct {
+	PriceID    string `json:"price_id" binding:"required" example:"price_12345"`
+	SuccessURL string `json:"success_url" binding:"required,url" example:"https://example.com/success"`
+	CancelURL  string `json:"cancel_url" binding:"required,url" example:"https://example.com/cancel"`
+	Quantity   int64  `json:"quantity" binding:"required,min=1" example:"1"`
+}
+
 type UpdateStripePriceRequest struct {
-	UnitAmount    *float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
+	UnitAmount    *int  `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      *Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount *int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
 
 type GetStripeProductByIDParams struct {
-	ID string `json:"id" example:"product_123" doc:"ID of the product"`
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
 type GetStripePriceByIDParams struct {
-	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
+}
+
+type GetStripeCheckoutSessionParams struct {
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
 type GetAllStripeProductsRequest struct {
@@ -51,14 +58,9 @@ type GetAllStripePricesRequest struct {
 	ID string `json:"id" example:"price_123" doc:"ID of the product"`
 }
 
-type GetAllStripeProductsResponse struct {
-	StripeProducts []StripeProductResponse `json:"stripe_products" doc:"List of stripe products"`
-	Total          int                     `json:"total" example:"25" doc:"Total number of products"`
-}
-
-type GetAllStripePricesResponse struct {
-	StripePrices []StripePriceResponse `json:"stripe_products" doc:"List of stripe products"`
-	Total        int                   `json:"total" example:"25" doc:"Total number of prices"`
+type GetAllStripeSessionsRequest struct {
+    CustomerID string `query:"customer_id" doc:"Filter by customer"`
+    Limit      int64  `query:"limit" doc:"Number of sessions to return"`
 }
 
 type ArchiveStripeProductRequest struct {
@@ -69,34 +71,8 @@ type ArchiveStripePriceRequest struct {
 	ID string `json:"id" example:"price_123" doc:"ID of the product"`
 }
 
-type StripeProductResponse struct {
-	ID          string `json:"id" example:"price_123" doc:"ID of the product"`
-	Name        string `json:"name" binding:"required,min=1,max=100" example:"Premium Plan"`
-	Description string `json:"description" binding:"required,min=1,max=200" example:"Get premium content with this subscription"`
-}
-
-type StripePriceResponse struct {
-	ID            string   `json:"id" example:"price_123" doc:"ID of the product"`
-	UnitAmount    float32  `json:"total" example:"25.50" doc:"Price per billing cycle."`
-	Interval      Interval `json:"interval" example:"day" doc:"Interval between payments"`
-	IntervalCount int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
-}
-
-func ToStripeProductResponse(stripe_product *models.StripeProduct) *StripeProductResponse {
-	return &StripeProductResponse{
-		ID:          stripe_product.ID,
-		Name:        stripe_product.Name,
-		Description: stripe_product.Description,
-	}
-}
-
-func ToStripePriceResponse(stripe_price *models.StripePrice) *StripePriceResponse {
-	return &StripePriceResponse{
-		ID:            stripe_price.ID,
-		UnitAmount:    stripe_price.UnitAmount,
-		Interval:      Interval(stripe_price.Interval),
-		IntervalCount: stripe_price.IntervalCount,
-	}
+type DeleteCheckoutSessionRequest struct {
+	ID string `path:"id" example:"cs_123" doc:"ID of the checkout session"`
 }
 
 type GetStripeCustomerInput struct {
