@@ -102,13 +102,13 @@ docker-run:
 # Generates colleges.json from NCAA College Division Database (requires kagglehub)
 generate-colleges-data:
 	python3 -m pip install -r ./scripts/requirements.txt && \
-	cd scripts/seed && python3 seed_colleges.py --division 1
+	cd scripts/seed && touch data/colleges.json && python3 seed_colleges.py --division 1
 
 .PHONY: generate-sports-data
 # Generates sports.json from NCAA sports data (requires kagglehub)
 generate-sports-data:
 	python3 -m pip install -r ./scripts/requirements.txt && \
-	cd scripts/seed && python3 seed_sports.py
+	cd scripts/seed && touch data/sports.json && python3 seed_sports.py
 
 .PHONY: generate-seed-data
 # Generates both colleges.json and sports.json
