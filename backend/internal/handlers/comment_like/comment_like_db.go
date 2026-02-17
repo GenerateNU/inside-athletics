@@ -4,7 +4,6 @@ import (
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
-	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -40,15 +39,19 @@ func (u *CommentLikeDB) CreateCommentLike(commentLike *models.CommentLike) (*mod
 }
 
 // Permanently deletes a like by ID
-func (u *CommentLikeDB) DeleteCommentLike(id uuid.UUID) error {
-	result := u.db.Unscoped().Delete(&models.CommentLike{}, id)
+func (u *CommentLikeDB) DeleteCommentLike(id uuid.UUID) (commentID uuid.UUID, err error) {
+	var like models.CommentLike
+
+	// checks that like exists to be deleted
+	if err := u.db.Where("id = ?", id).First(&like).Error; err != nil {
+		_, handleErr := utils.HandleDBError(&like, err)
+		return uuid.Nil, handleErr
+	}
+	result := u.db.Delete(&like)
 	if result.Error != nil {
-		return result.Error
+		return uuid.Nil, result.Error
 	}
-	if result.RowsAffected == 0 {
-		return huma.Error404NotFound("Resource not found")
-	}
-	return nil
+	return like.CommentID, nil
 }
 
 // Retrieves like count for the comment and whether the given user has liked it. If userID is zero, liked is false.

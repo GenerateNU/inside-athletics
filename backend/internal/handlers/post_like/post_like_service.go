@@ -55,12 +55,7 @@ func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostL
 
 // Deletes a like by ID. Response includes updated total likes on the post and if user liked post.
 func (u *PostLikeService) DeletePostLike(ctx context.Context, input *DeletePostLikeParams) (*utils.ResponseBody[DeletePostLikeResponse], error) {
-	like, err := u.postLikeDB.GetPostLike(input.ID)
-	if err != nil {
-		return nil, err
-	}
-	postID := like.PostID
-	err = u.postLikeDB.DeletePostLike(input.ID)
+	postID, err := u.postLikeDB.DeletePostLike(input.ID)
 	if err != nil {
 		return nil, err
 	}

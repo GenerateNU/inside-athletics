@@ -55,12 +55,7 @@ func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *Creat
 
 // Deletes a like by ID. Response includes updated total likes on the comment and if user liked comment.
 func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *DeleteCommentLikeParams) (*utils.ResponseBody[DeleteCommentLikeResponse], error) {
-	like, err := u.commentLikeDB.GetCommentLike(input.ID)
-	if err != nil {
-		return nil, err
-	}
-	commentID := like.CommentID
-	err = u.commentLikeDB.DeleteCommentLike(input.ID)
+	commentID, err := u.commentLikeDB.DeleteCommentLike(input.ID)
 	if err != nil {
 		return nil, err
 	}

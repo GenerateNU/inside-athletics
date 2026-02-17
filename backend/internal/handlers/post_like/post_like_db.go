@@ -4,7 +4,6 @@ import (
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
-	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -39,16 +38,19 @@ func (u *PostLikeDB) CreatePostLike(postLike *models.PostLike) (*models.PostLike
 	return postLike, true, nil
 }
 
-// Permanently deletes a like by ID
-func (u *PostLikeDB) DeletePostLike(id uuid.UUID) error {
-	result := u.db.Unscoped().Delete(&models.PostLike{}, id)
+/// Permanently deletes a like by ID
+func (u *PostLikeDB) DeletePostLike(id uuid.UUID) (postID uuid.UUID, err error) {
+	var like models.PostLike
+	// checking if like that needs to be deleted exists
+	if err := u.db.Where("id = ?", id).First(&like).Error; err != nil {
+		_, handleErr := utils.HandleDBError(&like, err)
+		return uuid.Nil, handleErr
+	}
+	result := u.db.Delete(&like)
 	if result.Error != nil {
-		return result.Error
+		return uuid.Nil, result.Error
 	}
-	if result.RowsAffected == 0 {
-		return huma.Error404NotFound("Resource not found")
-	}
-	return nil
+	return like.PostID, nil
 }
 
 // Returns like count for the post and whether the given user has liked it. If userID is zero, liked is false.
