@@ -27,6 +27,15 @@ migrate-prod:
 start-dev:
 	doppler run --command="cd cmd && APP_ENV=development go run ."
 
+start-dev-windows:
+	doppler run --command="cd cmd && set APP_ENV=development && go run ."
+
+start-supabase:
+	npx supabase start
+
+stop-supabase:
+	npx supabase stop
+
 # starts server utilizing prod supabase db
 .PHONY: start-prod
 start-prod:
@@ -36,6 +45,7 @@ start-prod:
 .PHONY: lint
 lint:
 	doppler run --command="golangci-lint run --timeout=5m"
+
 
 # reverts single migration for prod
 .PHONY: revert-prod

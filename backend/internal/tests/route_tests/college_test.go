@@ -31,9 +31,7 @@ func TestGetCollege(t *testing.T) {
 
 	// college's uuid
 	resp := api.Get("/api/v1/college/"+college.ID.String(), "Authorization: Bearer mock-token")
-
 	var u h.GetCollegeResponse
-
 	DecodeTo(&u, resp)
 
 	if u.Name != "Northeastern University" {

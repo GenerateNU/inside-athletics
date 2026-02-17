@@ -3,9 +3,13 @@ package server
 import (
 	"encoding/json"
 	"inside-athletics/internal/handlers/college"
+	"inside-athletics/internal/handlers/comment"
 	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/stripe"
+	"inside-athletics/internal/handlers/tag"
+	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/handlers/user"
 	"strings"
 
@@ -31,6 +35,7 @@ type App struct {
 
 type RouteFN func(api huma.API, db *gorm.DB)
 
+// CreateApp initializes the Fiber app and returns the assembled App (server + Huma API).
 func CreateApp(db *gorm.DB) *App {
 
 	router := setupApp()
@@ -56,15 +61,16 @@ func CreateApp(db *gorm.DB) *App {
 	}
 }
 
+// CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
-	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route, stripe.Route}
+	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route, college.Route, tag.Route, tagpost.Route, comment.Route, stripe.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
 }
 
-// Initialize Fiber app with middlewares / configs
+// setupApp initializes the Fiber app with middleware and returns the configured instance.
 func setupApp() *fiber.App {
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
