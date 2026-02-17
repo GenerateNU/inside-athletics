@@ -52,8 +52,9 @@ type CreateUserBody struct {
 }
 
 type CreateUserResponse struct {
-	ID   uuid.UUID `json:"id" example:"1" doc:"ID of the user"`
-	Name string    `json:"name" example:"Joe" doc:"Name of the user"`
+	ID   uuid.UUID         `json:"id" example:"1" doc:"ID of the user"`
+	Name string            `json:"name" example:"Joe" doc:"Name of the user"`
+	Role *UserRoleResponse `json:"role,omitempty" doc:"Default role assigned to the user"`
 }
 
 type UpdateUserInput struct {

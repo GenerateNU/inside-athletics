@@ -155,6 +155,10 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 	respBody.Body = &CreateUserResponse{
 		ID:   createdUser.ID,
 		Name: createdUser.FirstName,
+		Role: &UserRoleResponse{
+			ID:   roleID,
+			Name: models.RoleUser,
+		},
 	}
 
 	return respBody, nil

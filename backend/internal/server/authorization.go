@@ -58,21 +58,18 @@ func authorizeByPermission(db *gorm.DB, userID string, action models.PermissionA
 		return false, http.StatusUnauthorized, "Invalid user ID"
 	}
 
-	var user models.User
-	if err := db.Select("id").First(&user, "id = ?", parsedUserID).Error; err != nil {
+	authDB := NewAuthorizationDB(db)
+
+	if err := authDB.UserExists(parsedUserID); err != nil {
 		return false, http.StatusUnauthorized, "User not found"
 	}
 
-	var count int64
-	if err := db.Table("user_roles").
-		Joins("JOIN role_permissions rp ON rp.role_id = user_roles.role_id").
-		Joins("JOIN permissions p ON p.id = rp.permission_id").
-		Where("user_roles.user_id = ? AND p.action = ? AND p.resource = ?", user.ID, action, resource).
-		Count(&count).Error; err != nil {
+	hasPermission, err := authDB.UserHasPermission(parsedUserID, action, resource)
+	if err != nil {
 		return false, http.StatusInternalServerError, "Unable to check permissions"
 	}
 
-	if count == 0 {
+	if !hasPermission {
 		return false, http.StatusForbidden, "Insufficient permissions"
 	}
 
