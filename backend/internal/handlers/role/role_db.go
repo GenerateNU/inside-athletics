@@ -17,7 +17,7 @@ func NewRoleDB(db *gorm.DB) *RoleDB {
 	return &RoleDB{db: db}
 }
 
-func (r *RoleDB) CreateRoleWithPermissionsStrict(spec models.RoleSpec) (*models.Role, error) {
+func (r *RoleDB) CreateRoleWithPermissionsStrict(spec RoleSpec) (*models.Role, error) {
 	var created *models.Role
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {

@@ -25,7 +25,7 @@ func (r *RoleService) CreateRole(ctx context.Context, input *struct{ Body Create
 		return nil, huma.Error422UnprocessableEntity("name cannot be empty")
 	}
 
-	builder := models.NewRoleBuilder(models.RoleName(input.Body.Name))
+	builder := NewRoleBuilder(models.RoleName(input.Body.Name))
 	for _, perm := range input.Body.Permissions {
 		if err := models.ValidatePermissionSpec(perm.Action, perm.Resource); err != nil {
 			if err == models.ErrPermissionActionInvalid {
@@ -56,7 +56,7 @@ func (r *RoleService) CreateRoleNameOnly(ctx context.Context, input *struct{ Bod
 		return nil, huma.Error422UnprocessableEntity("permissions must be empty for this endpoint")
 	}
 
-	spec := models.NewRoleBuilder(models.RoleName(input.Body.Name)).Build()
+	spec := NewRoleBuilder(models.RoleName(input.Body.Name)).Build()
 
 	role, err := r.roleDB.CreateRoleWithPermissionsStrict(spec)
 	if err != nil {
