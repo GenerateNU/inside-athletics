@@ -94,6 +94,7 @@ func resolveResourceAndAction(method, path, userID, pathID string) (models.Permi
 		return "", ""
 	}
 
+	// Special-case: if the user is acting on their own resource, use the *_own permissions.
 	if resource == "user" && (method == http.MethodPut || method == http.MethodPatch || method == http.MethodDelete) {
 		if userID != "" && pathID != "" && pathID == userID {
 			if method == http.MethodDelete {
