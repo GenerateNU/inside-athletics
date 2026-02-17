@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"inside-athletics/internal/handlers/permission"
 	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -34,12 +33,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		return respBody, err
 	}
 
-	userRoles, err := u.userDB.GetAllRolesForUser(id)
-	if err != nil {
-		return nil, err
-	}
-
-	roleResponses, err := u.mapRolesWithPermissions(userRoles)
+	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(id)
 	if err != nil {
 		return nil, err
 	}
@@ -81,12 +75,7 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		return respBody, err
 	}
 
-	userRoles, err := u.userDB.GetAllRolesForUser(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	roleResponses, err := u.mapRolesWithPermissions(userRoles)
+	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -253,28 +242,4 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	}
 
 	return parsedID, nil
-}
-
-func (u *UserService) mapRolesWithPermissions(userRoles *[]models.Role) (*[]role.RoleResponse, error) {
-	if userRoles == nil {
-		return nil, nil
-	}
-
-	responses := make([]role.RoleResponse, 0, len(*userRoles))
-	for i := range *userRoles {
-		perms, err := u.roleDB.GetAllPermissionsForRole((*userRoles)[i].ID)
-		if err != nil {
-			return nil, err
-		}
-
-		permResponses := permission.ToPermissionResponses(perms)
-
-		responses = append(responses, role.RoleResponse{
-			ID:          (*userRoles)[i].ID,
-			Name:        (*userRoles)[i].Name,
-			Permissions: permResponses,
-		})
-	}
-
-	return &responses, nil
 }

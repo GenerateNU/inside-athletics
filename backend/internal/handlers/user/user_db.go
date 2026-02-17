@@ -1,6 +1,8 @@
 package user
 
 import (
+	"inside-athletics/internal/handlers/permission"
+	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -52,6 +54,75 @@ func (u *UserDB) GetAllRolesForUser(userID uuid.UUID) (*[]models.Role, error) {
 		return nil, huma.Error500InternalServerError("Failed to get user roles", err)
 	}
 	return &userRoles, nil
+}
+
+type rolePermissionRow struct {
+	RoleID             uuid.UUID                `gorm:"column:role_id"`
+	RoleName           models.RoleName          `gorm:"column:role_name"`
+	PermissionID       *uuid.UUID               `gorm:"column:permission_id"`
+	PermissionAction   *models.PermissionAction `gorm:"column:permission_action"`
+	PermissionResource *string                  `gorm:"column:permission_resource"`
+}
+
+// GetRolesWithPermissionsForUser returns the roles and permissions for a user using a single join query.
+func (u *UserDB) GetRolesWithPermissionsForUser(userID uuid.UUID) (*[]role.RoleResponse, error) {
+	var rows []rolePermissionRow
+	err := u.db.Table("user_roles").
+		Select("roles.id as role_id, roles.name as role_name, permissions.id as permission_id, permissions.action as permission_action, permissions.resource as permission_resource").
+		Joins("JOIN roles ON roles.id = user_roles.role_id").
+		Joins("LEFT JOIN role_permissions rp ON rp.role_id = roles.id").
+		Joins("LEFT JOIN permissions ON permissions.id = rp.permission_id").
+		Where("user_roles.user_id = ?", userID).
+		Order("roles.name ASC").
+		Scan(&rows).Error
+	if err != nil {
+		return nil, huma.Error500InternalServerError("Failed to get user roles", err)
+	}
+	if len(rows) == 0 {
+		return nil, nil
+	}
+
+	roleMap := make(map[uuid.UUID]*role.RoleResponse, len(rows))
+	roleOrder := make([]uuid.UUID, 0, len(rows))
+	permSeen := make(map[uuid.UUID]map[uuid.UUID]struct{}, len(rows))
+
+	for _, row := range rows {
+		r, ok := roleMap[row.RoleID]
+		if !ok {
+			r = &role.RoleResponse{
+				ID:          row.RoleID,
+				Name:        row.RoleName,
+				Permissions: nil,
+			}
+			roleMap[row.RoleID] = r
+			roleOrder = append(roleOrder, row.RoleID)
+		}
+
+		if row.PermissionID == nil || row.PermissionAction == nil || row.PermissionResource == nil {
+			continue
+		}
+
+		if _, ok := permSeen[row.RoleID]; !ok {
+			permSeen[row.RoleID] = make(map[uuid.UUID]struct{})
+		}
+		if _, ok := permSeen[row.RoleID][*row.PermissionID]; ok {
+			continue
+		}
+		permSeen[row.RoleID][*row.PermissionID] = struct{}{}
+
+		r.Permissions = append(r.Permissions, permission.PermissionResponse{
+			ID:       *row.PermissionID,
+			Action:   *row.PermissionAction,
+			Resource: *row.PermissionResource,
+		})
+	}
+
+	responses := make([]role.RoleResponse, 0, len(roleOrder))
+	for _, id := range roleOrder {
+		responses = append(responses, *roleMap[id])
+	}
+
+	return &responses, nil
 }
 
 func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User, error) {
