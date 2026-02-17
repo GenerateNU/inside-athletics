@@ -110,15 +110,8 @@ func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) 
 
 // Updates a comment's description by ID.
 func (s *CommentService) UpdateComment(ctx context.Context, input *UpdateCommentInput) (*utils.ResponseBody[CommentResponse], error) {
-	// Get the comment from the database
-	comment, err := s.commentDB.GetCommentByID(input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	comment.Description = input.Body.Description
 	// Update the comment in the database
-	updated, err := s.commentDB.UpdateComment(comment)
+	updated, err := s.commentDB.UpdateComment(input.ID, input.Body)
 	if err != nil {
 		return nil, err
 	}

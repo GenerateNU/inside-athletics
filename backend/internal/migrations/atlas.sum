@@ -1,3 +1,4 @@
+h1:r7lDqiQQBp7g6yb/mh0vFYRX8wq/ODBlHyIeZCwiInU=
 h1:pcWPh3Bqh443C6JR5TwkwWGiWgAJH6U/ewl1OwkVouY=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
@@ -8,3 +9,5 @@ h1:pcWPh3Bqh443C6JR5TwkwWGiWgAJH6U/ewl1OwkVouY=
 20260208163126_create_post_table.sql h1:g1vJT0XjRYfZSHah5JHdYwyTmsdkcEO31cezmOCmcJU=
 20260209175859_AddCommentsTable.sql h1:8HsnTUnZhiEcdFRaZxM/vTrxPGW40+yMEErBT0lC8Fw=
 20260210120000_CreateUserRoles.sql h1:eKabgOq+zgJNenw9NkFA3pJpnK8QYLoys7zLQOWSJtw=
+20260217040826_Create-Tag-Table.sql h1:OnPHPyKRHKLAB28Rp8ZT1oT40xhttDBFeL7q2WEe6I8=
+20260217040827_CreateTagPostTable.sql h1:+bVICnyiLW+ccPkK+qdn2p2HfiRzwBop7rIdS3+iznE=

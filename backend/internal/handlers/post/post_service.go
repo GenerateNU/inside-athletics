@@ -2,6 +2,7 @@ package post
 
 import (
 	"context"
+	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/utils"
 
 	"github.com/google/uuid"
@@ -9,13 +10,15 @@ import (
 )
 
 type PostService struct {
-	postDB *PostDB
+	postDB    *PostDB
+	tagPostDB *tagpost.TagPostDB
 }
 
 // NewPostService creates a new PostService instance
 func NewPostService(db *gorm.DB) *PostService {
 	return &PostService{
-		postDB: NewPostDB(db),
+		postDB:    NewPostDB(db),
+		tagPostDB: tagpost.NewTagPostDB(db),
 	}
 }
 
@@ -83,6 +86,25 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 	return &utils.ResponseBody[PostResponse]{
 		Body: ToPostResponse(post),
 	}, nil
+}
+
+// GetTagsByPost retrieves tag IDs for a post
+func (s *PostService) GetTagsByPost(ctx context.Context, input *GetTagsByPostParams) (*utils.ResponseBody[GetTagsByPostResponse], error) {
+	tags, err := s.tagPostDB.GetTagsByPost(input.PostID)
+	respBody := &utils.ResponseBody[GetTagsByPostResponse]{}
+
+	if err != nil {
+		return respBody, err
+	}
+
+	response := &GetTagsByPostResponse{
+		PostID: input.PostID,
+		TagIDs: *tags,
+	}
+
+	return &utils.ResponseBody[GetTagsByPostResponse]{
+		Body: response,
+	}, err
 }
 
 func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySportIDParams) (*utils.ResponseBody[GetPostsBySportIDResponse], error) {
