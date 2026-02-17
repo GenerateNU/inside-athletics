@@ -26,7 +26,7 @@ func NewStripeService(db *gorm.DB) *StripeService {
 }
 
 // products are created with default no associated prices
-func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ Body CreateStripeProductRequest }) (*utils.ResponseBody[*stripe.Product], error) {
+func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ Body CreateStripeProductRequest }) (*utils.ResponseBody[stripe.Product], error) {
 	// Validate business rules
 	if input.Body.Name == "" {
 		return nil, huma.Error422UnprocessableEntity("name cannot be empty.")
@@ -46,12 +46,12 @@ func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ 
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.Product]{
-		Body: &stripe_product,
+	return &utils.ResponseBody[stripe.Product]{
+		Body: stripe_product,
 	}, nil
 }
 
-func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Body CreateStripePriceRequest }) (*utils.ResponseBody[*stripe.Price], error) {
+func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Body CreateStripePriceRequest }) (*utils.ResponseBody[stripe.Price], error) {
 	// Validate business rules
 	if input.Body.Product_ID == "" {
 		return nil, huma.Error422UnprocessableEntity("ID cannot be empty.")
@@ -71,7 +71,7 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 	price_params := &stripe.PriceParams{
 		Product:    stripe.String(input.Body.Product_ID),
 		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount)), // multiply by 100 since stripe does not take floats
-		Currency:   stripe.String(string(stripe.CurrencyUSD)),  //hardcoded USD
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),        //hardcoded USD
 		Recurring: &stripe.PriceRecurringParams{
 			Interval:      stripe.String(string(input.Body.Interval)),
 			IntervalCount: stripe.Int64(int64(input.Body.IntervalCount)),
@@ -83,12 +83,12 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.Price]{
-		Body: &stripe_price,
+	return &utils.ResponseBody[stripe.Price]{
+		Body: stripe_price,
 	}, nil
 }
 
-func (s *StripeService) GetStripeProductByID(ctx context.Context, input *GetStripeProductByIDParams) (*utils.ResponseBody[*stripe.Product], error) {
+func (s *StripeService) GetStripeProductByID(ctx context.Context, input *GetStripeProductByIDParams) (*utils.ResponseBody[stripe.Product], error) {
 	if input.ID == "" {
 		return nil, fmt.Errorf("product ID is empty")
 	}
@@ -98,12 +98,12 @@ func (s *StripeService) GetStripeProductByID(ctx context.Context, input *GetStri
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.Product]{
-		Body: &stripe_product,
+	return &utils.ResponseBody[stripe.Product]{
+		Body: stripe_product,
 	}, nil
 }
 
-func (s *StripeService) GetStripePriceByID(ctx context.Context, input *GetStripePriceByIDParams) (*utils.ResponseBody[*stripe.Price], error) {
+func (s *StripeService) GetStripePriceByID(ctx context.Context, input *GetStripePriceByIDParams) (*utils.ResponseBody[stripe.Price], error) {
 	if input.ID == "" {
 		return nil, fmt.Errorf("price ID is empty")
 	}
@@ -112,15 +112,15 @@ func (s *StripeService) GetStripePriceByID(ctx context.Context, input *GetStripe
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.Price]{
-		Body: &stripe_price,
+	return &utils.ResponseBody[stripe.Price]{
+		Body: stripe_price,
 	}, nil
 }
 
 func (s *StripeService) UpdateStripeProduct(ctx context.Context, input *struct {
 	ID   string `path:"id"`
 	Body UpdateStripeProductRequest
-}) (*utils.ResponseBody[*stripe.Product], error) {
+}) (*utils.ResponseBody[stripe.Product], error) {
 	if input.ID == "" {
 		return nil, fmt.Errorf("product ID is empty")
 	}
@@ -135,15 +135,15 @@ func (s *StripeService) UpdateStripeProduct(ctx context.Context, input *struct {
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.Product]{
-		Body: &stripe_product,
+	return &utils.ResponseBody[stripe.Product]{
+		Body: stripe_product,
 	}, nil
 }
 
 func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 	ID   string `path:"id"`
 	Body UpdateStripePriceRequest
-}) (*utils.ResponseBody[*stripe.Price], error) {
+}) (*utils.ResponseBody[stripe.Price], error) {
 	if input.ID == "" {
 		return nil, fmt.Errorf("price ID is empty")
 	}
@@ -172,8 +172,8 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 		Active: stripe.Bool(false),
 	})
 
-	return &utils.ResponseBody[*stripe.Price]{
-		Body: &newPrice,
+	return &utils.ResponseBody[stripe.Price]{
+		Body: newPrice,
 	}, nil
 }
 
@@ -320,7 +320,7 @@ func (s *StripeService) GetStripeCustomerByEmail(ctx context.Context, input *Get
 	}
 
 	if !iter.Next() {
-		return nil, fmt.Errorf("customer not found with that email")
+		return nil, fmt.Errorf("Customer Not Found With That Email")
 	}
 	cust := iter.Customer()
 
@@ -473,7 +473,7 @@ func (s *StripeService) CreateStripeCheckoutSession(
 	input *struct {
 		Body CreateStripeCheckoutSessionRequest
 	},
-) (*utils.ResponseBody[*stripe.CheckoutSession], error) {
+) (*utils.ResponseBody[stripe.CheckoutSession], error) {
 
 	// Validate business rules
 	if input.Body.PriceID == "" {
@@ -515,12 +515,12 @@ func (s *StripeService) CreateStripeCheckoutSession(
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.CheckoutSession]{
-		Body: &stripeSession,
+	return &utils.ResponseBody[stripe.CheckoutSession]{
+		Body: stripeSession,
 	}, nil
 }
 
-func (s *StripeService) GetStripeCheckoutSessionByID(ctx context.Context, input *GetStripeCheckoutSessionParams) (*utils.ResponseBody[*stripe.CheckoutSession], error) {
+func (s *StripeService) GetStripeCheckoutSessionByID(ctx context.Context, input *GetStripeCheckoutSessionParams) (*utils.ResponseBody[stripe.CheckoutSession], error) {
 	if input.ID == "" {
 		return nil, fmt.Errorf("product ID is empty")
 	}
@@ -530,14 +530,14 @@ func (s *StripeService) GetStripeCheckoutSessionByID(ctx context.Context, input 
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.CheckoutSession]{
-		Body: &checkoutSession,
+	return &utils.ResponseBody[stripe.CheckoutSession]{
+		Body: checkoutSession,
 	}, nil
 }
 
 func (s *StripeService) DeleteStripeCheckoutSession(
 	ctx context.Context, input *DeleteCheckoutSessionRequest,
-) (*utils.ResponseBody[*stripe.CheckoutSession], error) {
+) (*utils.ResponseBody[stripe.CheckoutSession], error) {
 
 	if input.ID == "" {
 		return nil, huma.Error422UnprocessableEntity("session id cannot be empty")
@@ -548,8 +548,8 @@ func (s *StripeService) DeleteStripeCheckoutSession(
 		return nil, err
 	}
 
-	return &utils.ResponseBody[*stripe.CheckoutSession]{
-		Body: &expired,
+	return &utils.ResponseBody[stripe.CheckoutSession]{
+		Body: expired,
 	}, nil
 }
 
