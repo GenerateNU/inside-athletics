@@ -55,7 +55,7 @@ type GetAllStripeProductsRequest struct {
 }
 
 type GetAllStripePricesRequest struct {
-	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+	ID string `path:"id" example:"prod_123" doc:"ID of the product"`
 }
 
 type GetAllStripeSessionsRequest struct {

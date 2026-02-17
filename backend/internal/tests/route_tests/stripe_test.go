@@ -1,6 +1,7 @@
 package routeTests
 
 import (
+	"fmt"
 	s "inside-athletics/internal/handlers/stripe"
 	"testing"
 
@@ -225,7 +226,7 @@ func TestCreatePrice(t *testing.T) {
 	}
 
 	id := result.ID
-	unitAmount := 2550
+	unitAmount := 2500
 	interval := s.Day
 	intervalCount := 3
 
@@ -244,7 +245,7 @@ func TestCreatePrice(t *testing.T) {
 		t.Errorf("expected product id to be %s, got %v", id, price.Product)
 	}
 
-	if price.UnitAmount != int64(unitAmount) {
+	if int64(price.UnitAmount) != int64(unitAmount) {
 		t.Errorf("expected unit amount to be %d, got %d", unitAmount, price.UnitAmount)
 	}
 
@@ -511,13 +512,15 @@ func TestGetAllStripePrices(t *testing.T) {
 		ID: productID,
 	}
 
-	resp := api.Get("/api/v1/stripe_prices/", body, "Authorization: Bearer "+uuid.NewString())
+	resp := api.Get("/api/v1/stripe_prices/"+productID, body, "Authorization: Bearer "+uuid.NewString())
 
-	var updatedPrices []stripe.Price
-	DecodeTo(&updatedPrices, resp)
+	fmt.Println(resp.Body.String())
 
-	if len(updatedPrices) < 2 {
-		t.Errorf("expected at least 2 prices, but got %d", len(updatedPrices))
+	var stripePrices []stripe.Price
+	DecodeTo(&stripePrices, resp)
+
+	if len(stripePrices) < 2 {
+		t.Errorf("expected at least 2 products, got %d", len(stripePrices))
 	}
 }
 
@@ -894,7 +897,7 @@ func TestGetAllStripeSessions(t *testing.T) {
 	}
 
 	requestBody := s.GetAllStripeSessionsRequest{
-		Limit:   10,
+		Limit: 10,
 	}
 
 	resp := api.Get("/api/v1/checkout/sessions/", requestBody, "Authorization: Bearer "+uuid.NewString())

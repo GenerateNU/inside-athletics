@@ -69,7 +69,7 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 
 	price_params := &stripe.PriceParams{
 		Product:    stripe.String(input.Body.Product_ID),
-		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount) / 100), // multiply by 100 since stripe does not take floats
+		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount)), // multiply by 100 since stripe does not take floats
 		Currency:   stripe.String(string(stripe.CurrencyUSD)),        //hardcoded USD
 		Recurring: &stripe.PriceRecurringParams{
 			Interval:      stripe.String(string(input.Body.Interval)),
@@ -201,8 +201,6 @@ func (s *StripeService) GetAllStripePrices(ctx context.Context, input *GetAllStr
 	params := &stripe.PriceListParams{
 		Product: stripe.String(input.ID),
 	}
-
-	params.Active = stripe.Bool(true)
 	iter := price.List(params)
 	prices := make([]*stripe.Price, 0)
 
