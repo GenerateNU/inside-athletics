@@ -39,7 +39,7 @@ func (u *UserDB) AddUserRole(userID, roleID uuid.UUID) error {
 		UserID: userID,
 		RoleID: roleID,
 	}
-	if err := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).Find(&userRole).Error; err != nil {
+	if err := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).FirstOrCreate(&userRole).Error; err != nil {
 		return huma.Error500InternalServerError("Failed to assign role to user", err)
 	}
 	return nil
