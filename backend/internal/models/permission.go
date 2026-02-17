@@ -18,14 +18,6 @@ const (
 	PermissionDeleteOwn PermissionAction = "delete_own"
 )
 
-var validPermissionActions = map[PermissionAction]struct{}{
-	PermissionCreate:    {},
-	PermissionUpdate:    {},
-	PermissionDelete:    {},
-	PermissionUpdateOwn: {},
-	PermissionDeleteOwn: {},
-}
-
 var (
 	ErrPermissionSpecInvalid    = errors.New("permission spec must include action and resource")
 	ErrPermissionActionInvalid  = errors.New("permission action is invalid")
@@ -33,8 +25,16 @@ var (
 )
 
 func IsValidPermissionAction(action PermissionAction) bool {
-	_, ok := validPermissionActions[action]
-	return ok
+	switch action {
+	case PermissionCreate,
+		PermissionUpdate,
+		PermissionDelete,
+		PermissionUpdateOwn,
+		PermissionDeleteOwn:
+		return true
+	default:
+		return false
+	}
 }
 
 func ValidatePermissionSpec(action PermissionAction, resource string) error {
