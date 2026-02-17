@@ -9,12 +9,13 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 
-	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/price"
-	"github.com/stripe/stripe-go/v72/product"
+	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v81/price"
+	"github.com/stripe/stripe-go/v81/product"
+	"github.com/stripe/stripe-go/v81/subscription"
 
-	"github.com/stripe/stripe-go/v72/checkout/session"
-	"github.com/stripe/stripe-go/v72/customer"
+	"github.com/stripe/stripe-go/v81/checkout/session"
+	"github.com/stripe/stripe-go/v81/customer"
 )
 
 type StripeService struct {
@@ -305,6 +306,32 @@ func (s *StripeService) GetStripeCustomer(ctx context.Context, input *GetStripeC
 	}, nil
 }
 
+func (s *StripeService) GetStripeCustomerByEmail(ctx context.Context, input *GetStripeCustomerByEmailInput) (*utils.ResponseBody[GetStripeCustomerByEmailResponse], error) {
+	email := input.Email
+
+	params := &stripe.CustomerSearchParams{
+		SearchParams: stripe.SearchParams{
+			Query: "email:'" + email + "'",
+		},
+	}
+	iter := customer.Search(params)
+	if err := iter.Err(); err != nil {
+		return nil, err
+	}
+
+	if !iter.Next() {
+		return nil, fmt.Errorf("Customer Not Found With That Email")
+	}
+	cust := iter.Customer()
+
+	return &utils.ResponseBody[GetStripeCustomerByEmailResponse]{
+		Body: &GetStripeCustomerByEmailResponse{
+			ID:    cust.ID,
+			Email: cust.Email,
+		},
+	}, nil
+}
+
 func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateStripeCustomerInput) (*utils.ResponseBody[GetStripeCustomerResponse], error) {
 	id := input.ID
 
@@ -338,13 +365,12 @@ func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateS
 	}, nil
 }
 
-/**
 func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteStripeCustomerInput) (*utils.ResponseBody[DeleteStripeCustomerResponse], error) {
 	id := input.ID
 
 	params := &stripe.CustomerParams{}
 
-	results, err := customer.Del(id.String(), params)
+	results, err := customer.Del(id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +383,6 @@ func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteS
 		Body: respBody,
 	}, nil
 }
-*/
 
 func mapStripeCustomerToModel(c *stripe.Customer) *GetStripeCustomerResponse {
 	customer := &GetStripeCustomerResponse{
@@ -406,6 +431,43 @@ func mapStripeCustomerToModel(c *stripe.Customer) *GetStripeCustomerResponse {
 	return customer
 }
 
+func (s *StripeService) CheckActiveSubscription(ctx context.Context, input *HasActiveSubscriptionInput) (*utils.ResponseBody[HasActiveSubscriptionResponse], error) {
+	id := input.CustomerID
+
+	params := &stripe.SubscriptionListParams{
+		Customer: stripe.String(id),
+		Status:   stripe.String("all"),
+	}
+
+	iter := subscription.List(params)
+
+	for iter.Next() {
+		sub := iter.Subscription()
+
+		if sub.Status == stripe.SubscriptionStatusActive {
+			respBody := &HasActiveSubscriptionResponse{
+				HasActiveSubscription: true,
+				SubscriptionID:        sub.ID,
+				Status:                string(sub.Status),
+				CurrentPeriodEnd:      sub.CurrentPeriodEnd,
+			}
+			return &utils.ResponseBody[HasActiveSubscriptionResponse]{
+				Body: respBody,
+			}, nil
+		}
+	}
+
+	if err := iter.Err(); err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[HasActiveSubscriptionResponse]{
+		Body: &HasActiveSubscriptionResponse{
+			HasActiveSubscription: false,
+		},
+	}, nil
+}
+
 func (s *StripeService) CreateStripeCheckoutSession(
 	ctx context.Context,
 	input *struct {
@@ -429,7 +491,6 @@ func (s *StripeService) CreateStripeCheckoutSession(
 	if input.Body.Quantity <= 0 {
 		return nil, huma.Error422UnprocessableEntity("quantity must be greater than 0.")
 	}
-
 
 	params := &stripe.CheckoutSessionParams{
 		Params: stripe.Params{
@@ -493,41 +554,41 @@ func (s *StripeService) DeleteStripeCheckoutSession(
 }
 
 func (s *StripeService) GetAllStripeSessions(
-    ctx context.Context, input *GetAllStripeSessionsRequest,
+	ctx context.Context, input *GetAllStripeSessionsRequest,
 ) (*utils.ResponseBody[[]*stripe.CheckoutSession], error) {
 
-    limit := int64(50)
-    if input.Limit > 0 {
-        limit = input.Limit
-    }
+	limit := int64(50)
+	if input.Limit > 0 {
+		limit = input.Limit
+	}
 
-    params := &stripe.CheckoutSessionListParams{
-        ListParams: stripe.ListParams{
-            Limit: &limit,
-        },
-    }
+	params := &stripe.CheckoutSessionListParams{
+		ListParams: stripe.ListParams{
+			Limit: &limit,
+		},
+	}
 
-    // if input.PriceID != "" {
-    //     params.AddExpand("data.line_items")
-    // }
+	// if input.PriceID != "" {
+	//     params.AddExpand("data.line_items")
+	// }
 
-    if input.CustomerID != "" {
-        params.Customer = stripe.String(input.CustomerID)
-    }
+	if input.CustomerID != "" {
+		params.Customer = stripe.String(input.CustomerID)
+	}
 
-    i := session.List(params)
-    var sessions []*stripe.CheckoutSession
-	
-    for i.Next() {
-        sess := i.CheckoutSession()
-        sessions = append(sessions, sess)
-    }
+	i := session.List(params)
+	var sessions []*stripe.CheckoutSession
 
-    if err := i.Err(); err != nil {
-        return nil, err
-    }
+	for i.Next() {
+		sess := i.CheckoutSession()
+		sessions = append(sessions, sess)
+	}
+
+	if err := i.Err(); err != nil {
+		return nil, err
+	}
 
 	return &utils.ResponseBody[[]*stripe.CheckoutSession]{
-		Body: &sessions, 
+		Body: &sessions,
 	}, nil
 }

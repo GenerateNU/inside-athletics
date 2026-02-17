@@ -559,6 +559,39 @@ func TestGetCustomer(t *testing.T) {
 		t.Fatalf("Unexpected response: %+v", c)
 	}
 }
+func TestGetCustomerByEmail(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	name := "Suli"
+	email := "suli@gmail.com"
+	phone := "888 420 6769"
+	description := "premium content user"
+	params := &stripe.CustomerParams{
+		Name:        &name,
+		Email:       &email,
+		Phone:       &phone,
+		Description: &description,
+	}
+	result, err := customer.New(params)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	result_id := result.ID
+
+	resp := api.Get("/api/v1/stripe_customers/email/"+email, "Authorization: Bearer "+uuid.NewString())
+
+	var c s.GetStripeCustomerByEmailResponse
+
+	DecodeTo(&c, resp)
+
+	if c.ID != result_id ||
+		c.Email != email {
+		t.Fatalf("Unexpected response: %+v", c)
+	}
+}
 
 func TestRegisterCustomer(t *testing.T) {
 	testDB := SetupTestDB(t)
@@ -576,42 +609,31 @@ func TestRegisterCustomer(t *testing.T) {
 		Description: &description,
 	}
 
-	t.Logf(("running endpoint"))
-	resp := api.Post("/api/v1/stripe_customers", reqBody, "Authorization: Bearer "+uuid.NewString())
-
-	t.Logf("Response code: %d", resp.Code)
-	bodyStr := resp.Body.String()
-	t.Logf("Response body: %s", bodyStr)
-
-	// t.Logf("Response status: %d", resp.StatusCode)
-	// t.Logf("Response headers: %+v", resp.Header)
+	resp := api.Post("/api/v1/stripe_customers/", reqBody, "Authorization: Bearer "+uuid.NewString())
 
 	var c s.RegisterStripeCustomerResponse
 	DecodeTo(&c, resp)
-
-	t.Logf("Decoded response: %+v", c)
 
 	if c.ID == "" {
 		t.Fatalf("Expected ID to be set, got nil")
 	}
 
-	// params := &stripe.CustomerParams{}
-	// customer, err := customer.Get(c.ID, params)
+	params := &stripe.CustomerParams{}
+	customer, err := customer.Get(c.ID, params)
 
-	// if err != nil {
-	// 	t.Fatalf("Unexpected response: %+v", err)
-	// }
-	// if customer != nil {
-	// 	t.Fatalf("Unexpected")
-	// }
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+	if customer == nil {
+		t.Fatalf("Unexpected")
+	}
 
-	// if customer.Name != name ||
-	// 	customer.Email != email ||
-	// 	customer.Phone != phone ||
-	// 	customer.Description != description {
-	// 	t.Fatalf("Unexpected response: %+v", c)
-	// }
-
+	if customer.Name != name ||
+		customer.Email != email ||
+		customer.Phone != phone ||
+		customer.Description != description {
+		t.Fatalf("Unexpected response: %+v", c)
+	}
 }
 
 func TestUpdateCustomer(t *testing.T) {
