@@ -16,7 +16,7 @@ type CreateStripeProductRequest struct {
 
 type CreateStripePriceRequest struct {
 	Product_ID    string   `json:"id" example:"product_123" doc:"ID of the product"`
-	UnitAmount    int  `json:"total" example:"2550" doc:"Price per billing cycle."`
+	UnitAmount    int      `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
@@ -34,7 +34,7 @@ type CreateStripeCheckoutSessionRequest struct {
 }
 
 type UpdateStripePriceRequest struct {
-	UnitAmount    *int  `json:"total" example:"2550" doc:"Price per billing cycle."`
+	UnitAmount    *int      `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      *Interval `json:"interval" example:"day" doc:"Interval between payments"`
 	IntervalCount *int      `json:"interval_count" example:"3" doc:"Number of intervals a billing cycle lasts"`
 }
@@ -59,8 +59,8 @@ type GetAllStripePricesRequest struct {
 }
 
 type GetAllStripeSessionsRequest struct {
-    CustomerID string `query:"customer_id" doc:"Filter by customer"`
-    Limit      int64  `query:"limit" doc:"Number of sessions to return"`
+	CustomerID string `query:"customer_id" doc:"Filter by customer"`
+	Limit      int64  `query:"limit" doc:"Number of sessions to return"`
 }
 
 type ArchiveStripeProductRequest struct {
@@ -101,6 +101,15 @@ type GetStripeCustomerResponse struct {
 	Shipping            *string           `gorm:"column:shipping;type:jsonb" json:"shipping" doc:"Shipping information"`
 	TaxExempt           string            `gorm:"column:tax_exempt;default:'none'" json:"tax_exempt" example:"none" doc:"Tax exempt status"`
 	TestClock           *string           `gorm:"column:test_clock" json:"test_clock" doc:"Test clock ID"`
+}
+
+type GetStripeCustomerByEmailInput struct {
+	Email string `path:"email" maxLength:"36" example:"suli@gmail.com" doc:"email to identify the stripe user"`
+}
+
+type GetStripeCustomerByEmailResponse struct {
+	ID    string `gorm:"primaryKey;column:id" json:"id" example:"cus_NffrFeUfNV2Hib" doc:"Stripe customer ID"`
+	Email string `gorm:"column:email" json:"email" example:"jennyrosen@example.com" doc:"Customer email"`
 }
 
 type InvoiceSettings struct {
@@ -157,4 +166,15 @@ type DeleteStripeCustomerResponse struct {
 	ID      string `gorm:"primaryKey;column:id" json:"id" example:"cus_NffrFeUfNV2Hib" doc:"Stripe customer ID"`
 	Object  string `gorm:"column:object" json:"object" example:"customer" doc:"Object type"`
 	Deleted bool   `gorm:"column:deleted" json:"deleted" example:"true" doc:"Object bool"`
+}
+
+type HasActiveSubscriptionInput struct {
+	CustomerID string `json:"path" doc:"Stripe Customer ID"`
+}
+
+type HasActiveSubscriptionResponse struct {
+	HasActiveSubscription bool   `json:"has_active_subscription"`
+	SubscriptionID        string `json:"subscription_id,omitempty"`
+	Status                string `json:"status,omitempty"` // active, past_due, canceled, etc
+	CurrentPeriodEnd      int64  `json:"current_period_end,omitempty"`
 }

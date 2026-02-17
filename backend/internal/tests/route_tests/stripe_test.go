@@ -556,6 +556,39 @@ func TestGetCustomer(t *testing.T) {
 		t.Fatalf("Unexpected response: %+v", c)
 	}
 }
+func TestGetCustomerByEmail(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	name := "Suli"
+	email := "suli@gmail.com"
+	phone := "888 420 6769"
+	description := "premium content user"
+	params := &stripe.CustomerParams{
+		Name:        &name,
+		Email:       &email,
+		Phone:       &phone,
+		Description: &description,
+	}
+	result, err := customer.New(params)
+	if err != nil {
+		t.Fatalf("Unexpected response: %+v", err)
+	}
+
+	result_id := result.ID
+
+	resp := api.Get("/api/v1/stripe_customers/email/"+email, "Authorization: Bearer "+uuid.NewString())
+
+	var c s.GetStripeCustomerByEmailResponse
+
+	DecodeTo(&c, resp)
+
+	if c.ID != result_id ||
+		c.Email != email {
+		t.Fatalf("Unexpected response: %+v", c)
+	}
+}
 
 func TestRegisterCustomer(t *testing.T) {
 	testDB := SetupTestDB(t)
@@ -883,7 +916,7 @@ func TestGetAllStripeSessions(t *testing.T) {
 	}
 
 	requestBody := s.GetAllStripeSessionsRequest{
-		Limit:   10,
+		Limit: 10,
 	}
 
 	resp := api.Get("/api/v1/checkout/sessions/", requestBody, "Authorization: Bearer "+uuid.NewString())

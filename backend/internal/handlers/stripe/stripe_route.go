@@ -31,17 +31,18 @@ func Route(api huma.API, db *gorm.DB) {
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/stripe_customers")
-		huma.Post(grp, "/", stripeService.RegisterStripeCustomer)     // Register a new customer
-		huma.Get(grp, "/{id}", stripeService.GetStripeCustomer)       // Get a customer
-		huma.Patch(grp, "/{id}", stripeService.UpdateStripeCustomer)  // Update a customer
-		huma.Delete(grp, "/{id}", stripeService.DeleteStripeCustomer) // Delete a customer
+		huma.Post(grp, "/", stripeService.RegisterStripeCustomer)               // Register a new customer
+		huma.Get(grp, "/{id}", stripeService.GetStripeCustomer)                 // Get a customer
+		huma.Get(grp, "/email/{email}", stripeService.GetStripeCustomerByEmail) // Get a customer
+		huma.Patch(grp, "/{id}", stripeService.UpdateStripeCustomer)            // Update a customer
+		huma.Delete(grp, "/{id}", stripeService.DeleteStripeCustomer)           // Delete a customer
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/checkout/sessions")
 
-		huma.Post(grp, "/", stripeService.CreateStripeCheckoutSession)        // CREATE checkout session
-		huma.Get(grp, "/", stripeService.GetAllStripeSessions)           // Get all sessions
-		huma.Get(grp, "/{id}", stripeService.GetStripeCheckoutSessionByID)        // READ checkout session by ID
+		huma.Post(grp, "/", stripeService.CreateStripeCheckoutSession)     // CREATE checkout session
+		huma.Get(grp, "/", stripeService.GetAllStripeSessions)             // Get all sessions
+		huma.Get(grp, "/{id}", stripeService.GetStripeCheckoutSessionByID) // READ checkout session by ID
 		//NOTE: the current stripe version doesn't support updating sessions, but even within the API version the ability to update is limited
 		huma.Delete(grp, "/{id}", stripeService.DeleteStripeCheckoutSession) // DELETE (expire) checkout session
 	}
