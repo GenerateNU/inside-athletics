@@ -7,6 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CommentLikeDB struct {
@@ -21,14 +22,26 @@ func (u *CommentLikeDB) GetCommentLike(id uuid.UUID) (*models.CommentLike, error
 }
 
 // CreateCommentLike creates a new like on a comment in the database
-func (u *CommentLikeDB) CreateCommentLike(commentLike *models.CommentLike) (*models.CommentLike, error) {
-	dbResponse := u.db.Create(commentLike)
-	return utils.HandleDBError(commentLike, dbResponse.Error)
+func (u *CommentLikeDB) CreateCommentLike(commentLike *models.CommentLike) (*models.CommentLike, bool, error) {
+	dbResponse := u.db.Clauses(
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "user_id"}, {Name: "comment_id"}},
+			DoNothing: true,
+		},
+		clause.Returning{},
+	).Create(commentLike)
+	if dbResponse.Error != nil {
+		return nil, false, dbResponse.Error
+	}
+	if dbResponse.RowsAffected == 0 {
+		return nil, false, nil
+	}
+	return commentLike, true, nil
 }
 
-// Soft deletes a like by ID.
+// Permanently deletes a like by ID
 func (u *CommentLikeDB) DeleteCommentLike(id uuid.UUID) error {
-	result := u.db.Delete(&models.CommentLike{}, id)
+	result := u.db.Unscoped().Delete(&models.CommentLike{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

@@ -29,20 +29,16 @@ func (u *CommentLikeService) GetCommentLike(ctx context.Context, input *GetComme
 // Creates a like on a comment. Returns 409 if the user has already liked the comment.
 // Response includes total likes on the comment and liked=true for the requesting user.
 func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *CreateCommentLikeInput) (*utils.ResponseBody[CreateCommentLikeResponse], error) {
-	_, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, input.Body.UserID)
-	if err != nil {
-		return nil, err
-	}
-	if liked {
-		return nil, huma.Error409Conflict("User has already liked this comment")
-	}
 	commentLike := &models.CommentLike{
 		UserID:    input.Body.UserID,
 		CommentID: input.Body.CommentID,
 	}
-	created, err := u.commentLikeDB.CreateCommentLike(commentLike)
+	created, inserted, err := u.commentLikeDB.CreateCommentLike(commentLike)
 	if err != nil {
 		return nil, err
+	}
+	if !inserted {
+		return nil, huma.Error409Conflict("User has already liked this comment")
 	}
 	total, _, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, input.Body.UserID)
 	if err != nil {

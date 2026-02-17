@@ -7,6 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PostLikeDB struct {
@@ -21,14 +22,26 @@ func (u *PostLikeDB) GetPostLike(id uuid.UUID) (*models.PostLike, error) {
 }
 
 // Creates a new like on a post in the database
-func (u *PostLikeDB) CreatePostLike(postLike *models.PostLike) (*models.PostLike, error) {
-	dbResponse := u.db.Create(postLike)
-	return utils.HandleDBError(postLike, dbResponse.Error)
+func (u *PostLikeDB) CreatePostLike(postLike *models.PostLike) (*models.PostLike, bool, error) {
+	dbResponse := u.db.Clauses(
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "user_id"}, {Name: "post_id"}},
+			DoNothing: true,
+		},
+		clause.Returning{},
+	).Create(postLike)
+	if dbResponse.Error != nil {
+		return nil, false, dbResponse.Error
+	}
+	if dbResponse.RowsAffected == 0 {
+		return nil, false, nil
+	}
+	return postLike, true, nil
 }
 
-// Soft deletes a like by ID
+// Permanently deletes a like by ID
 func (u *PostLikeDB) DeletePostLike(id uuid.UUID) error {
-	result := u.db.Delete(&models.PostLike{}, id)
+	result := u.db.Unscoped().Delete(&models.PostLike{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

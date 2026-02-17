@@ -29,20 +29,16 @@ func (u *PostLikeService) GetPostLike(ctx context.Context, input *GetPostLikePar
 // Creates a like on a post. Returns 409 if the user has already liked the post.
 // Response includes total likes on the post and liked=true for the requesting user.
 func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostLikeInput) (*utils.ResponseBody[CreatePostLikeResponse], error) {
-	_, liked, err := u.postLikeDB.GetPostLikeInfo(input.Body.PostID, input.Body.UserID)
-	if err != nil {
-		return nil, err
-	}
-	if liked {
-		return nil, huma.Error409Conflict("User has already liked this post")
-	}
 	postLike := &models.PostLike{
 		UserID: input.Body.UserID,
 		PostID: input.Body.PostID,
 	}
-	created, err := u.postLikeDB.CreatePostLike(postLike)
+	created, inserted, err := u.postLikeDB.CreatePostLike(postLike)
 	if err != nil {
 		return nil, err
+	}
+	if !inserted {
+		return nil, huma.Error409Conflict("User has already liked this post")
 	}
 	total, _, err := u.postLikeDB.GetPostLikeInfo(input.Body.PostID, input.Body.UserID)
 	if err != nil {
