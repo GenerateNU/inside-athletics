@@ -54,7 +54,6 @@ func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ 
 		Created:     stripe_product.Created,
 	}
 
-
 	return &utils.ResponseBody[StripeProductResponse]{
 		Body: response,
 	}, nil
@@ -80,7 +79,7 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 	price_params := &stripe.PriceParams{
 		Product:    stripe.String(input.Body.Product_ID),
 		UnitAmount: stripe.Int64(int64(input.Body.UnitAmount)), // multiply by 100 since stripe does not take floats
-		Currency:   stripe.String(string(stripe.CurrencyUSD)),        //hardcoded USD
+		Currency:   stripe.String(string(stripe.CurrencyUSD)),  //hardcoded USD
 		Recurring: &stripe.PriceRecurringParams{
 			Interval:      stripe.String(string(input.Body.Interval)),
 			IntervalCount: stripe.Int64(int64(input.Body.IntervalCount)),
@@ -255,7 +254,6 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 		Body: response,
 	}, nil
 }
-
 
 func (s *StripeService) GetAllStripeProducts(ctx context.Context, input *GetAllStripeProductsRequest) (*utils.ResponseBody[[]*StripeProductResponse], error) {
 	params := &stripe.ProductListParams{}
@@ -433,7 +431,7 @@ func (s *StripeService) GetStripeCustomerByEmail(ctx context.Context, input *Get
 	}
 
 	if !iter.Next() {
-		return nil, fmt.Errorf("Customer Not Found With That Email")
+		return nil, fmt.Errorf("customer not found with that email")
 	}
 	cust := iter.Customer()
 
