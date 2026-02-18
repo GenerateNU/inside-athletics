@@ -98,6 +98,27 @@ docker-run:
 		--name inside-athletics-container \
 		inside-athletics-backend
 
+.PHONY: generate-colleges-data
+# Generates colleges.json from NCAA College Division Database (requires kagglehub)
+generate-colleges-data:
+	python3 -m pip install -r ./scripts/requirements.txt && \
+	cd scripts/seed && mkdir -p data && touch data/colleges.json && python3 seed_colleges.py --division 1
+
+.PHONY: generate-sports-data
+# Generates sports.json from NCAA sports data (requires kagglehub)
+generate-sports-data:
+	python3 -m pip install -r ./scripts/requirements.txt && \
+	cd scripts/seed && mkdir -p data && touch data/sports.json && python3 seed_sports.py
+
+.PHONY: generate-seed-data
+# Generates both colleges.json and sports.json
+generate-seed-data: generate-colleges-data generate-sports-data
+
+.PHONY: seed
+# Generates seed data and seeds the database with college and sports data
+seed: generate-seed-data
+	doppler run --command="go run scripts/seed/seed.go"
+
 
 
 
