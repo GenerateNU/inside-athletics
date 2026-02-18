@@ -33,6 +33,34 @@ type CreateStripeCheckoutSessionRequest struct {
 	Quantity   int64  `json:"quantity" binding:"required,min=1" example:"1"`
 }
 
+type StripeCheckoutSessionResponse struct {
+	ID            string `json:"id" example:"cs_test_12345"`
+	URL           string `json:"url" example:"https://checkout.stripe.com/c/pay/cs_test_12345"`
+	Mode          string `json:"mode" example:"subscription"`
+	SubscriptionID string `json:"subscription_id,omitempty" example:"sub_12345"`
+	Status        string `json:"status" example:"open"`
+	Created       int64  `json:"created" example:"1700000000"`
+}
+
+type StripeProductResponse struct {
+	ID          string `json:"id" example:"prod_12345"`
+	Name        string `json:"name" example:"Premium Plan"`
+	Description string `json:"description" example:"Get premium content with this subscription"`
+	Active      bool   `json:"active" example:"true"`
+	Created     int64  `json:"created" example:"1700000000"`
+}
+
+type StripePriceResponse struct {
+	ID            string `json:"id" example:"price_12345"`
+	ProductID     string `json:"product_id" example:"prod_12345"`
+	UnitAmount    int64  `json:"unit_amount" example:"2000"`
+	Currency      string `json:"currency" example:"usd"`
+	Interval      string `json:"interval" example:"month"`
+	IntervalCount int64  `json:"interval_count" example:"1"`
+	Active        bool   `json:"active" example:"true"`
+	Created       int64  `json:"created" example:"1700000000"`
+}
+
 type UpdateStripePriceRequest struct {
 	UnitAmount    *int      `json:"total" example:"2550" doc:"Price per billing cycle."`
 	Interval      *Interval `json:"interval" example:"day" doc:"Interval between payments"`

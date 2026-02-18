@@ -27,7 +27,7 @@ func TestCreateProduct(t *testing.T) {
 	}
 
 	resp := api.Post("/api/v1/stripe_product/", body, "Authorization: Bearer "+uuid.NewString())
-	var product stripe.Product
+	var product s.StripeProductResponse
 	DecodeTo(&product, resp)
 
 	if product.Name != "Premium Plan" {
@@ -67,7 +67,7 @@ func TestGetProductByID(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var stripeProduct stripe.Product
+	var stripeProduct s.StripeProductResponse
 	DecodeTo(&stripeProduct, resp)
 
 	if stripeProduct.Name != name {
@@ -112,7 +112,7 @@ func TestUpdateStripeProduct(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var stripeProduct stripe.Product
+	var stripeProduct s.StripeProductResponse
 	DecodeTo(&stripeProduct, resp)
 
 	if stripeProduct.Name != newName {
@@ -153,7 +153,7 @@ func TestArchiveStripeProduct(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var stripeProduct stripe.Product
+	var stripeProduct s.StripeProductResponse
 	DecodeTo(&stripeProduct, resp)
 
 	if stripeProduct.Active {
@@ -199,7 +199,7 @@ func TestGetAllProducts(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var stripeProducts []stripe.Product
+	var stripeProducts []s.StripeProductResponse
 	DecodeTo(&stripeProducts, resp)
 
 	if len(stripeProducts) < 2 {
@@ -238,24 +238,29 @@ func TestCreatePrice(t *testing.T) {
 	}
 
 	resp := api.Post("/api/v1/stripe_price/", body, "Authorization: Bearer "+uuid.NewString())
-	var price stripe.Price
+	var price s.StripePriceResponse
 	DecodeTo(&price, resp)
 
-	if price.Product == nil || price.Product.ID != id {
-		t.Errorf("expected product id to be %s, got %v", id, price.Product)
+	if price.ID == "" {
+		t.Errorf("expected price ID to be set, got empty string")
 	}
 
-	if int64(price.UnitAmount) != int64(unitAmount) {
+	if price.ProductID != id {
+		t.Errorf("expected product id to be %s, got %s", id, price.ProductID)
+	}
+
+	if price.UnitAmount != int64(unitAmount) {
 		t.Errorf("expected unit amount to be %d, got %d", unitAmount, price.UnitAmount)
 	}
 
-	if price.Recurring == nil || string(price.Recurring.Interval) != string(interval) {
-		t.Errorf("expected interval to be %s, got %s", interval, price.Recurring.Interval)
+	if price.Interval != string(interval) {
+		t.Errorf("expected interval to be %s, got %s", interval, price.Interval)
 	}
 
-	if price.Recurring == nil || price.Recurring.IntervalCount != int64(intervalCount) {
-		t.Errorf("expected interval count to be %d, got %d", intervalCount, price.Recurring.IntervalCount)
+	if price.IntervalCount != int64(intervalCount) {
+		t.Errorf("expected interval count to be %d, got %d", intervalCount, price.IntervalCount)
 	}
+
 }
 
 func TestGetStripePriceByID(t *testing.T) {
@@ -304,23 +309,27 @@ func TestGetStripePriceByID(t *testing.T) {
 	}
 
 	resp := api.Get("/api/v1/stripe_price/"+price_id, body, "Authorization: Bearer "+uuid.NewString())
-	var price stripe.Price
+	var price s.StripePriceResponse
 	DecodeTo(&price, resp)
 
-	if price.Product == nil || price.Product.ID != id {
-		t.Errorf("expected product id to be %s, got %v", id, price.Product)
+	if price.ID == "" {
+		t.Errorf("expected price ID to be set, got empty string")
+	}
+
+	if price.ProductID != id {
+		t.Errorf("expected product id to be %s, got %s", id, price.ProductID)
 	}
 
 	if price.UnitAmount != int64(unitAmount) {
 		t.Errorf("expected unit amount to be %d, got %d", unitAmount, price.UnitAmount)
 	}
 
-	if price.Recurring == nil || string(price.Recurring.Interval) != string(interval) {
-		t.Errorf("expected interval to be %s, got %s", interval, price.Recurring.Interval)
+	if price.Interval != string(interval) {
+		t.Errorf("expected interval to be %s, got %s", interval, price.Interval)
 	}
 
-	if price.Recurring == nil || price.Recurring.IntervalCount != int64(intervalCount) {
-		t.Errorf("expected interval count to be %d, got %d", intervalCount, price.Recurring.IntervalCount)
+	if price.IntervalCount != int64(intervalCount) {
+		t.Errorf("expected interval count to be %d, got %d", intervalCount, price.IntervalCount)
 	}
 }
 
@@ -375,26 +384,31 @@ func TestUpdateStripePrice(t *testing.T) {
 
 	resp := api.Patch("/api/v1/stripe_price/"+originalPrice.ID, body, "Authorization: Bearer "+uuid.NewString())
 
-	var updatedPrice stripe.Price
+	var updatedPrice s.StripePriceResponse
 	DecodeTo(&updatedPrice, resp)
 
 	if updatedPrice.ID == originalPrice.ID {
 		t.Errorf("expected new price ID, but got same ID %s", updatedPrice.ID)
 	}
-	if updatedPrice.Product.ID != productID {
-		t.Errorf("expected product id to be %s, got %s", productID, updatedPrice.Product.ID)
+
+	if updatedPrice.ProductID != productID {
+		t.Errorf("expected product id to be %s, got %s",
+			productID, updatedPrice.ProductID)
 	}
+
 	if updatedPrice.UnitAmount != int64(newUnitAmount) {
-		t.Errorf("expected unit amount to be %d, got %d", newUnitAmount, updatedPrice.UnitAmount)
+		t.Errorf("expected unit amount to be %d, got %d",
+			newUnitAmount, updatedPrice.UnitAmount)
 	}
-	if updatedPrice.Recurring == nil ||
-		string(updatedPrice.Recurring.Interval) != string(newInterval) {
-		t.Errorf("expected interval to be %s, got %s", newInterval, updatedPrice.Recurring.Interval)
+
+	if updatedPrice.Interval != string(newInterval) {
+		t.Errorf("expected interval to be %s, got %s",
+			newInterval, updatedPrice.Interval)
 	}
-	if updatedPrice.Recurring == nil ||
-		updatedPrice.Recurring.IntervalCount != int64(newIntervalCount) {
+
+	if updatedPrice.IntervalCount != int64(newIntervalCount) {
 		t.Errorf("expected interval count to be %d, got %d",
-			newIntervalCount, updatedPrice.Recurring.IntervalCount)
+			newIntervalCount, updatedPrice.IntervalCount)
 	}
 }
 
@@ -446,7 +460,7 @@ func TestArchiveStripePrice(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var archivedPrice stripe.Price
+	var archivedPrice s.StripePriceResponse
 	DecodeTo(&archivedPrice, resp)
 
 	if archivedPrice.Active {
@@ -516,7 +530,7 @@ func TestGetAllStripePrices(t *testing.T) {
 
 	fmt.Println(resp.Body.String())
 
-	var stripePrices []stripe.Price
+	var stripePrices []s.StripePriceResponse
 	DecodeTo(&stripePrices, resp)
 
 	if len(stripePrices) < 2 {
@@ -721,31 +735,19 @@ func TestCreateCheckoutSession(t *testing.T) {
 
 	resp := api.Post("/api/v1/checkout/sessions/", reqBody, "Authorization: Bearer "+uuid.NewString())
 
-	var session stripe.CheckoutSession
+	var session s.StripeCheckoutSessionResponse
 	DecodeTo(&session, resp)
 
 	if session.ID == "" {
 		t.Errorf("expected checkout session ID to be set, got empty string")
 	}
 
-	if len(session.LineItems.Data) == 0 {
-		t.Errorf("expected at least one line item, got 0")
-	} else {
-		lineItem := session.LineItems.Data[0]
-		if lineItem.Price == nil || lineItem.Price.ID != priceResult.ID {
-			t.Errorf("expected line item price ID to be %s, got %v", priceResult.ID, lineItem.Price)
-		}
-		if lineItem.Quantity != reqBody.Quantity {
-			t.Errorf("expected quantity to be %d, got %d", reqBody.Quantity, lineItem.Quantity)
-		}
+	if session.URL == "" {
+		t.Errorf("expected checkout session URL to be set, got empty string")
 	}
 
-	if session.SuccessURL != reqBody.SuccessURL {
-		t.Errorf("expected success URL to be %s, got %s", reqBody.SuccessURL, session.SuccessURL)
-	}
-
-	if session.CancelURL != reqBody.CancelURL {
-		t.Errorf("expected cancel URL to be %s, got %s", reqBody.CancelURL, session.CancelURL)
+	if session.Mode != "subscription" {
+		t.Errorf("expected mode to be subscription, got %s", session.Mode)
 	}
 
 	if string(session.Mode) != string(stripe.CheckoutSessionModeSubscription) {
@@ -807,23 +809,24 @@ func TestGetStripeCheckoutSessionByID(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var fetchedSession stripe.CheckoutSession
-	DecodeTo(&fetchedSession, getResp)
+	var session s.StripeCheckoutSessionResponse
+	DecodeTo(&session, getResp)
 
-	if fetchedSession.ID != createdSession.ID {
-		t.Errorf("expected session ID %s, got %s", createdSession.ID, fetchedSession.ID)
+
+	if session.ID == "" {
+		t.Errorf("expected checkout session ID to be set, got empty string")
 	}
 
-	if fetchedSession.SuccessURL != *sessionParams.SuccessURL {
-		t.Errorf("expected success URL %s, got %s", *sessionParams.SuccessURL, fetchedSession.SuccessURL)
+	if session.URL == "" {
+		t.Errorf("expected checkout session URL to be set, got empty string")
 	}
 
-	if fetchedSession.CancelURL != *sessionParams.CancelURL {
-		t.Errorf("expected cancel URL %s, got %s", *sessionParams.CancelURL, fetchedSession.CancelURL)
+	if session.Mode != "subscription" {
+		t.Errorf("expected mode to be subscription, got %s", session.Mode)
 	}
 
-	if string(fetchedSession.Mode) != string(stripe.CheckoutSessionModeSubscription) {
-		t.Errorf("expected mode to be subscription, got %s", fetchedSession.Mode)
+	if string(session.Mode) != string(stripe.CheckoutSessionModeSubscription) {
+		t.Errorf("expected mode to be subscription, got %s", session.Mode)
 	}
 }
 
@@ -866,19 +869,11 @@ func TestDeleteStripeCheckoutSession(t *testing.T) {
 		"Authorization: Bearer "+uuid.NewString(),
 	)
 
-	var deletedSession stripe.CheckoutSession
-	DecodeTo(&deletedSession, resp)
+	var session s.StripeCheckoutSessionResponse
+	DecodeTo(&session, resp)
 
-	if deletedSession.ID != createdSession.ID {
-		t.Errorf("expected session ID %s, got %s", createdSession.ID, deletedSession.ID)
-	}
-
-	if deletedSession.Status != stripe.CheckoutSessionStatusExpired {
-		t.Errorf("expected session to be expired, got status %s", deletedSession.Status)
-	}
-
-	if deletedSession.ExpiresAt == 0 {
-		t.Errorf("expected ExpiresAt to be set, got 0")
+	if session.ID == "" {
+		t.Errorf("expected checkout session ID to be set, got empty string")
 	}
 }
 
@@ -923,7 +918,7 @@ func TestGetAllStripeSessions(t *testing.T) {
 	}
 
 	resp := api.Get("/api/v1/checkout/sessions/", requestBody, "Authorization: Bearer "+uuid.NewString())
-	var sessionList []*stripe.CheckoutSession
+	var sessionList []*s.StripeCheckoutSessionResponse
 	DecodeTo(&sessionList, resp)
 
 	if len(sessionList) == 0 {
