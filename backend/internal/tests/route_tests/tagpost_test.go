@@ -116,7 +116,10 @@ func TestCreateTagPost(t *testing.T) {
 		PostID: postId,
 	}
 
-	resp := api.Post("/api/v1/post/tag/", "Authorization: Bearer mock-token", payload)
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+	resp := api.Post("/api/v1/post/tag/", authHeader, payload)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -151,7 +154,10 @@ func TestUpdateTagPost(t *testing.T) {
 		PostID: updatedId,
 	}
 
-	resp := api.Patch("/api/v1/post/tag/"+tagpost.ID.String(), "Authorization: Bearer mock-token", update)
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionUpdate, Resource: "post"},
+	})
+	resp := api.Patch("/api/v1/post/tag/"+tagpost.ID.String(), authHeader, update)
 
 	var response tagpostPackage.UpdateTagPostResponse
 	DecodeTo(&response, resp)
@@ -176,7 +182,10 @@ func TestDeleteTagPost(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Delete("/api/v1/post/tag/"+tagpost.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "post"},
+	})
+	resp := api.Delete("/api/v1/post/tag/"+tagpost.ID.String(), authHeader)
 
 	var response tagpostPackage.DeleteTagPostResponse
 	DecodeTo(&response, resp)
