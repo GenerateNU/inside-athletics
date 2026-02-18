@@ -6,7 +6,6 @@ require (
 	ariga.io/atlas-provider-gorm v0.6.0
 	github.com/gofiber/fiber/v2 v2.52.7
 	github.com/google/uuid v1.6.0
-	github.com/stripe/stripe-go/v72 v72.122.0
 	github.com/stripe/stripe-go/v81 v81.4.0
 	github.com/testcontainers/testcontainers-go v0.40.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.40.0
@@ -99,7 +98,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.62.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	gitlab.com/golang-utils/isnil v1.0.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.38.0 // indirect
