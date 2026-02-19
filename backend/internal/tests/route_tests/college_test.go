@@ -14,6 +14,12 @@ func TestGetCollege(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
+
 	college := models.College{
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
@@ -30,7 +36,7 @@ func TestGetCollege(t *testing.T) {
 	}
 
 	// college's uuid
-	resp := api.Get("/api/v1/college/"+college.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/college/"+college.ID.String(), authHeader)
 	var u h.GetCollegeResponse
 	DecodeTo(&u, resp)
 
@@ -43,6 +49,12 @@ func TestCreateCollege(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
 
 	requestBody := h.CreateCollegeRequest{
 		Name:         "Northeastern University",
@@ -58,7 +70,7 @@ func TestCreateCollege(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+	resp := api.Post("/api/v1/college", authHeader, "Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
 	var response h.CreateCollegeResponse
@@ -73,6 +85,12 @@ func TestUpdateCollege(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
 
 	college := models.College{
 		Name:         "Northeastern University",
@@ -101,7 +119,7 @@ func TestUpdateCollege(t *testing.T) {
 	}
 
 	resp := api.Put("/api/v1/college/"+college.ID.String(),
-		"Authorization: Bearer mock-token",
+		authHeader,
 		"Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
@@ -132,6 +150,12 @@ func TestDeleteCollege(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
+
 	college := models.College{
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
@@ -145,7 +169,7 @@ func TestDeleteCollege(t *testing.T) {
 		t.Fatalf("Unable to add college to table: %s", err.Error())
 	}
 
-	resp := api.Delete("/api/v1/college/"+college.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/college/"+college.ID.String(), authHeader)
 
 	var response h.DeleteCollegeResponse
 	DecodeTo(&response, resp)
@@ -164,6 +188,12 @@ func TestCreateCollegeMissingName(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
+
 	requestBody := h.CreateCollegeRequest{
 		State:        "Massachusetts",
 		City:         "Boston",
@@ -176,7 +206,7 @@ func TestCreateCollegeMissingName(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+	resp := api.Post("/api/v1/college", authHeader, "Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
 	if resp.Code < 400 {
@@ -189,6 +219,12 @@ func TestCreateCollegeMissingState(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
+
 	requestBody := h.CreateCollegeRequest{
 		Name:         "Northeastern University",
 		City:         "Boston",
@@ -201,7 +237,7 @@ func TestCreateCollegeMissingState(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+	resp := api.Post("/api/v1/college", authHeader, "Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
 	if resp.Code < 400 {
@@ -213,6 +249,12 @@ func TestCreateCollegeMissingCity(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
 
 	requestBody := h.CreateCollegeRequest{
 		Name:         "Northeastern University",
@@ -226,7 +268,7 @@ func TestCreateCollegeMissingCity(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+	resp := api.Post("/api/v1/college", authHeader, "Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
 	if resp.Code < 400 {
@@ -238,6 +280,12 @@ func TestCreateCollegeMissingDivisionRank(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
 
 	requestBody := h.CreateCollegeRequest{
 		Name:    "Northeastern University",
@@ -251,7 +299,7 @@ func TestCreateCollegeMissingDivisionRank(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+	resp := api.Post("/api/v1/college", authHeader, "Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
 	if resp.Code < 400 {
@@ -263,6 +311,12 @@ func TestCreateCollegeMissingWebsite(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
 
 	requestBody := h.CreateCollegeRequest{
 		Name:         "Northeastern University",
@@ -276,7 +330,7 @@ func TestCreateCollegeMissingWebsite(t *testing.T) {
 		t.Fatalf("Unable to marshal request body: %s", err.Error())
 	}
 
-	resp := api.Post("/api/v1/college", "Authorization: Bearer mock-token", "Content-Type: application/json",
+	resp := api.Post("/api/v1/college", authHeader, "Content-Type: application/json",
 		bytes.NewReader(jsonBody))
 
 	if resp.Code < 400 {

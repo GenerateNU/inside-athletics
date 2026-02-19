@@ -20,7 +20,14 @@ func TestCreatePostLike(t *testing.T) {
 		"user_id": user.ID.String(),
 		"post_id": post.ID.String(),
 	}
-	resp := api.Post("/api/v1/post/like", body, "Authorization: Bearer mock-token")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	resp := api.Post("/api/v1/post/like", body, authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -49,7 +56,11 @@ func TestGetPostLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Get("/api/v1/post/like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+	})
+
+	resp := api.Get("/api/v1/post/like/"+like.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -71,7 +82,11 @@ func TestGetPostLikeInfo(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Get("/api/v1/post/like/"+post.ID.String()+"/likes?user_id="+user.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+	})
+
+	resp := api.Get("/api/v1/post/like/"+post.ID.String()+"/likes?user_id="+user.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -97,7 +112,15 @@ func TestDeletePostLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/post/like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionDelete, Resource: "post"},
+
+	})
+
+	resp := api.Delete("/api/v1/post/like/"+like.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -115,7 +138,7 @@ func TestDeletePostLike(t *testing.T) {
 		t.Error("expected liked false after delete")
 	}
 
-	getResp := api.Get("/api/v1/post/like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	getResp := api.Get("/api/v1/post/like/"+like.ID.String(), authHeader)
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
@@ -131,12 +154,19 @@ func TestCreatePostLikeDuplicateReturns409(t *testing.T) {
 		"user_id": user.ID.String(),
 		"post_id": post.ID.String(),
 	}
-	resp1 := api.Post("/api/v1/post/like", body, "Authorization: Bearer mock-token")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "user"},
+	})
+
+	resp1 := api.Post("/api/v1/post/like", body, authHeader)
 	if resp1.Code != http.StatusOK {
 		t.Fatalf("first create expected 200, got %d: %s", resp1.Code, resp1.Body.String())
 	}
 
-	resp2 := api.Post("/api/v1/post/like", body, "Authorization: Bearer mock-token")
+	resp2 := api.Post("/api/v1/post/like", body, authHeader)
 	if resp2.Code != http.StatusConflict {
 		t.Errorf("expected 409 for duplicate like, got %d: %s", resp2.Code, resp2.Body.String())
 	}

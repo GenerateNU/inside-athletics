@@ -3,6 +3,7 @@ package routeTests
 import (
 	"context"
 	"encoding/json"
+	"inside-athletics/internal/models"
 	"inside-athletics/internal/server"
 	"log"
 	"net/http/httptest"
@@ -73,6 +74,7 @@ func SetupTestDB(t *testing.T) *TestDatabase {
 
 	// Run migrations to sync schemas with temporary DB
 	testDB.RunMigrations(t)
+	testDB.SeedDefaultRoles(t)
 
 	return testDB
 }
@@ -124,6 +126,24 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("failed to run atlas migrations: %s\nOutput: %s", err, output)
+	}
+}
+
+func (td *TestDatabase) SeedDefaultRoles(t *testing.T) {
+	t.Helper()
+
+	roleNames := []models.RoleName{
+		models.RoleUser,
+		models.RoleAdmin,
+		models.RoleModerator,
+		models.RoleName("coach"),
+	}
+
+	for _, name := range roleNames {
+		role := models.Role{Name: name}
+		if err := td.DB.Where("name = ?", name).FirstOrCreate(&role).Error; err != nil {
+			t.Fatalf("failed to seed role %s: %v", name, err)
+		}
 	}
 }
 

@@ -34,7 +34,16 @@ func TestCreateCommentLike(t *testing.T) {
 		"user_id":    user.ID.String(),
 		"comment_id": comment.ID.String(),
 	}
-	resp := api.Post("/api/v1/comment/like", body, "Authorization: Bearer mock-token")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "comment"},
+	})
+
+
+	resp := api.Post("/api/v1/comment/like", body, authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -63,7 +72,14 @@ func TestGetCommentLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Get("/api/v1/comment/like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "comment"},
+	})
+
+	resp := api.Get("/api/v1/comment/like/"+like.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -84,7 +100,15 @@ func TestGetCommentLikeInfo(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Get("/api/v1/comment/like/"+comment.ID.String()+"/likes?user_id="+user.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "comment"},
+	})
+
+
+	resp := api.Get("/api/v1/comment/like/"+comment.ID.String()+"/likes?user_id="+user.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -109,7 +133,15 @@ func TestDeleteCommentLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/comment/like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "comment"},
+		{Action: models.PermissionDelete, Resource: "comment"},
+	})
+
+	resp := api.Delete("/api/v1/comment/like/"+like.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -126,7 +158,7 @@ func TestDeleteCommentLike(t *testing.T) {
 		t.Error("expected liked false after delete")
 	}
 
-	getResp := api.Get("/api/v1/comment/like/"+like.ID.String(), "Authorization: Bearer mock-token")
+	getResp := api.Get("/api/v1/comment/like/"+like.ID.String(), authHeader)
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
@@ -142,12 +174,20 @@ func TestCreateCommentLikeDuplicateReturns409(t *testing.T) {
 		"user_id":    user.ID.String(),
 		"comment_id": comment.ID.String(),
 	}
-	resp1 := api.Post("/api/v1/comment/like", body, "Authorization: Bearer mock-token")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "like"},
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "comment"},
+	})
+
+	resp1 := api.Post("/api/v1/comment/like", body, authHeader)
 	if resp1.Code != http.StatusOK {
 		t.Fatalf("first create expected 200, got %d: %s", resp1.Code, resp1.Body.String())
 	}
 
-	resp2 := api.Post("/api/v1/comment/like", body, "Authorization: Bearer mock-token")
+	resp2 := api.Post("/api/v1/comment/like", body, authHeader)
 	if resp2.Code != http.StatusConflict {
 		t.Errorf("expected 409 for duplicate like, got %d: %s", resp2.Code, resp2.Body.String())
 	}
