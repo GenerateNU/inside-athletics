@@ -69,3 +69,36 @@ func (s *Service) GetDownloadURL(ctx context.Context, key string) (*GetDownloadU
 		ExpiresIn:   int(expiresIn.Seconds()),
 	}, nil
 }
+
+// Verifies object exists via HeadObject, then returns download URL and size/metadata.
+func (s *Service) ConfirmUpload(ctx context.Context, key string) (*ConfirmUploadResponse, error) {
+	if key == "" {
+		return nil, fmt.Errorf("key is required")
+	}
+	size, metadata, err := s.client.HeadObject(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	expiresIn := s.cfg.PresignedURLExpiry
+	if expiresIn == 0 {
+		expiresIn = DefaultPresignedURLExpiry
+	}
+	downloadURL, err := s.client.PresignedDownloadURL(ctx, key, expiresIn)
+	if err != nil {
+		return nil, err
+	}
+	return &ConfirmUploadResponse{
+		Key:         key,
+		DownloadURL: downloadURL,
+		Size:        size,
+		Metadata:    metadata,
+	}, nil
+}
+
+// Removes the object at key from S3.
+func (s *Service) DeleteObject(ctx context.Context, key string) error {
+	if key == "" {
+		return fmt.Errorf("key is required")
+	}
+	return s.client.DeleteObject(ctx, key)
+}

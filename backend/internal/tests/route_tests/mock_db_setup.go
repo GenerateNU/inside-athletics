@@ -3,7 +3,10 @@ package routeTests
 import (
 	"context"
 	"encoding/json"
+	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/server"
+	"inside-athletics/internal/s3"
+	unitTests "inside-athletics/internal/tests/unit_tests"
 	"log"
 	"net/http/httptest"
 	"os/exec"
@@ -150,6 +153,23 @@ func SetupTestAPI(t *testing.T, dbUrl string) (humatest.TestAPI, *gorm.DB) {
 	}
 
 	server.CreateRoutes(db, api)
+	registerContentRoutesWithMock(api, db)
 
 	return api, db
+}
+
+// Returns an API with only content routes and mock S3.
+func RegisterContentTestAPI(t *testing.T) humatest.TestAPI {
+	_, api := humatest.New(t)
+	api.UseMiddleware(MockAuthMiddleware(api))
+	registerContentRoutesWithMock(api, nil)
+	return api
+}
+
+func registerContentRoutesWithMock(api humatest.TestAPI, db *gorm.DB) {
+	mockS3 := unitTests.NewMockS3Client()
+	mockS3.HeadObjectResponse.Size = 1024
+	mockS3.HeadObjectResponse.Metadata = map[string]string{"filename": "photo.jpg"}
+	s3Svc := s3.NewService(mockS3, s3.Config{Bucket: "test", Region: "us-east-1", PresignedURLExpiry: time.Hour})
+	content.Route(api, db, s3Svc)
 }

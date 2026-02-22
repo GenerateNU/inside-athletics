@@ -1,13 +1,16 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"inside-athletics/internal/handlers/comment"
+	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/handlers/health"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/user"
 	"inside-athletics/internal/handlers/college"
+	"inside-athletics/internal/s3"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -62,6 +65,12 @@ func CreateRoutes(db *gorm.DB, api huma.API) {
 	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route, college.Route, comment.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
+	}
+	// S3 content routes when backend/.env has S3_BUCKET and AWS_REGION.
+	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
+		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
+			content.Route(api, db, s3.NewService(client, s3Cfg))
+		}
 	}
 }
 
