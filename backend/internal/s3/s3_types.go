@@ -56,3 +56,11 @@ type GetDownloadURLResponse struct {
 	DownloadURL string `json:"download_url"`
 	ExpiresIn   int    `json:"expires_in"` // seconds until URL expires
 }
+
+// Response after confirming an upload (HeadObject + presigned download URL).
+type ConfirmUploadResponse struct {
+	Key         string            `json:"key"`
+	DownloadURL string            `json:"download_url"`
+	Size        int64             `json:"size"`
+	Metadata    map[string]string  `json:"metadata,omitempty"`
+}
