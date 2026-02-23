@@ -22,6 +22,7 @@ func (s *Service) GetUploadURL(ctx context.Context, input GetUploadURLInput) (*G
 	if input.FileName == "" || input.FileType == "" || input.ContentKind == "" {
 		return nil, fmt.Errorf("fileName, fileType, and contentKind are required")
 	}
+	// Use contentID for key path when present, otherwise userID (e.g. profile uploads).
 	owner := input.ContentID
 	if owner == "" {
 		owner = input.UserID
