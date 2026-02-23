@@ -1,5 +1,7 @@
 -- Seed permissions for posts, comments, and likes
 INSERT INTO "public"."permissions" ("action", "resource") VALUES
+  ('get', 'role'),
+  ('get', 'permission'),
   ('create', 'post'),
   ('update', 'post'),
   ('delete', 'post'),
