@@ -63,12 +63,12 @@ V_FLAG := $(if $(filter true,$(VERBOSE)),-v,)
 .PHONY: run-all-tests
 # Runs all tests, if passed verbose, log test details
 run-all-tests:
-	go test $(V_FLAG) ./internal/tests/route_tests ./internal/tests/unit_tests
+	doppler run --command="go test $(V_FLAG)  ./internal/tests/route_tests ./internal/tests/unit_tests"
 
 .PHONY: run-route-tests
 # Runs all the route tests, if passed verbose, log test details
 run-route-tests:
-	go test $(V_FLAG) ./internal/tests/route_tests
+	doppler run --command="go test $(V_FLAG) ./internal/tests/route_tests"
 
 .PHONY: run-unit-tests
 # Runs all the unit tests, if passed verbose, log test details
