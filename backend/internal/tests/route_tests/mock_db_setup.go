@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"inside-athletics/internal/models"
 
-	// "fmt"
+	"fmt"
 	"inside-athletics/internal/server"
 	"log"
 	"net/http/httptest"
