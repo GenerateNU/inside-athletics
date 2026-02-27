@@ -12,8 +12,8 @@ func Route(api huma.API, db *gorm.DB) {
 	{
 		grp := huma.NewGroup(api, "/api/v1/user/tag")
 		huma.Post(grp, "/", tagFollowService.CreateTagFollow)
-		huma.Get(grp, "/{id}", tagFollowService.GetTagFollowsByUser)
-		huma.Get(grp, "/{id}", tagFollowService.GetFollowingUsersByTag)
+		huma.Get(grp, "/{user_id}/follows", tagFollowService.GetTagFollowsByUser)
+		huma.Get(grp, "/{tag_id}/users", tagFollowService.GetFollowingUsersByTag)
 		huma.Delete(grp, "/{id}", tagFollowService.DeleteTagFollow)
 	}
 }
