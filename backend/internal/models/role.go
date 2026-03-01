@@ -25,5 +25,7 @@ type Role struct {
 
 type RolePermission struct {
 	RoleID       uuid.UUID  `json:"role_id" gorm:"type:uuid;primaryKey"`
-	PermissionID uuid.UUID  `json:"permission_id" gorm:"type:uuid;primaryKey"`
+    PermissionID uuid.UUID  `json:"permission_id" gorm:"type:uuid;primaryKey"`
+    Role         Role       `json:"-" gorm:"foreignKey:RoleID;references:ID;constraint:OnDelete:CASCADE"`
+    Permission   Permission `json:"-" gorm:"foreignKey:PermissionID;references:ID;constraint:OnDelete:CASCADE"`
 }
