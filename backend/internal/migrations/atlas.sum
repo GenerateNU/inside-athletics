@@ -1,4 +1,4 @@
-h1:TWCTt81kg9Q3r3I+vrufL0nAFsfGZWJKJtPh39ZPFyc=
+h1:9tx+Odkhuyup2gd2B0wGO2YaPJGMNZO0015vam1YSsA=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
@@ -15,3 +15,4 @@ h1:TWCTt81kg9Q3r3I+vrufL0nAFsfGZWJKJtPh39ZPFyc=
 20260217160000_UniqueUserPostCommentLikes.sql h1:xrkojTLdf7dR+0n5IsceuHxIznkjhw2nqog/EngXNf4=
 20260223120000_SeedRolePermissions.sql h1:kG0D9ZmvBOp0o8Uvk5cFYwfPhrVsKiPaQj5boMc4ob4=
 20260301215152_FixModelSqlDifferences.sql h1:5Cnl7uiKG3TffwK5osP2ALfRsUrEfctlwbgjdKExGgY=
+20260302023605_UserForeignKeys.sql h1:zg7c0/Ab2Q6hGdzR5KosiFzFCVRRKKJzTRsPYwNVvHM=

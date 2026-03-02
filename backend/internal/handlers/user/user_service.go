@@ -49,10 +49,10 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		Username:              user.Username,
 		Bio:                   user.Bio,
 		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
+		Sport:                 &user.Sport.Name,
 		ExpectedGradYear:      user.Expected_Grad_Year,
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
+		College:               &user.College.Name,
 		Division:              user.Division,
 		Roles:                 roleResponses,
 	}
@@ -88,10 +88,10 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		Username:              user.Username,
 		Bio:                   user.Bio,
 		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
+		Sport:                 &user.Sport.Name,
 		ExpectedGradYear:      user.Expected_Grad_Year,
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
+		College:               &user.College.Name,
 		Division:              user.Division,
 		Roles:                 roleResponses,
 	}
@@ -103,11 +103,6 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 	respBody := &utils.ResponseBody[CreateUserResponse]{}
 
 	currentUserID, err := u.getCurrentUserID(ctx)
-	if err != nil {
-		return respBody, err
-	}
-
-	sportJSON, err := marshalSport(input.Body.Sport)
 	if err != nil {
 		return respBody, err
 	}
@@ -125,10 +120,10 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Username:                input.Body.Username,
 		Bio:                     input.Body.Bio,
 		Account_Type:            input.Body.AccountType,
-		Sport:                   sportJSON,
+		SportID:                 input.Body.SportID,
 		Expected_Grad_Year:      input.Body.ExpectedGradYear,
 		Verified_Athlete_Status: input.Body.VerifiedAthleteStatus,
-		College:                 input.Body.College,
+		CollegeID:               input.Body.CollegeID,
 		Division:                input.Body.Division,
 	}
 

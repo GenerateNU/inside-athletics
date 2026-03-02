@@ -10,14 +10,35 @@ import (
 	"github.com/google/uuid"
 )
 
+func addCollegeAndSport(t *testing.T, testDB *TestDatabase) (models.College, models.Sport) {
+	college := models.College{
+		ID:           NortheasternID,
+		Name:         "Northeastern University",
+		State:        "Massachusetts",
+		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
+		DivisionRank: 1,
+	}
+	if err := testDB.DB.Create(&college).Error; err != nil {
+		t.Fatalf("Unable to create college: %s", err.Error())
+	}
+	sport := models.Sport{
+		ID:   SoccerID,
+		Name: "Women's Soccer",
+	}
+	if err := testDB.DB.Create(&sport).Error; err != nil {
+		t.Fatalf("Unable to create sport: %s", err.Error())
+	}
+	return college, sport
+}
+
 func TestGetUser(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	// insert directly into DB to test
-	// Don't use another endpoint to test this one - harder to tell which one is
-	// incorrect if the test fails
+	college, sport := addCollegeAndSport(t, testDB)
+
 	user := models.User{
 		ID:                      uuid.New(),
 		FirstName:               "Suli",
@@ -25,25 +46,25 @@ func TestGetUser(t *testing.T) {
 		Email:                   "suli@example.com",
 		Username:                "suli",
 		Account_Type:            false,
-		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusVerified,
+		CollegeID:               &college.ID,
+		SportID:                 &sport.ID,
+		Division:                divisionPtr(models.DivisionI),
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
-
 	if err != nil {
 		t.Fatalf("Unable to add user to table: %s", err.Error())
 	}
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+	})
 
-	// Need to authenticate each request by passing an authorization header like this
-	// when we start making endpoints that require a user-id you should add the user-id
-	// you need here
 	resp := api.Get("/api/v1/user/"+user.ID.String(), authHeader)
 
 	var u h.GetUserResponse
-
 	DecodeTo(&u, resp)
 	if u.ID != user.ID ||
 		u.FirstName != "Suli" ||
@@ -51,8 +72,65 @@ func TestGetUser(t *testing.T) {
 		u.Email != "suli@example.com" ||
 		u.Username != "suli" ||
 		u.AccountType != false ||
-		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusPending {
+		u.College == nil ||
+		*u.College != "Northeastern University" ||
+		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusVerified {
 		t.Fatalf("Unexpected response: %+v", u)
+	}
+}
+
+func TestGetUserWithCollegeAndSport(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	college, sport := addCollegeAndSport(t, testDB)
+
+	user := models.User{
+		ID:                      uuid.New(),
+		FirstName:               "Suli",
+		LastName:                "Test",
+		Email:                   "suli@example.com",
+		Username:                "suli",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusVerified,
+		CollegeID:               &college.ID,
+		SportID:                 &sport.ID,
+		Division:                divisionPtr(models.DivisionI),
+	}
+	userResp := testDB.DB.Create(&user)
+	_, err := utils.HandleDBError(&user, userResp.Error)
+	if err != nil {
+		t.Fatalf("Unable to add user to table: %s", err.Error())
+	}
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
+
+	resp := api.Get("/api/v1/user/"+user.ID.String(), authHeader)
+
+	var u h.GetUserResponse
+	DecodeTo(&u, resp)
+	if u.ID != user.ID ||
+		u.College == nil ||
+		u.Sport == nil ||
+		u.Division == nil ||
+		*u.Division != models.DivisionI {
+		t.Fatalf("Unexpected response: %+v", u)
+	}
+}
+
+func TestGetUserNotFound(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
+
+	resp := api.Get("/api/v1/user/"+NonExistentID.String(), authHeader)
+
+	if resp.Code != http.StatusNotFound {
+		t.Fatalf("Expected 404, got %d: %s", resp.Code, resp.Body.String())
 	}
 }
 
@@ -69,7 +147,7 @@ func TestGetCurrentUserID(t *testing.T) {
 		Email:                   "suli@example.com",
 		Username:                "suli",
 		Account_Type:            false,
-		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusNone,
 	}
 	userResp := testDB.DB.Create(&user)
 	_, err := utils.HandleDBError(&user, userResp.Error)
@@ -89,7 +167,7 @@ func TestGetCurrentUserID(t *testing.T) {
 		u.Email != "suli@example.com" ||
 		u.Username != "suli" ||
 		u.AccountType != false ||
-		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusPending {
+		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusNone {
 		t.Fatalf("Unexpected response: %+v", u)
 	}
 }
@@ -99,6 +177,8 @@ func TestCreateUser(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	college, sport := addCollegeAndSport(t, testDB)
+
 	userID := uuid.NewString()
 	payload := h.CreateUserBody{
 		FirstName:             "Suli",
@@ -107,10 +187,10 @@ func TestCreateUser(t *testing.T) {
 		Username:              "suli",
 		Bio:                   strPtr("My bio"),
 		AccountType:           true,
-		Sport:                 []string{"hockey"},
+		SportID:               &sport.ID,
 		ExpectedGradYear:      2027,
-		VerifiedAthleteStatus: models.VerifiedAthleteStatusPending,
-		College:               strPtr("Northeastern University"),
+		VerifiedAthleteStatus: models.VerifiedAthleteStatusVerified,
+		CollegeID:             &college.ID,
 		Division:              divisionPtr(models.DivisionI),
 	}
 
@@ -136,7 +216,6 @@ func TestCreateUserWithNoneStatus(t *testing.T) {
 		Username:              "suli",
 		Bio:                   strPtr("My bio"),
 		AccountType:           true,
-		Sport:                 []string{"hockey"},
 		ExpectedGradYear:      2027,
 		VerifiedAthleteStatus: models.VerifiedAthleteStatusNone,
 	}
