@@ -53,18 +53,18 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 
 // GetAllPosts retrieves all posts with pagination
 func (s *PostService) GetAllPosts(ctx context.Context, input *GetAllPostsParams) (*utils.ResponseBody[GetAllPostsResponse], error) {
-	id, err := utils.GetCurrentUserID(ctx)
+	userID, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	posts, total, err := s.postDB.GetAllPosts(input.Limit, input.Offset)
+	posts, total, err := s.postDB.GetAllPosts(input.Limit, input.Offset, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		postResponses = append(postResponses, *ToPostResponse(&posts[i], id))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
 	return &utils.ResponseBody[GetAllPostsResponse]{
@@ -80,48 +80,48 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 	ID   uuid.UUID `path:"id"`
 	Body UpdatePostRequest
 }) (*utils.ResponseBody[PostResponse], error) {
-	id, err := utils.GetCurrentUserID(ctx)
+	userID, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	updatedPost, err := s.postDB.UpdatePost(input.ID, input.Body)
+	updatedPost, err := s.postDB.UpdatePost(input.ID, input.Body, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(updatedPost, id),
+		Body: ToPostResponse(updatedPost, userID),
 	}, nil
 }
 
 func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams) (*utils.ResponseBody[PostResponse], error) {
-	id, err := utils.GetCurrentUserID(ctx)
+	userID, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	post, err := s.postDB.GetPostByID((input.ID))
+	post, err := s.postDB.GetPostByID((input.ID), userID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post, id),
+		Body: ToPostResponse(post, userID),
 	}, nil
 }
 
 func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySportIDParams) (*utils.ResponseBody[GetPostsBySportIDResponse], error) {
-	id, err := utils.GetCurrentUserID(ctx)
+	userID, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	posts, total, err := s.postDB.GetPostsBySportID(input.Limit, input.Offset, input.SportId)
+	posts, total, err := s.postDB.GetPostsBySportID(input.Limit, input.Offset, input.SportId, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		postResponses = append(postResponses, *ToPostResponse(&posts[i], id))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
 	return &utils.ResponseBody[GetPostsBySportIDResponse]{
@@ -133,18 +133,18 @@ func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySpo
 }
 
 func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostsByAuthorIDParams) (*utils.ResponseBody[GetPostsByAuthorIDResponse], error) {
-	id, err := utils.GetCurrentUserID(ctx)
+	userID, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	posts, total, err := s.postDB.GetPostsByAuthorID(input.Limit, input.Offset, input.AuthorID)
+	posts, total, err := s.postDB.GetPostsByAuthorID(input.Limit, input.Offset, input.AuthorID, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		postResponses = append(postResponses, *ToPostResponse(&posts[i], id))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
 	return &utils.ResponseBody[GetPostsByAuthorIDResponse]{

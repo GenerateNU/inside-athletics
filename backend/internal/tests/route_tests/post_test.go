@@ -11,7 +11,7 @@ import (
 
 func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
 	user := models.User{
-		ID: JohnID,
+		ID:                      JohnID,
 		FirstName:               "Test",
 		LastName:                "User",
 		Email:                   "test-john@example.com",
@@ -25,9 +25,9 @@ func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
 	}
 
 	popularity := int32(100)
-	soccer := models.Sport {
-		ID: SoccerID,
-		Name: "Soccer",
+	soccer := models.Sport{
+		ID:         SoccerID,
+		Name:       "Soccer",
 		Popularity: &popularity,
 	}
 
@@ -48,7 +48,7 @@ func TestCreatePost(t *testing.T) {
 	})
 
 	CreateUserAndSport(testDB, t)
-	
+
 	body := map[string]any{
 		"author_id":    JohnID,
 		"sport_id":     SoccerID,
@@ -82,10 +82,6 @@ func TestCreatePost(t *testing.T) {
 		t.Errorf("expected content %q, got %q", "My name is Bob Joe...", result.Content)
 	}
 
-	if result.Likes != 0 {
-		t.Errorf("expected Likes 0, got %d", result.Likes)
-	}
-
 	if result.IsAnonymous != false {
 		t.Errorf("expected IsAnonymous false, got %v", result.IsAnonymous)
 	}
@@ -111,7 +107,7 @@ func TestCreatePostWithTags(t *testing.T) {
 	testDB.DB.Create(&tag2)
 
 	body := map[string]any{
-		"author_id":  	JohnID,
+		"author_id":    JohnID,
 		"sport_id":     SoccerID,
 		"title":        "Post with tags",
 		"content":      "Testing that tags are associated with this post correctly.",
@@ -184,8 +180,104 @@ func TestGetPostById(t *testing.T) {
 		t.Errorf("expected content %q, got %q", "My name is Bob Joe...", result.Content)
 	}
 
-	if result.Likes != 0 {
-		t.Errorf("expected Likes 0, got %d", result.Likes)
+	if result.LikeCount != 0 {
+		t.Errorf("expected Likes 0, got %d", result.LikeCount)
+	}
+
+	if result.IsAnonymous != false {
+		t.Errorf("expected IsAnonymous false, got %v", result.IsAnonymous)
+	}
+}
+
+func TestGetPostByIdWithLikes(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	createdPost, err := postDB.CreatePost(&models.Post{
+		AuthorID:    JohnID,
+		SportID:     &SoccerID,
+		Title:       "Looking for thoughts on NEU Fencing!",
+		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
+		IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	// seed a like
+	like := models.PostLike{
+		UserID: JohnID,
+		PostID: createdPost.ID,
+	}
+	if err := testDB.DB.Create(&like).Error; err != nil {
+		t.Fatalf("failed to create like: %v", err)
+	}
+
+	// Seed a top-level comment
+	commentID := uuid.New()
+	comment := models.Comment{
+		ID:          commentID,
+		UserID:      JohnID,
+		PostID:      createdPost.ID,
+		Description: "Test comment",
+		IsAnonymous: false,
+	}
+	if err := testDB.DB.Create(&comment).Error; err != nil {
+		t.Fatalf("failed to create comment: %v", err)
+	}
+
+	// Seed a reply (comment with a parent)
+	reply := models.Comment{
+		UserID:          JohnID,
+		PostID:          createdPost.ID,
+		ParentCommentID: &commentID,
+		Description:     "Test reply",
+		IsAnonymous:     false,
+	}
+	if err := testDB.DB.Create(&reply).Error; err != nil {
+		t.Fatalf("failed to create reply: %v", err)
+	}
+
+	resp := api.Get("/api/v1/post/"+createdPost.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result post.PostResponse
+	DecodeTo(&result, resp)
+
+	if result.Author == nil || result.Author.ID != JohnID {
+		t.Errorf("expected authorID %v, got %v", JohnID, result.Author)
+	}
+
+	if result.Sport == nil || result.Sport.ID != SoccerID {
+		t.Errorf("expected sportID %v, got %v", SoccerID, result.Sport)
+	}
+
+	if result.Title != "Looking for thoughts on NEU Fencing!" {
+		t.Errorf("expected title %q, got %q", "Looking for thoughts on NEU Fencing!", result.Title)
+	}
+
+	if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
+		t.Errorf("expected content %q, got %q", "My name is Bob Joe...", result.Content)
+	}
+
+	if result.LikeCount != 1 {
+		t.Errorf("expected Likes 1, got %d", result.LikeCount)
+	}
+
+	if result.CommentCount != 2 {
+		t.Errorf("expected Comments 2 , got %d", result.CommentCount)
 	}
 
 	if result.IsAnonymous != false {
@@ -251,18 +343,26 @@ func TestGetPostByAuthorId(t *testing.T) {
 
 	CreateUserAndSport(testDB, t)
 
-	_, err1 := postDB.CreatePost(&models.Post{
+	post1, err1 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "First Post About Fencing", Content: "This is the first post content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err1 != nil {
 		t.Fatalf("failed to create post 1: %v", err1)
+	}
+
+	like := models.PostLike{
+		UserID: JohnID,
+		PostID: post1.ID,
+	}
+	if err := testDB.DB.Create(&like).Error; err != nil {
+		t.Fatalf("failed to create like: %v", err)
 	}
 
 	_, err2 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
@@ -281,6 +381,13 @@ func TestGetPostByAuthorId(t *testing.T) {
 
 	if len(result.Posts) < 2 {
 		t.Errorf("expected at least 2 posts in response, got %d", len(result.Posts))
+	}
+
+	if result.Posts[0].LikeCount != 1 {
+		t.Errorf("expected 1 like in first post")
+	}
+	if result.Posts[1].LikeCount != 0 {
+		t.Errorf("expected 0 likes in first post")
 	}
 }
 
@@ -301,15 +408,15 @@ func TestGetPostsBySportId(t *testing.T) {
 	_, err1 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "First Post About Fencing", Content: "This is the first post content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err1 != nil {
 		t.Fatalf("failed to create post 1: %v", err1)
 	}
 
 	_, err2 := postDB.CreatePost(&models.Post{
-		AuthorID:JohnID, SportID: &SoccerID,
+		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
@@ -348,15 +455,15 @@ func TestGetAllPosts(t *testing.T) {
 	_, err1 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "First Post About Fencing", Content: "This is the first post content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err1 != nil {
 		t.Fatalf("failed to create post 1: %v", err1)
 	}
 
 	_, err2 := postDB.CreatePost(&models.Post{
-		AuthorID: JohnID, SportID: &SoccerID, 
+		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
@@ -396,7 +503,7 @@ func TestUpdatePost(t *testing.T) {
 	createdPost, err := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "Original Title", Content: "Original content", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -463,7 +570,7 @@ func TestDeletePost(t *testing.T) {
 	createdPost, err := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
 		Title: "Post to Delete", Content: "This post will be deleted", IsAnonymous: false,
-	},[]post.TagRequest{})
+	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -496,6 +603,6 @@ func TestDeletePostNotFound(t *testing.T) {
 	}
 }
 
-func uuidDereference(v *uuid.UUID) uuid.UUID{
+func uuidDereference(v *uuid.UUID) uuid.UUID {
 	return *v
 }

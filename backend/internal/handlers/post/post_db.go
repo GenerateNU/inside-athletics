@@ -39,21 +39,28 @@ func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post,
 }
 
 // GetPostByID retrieves a post by its ID
-func (s *PostDB) GetPostByID(id uuid.UUID) (*models.Post, error) {
+func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, error) {
 	var post models.Post
 	dbResponse := s.db.
+		Model(&models.Post{}).
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
 		}).
-		First(&post, "id = ?", id)
+		First(&post, "posts.id = ?", id)
+
 	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
 // GetPostsBySportID retrieves all posts with the given sport ID
-func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]models.Post, int64, error) {
+func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID uuid.UUID) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
@@ -66,6 +73,12 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]mode
 
 	// Get paginated results
 	if err := s.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
@@ -83,7 +96,7 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]mode
 }
 
 // GetPostByAuthorID retrieves a post by its author ID
-func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]models.Post, int64, error) {
+func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userID uuid.UUID) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
@@ -96,6 +109,12 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]mo
 
 	// Get paginated results
 	if err := s.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
@@ -126,7 +145,7 @@ func (p *PostDB) DeletePost(id uuid.UUID) error {
 }
 
 // GetAllPosts retrieves all posts with pagination
-func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) {
+func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.Post, int, error) {
 	var posts []models.Post
 	var total int64
 
@@ -137,6 +156,12 @@ func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) 
 
 	// Get paginated posts
 	dbResponse := p.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
@@ -154,10 +179,15 @@ func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) 
 }
 
 // UpdatePost updates an existing post
-func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest) (*models.Post, error) {
+func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid.UUID) (*models.Post, error) {
 	var updatedPost models.Post
 	dbResponse := p.db.Model(&models.Post{}).
 		Clauses(clause.Returning{}).
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
