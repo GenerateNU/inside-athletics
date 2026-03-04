@@ -13,7 +13,7 @@ type CommentService struct {
 }
 
 // Creates a new comment.
-func (s *CommentService) CreateComment(ctx context.Context, input *CreateCommentInput) (*utils.ResponseBody[CommentResponse], error) {
+func (s *CommentService) CreateComment(ctx context.Context, input *CreateCommentInput) (*utils.ResponseBody[CreateCommentResponse], error) {
 	id, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
@@ -45,8 +45,8 @@ func (s *CommentService) CreateComment(ctx context.Context, input *CreateComment
 	}
 
 	// Convert the comment to a response
-	return &utils.ResponseBody[CommentResponse]{
-		Body: ToCommentResponse(created, id),
+	return &utils.ResponseBody[CreateCommentResponse]{
+		Body: ToCreateCommentResponse(created, id),
 	}, nil
 }
 

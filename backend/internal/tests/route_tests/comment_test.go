@@ -69,7 +69,7 @@ func TestCreateComment(t *testing.T) {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result comment.CommentResponse
+	var result comment.CreateCommentResponse
 	DecodeTo(&result, resp)
 	if result.Description != "A test comment" {
 		t.Errorf("expected description 'A test comment', got %s", result.Description)
@@ -101,7 +101,7 @@ func TestCreateCommentAnonymous(t *testing.T) {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result comment.CommentResponse
+	var result comment.CreateCommentResponse
 	DecodeTo(&result, resp)
 	if result.IsAnonymous != true {
 		t.Errorf("expected is_anonymous true, got %v", result.IsAnonymous)
@@ -134,7 +134,7 @@ func TestGetComment(t *testing.T) {
 	if result.ID != created.ID || result.Description != "Get me" {
 		t.Errorf("expected same comment, got %+v", result)
 	}
-	if result.UserID != nil {
+	if result.User != nil {
 		t.Errorf("expected nil UserId for Anonymous")
 	}
 
@@ -147,7 +147,7 @@ func TestGetComment(t *testing.T) {
 	if result2.ID != created.ID || result2.Description != "Get me" {
 		t.Errorf("expected same comment, got %+v", result2)
 	}
-	if uuidDereference(result2.UserID) != user.ID {
+	if *result2.User != user {
 		t.Errorf("expected UserId for Anonymous")
 	}
 

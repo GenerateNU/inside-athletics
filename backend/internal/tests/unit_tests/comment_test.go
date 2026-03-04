@@ -19,8 +19,8 @@ func TestToCommentResponse_WhenAnonymousAndNotOwnUser_HidesUserID(t *testing.T) 
 		Description: "Anonymous",
 	}
 	resp := comment.ToCommentResponse(c, uuid.New())
-	if resp.UserID != nil {
-		t.Errorf("expected user_id nil for anonymous when not super user, got %v", resp.UserID)
+	if resp.User != nil {
+		t.Errorf("expected user_id nil for anonymous when not own user, got %v", resp.User.ID)
 	}
 	if resp.IsAnonymous != true {
 		t.Error("expected is_anonymous true")
@@ -37,7 +37,7 @@ func TestToCommentResponse_WhenAnonymousAndNotOwnUser_ShowsUserID(t *testing.T) 
 		PostID:      uuid.New(),
 		Description: "Anonymous",
 	}
-	resp := comment.ToCommentResponse(c, c.UserID)
+	resp := comment.ToCreateCommentResponse(c, c.UserID)
 	if resp.UserID == nil || *resp.UserID != userID {
 		t.Errorf("expected user_id %s for own user, got %v", userID, resp.UserID)
 	}
@@ -53,7 +53,7 @@ func TestToCommentResponse_WhenNotAnonymous_ShowsUserID(t *testing.T) {
 		PostID:      uuid.New(),
 		Description: "Not anonymous",
 	}
-	resp := comment.ToCommentResponse(c, uuid.New())
+	resp := comment.ToCreateCommentResponse(c, uuid.New())
 	if resp.UserID == nil || *resp.UserID != userID {
 		t.Errorf("expected user_id %s when not anonymous, got %v", userID, resp.UserID)
 	}
