@@ -1,8 +1,20 @@
 package tag
 
 import (
+	"inside-athletics/internal/handlers/post"
+
 	"github.com/google/uuid"
 )
+
+// GETTING ALL POSTS FROM A TAG
+type GetPostsByTagParam struct {
+	TagID  uuid.UUID `path:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
+	Limit  int       `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
+	Offset int       `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
+}
+type GetPostsByTagResponse struct {
+	Posts []post.PostResponse `json:"post_ids" doc:"The post ids associated with a tag"`
+}
 
 type GetTagByIDParams struct {
 	ID uuid.UUID `path:"id" example:"1" doc:"ID to identify tag"`
@@ -14,11 +26,6 @@ type GetTagByNameParams struct {
 
 type GetPostsByTagParams struct {
 	TagID uuid.UUID `path:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
-}
-
-type GetPostsByTagResponse struct {
-	TagID   uuid.UUID   `json:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
-	PostIDs []uuid.UUID `json:"post_ids" example:"[\"123e4567-e89b-12d3-a456-426614174000\",\"123e4567-e89b-12d3-a456-426614174001\"]" doc:"The post ids associated with a tag"`
 }
 
 type GetTagResponse struct {

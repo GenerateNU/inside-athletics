@@ -2,7 +2,9 @@ package post
 
 import (
 	"context"
+	"fmt"
 	"inside-athletics/internal/handlers/tagpost"
+	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
 	"github.com/google/uuid"
@@ -22,23 +24,26 @@ func NewPostService(db *gorm.DB) *PostService {
 	}
 }
 
-func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(
-		s.postDB.CreatePost(
-			input.Body.AuthorId,
-			input.Body.SportId,
-			input.Body.Title,
-			input.Body.Content,
-			input.Body.IsAnonymous,
-		),
+func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[CreatePostResponse], error) {
+	post := &models.Post{
+		AuthorID:    input.Body.AuthorId,
+		SportID:     input.Body.SportId,
+		CollegeID:   input.Body.CollegeId,
+		Title:       input.Body.Title,
+		Content:     input.Body.Content,
+		IsAnonymous: input.Body.IsAnonymous,
+	}
+
+	createdPost, err := utils.HandleDBError(
+		s.postDB.CreatePost(post, input.Body.Tags),
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post),
+	return &utils.ResponseBody[CreatePostResponse]{
+		Body: ToCreatePostResponse(createdPost),
 	}, nil
 }
 
@@ -78,7 +83,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 }
 
 func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByID((input.ID)))
+	post, err := s.postDB.GetPostByID((input.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -86,25 +91,6 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 	return &utils.ResponseBody[PostResponse]{
 		Body: ToPostResponse(post),
 	}, nil
-}
-
-// GetTagsByPost retrieves tag IDs for a post
-func (s *PostService) GetTagsByPost(ctx context.Context, input *GetTagsByPostParams) (*utils.ResponseBody[GetTagsByPostResponse], error) {
-	tags, err := s.tagPostDB.GetTagsByPost(input.PostID)
-	respBody := &utils.ResponseBody[GetTagsByPostResponse]{}
-
-	if err != nil {
-		return respBody, err
-	}
-
-	response := &GetTagsByPostResponse{
-		PostID: input.PostID,
-		TagIDs: *tags,
-	}
-
-	return &utils.ResponseBody[GetTagsByPostResponse]{
-		Body: response,
-	}, err
 }
 
 func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySportIDParams) (*utils.ResponseBody[GetPostsBySportIDResponse], error) {
@@ -148,9 +134,21 @@ func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostsByAu
 // DeletePost soft deletes a post by ID
 func (s *PostService) DeletePost(ctx context.Context, input *struct {
 	ID uuid.UUID `path:"id"`
-}) (*struct{}, error) {
-	if err := s.postDB.DeletePost(input.ID); err != nil {
-		return nil, err
+}) (*utils.ResponseBody[DeletePostResponse], error) {
+	id := input.ID
+	err := s.postDB.DeletePost(id)
+
+	respBody := &utils.ResponseBody[DeletePostResponse]{}
+	if err != nil {
+		return respBody, err
 	}
-	return &struct{}{}, nil
+
+	response := &DeletePostResponse{
+		Message: fmt.Sprintf("Post %s deleted successfully", id.String()),
+		ID:      id,
+	}
+
+	return &utils.ResponseBody[DeletePostResponse]{
+		Body: response,
+	}, err
 }

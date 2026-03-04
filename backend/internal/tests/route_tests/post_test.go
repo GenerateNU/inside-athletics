@@ -9,6 +9,32 @@ import (
 	"github.com/google/uuid"
 )
 
+func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
+	user := models.User{
+		ID: JohnID,
+		FirstName:               "Test",
+		LastName:                "User",
+		Email:                   "test-john@example.com",
+		Username:                "testuser-john",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+
+	if err := testDB.DB.Create(&user).Error; err != nil {
+		t.Fatalf("failed to create user: %v", err)
+	}
+
+	popularity := int32(100)
+	soccer := models.Sport {
+		ID: SoccerID,
+		Name: "Soccer",
+		Popularity: &popularity,
+	}
+
+	if err := testDB.DB.Create(&soccer).Error; err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
+}
 func TestCreatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -21,48 +47,31 @@ func TestCreatePost(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "post"},
 	})
 
-	authorID := uuid.New()
-
-	popularity := int32(100000)
-
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
-
-	sportID := createdSport.ID
-
+	CreateUserAndSport(testDB, t)
+	
 	body := map[string]any{
-		"author_id":    authorID,
-		"sport_id":     sportID,
+		"author_id":    JohnID,
+		"sport_id":     SoccerID,
 		"title":        "Looking for thoughts on NEU Fencing!",
 		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		"is_anonymous": true,
+		"tags":         []map[string]any{},
 	}
 
 	resp := api.Post("/api/v1/post/", body, authHeader)
-
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result post.PostResponse
+	var result post.CreatePostResponse
 	DecodeTo(&result, resp)
 
-	if result.AuthorId != authorID {
-		t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+	if result.AuthorID == nil || uuidDereference(result.AuthorID) != JohnID {
+		t.Errorf("expected authorID %v, got %v", JohnID, result.AuthorID)
 	}
 
-	if result.SportId != sportID {
-		t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+	if result.SportID == nil || uuidDereference(result.SportID) != SoccerID {
+		t.Errorf("expected sportID %v, got %v", SoccerID, result.SportID)
 	}
 
 	if result.Title != "Looking for thoughts on NEU Fencing!" {
@@ -70,15 +79,59 @@ func TestCreatePost(t *testing.T) {
 	}
 
 	if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
-		t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+		t.Errorf("expected content %q, got %q", "My name is Bob Joe...", result.Content)
 	}
 
 	if result.Likes != 0 {
-		t.Errorf("expected UpVotes 0, got %d", result.Likes)
+		t.Errorf("expected Likes 0, got %d", result.Likes)
 	}
 
 	if result.IsAnonymous != true {
-		t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+		t.Errorf("expected IsAnonymous true, got %v", result.IsAnonymous)
+	}
+}
+
+func TestCreatePostWithTags(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	tag1 := models.Tag{Name: "recruiting"}
+	tag2 := models.Tag{Name: "fencing"}
+	testDB.DB.Create(&tag1)
+	testDB.DB.Create(&tag2)
+
+	body := map[string]any{
+		"author_id":  	JohnID,
+		"sport_id":     SoccerID,
+		"title":        "Post with tags",
+		"content":      "Testing that tags are associated with this post correctly.",
+		"is_anonymous": false,
+		"tags": []map[string]any{
+			{"id": tag1.ID},
+			{"id": tag2.ID},
+		},
+	}
+
+	resp := api.Post("/api/v1/post/", body, authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result post.CreatePostResponse
+	DecodeTo(&result, resp)
+
+	if len(result.Tags) != 2 {
+		t.Errorf("expected 2 tags, got %d", len(result.Tags))
 	}
 }
 
@@ -94,39 +147,20 @@ func TestGetPostById(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	authorID := uuid.New()
+	CreateUserAndSport(testDB, t)
 
-	popularity := int32(100000)
-
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
-
-	sportID := createdSport.ID
-
-	createdPost, err := postDB.CreatePost(
-		authorID,
-		sportID,
-		"Looking for thoughts on NEU Fencing!",
-		"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", // content
-		true,
-	)
-
+	createdPost, err := postDB.CreatePost(&models.Post{
+		AuthorID:    JohnID,
+		SportID:     &SoccerID,
+		Title:       "Looking for thoughts on NEU Fencing!",
+		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
+		IsAnonymous: true,
+	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
 	resp := api.Get("/api/v1/post/"+createdPost.ID.String(), authHeader)
-
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -134,12 +168,12 @@ func TestGetPostById(t *testing.T) {
 	var result post.PostResponse
 	DecodeTo(&result, resp)
 
-	if result.AuthorId != authorID {
-		t.Errorf("expected authorID %v, got %v", authorID, result.AuthorId)
+	if result.Author == nil || result.Author.ID != JohnID {
+		t.Errorf("expected authorID %v, got %v", JohnID, result.Author)
 	}
 
-	if result.SportId != sportID {
-		t.Errorf("expected sportID %v, got %v", sportID, result.SportId)
+	if result.Sport == nil || result.Sport.ID != SoccerID {
+		t.Errorf("expected sportID %v, got %v", SoccerID, result.Sport)
 	}
 
 	if result.Title != "Looking for thoughts on NEU Fencing!" {
@@ -147,15 +181,30 @@ func TestGetPostById(t *testing.T) {
 	}
 
 	if result.Content != "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" {
-		t.Errorf("expected content %q, got %q", "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?", result.Content)
+		t.Errorf("expected content %q, got %q", "My name is Bob Joe...", result.Content)
 	}
 
 	if result.Likes != 0 {
-		t.Errorf("expected UpVotes 0, got %d", result.Likes)
+		t.Errorf("expected Likes 0, got %d", result.Likes)
 	}
 
 	if result.IsAnonymous != true {
-		t.Errorf("expected IsAnonymous %v, got %v", true, result.IsAnonymous)
+		t.Errorf("expected IsAnonymous true, got %v", result.IsAnonymous)
+	}
+}
+
+func TestGetPostByIdNotFound(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
+
+	resp := api.Get("/api/v1/post/"+uuid.New().String(), authHeader)
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("expected 404, got %d", resp.Code)
 	}
 }
 
@@ -173,31 +222,24 @@ func TestBadValidation(t *testing.T) {
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
 
 	resp := api.Get("/api/v1/post/"+"random string", authHeader)
-
 	if resp.Code == http.StatusOK {
 		t.Fatalf("expected status 422, got %d: %s", resp.Code, resp.Body.String())
 	}
 
 	resp = api.Get("/api/v1/posts/by-sport/"+"random string", authHeader)
-
 	if resp.Code == http.StatusOK {
 		t.Fatalf("expected status 422, got %d: %s", resp.Code, resp.Body.String())
 	}
 
 	resp = api.Get("/api/v1/posts/by-author/"+"random string", authHeader)
-
 	if resp.Code == http.StatusOK {
 		t.Fatalf("expected status 422, got %d: %s", resp.Code, resp.Body.String())
 	}
-
 }
+
 func TestGetPostByAuthorId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
-
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
 
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
@@ -207,52 +249,30 @@ func TestGetPostByAuthorId(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	// Create a sport first
-	popularity := int32(100000)
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
+	CreateUserAndSport(testDB, t)
 
-	// Create two posts
-	authorID := uuid.New()
-	sportID := uuid.New()
-
-	_, err1 := postDB.CreatePost(
-		authorID,
-		sportID,
-		"First Post About Fencing",
-		"This is the first post content",
-		false,
-	)
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "First Post About Fencing", Content: "This is the first post content", IsAnonymous: false,
+	},[]post.TagRequest{})
 	if err1 != nil {
 		t.Fatalf("failed to create post 1: %v", err1)
 	}
 
-	_, err2 := postDB.CreatePost(
-		authorID,
-		sportID,
-		"Second Post About Basketball",
-		"This is the second post content",
-		true,
-	)
+	_, err2 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: true,
+	},[]post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
 
-	resp := api.Get("/api/v1/posts/by-author/"+authorID.String(), authHeader)
-
+	resp := api.Get("/api/v1/posts/by-author/"+JohnID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result post.GetPostsBySportIDResponse
+	var result post.GetPostsByAuthorIDResponse
 	DecodeTo(&result, resp)
 
 	if result.Total < 2 {
@@ -276,48 +296,25 @@ func TestGetPostsBySportId(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	// Create a sport first
-	popularity := int32(100000)
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
-	sportID := createdSport.ID
+	CreateUserAndSport(testDB, t)
 
-	// Create two posts
-	authorID1 := uuid.New()
-	authorID2 := uuid.New()
-
-	_, err1 := postDB.CreatePost(
-		authorID1,
-		sportID,
-		"First Post About Fencing",
-		"This is the first post content",
-		false,
-	)
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "First Post About Fencing", Content: "This is the first post content", IsAnonymous: false,
+	},[]post.TagRequest{})
 	if err1 != nil {
 		t.Fatalf("failed to create post 1: %v", err1)
 	}
 
-	_, err2 := postDB.CreatePost(
-		authorID2,
-		sportID,
-		"Second Post About Basketball",
-		"This is the second post content",
-		true,
-	)
+	_, err2 := postDB.CreatePost(&models.Post{
+		AuthorID:JohnID, SportID: &SoccerID,
+		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: true,
+	},[]post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
 
-	resp := api.Get("/api/v1/posts/by-sport/"+sportID.String(), authHeader)
-
+	resp := api.Get("/api/v1/posts/by-sport/"+SoccerID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -346,48 +343,25 @@ func TestGetAllPosts(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	// Create a sport first
-	popularity := int32(100000)
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
-	sportID := createdSport.ID
+	CreateUserAndSport(testDB, t)
 
-	// Create two posts
-	authorID1 := uuid.New()
-	authorID2 := uuid.New()
-
-	_, err1 := postDB.CreatePost(
-		authorID1,
-		sportID,
-		"First Post About Fencing",
-		"This is the first post content",
-		false,
-	)
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "First Post About Fencing", Content: "This is the first post content", IsAnonymous: false,
+	},[]post.TagRequest{})
 	if err1 != nil {
 		t.Fatalf("failed to create post 1: %v", err1)
 	}
 
-	_, err2 := postDB.CreatePost(
-		authorID2,
-		sportID,
-		"Second Post About Basketball",
-		"This is the second post content",
-		true,
-	)
+	_, err2 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID, 
+		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: true,
+	},[]post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
 	}
 
 	resp := api.Get("/api/v1/posts/", authHeader)
-
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -417,41 +391,22 @@ func TestUpdatePost(t *testing.T) {
 		{Action: models.PermissionUpdate, Resource: "post"},
 	})
 
-	// Create a sport first
-	popularity := int32(100000)
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
-	sportID := createdSport.ID
+	CreateUserAndSport(testDB, t)
 
-	// Create a post
-	authorID := uuid.New()
-	createdPost, err := postDB.CreatePost(
-		authorID,
-		sportID,
-		"Original Title",
-		"Original content",
-		false,
-	)
+	createdPost, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Original Title", Content: "Original content", IsAnonymous: false,
+	},[]post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
-	// Update the post
 	updateBody := map[string]any{
 		"title":   "Updated Title",
 		"content": "Updated content about the program",
 	}
 
 	resp := api.Patch("/api/v1/post/"+createdPost.ID.String(), updateBody, authHeader)
-
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -472,6 +427,24 @@ func TestUpdatePost(t *testing.T) {
 	}
 }
 
+func TestUpdatePostNotFound(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionUpdate, Resource: "post"},
+	})
+
+	updateBody := map[string]any{"title": "Doesn't Matter"}
+	resp := api.Patch("/api/v1/post/"+uuid.New().String(), updateBody, authHeader)
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("expected 404, got %d", resp.Code)
+	}
+}
+
 func TestDeletePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -485,43 +458,44 @@ func TestDeletePost(t *testing.T) {
 		{Action: models.PermissionDelete, Resource: "post"},
 	})
 
-	// Create a sport first
-	popularity := int32(100000)
-	sport := map[string]any{
-		"name":       "Women's Basketball",
-		"popularity": popularity,
-	}
-	resp_sport := api.Post("/api/v1/sport/", sport, authHeader)
-	if resp_sport.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", resp_sport.Code, resp_sport.Body.String())
-	}
-	var createdSport models.Sport
-	DecodeTo(&createdSport, resp_sport)
-	sportID := createdSport.ID
+	CreateUserAndSport(testDB, t)
 
-	// Create a post
-	authorID := uuid.New()
-	createdPost, err := postDB.CreatePost(
-		authorID,
-		sportID,
-		"Post to Delete",
-		"This post will be deleted",
-		false,
-	)
+	createdPost, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Post to Delete", Content: "This post will be deleted", IsAnonymous: false,
+	},[]post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
-	// Delete the post
 	resp := api.Delete("/api/v1/post/"+createdPost.ID.String(), authHeader)
-
-	if resp.Code != http.StatusNoContent {
+	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 204, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	// Verify the post is deleted by trying to get it
 	getResp := api.Get("/api/v1/post/"+createdPost.ID.String(), authHeader)
-	if getResp.Code != 500 {
+	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
+}
+
+func TestDeletePostNotFound(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "post"},
+	})
+
+	resp := api.Delete("/api/v1/post/"+uuid.New().String(), authHeader)
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("expected 404, got %d", resp.Code)
+	}
+}
+
+func uuidDereference(v *uuid.UUID) uuid.UUID{
+	return *v
 }

@@ -13,6 +13,24 @@ type TagDB struct {
 	db *gorm.DB
 }
 
+func (u *TagDB) GetPostsByTag(tag_id uuid.UUID, limit int, offset int) (*[]models.Post, error) {
+	var posts []models.Post
+	dbResponse := u.db.
+		Model(&models.Post{}).
+		Joins("JOIN tag_posts tp ON tp.post_id = posts.id").
+		Where("tp.tag_id = ?", tag_id).
+		Limit(limit).
+		Offset(offset).
+		Preload("Author").
+		Preload("Sport").
+		Preload("College").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Joins("JOIN tag_posts tp ON tp.tag_id = tags.id")
+		}).
+		Find(&posts)
+	return utils.HandleDBError(&posts, dbResponse.Error)
+}
+
 func (u *TagDB) GetTagByName(name string) (*models.Tag, error) {
 	var tag models.Tag
 	dbResponse := u.db.Where("name = ?", name).First(&tag)

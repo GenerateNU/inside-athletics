@@ -49,10 +49,10 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		Username:              user.Username,
 		Bio:                   user.Bio,
 		AccountType:           user.Account_Type,
-		Sport:                 &user.Sport.Name,
+		Sport:                 user.Sport,
 		ExpectedGradYear:      user.Expected_Grad_Year,
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               &user.College.Name,
+		College:               user.College,
 		Division:              user.Division,
 		Roles:                 roleResponses,
 	}
@@ -88,10 +88,10 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		Username:              user.Username,
 		Bio:                   user.Bio,
 		AccountType:           user.Account_Type,
-		Sport:                 &user.Sport.Name,
+		Sport:                 user.Sport,
 		ExpectedGradYear:      user.Expected_Grad_Year,
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               &user.College.Name,
+		College:               user.College,
 		Division:              user.Division,
 		Roles:                 roleResponses,
 	}
@@ -156,9 +156,25 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 		return respBody, err
 	}
 
+	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(input.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	respBody.Body = &UpdateUserResponse{
-		ID:   updatedUser.ID,
-		Name: updatedUser.FirstName,
+		ID:                    updatedUser.ID,
+		FirstName:             updatedUser.FirstName,
+		LastName:              updatedUser.LastName,
+		Email:                 updatedUser.Email,
+		Username:              updatedUser.Username,
+		Bio:                   updatedUser.Bio,
+		AccountType:           updatedUser.Account_Type,
+		Sport:                 updatedUser.Sport,
+		ExpectedGradYear:      updatedUser.Expected_Grad_Year,
+		VerifiedAthleteStatus: updatedUser.Verified_Athlete_Status,
+		College:               updatedUser.College,
+		Division:              updatedUser.Division,
+		Roles:                 roleResponses,
 	}
 
 	return respBody, nil

@@ -66,6 +66,8 @@ func TestGetUser(t *testing.T) {
 
 	var u h.GetUserResponse
 	DecodeTo(&u, resp)
+
+	t.Log()
 	if u.ID != user.ID ||
 		u.FirstName != "Suli" ||
 		u.LastName != "Test" ||
@@ -73,7 +75,9 @@ func TestGetUser(t *testing.T) {
 		u.Username != "suli" ||
 		u.AccountType != false ||
 		u.College == nil ||
-		*u.College != "Northeastern University" ||
+		u.College.Name != "Northeastern University" ||
+		u.Sport == nil ||
+		u.Sport.Name != "Women's Soccer" ||
 		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusVerified {
 		t.Fatalf("Unexpected response: %+v", u)
 	}
@@ -262,7 +266,7 @@ func TestUpdateUser(t *testing.T) {
 
 	var u h.UpdateUserResponse
 	DecodeTo(&u, resp)
-	if u.Name != "Updated" {
+	if u.FirstName != "Updated" {
 		t.Fatalf("Unexpected response: %+v", u)
 	}
 }

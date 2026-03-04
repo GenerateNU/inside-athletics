@@ -11,7 +11,6 @@ func Route(api huma.API, db *gorm.DB) {
 		grp := huma.NewGroup(api, "/api/v1/post")
 		huma.Post(grp, "/", postService.CreatePost)                 // Create post
 		huma.Get(grp, "/{id}", postService.GetPostByID)             // Read post by ID
-		huma.Get(grp, "/{post_id}/tags", postService.GetTagsByPost) // Read tags by post id
 		huma.Patch(grp, "/{id}", postService.UpdatePost)            // Update post
 		huma.Delete(grp, "/{id}", postService.DeletePost)           // Delete post
 	}

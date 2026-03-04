@@ -29,11 +29,21 @@ func seedUserAndPost(t *testing.T, testDB *TestDatabase, unique string) (models.
 	if err := testDB.DB.Create(&user).Error; err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
+	popularity := int32(100)
+	soccer := models.Sport {
+		ID: SoccerID,
+		Name: "Soccer",
+		Popularity: &popularity,
+	}
 	post := models.Post{
-		AuthorId: user.ID,
-		SportId:  uuid.New(),
+		AuthorID: user.ID,
+		SportID:  &SoccerID,
 		Title:    "Test Post",
 		Content:  "Test content",
+	}
+
+	if err := testDB.DB.Create(&soccer).Error; err != nil {
+		t.Fatalf("failed to create sport: %v", err)
 	}
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)

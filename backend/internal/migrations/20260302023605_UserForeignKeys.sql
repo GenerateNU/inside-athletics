@@ -1,2 +1,0 @@
--- Modify "users" table
-ALTER TABLE "public"."users" DROP COLUMN "sport", DROP COLUMN "college", ADD COLUMN "sport_id" uuid NULL, ADD COLUMN "college_id" uuid NULL, ADD CONSTRAINT "fk_users_college" FOREIGN KEY ("college_id") REFERENCES "public"."colleges" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION, ADD CONSTRAINT "fk_users_sport" FOREIGN KEY ("sport_id") REFERENCES "public"."sports" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION;

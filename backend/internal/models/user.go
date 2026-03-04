@@ -18,13 +18,13 @@ type User struct {
 	Email                   string                `json:"email" example:"suli123@email.com" doc:"The email of a user" gorm:"type:varchar(100);not null"`
 	Username                string                `json:"username" example:"suliproathelete" doc:"The username of a user" gorm:"type:varchar(100);not null"`
 	Bio                     *string               `json:"bio" example:"My name is Suli and I'm a pro athlete" doc:"The name of a user" gorm:"type:varchar(100);"` //nullable
-	Account_Type            bool                  `json:"account_type" example:"True" doc:"If the user has access to premium features" gorm:"type:bool;not null"`
+	Account_Type            bool                  `json:"account_type" example:"true" doc:"If the user has access to premium features" gorm:"type:bool;not null"`
 	SportID                 *uuid.UUID            `json:"sport" example:"hockey" doc:"The sport the user plays" gorm:"type:uuid;"` //nullable
-	Sport                   Sport                 `json:"-" gorm:"foreignKey:SportID;references:ID"`
+	Sport                   *Sport                `json:"-" gorm:"foreignKey:SportID;references:ID"`
 	Expected_Grad_Year      uint                  `json:"expected_grad_year" example:"2027" doc:"The user's grad year" gorm:"type:uint;"` //nullable
 	Verified_Athlete_Status VerifiedAthleteStatus `json:"verified_athelete_status" example:"pending" doc:"" gorm:"type:varchar(100);not null"`
-	CollegeID               *uuid.UUID             `json:"college" example:"Northeastern University" doc:"The college of a user" gorm:"type:uuid"` //nullable
-	College                 College               `json:"-" gorm:"foreignKey:CollegeID;references:ID"`
+	CollegeID               *uuid.UUID            `json:"college" doc:"The college of a user" gorm:"type:uuid"` //nullable
+	College                 *College              `json:"-" gorm:"foreignKey:CollegeID;references:ID"`
 	Division                *Division             `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint;"`
 }
 

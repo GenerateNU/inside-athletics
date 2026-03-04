@@ -10,13 +10,17 @@ import (
 // Post represents a post entity in the system
 type Post struct {
 	ID          uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	AuthorId    uuid.UUID      `json:"author_id" type:"uuid"`
-	SportId     uuid.UUID      `json:"sport_id" type:"uuid"`
+	AuthorID    uuid.UUID      `json:"author_id" type:"uuid"`
+	Author 		User 		   `json:"-" gorm:"foreignKey:AuthorID;references:ID;constraint:OnDelete:CASCADE"`
+	SportID     *uuid.UUID     `json:"sport_id" gorm:"type:uuid;default:null"`
+	Sport 		*Sport 		   `json:"-" gorm:"foreignKey:SportID;references:ID;constraint:OnDelete:SET NULL;"`
+	CollegeID   *uuid.UUID 	   `json:"college_id" gorm:"type:uuid;default:null"`
+	College 	*College 	   `json:"-" gorm:"foreignKey:CollegeID;references:ID;constraint:OnDelete:SET NULL;"`
+	Tags  		[]Tag          `json:"tags" gorm:"many2many:tag_posts;"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 	Title       string         `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content     string         `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
-	Likes     int64            `json:"Likes,omitempty" example:"20000" gorm:"type:int"`
-	IsAnonymous bool           `json:"isAnonymous"`
+	IsAnonymous bool           `json:"isAnonymous" gorm:"default:false"`
 }
