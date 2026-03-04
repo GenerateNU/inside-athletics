@@ -81,7 +81,7 @@ func TestGetPostsByTag(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tag/"+HealthAndWellnessID.String()+"/posts", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/tag/"+HealthAndWellnessID.String()+"/posts", "Authorization: Bearer " + mockUUID)
 
 	var response tagPackage.GetPostsByTagResponse
 
@@ -111,7 +111,7 @@ func TestGetTagpostByID(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/post/tag/"+newId.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/tag/"+newId.String(), "Authorization: Bearer " + mockUUID)
 
 	var response tagpostPackage.GetTagPostByIDResponse
 

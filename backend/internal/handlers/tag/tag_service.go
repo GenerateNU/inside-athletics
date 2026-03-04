@@ -53,6 +53,10 @@ func (u *TagService) GetTagById(ctx context.Context, input *GetTagByIDParams) (*
 
 // Returns an array of post ids that are tagged with a unique tag, determined by the tag id.
 func (u *TagService) GetPostsByTag(ctx context.Context, input *GetPostsByTagParam) (*utils.ResponseBody[GetPostsByTagResponse], error) {
+	id, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	posts, err := u.tagDB.GetPostsByTag(input.TagID, input.Limit, input.Offset)
 	respBody := &utils.ResponseBody[GetPostsByTagResponse]{}
 
@@ -62,7 +66,7 @@ func (u *TagService) GetPostsByTag(ctx context.Context, input *GetPostsByTagPara
 
 	postResponses := make([]post.PostResponse, 0, len(*posts))
 	for i := range *posts {
-		postResponses = append(postResponses, *post.ToPostResponse(&((*posts)[i])))
+		postResponses = append(postResponses, *post.ToPostResponse(&((*posts)[i]), id))
 	}
 
 	response := &GetPostsByTagResponse{

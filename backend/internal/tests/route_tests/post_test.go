@@ -54,7 +54,7 @@ func TestCreatePost(t *testing.T) {
 		"sport_id":     SoccerID,
 		"title":        "Looking for thoughts on NEU Fencing!",
 		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
-		"is_anonymous": true,
+		"is_anonymous": false,
 		"tags":         []map[string]any{},
 	}
 
@@ -86,8 +86,8 @@ func TestCreatePost(t *testing.T) {
 		t.Errorf("expected Likes 0, got %d", result.Likes)
 	}
 
-	if result.IsAnonymous != true {
-		t.Errorf("expected IsAnonymous true, got %v", result.IsAnonymous)
+	if result.IsAnonymous != false {
+		t.Errorf("expected IsAnonymous false, got %v", result.IsAnonymous)
 	}
 }
 
@@ -154,7 +154,7 @@ func TestGetPostById(t *testing.T) {
 		SportID:     &SoccerID,
 		Title:       "Looking for thoughts on NEU Fencing!",
 		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
-		IsAnonymous: true,
+		IsAnonymous: false,
 	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
@@ -188,8 +188,8 @@ func TestGetPostById(t *testing.T) {
 		t.Errorf("expected Likes 0, got %d", result.Likes)
 	}
 
-	if result.IsAnonymous != true {
-		t.Errorf("expected IsAnonymous true, got %v", result.IsAnonymous)
+	if result.IsAnonymous != false {
+		t.Errorf("expected IsAnonymous false, got %v", result.IsAnonymous)
 	}
 }
 
@@ -261,7 +261,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 
 	_, err2 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
-		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: true,
+		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: false,
 	},[]post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
@@ -308,7 +308,7 @@ func TestGetPostsBySportId(t *testing.T) {
 
 	_, err2 := postDB.CreatePost(&models.Post{
 		AuthorID:JohnID, SportID: &SoccerID,
-		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: true,
+		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: false,
 	},[]post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)
@@ -355,7 +355,7 @@ func TestGetAllPosts(t *testing.T) {
 
 	_, err2 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID, 
-		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: true,
+		Title: "Second Post About Basketball", Content: "This is the second post content", IsAnonymous: false,
 	},[]post.TagRequest{})
 	if err2 != nil {
 		t.Fatalf("failed to create post 2: %v", err2)

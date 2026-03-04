@@ -117,10 +117,15 @@ type UpdatePostRequest struct {
 }
 
 // ToPostResponse converts a Post model to a postResponse
-func ToPostResponse(post *models.Post) *PostResponse {
+func ToPostResponse(post *models.Post, id uuid.UUID) *PostResponse {
+	var author *models.User
+	if !post.IsAnonymous || id == post.AuthorID {
+		a := post.Author
+		author = &a
+	}
 	return &PostResponse{
 		ID:          post.ID,
-		Author:      &post.Author,
+		Author:      author,
 		Sport:       post.Sport,
 		College:     post.College,
 		Tags:        post.Tags,
@@ -131,10 +136,15 @@ func ToPostResponse(post *models.Post) *PostResponse {
 }
 
 // ToPostResponse converts a Post model to a postResponse
-func ToCreatePostResponse(post *models.Post) *CreatePostResponse {
+func ToCreatePostResponse(post *models.Post, id uuid.UUID) *CreatePostResponse {
+	var userId *uuid.UUID
+	if (!post.IsAnonymous) || (id == post.AuthorID) {
+		uid := post.AuthorID
+		userId = &uid
+	}
 	return &CreatePostResponse{
 		ID:          post.ID,
-		AuthorID:    &post.AuthorID,
+		AuthorID:    userId,
 		SportID:     post.SportID,
 		CollegeID:   post.CollegeID,
 		Tags:        post.Tags,

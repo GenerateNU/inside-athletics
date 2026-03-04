@@ -30,9 +30,9 @@ func seedUserAndPost(t *testing.T, testDB *TestDatabase, unique string) (models.
 		t.Fatalf("failed to create user: %v", err)
 	}
 	popularity := int32(100)
-	soccer := models.Sport {
-		ID: SoccerID,
-		Name: "Soccer",
+	soccer := models.Sport{
+		ID:         SoccerID,
+		Name:       "Soccer",
 		Popularity: &popularity,
 	}
 	post := models.Post{
@@ -64,7 +64,7 @@ func TestCreateComment(t *testing.T) {
 		"is_anonymous": false,
 	}
 
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer mock-token")
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -82,7 +82,7 @@ func TestCreateComment(t *testing.T) {
 	}
 }
 
-// Asserts anonymous comments hide user_id when caller is not a super user (default context).
+// Asserts anonymous comments hide user_id when caller is not the user who made the comment.
 func TestCreateCommentAnonymous(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -96,7 +96,7 @@ func TestCreateCommentAnonymous(t *testing.T) {
 		"is_anonymous": true,
 	}
 
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer mock-token")
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -107,32 +107,50 @@ func TestCreateCommentAnonymous(t *testing.T) {
 		t.Errorf("expected is_anonymous true, got %v", result.IsAnonymous)
 	}
 	if result.UserID != nil {
-		t.Errorf("expected user_id omitted for anonymous when not super user, got %v", result.UserID)
+		t.Errorf("expected user_id omitted for anonymous when not user who made comment, got %v", result.UserID)
 	}
 }
 
+// testing get anonymous comment, when user is not user who made comment, will not return user id
+// also testing when user who made comment gets it, userId is shown
 func TestGetComment(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, post := seedUserAndPost(t, testDB, "get-comment")
 	commentDB := comment.NewCommentDB(testDB.DB)
-	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Get me"}
+	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Get me", IsAnonymous: true}
 	created, err := commentDB.CreateComment(c)
 	if err != nil {
 		t.Fatalf("failed to create comment: %v", err)
 	}
 
-	resp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
-
 	var result comment.CommentResponse
 	DecodeTo(&result, resp)
 	if result.ID != created.ID || result.Description != "Get me" {
 		t.Errorf("expected same comment, got %+v", result)
 	}
+	if result.UserID != nil {
+		t.Errorf("expected nil UserId for Anonymous")
+	}
+
+	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + user.ID.String())
+	if resp2.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp2.Code, resp2.Body.String())
+	}
+	var result2 comment.CommentResponse
+	DecodeTo(&result2, resp2)
+	if result2.ID != created.ID || result2.Description != "Get me" {
+		t.Errorf("expected same comment, got %+v", result2)
+	}
+	if uuidDereference(result2.UserID) != user.ID {
+		t.Errorf("expected UserId for Anonymous")
+	}
+
 }
 
 func TestGetCommentsByPost(t *testing.T) {
@@ -148,7 +166,7 @@ func TestGetCommentsByPost(t *testing.T) {
 		}
 	}
 
-	resp := api.Get("/api/v1/post/"+post.ID.String()+"/comments", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/post/"+post.ID.String()+"/comments", "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -177,7 +195,7 @@ func TestGetReplies(t *testing.T) {
 		t.Fatalf("failed to create reply: %v", err)
 	}
 
-	resp := api.Get("/api/v1/comment/"+createdParent.ID.String()+"/replies", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/comment/"+createdParent.ID.String()+"/replies", "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -205,7 +223,7 @@ func TestUpdateComment(t *testing.T) {
 	}
 
 	updateBody := map[string]any{"description": "Updated"}
-	resp := api.Patch("/api/v1/comment/"+created.ID.String(), updateBody, "Authorization: Bearer mock-token")
+	resp := api.Patch("/api/v1/comment/"+created.ID.String(), updateBody, "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -229,12 +247,12 @@ func TestDeleteComment(t *testing.T) {
 		t.Fatalf("failed to create comment: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	getResp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer mock-token")
+	getResp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + mockUUID)
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
@@ -264,7 +282,7 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 		"description":       "Reply to reply",
 		"is_anonymous":      false,
 	}
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer mock-token")
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer " + mockUUID)
 	if resp.Code != http.StatusBadRequest {
 		t.Errorf("expected 400 for reply-to-reply (one layer only), got %d: %s", resp.Code, resp.Body.String())
 	}

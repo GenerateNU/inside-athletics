@@ -62,9 +62,9 @@ type DeleteCommentRequest struct {
 }
 
 // Converts a Comment model to a CommentResponse, sets UserID to nil for anonymous comments when caller is not super user.
-func ToCommentResponse(c *models.Comment, forSuperUser bool) *CommentResponse {
+func ToCommentResponse(c *models.Comment, id uuid.UUID) *CommentResponse {
 	var userID *uuid.UUID
-	if forSuperUser || !c.IsAnonymous {
+	if (!c.IsAnonymous) || (id == c.UserID ){
 		uid := c.UserID
 		userID = &uid
 	}

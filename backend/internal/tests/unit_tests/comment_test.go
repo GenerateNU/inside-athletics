@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// Verifies ToCommentResponse omits user_id for anonymous comments when caller is not super user.
-func TestToCommentResponse_WhenAnonymousAndNotSuperUser_HidesUserID(t *testing.T) {
+// Verifies ToCommentResponse omits user_id for anonymous comments when caller is not the user who made the comment.
+func TestToCommentResponse_WhenAnonymousAndNotOwnUser_HidesUserID(t *testing.T) {
 	userID := uuid.New()
 	c := &models.Comment{
 		ID:          uuid.New(),
@@ -18,7 +18,7 @@ func TestToCommentResponse_WhenAnonymousAndNotSuperUser_HidesUserID(t *testing.T
 		PostID:      uuid.New(),
 		Description: "Anonymous",
 	}
-	resp := comment.ToCommentResponse(c, false)
+	resp := comment.ToCommentResponse(c, uuid.New())
 	if resp.UserID != nil {
 		t.Errorf("expected user_id nil for anonymous when not super user, got %v", resp.UserID)
 	}
@@ -27,8 +27,8 @@ func TestToCommentResponse_WhenAnonymousAndNotSuperUser_HidesUserID(t *testing.T
 	}
 }
 
-// Verifies ToCommentResponse includes user_id for anonymous comments when caller is super user.
-func TestToCommentResponse_WhenAnonymousAndSuperUser_ShowsUserID(t *testing.T) {
+// Verifies ToCommentResponse includes user_id for anonymous comments when caller is the user who made the comment.
+func TestToCommentResponse_WhenAnonymousAndNotOwnUser_ShowsUserID(t *testing.T) {
 	userID := uuid.New()
 	c := &models.Comment{
 		ID:          uuid.New(),
@@ -37,9 +37,9 @@ func TestToCommentResponse_WhenAnonymousAndSuperUser_ShowsUserID(t *testing.T) {
 		PostID:      uuid.New(),
 		Description: "Anonymous",
 	}
-	resp := comment.ToCommentResponse(c, true)
+	resp := comment.ToCommentResponse(c, c.UserID)
 	if resp.UserID == nil || *resp.UserID != userID {
-		t.Errorf("expected user_id %s for super user, got %v", userID, resp.UserID)
+		t.Errorf("expected user_id %s for own user, got %v", userID, resp.UserID)
 	}
 }
 
@@ -53,7 +53,7 @@ func TestToCommentResponse_WhenNotAnonymous_ShowsUserID(t *testing.T) {
 		PostID:      uuid.New(),
 		Description: "Not anonymous",
 	}
-	resp := comment.ToCommentResponse(c, false)
+	resp := comment.ToCommentResponse(c, uuid.New())
 	if resp.UserID == nil || *resp.UserID != userID {
 		t.Errorf("expected user_id %s when not anonymous, got %v", userID, resp.UserID)
 	}
