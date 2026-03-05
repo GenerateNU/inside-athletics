@@ -64,7 +64,7 @@ func TestCreateComment(t *testing.T) {
 		"is_anonymous": false,
 	}
 
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer " + mockUUID)
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -96,7 +96,7 @@ func TestCreateCommentAnonymous(t *testing.T) {
 		"is_anonymous": true,
 	}
 
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer " + mockUUID)
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -125,7 +125,7 @@ func TestGetComment(t *testing.T) {
 		t.Fatalf("failed to create comment: %v", err)
 	}
 
-	resp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -138,7 +138,7 @@ func TestGetComment(t *testing.T) {
 		t.Errorf("expected nil UserId for Anonymous")
 	}
 
-	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + user.ID.String())
+	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+user.ID.String())
 	if resp2.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp2.Code, resp2.Body.String())
 	}
@@ -149,6 +149,57 @@ func TestGetComment(t *testing.T) {
 	}
 	if *result2.User != user {
 		t.Errorf("expected UserId for Anonymous")
+	}
+
+}
+
+func TestGetCommentWithLikes(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	user, post := seedUserAndPost(t, testDB, "get-comment")
+	commentDB := comment.NewCommentDB(testDB.DB)
+	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Get me", IsAnonymous: true}
+	created, err := commentDB.CreateComment(c)
+	if err != nil {
+		t.Fatalf("failed to create comment: %v", err)
+	}
+
+	l1 := &models.CommentLike{UserID: user.ID, CommentID: c.ID}
+	testDB.DB.Create(&l1)
+
+	resp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+mockUUID)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+	var result comment.CommentResponse
+	DecodeTo(&result, resp)
+	if result.ID != created.ID || result.Description != "Get me" {
+		t.Errorf("expected same comment, got %+v", result)
+	}
+	if result.User != nil {
+		t.Errorf("expected nil UserId for Anonymous")
+	}
+
+	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+user.ID.String())
+	if resp2.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp2.Code, resp2.Body.String())
+	}
+	var result2 comment.CommentResponse
+	DecodeTo(&result2, resp2)
+	if result2.ID != created.ID || result2.Description != "Get me" {
+		t.Errorf("expected same comment, got %+v", result2)
+	}
+	if *result2.User != user {
+		t.Errorf("expected UserId for Anonymous")
+	}
+
+	if result2.LikeCount != 1 {
+		t.Errorf("expected 1 like got, %+v", result.LikeCount)
+	}
+
+	if result2.IsLiked != true {
+		t.Errorf("expected comment to be liked by user got, %+v", result2.IsLiked)
 	}
 
 }
@@ -166,7 +217,7 @@ func TestGetCommentsByPost(t *testing.T) {
 		}
 	}
 
-	resp := api.Get("/api/v1/post/"+post.ID.String()+"/comments", "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/post/"+post.ID.String()+"/comments", "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -195,7 +246,7 @@ func TestGetReplies(t *testing.T) {
 		t.Fatalf("failed to create reply: %v", err)
 	}
 
-	resp := api.Get("/api/v1/comment/"+createdParent.ID.String()+"/replies", "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/comment/"+createdParent.ID.String()+"/replies", "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -223,7 +274,7 @@ func TestUpdateComment(t *testing.T) {
 	}
 
 	updateBody := map[string]any{"description": "Updated"}
-	resp := api.Patch("/api/v1/comment/"+created.ID.String(), updateBody, "Authorization: Bearer " + mockUUID)
+	resp := api.Patch("/api/v1/comment/"+created.ID.String(), updateBody, "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -247,12 +298,12 @@ func TestDeleteComment(t *testing.T) {
 		t.Fatalf("failed to create comment: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Delete("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	getResp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer " + mockUUID)
+	getResp := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+mockUUID)
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
@@ -282,7 +333,7 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 		"description":       "Reply to reply",
 		"is_anonymous":      false,
 	}
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer " + mockUUID)
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusBadRequest {
 		t.Errorf("expected 400 for reply-to-reply (one layer only), got %d: %s", resp.Code, resp.Body.String())
 	}
