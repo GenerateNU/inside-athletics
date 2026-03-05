@@ -29,6 +29,8 @@ type CommentResponse struct {
 	ParentCommentID *uuid.UUID   `json:"parent_comment_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"CommentID the comment belongs to"`
 	PostID          uuid.UUID    `json:"post_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"PostID the comment belongs to"`
 	Description     string       `json:"description" example:"This is a helpful thread" maxLength:"1500" doc:"Content of the comment"`
+	LikeCount       int64       `json:"like_count,omitempty" example:"20000" gorm:"type:int"`
+	IsLiked 		bool		`json:"is_liked,omitempty" example:"true" gorm:"type:bool"`
 }
 
 type CreateCommentResponse struct {
@@ -84,6 +86,8 @@ func ToCommentResponse(c *models.Comment, id uuid.UUID) *CommentResponse {
 		ParentCommentID: c.ParentCommentID,
 		PostID:          c.PostID,
 		Description:     c.Description,
+		LikeCount:       c.LikeCount,
+		IsLiked:         c.IsLiked,
 	}
 }
 

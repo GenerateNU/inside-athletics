@@ -26,4 +26,9 @@ type Comment struct {
 	Post     Post      `json:"-" gorm:"foreignKey:PostID;references:ID;constraint:OnDelete:CASCADE"`
 
 	Description string `json:"description" example:"This is a helpful thread" maxLength:"1500" doc:"Content of the comment" gorm:"type:varchar(3000);not null"`
+
+	// only used for db queries -> ignored during migrations
+	LikeCount    int64  `json:"like_count" gorm:"column:like_count;->;-:migration"`
+	IsLiked      bool `json:"is_liked" gorm:"column:is_liked;->;-:migration"`
 }
+
