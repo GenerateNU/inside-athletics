@@ -29,8 +29,9 @@ func (u *PostLikeService) GetPostLike(ctx context.Context, input *GetPostLikePar
 // Creates a like on a post. Returns 409 if the user has already liked the post.
 // Response includes total likes on the post and liked=true for the requesting user.
 func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostLikeInput) (*utils.ResponseBody[CreatePostLikeResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
 	postLike := &models.PostLike{
-		UserID: input.Body.UserID,
+		UserID: userID,
 		PostID: input.Body.PostID,
 	}
 	created, inserted, err := u.postLikeDB.CreatePostLike(postLike)
@@ -40,7 +41,7 @@ func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostL
 	if !inserted {
 		return nil, huma.Error409Conflict("User has already liked this post")
 	}
-	total, _, err := u.postLikeDB.GetPostLikeInfo(input.Body.PostID, input.Body.UserID)
+	total, _, err := u.postLikeDB.GetPostLikeInfo(input.Body.PostID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,11 +56,12 @@ func (u *PostLikeService) CreatePostLike(ctx context.Context, input *CreatePostL
 
 // Deletes a like by ID. Response includes updated total likes on the post and if user liked post.
 func (u *PostLikeService) DeletePostLike(ctx context.Context, input *DeletePostLikeParams) (*utils.ResponseBody[DeletePostLikeResponse], error) {
-	postID, err := u.postLikeDB.DeletePostLike(input.ID)
+	userID, err := utils.GetCurrentUserID(ctx)
+	postID, err := u.postLikeDB.DeletePostLike(input.PostID, userID)
 	if err != nil {
 		return nil, err
 	}
-	total, liked, err := u.postLikeDB.GetPostLikeInfo(postID, input.UserID)
+	total, liked, err := u.postLikeDB.GetPostLikeInfo(postID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +76,8 @@ func (u *PostLikeService) DeletePostLike(ctx context.Context, input *DeletePostL
 
 // Retrieves like count and whether the user has liked the post.
 func (u *PostLikeService) GetPostLikeInfo(ctx context.Context, input *GetPostLikeInfoParams) (*utils.ResponseBody[GetPostLikeInfoResponse], error) {
-	count, liked, err := u.postLikeDB.GetPostLikeInfo(input.PostID, input.UserID)
+	userID, err := utils.GetCurrentUserID(ctx)
+	count, liked, err := u.postLikeDB.GetPostLikeInfo(input.PostID, userID)
 	if err != nil {
 		return nil, err
 	}
