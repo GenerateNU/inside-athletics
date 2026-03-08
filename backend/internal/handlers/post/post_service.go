@@ -7,6 +7,7 @@ import (
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -28,6 +29,10 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 	id, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(input.Body.Tags) == 0 && input.Body.SportId == nil && input.Body.CollegeId == nil {
+		return nil, huma.Error400BadRequest("Need to have at least a single tag on a post")
 	}
 	post := &models.Post{
 		AuthorID:    id,

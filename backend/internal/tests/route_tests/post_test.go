@@ -88,6 +88,35 @@ func TestCreatePost(t *testing.T) {
 	}
 }
 
+func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	},
+		JohnID,
+	)
+
+	body := map[string]any{
+		"title":        "Looking for thoughts on NEU Fencing!",
+		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
+		"is_anonymous": false,
+		"tags":         []map[string]any{},
+	}
+
+	resp := api.Post("/api/v1/post/", body, authHeader)
+	if resp.Code != http.StatusBadRequest {
+		t.Fatalf("expected status 400, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestCreatePostWithTags(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
