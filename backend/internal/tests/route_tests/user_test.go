@@ -17,7 +17,7 @@ func addCollegeAndSport(t *testing.T, testDB *TestDatabase) (models.College, mod
 		State:        "Massachusetts",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.Division(1),
 	}
 	if err := testDB.DB.Create(&college).Error; err != nil {
 		t.Fatalf("Unable to create college: %s", err.Error())

@@ -19,7 +19,7 @@ type SeedCollege struct {
 	City         string `json:"city"`
 	Website      string `json:"website"`
 	AcademicRank *int16 `json:"academic_rank,omitempty"`
-	DivisionRank int8   `json:"division_rank"`
+	DivisionRank uint   `json:"division_rank"`
 	Logo         string `json:"logo,omitempty"`
 }
 
@@ -92,7 +92,7 @@ func seedColleges(db *gorm.DB, filename string) error {
 			City:         sc.City,
 			Website:      sc.Website,
 			AcademicRank: sc.AcademicRank,
-			DivisionRank: sc.DivisionRank,
+			DivisionRank: models.Division(sc.DivisionRank),
 			Logo:         sc.Logo,
 		}
 

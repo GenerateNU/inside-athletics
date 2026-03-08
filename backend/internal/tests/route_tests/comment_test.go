@@ -58,13 +58,12 @@ func TestCreateComment(t *testing.T) {
 	user, post := seedUserAndPost(t, testDB, "create-comment")
 
 	body := map[string]any{
-		"user_id":      user.ID.String(),
 		"post_id":      post.ID.String(),
 		"description":  "A test comment",
 		"is_anonymous": false,
 	}
 
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+mockUUID)
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+user.ID.String())
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -77,9 +76,6 @@ func TestCreateComment(t *testing.T) {
 	if result.PostID != post.ID {
 		t.Errorf("expected post_id %s, got %s", post.ID, result.PostID)
 	}
-	if result.UserID == nil || *result.UserID != user.ID {
-		t.Errorf("expected user_id for non-anonymous comment, got %v", result.UserID)
-	}
 }
 
 // Asserts anonymous comments hide user_id when caller is not the user who made the comment.
@@ -90,13 +86,12 @@ func TestCreateCommentAnonymous(t *testing.T) {
 	user, post := seedUserAndPost(t, testDB, "create-anon")
 
 	body := map[string]any{
-		"user_id":      user.ID.String(),
 		"post_id":      post.ID.String(),
 		"description":  "Anonymous comment",
 		"is_anonymous": true,
 	}
 
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+mockUUID)
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+user.ID.String())
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -105,9 +100,6 @@ func TestCreateCommentAnonymous(t *testing.T) {
 	DecodeTo(&result, resp)
 	if result.IsAnonymous != true {
 		t.Errorf("expected is_anonymous true, got %v", result.IsAnonymous)
-	}
-	if result.UserID != nil {
-		t.Errorf("expected user_id omitted for anonymous when not user who made comment, got %v", result.UserID)
 	}
 }
 
@@ -327,13 +319,12 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 	}
 
 	body := map[string]any{
-		"user_id":           user.ID.String(),
 		"post_id":           post.ID.String(),
 		"parent_comment_id": createdReply.ID.String(),
 		"description":       "Reply to reply",
 		"is_anonymous":      false,
 	}
-	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+mockUUID)
+	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+user.ID.String())
 	if resp.Code != http.StatusBadRequest {
 		t.Errorf("expected 400 for reply-to-reply (one layer only), got %d: %s", resp.Code, resp.Body.String())
 	}

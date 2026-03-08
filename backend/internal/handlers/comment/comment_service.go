@@ -31,7 +31,7 @@ func (s *CommentService) CreateComment(ctx context.Context, input *CreateComment
 
 	// Create the comment model
 	comment := &models.Comment{
-		UserID:          input.Body.UserID,
+		UserID:          userID,
 		IsAnonymous:     input.Body.IsAnonymous,
 		ParentCommentID: input.Body.ParentCommentID,
 		PostID:          input.Body.PostID,
