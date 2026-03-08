@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -227,17 +226,6 @@ func (u *UserService) AssignRole(ctx context.Context, input *AssignRoleInput) (*
 			},
 		},
 	}, nil
-}
-
-func marshalSport(sport []string) ([]byte, error) {
-	if sport == nil {
-		return nil, nil
-	}
-	sportJSON, err := json.Marshal(sport)
-	if err != nil {
-		return nil, huma.Error400BadRequest("Invalid sport values", err)
-	}
-	return sportJSON, nil
 }
 
 func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {

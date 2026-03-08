@@ -30,6 +30,9 @@ func (u *CommentLikeService) GetCommentLike(ctx context.Context, input *GetComme
 // Response includes total likes on the comment and liked=true for the requesting user.
 func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *CreateCommentLikeInput) (*utils.ResponseBody[CreateCommentLikeResponse], error) {
 	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	commentLike := &models.CommentLike{
 		UserID:    userID,
 		CommentID: input.Body.CommentID,
@@ -57,6 +60,9 @@ func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *Creat
 // Deletes a like by ID. Response includes updated total likes on the comment and if user liked comment.
 func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *DeleteCommentLikeParams) (*utils.ResponseBody[DeleteCommentLikeResponse], error) {
 	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	commentID, err := u.commentLikeDB.DeleteCommentLike(input.CommentID, userID)
 	if err != nil {
 		return nil, err
@@ -77,6 +83,9 @@ func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *Delet
 // Retrieves like count and whether the user has liked the comment.
 func (u *CommentLikeService) GetCommentLikeInfo(ctx context.Context, input *GetCommentLikeInfoParams) (*utils.ResponseBody[GetCommentLikeInfoResponse], error) {
 	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	count, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.CommentID, userID)
 	if err != nil {
 		return nil, err

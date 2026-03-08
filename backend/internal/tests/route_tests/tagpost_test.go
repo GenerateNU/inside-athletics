@@ -87,7 +87,7 @@ func TestGetPostsByTag(t *testing.T) {
 
 	DecodeTo(&response, resp)
 
-	if !(len(response.Posts) == 1) || response.Posts[0].ID != post.ID {
+	if len(response.Posts) != 1 || response.Posts[0].ID != post.ID {
 		t.Fatalf("Unexpected response: %s", resp.Body.String())
 	}
 }
