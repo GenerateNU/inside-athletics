@@ -198,7 +198,7 @@ func TestCreateUser(t *testing.T) {
 		Division:              divisionPtr(models.DivisionI),
 	}
 
-	resp := api.Post("/api/v1/user/", "Authorization: Bearer "+userID, payload)
+	resp := api.Post("/api/v1/user", "Authorization: Bearer "+userID, payload)
 
 	var u h.CreateUserResponse
 	DecodeTo(&u, resp)
@@ -224,7 +224,7 @@ func TestCreateUserWithNoneStatus(t *testing.T) {
 		VerifiedAthleteStatus: models.VerifiedAthleteStatusNone,
 	}
 
-	resp := api.Post("/api/v1/user/", "Authorization: Bearer "+userID, payload)
+	resp := api.Post("/api/v1/user", "Authorization: Bearer "+userID, payload)
 
 	var u h.CreateUserResponse
 	DecodeTo(&u, resp)
@@ -254,15 +254,17 @@ func TestUpdateUser(t *testing.T) {
 	}
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionUpdate, Resource: "user"},
-	})
+	},
+		user.ID,
+	)
 
 	update := h.UpdateUserBody{
 		FirstName: strPtr("Updated"),
 	}
 
-	resp := api.Patch("/api/v1/user/"+user.ID.String(), authHeader, update)
+	resp := api.Patch("/api/v1/user", authHeader, update)
 
 	var u h.UpdateUserResponse
 	DecodeTo(&u, resp)

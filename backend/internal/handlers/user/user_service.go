@@ -150,13 +150,17 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 
 func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*utils.ResponseBody[UpdateUserResponse], error) {
 	respBody := &utils.ResponseBody[UpdateUserResponse]{}
-
-	updatedUser, err := u.userDB.UpdateUser(input.ID, input.Body)
+	currentUserID, err := u.getCurrentUserID(ctx)
 	if err != nil {
 		return respBody, err
 	}
 
-	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(input.ID)
+	updatedUser, err := u.userDB.UpdateUser(currentUserID, input.Body)
+	if err != nil {
+		return respBody, err
+	}
+
+	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(currentUserID)
 	if err != nil {
 		return nil, err
 	}
