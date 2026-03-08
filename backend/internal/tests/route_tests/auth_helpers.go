@@ -12,12 +12,10 @@ import (
 
 var permissionMu sync.Mutex
 
-
 type permissionSpec struct {
 	Action   models.PermissionAction
 	Resource string
 }
-
 
 func seedUserWithRoleAndPermissions(t *testing.T, db *gorm.DB, roleName models.RoleName, perms []permissionSpec) (uuid.UUID, string) {
 	t.Helper()
@@ -47,11 +45,21 @@ func authHeaderWithPermissions(t *testing.T, db *gorm.DB, perms []permissionSpec
 	return header
 }
 
+func authHeaderWithPermissionsGivenUser(t *testing.T, db *gorm.DB, perms []permissionSpec, userID uuid.UUID) string {
+	roleID := getRoleID(t, db, models.RoleAdmin)
+	assignRoleToUser(t, db, userID, roleID)
+	for _, perm := range perms {
+		ensurePermissionForRole(t, db, roleID, perm.Action, perm.Resource)
+	}
+	return "Authorization: Bearer " + userID.String()
+
+}
+
 func ensurePermissionForRole(t *testing.T, db *gorm.DB, roleID uuid.UUID, action models.PermissionAction, resource string) {
 	t.Helper()
 
 	permissionMu.Lock()
-    defer permissionMu.Unlock()
+	defer permissionMu.Unlock()
 
 	permission := models.Permission{
 		Action:   action,

@@ -8,7 +8,6 @@ import (
 
 // CreatePostRequest defines the request body for creating a new post
 type CreatePostRequest struct {
-	AuthorId    uuid.UUID    `json:"author_id"`
 	SportId     *uuid.UUID   `json:"sport_id,omitempty"`
 	CollegeId   *uuid.UUID   `json:"college_id,omitempty"`
 	Tags        []TagRequest `json:"tags,omitempty"`

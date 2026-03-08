@@ -42,15 +42,16 @@ func TestCreatePost(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "sport"},
-		{Action: models.PermissionCreate, Resource: "post"},
-	})
-
 	CreateUserAndSport(testDB, t)
 
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	},
+		JohnID,
+	)
+
 	body := map[string]any{
-		"author_id":    JohnID,
 		"sport_id":     SoccerID,
 		"title":        "Looking for thoughts on NEU Fencing!",
 		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
@@ -94,12 +95,14 @@ func TestCreatePostWithTags(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	CreateUserAndSport(testDB, t)
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
 		{Action: models.PermissionCreate, Resource: "post"},
-	})
-
-	CreateUserAndSport(testDB, t)
+	},
+		JohnID,
+	)
 
 	tag1 := models.Tag{Name: "recruiting"}
 	tag2 := models.Tag{Name: "fencing"}
@@ -107,7 +110,6 @@ func TestCreatePostWithTags(t *testing.T) {
 	testDB.DB.Create(&tag2)
 
 	body := map[string]any{
-		"author_id":    JohnID,
 		"sport_id":     SoccerID,
 		"title":        "Post with tags",
 		"content":      "Testing that tags are associated with this post correctly.",

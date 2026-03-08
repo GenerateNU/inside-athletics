@@ -30,7 +30,7 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 		return nil, err
 	}
 	post := &models.Post{
-		AuthorID:    input.Body.AuthorId,
+		AuthorID:    id,
 		SportID:     input.Body.SportId,
 		CollegeID:   input.Body.CollegeId,
 		Title:       input.Body.Title,
