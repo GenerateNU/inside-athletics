@@ -29,8 +29,9 @@ func (u *CommentLikeService) GetCommentLike(ctx context.Context, input *GetComme
 // Creates a like on a comment. Returns 409 if the user has already liked the comment.
 // Response includes total likes on the comment and liked=true for the requesting user.
 func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *CreateCommentLikeInput) (*utils.ResponseBody[CreateCommentLikeResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
 	commentLike := &models.CommentLike{
-		UserID:    input.Body.UserID,
+		UserID:    userID,
 		CommentID: input.Body.CommentID,
 	}
 	created, inserted, err := u.commentLikeDB.CreateCommentLike(commentLike)
@@ -40,7 +41,7 @@ func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *Creat
 	if !inserted {
 		return nil, huma.Error409Conflict("User has already liked this comment")
 	}
-	total, _, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, input.Body.UserID)
+	total, _, err := u.commentLikeDB.GetCommentLikeInfo(input.Body.CommentID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,11 +56,12 @@ func (u *CommentLikeService) CreateCommentLike(ctx context.Context, input *Creat
 
 // Deletes a like by ID. Response includes updated total likes on the comment and if user liked comment.
 func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *DeleteCommentLikeParams) (*utils.ResponseBody[DeleteCommentLikeResponse], error) {
-	commentID, err := u.commentLikeDB.DeleteCommentLike(input.ID)
+	userID, err := utils.GetCurrentUserID(ctx)
+	commentID, err := u.commentLikeDB.DeleteCommentLike(input.CommentID, userID)
 	if err != nil {
 		return nil, err
 	}
-	total, liked, err := u.commentLikeDB.GetCommentLikeInfo(commentID, input.UserID)
+	total, liked, err := u.commentLikeDB.GetCommentLikeInfo(commentID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +76,8 @@ func (u *CommentLikeService) DeleteCommentLike(ctx context.Context, input *Delet
 
 // Retrieves like count and whether the user has liked the comment.
 func (u *CommentLikeService) GetCommentLikeInfo(ctx context.Context, input *GetCommentLikeInfoParams) (*utils.ResponseBody[GetCommentLikeInfoResponse], error) {
-	count, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.CommentID, input.UserID)
+	userID, err := utils.GetCurrentUserID(ctx)
+	count, liked, err := u.commentLikeDB.GetCommentLikeInfo(input.CommentID, userID)
 	if err != nil {
 		return nil, err
 	}

@@ -31,17 +31,17 @@ func TestCreateCommentLike(t *testing.T) {
 	user, _, comment := seedUserPostAndComment(t, testDB, "create-like")
 
 	body := map[string]any{
-		"user_id":    user.ID.String(),
 		"comment_id": comment.ID.String(),
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionCreate, Resource: "comment"},
-	})
-
+	},
+		user.ID,
+	)
 
 	resp := api.Post("/api/v1/comment/like", body, authHeader)
 	if resp.Code != http.StatusOK {
@@ -72,12 +72,14 @@ func TestGetCommentLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionCreate, Resource: "comment"},
-	})
+	},
+		user.ID,
+	)
 
 	resp := api.Get("/api/v1/comment/like/"+like.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
@@ -100,15 +102,16 @@ func TestGetCommentLikeInfo(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionCreate, Resource: "comment"},
-	})
+	},
+		user.ID,
+	)
 
-
-	resp := api.Get("/api/v1/comment/like/"+comment.ID.String()+"/likes?user_id="+user.ID.String(), authHeader)
+	resp := api.Get("/api/v1/comment/like/"+comment.ID.String()+"/likes", authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -133,15 +136,17 @@ func TestDeleteCommentLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionCreate, Resource: "comment"},
 		{Action: models.PermissionDelete, Resource: "comment"},
-	})
+	},
+		user.ID,
+	)
 
-	resp := api.Delete("/api/v1/comment/like/"+like.ID.String(), authHeader)
+	resp := api.Delete("/api/v1/comment/like/"+comment.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -171,16 +176,17 @@ func TestCreateCommentLikeDuplicateReturns409(t *testing.T) {
 	user, _, comment := seedUserPostAndComment(t, testDB, "dup-like")
 
 	body := map[string]any{
-		"user_id":    user.ID.String(),
 		"comment_id": comment.ID.String(),
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionCreate, Resource: "comment"},
-	})
+	},
+		user.ID,
+	)
 
 	resp1 := api.Post("/api/v1/comment/like", body, authHeader)
 	if resp1.Code != http.StatusOK {
