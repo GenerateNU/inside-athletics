@@ -3,6 +3,7 @@ package routeTests
 import (
 	"inside-athletics/internal/handlers/tagfollow"
 	"inside-athletics/internal/models"
+	"net/http"
 	"reflect"
 	"testing"
 
@@ -44,6 +45,11 @@ func TestGetTagFollowsByUser(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "create-user-tag")
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
 	createdTagFollow := models.TagFollow{
 		ID:     uuid.New(),
 		UserID: user.ID,
@@ -54,7 +60,7 @@ func TestGetTagFollowsByUser(t *testing.T) {
 		t.Fatalf("Unable to add tag follow to table: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/tag/"+user.ID.String()+"/follows", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/user/tag/"+user.ID.String()+"/follows", authHeader)
 
 	var response tagfollow.GetTagFollowsByUserResponse
 
@@ -72,6 +78,11 @@ func TestGetFollowingUsersByTag(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "get-following-users-by-tag")
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
 	createdTagFollow := models.TagFollow{
 		ID:     uuid.New(),
 		UserID: user.ID,
@@ -82,7 +93,7 @@ func TestGetFollowingUsersByTag(t *testing.T) {
 		t.Fatalf("Unable to add tag follow to table: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/tag/"+tag.ID.String()+"/users", "Authorization: Bearer mock-token")
+	resp := api.Get("/api/v1/user/tag/"+tag.ID.String()+"/users", authHeader)
 
 	var response tagfollow.GetFollowingUsersByTagResponse
 
@@ -100,12 +111,17 @@ func TestCreateTagFollow(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "create-tag-follow")
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
 	reqBody := tagfollow.CreateTagFollowBody{
 		UserID: user.ID,
 		TagID:  tag.ID,
 	}
 
-	resp := api.Post("/api/v1/user/tag/", reqBody, "Authorization: Bearer mock-token")
+	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)
 
 	var response tagfollow.CreateTagFollowResponse
 	DecodeTo(&response, resp)
@@ -130,6 +146,13 @@ func TestDeleteTagFollow(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "delete-tag-follow")
 
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionDelete, Resource: "user"},
+		{Action: models.PermissionDelete, Resource: "tag"},
+	})
+
 	createdTagFollow := models.TagFollow{
 		ID:     uuid.New(),
 		UserID: user.ID,
@@ -140,7 +163,7 @@ func TestDeleteTagFollow(t *testing.T) {
 		t.Fatalf("Unable to add tag follow to table: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/user/tag/"+createdTagFollow.ID.String(), "Authorization: Bearer mock-token")
+	resp := api.Delete("/api/v1/user/tag/"+createdTagFollow.ID.String(), authHeader)
 
 	var response tagfollow.DeleteTagFollowResponse
 	DecodeTo(&response, resp)
@@ -154,5 +177,190 @@ func TestDeleteTagFollow(t *testing.T) {
 	err := testDB.DB.Where("id = ?", createdTagFollow.ID).First(&tagFollow).Error
 	if err == nil {
 		t.Fatalf("TagFollow still exists in DB after deletion")
+	}
+}
+
+// Retrieving list of tags by user with an invalid tag UUID should throw errors
+func TestGetTagFollowsByUser_InvalidUUID(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
+	resp := api.Get("/api/v1/user/tag/not-a-valid-uuid/follows", authHeader)
+
+	if resp.Code == http.StatusOK {
+		t.Fatalf("expected non-200 for invalid UUID, got %d: %s", resp.Code, resp.Body.String())
+	}
+	if resp.Code != http.StatusUnprocessableEntity {
+		t.Logf("invalid UUID returned status %d (expected 422): %s", resp.Code, resp.Body.String())
+	}
+}
+
+// Retrieving list of users by tag with an invalid tag UUID should throw an error
+func TestGetFollowingUsersByTag_InvalidUUID(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
+	resp := api.Get("/api/v1/user/tag/invalid-uuid/users", authHeader)
+
+	if resp.Code == http.StatusOK {
+		t.Fatalf("expected non-200 for invalid UUID, got %d: %s", resp.Code, resp.Body.String())
+	}
+	if resp.Code != http.StatusUnprocessableEntity {
+		t.Logf("invalid UUID returned status %d (expected 422): %s", resp.Code, resp.Body.String())
+	}
+}
+
+// Creating a tag follow when it already exists should throw an error
+func TestCreateTagFollow_DuplicateReturns409(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	user, tag := seedUserAndTag(t, testDB, "dup-tagfollow")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
+	reqBody := tagfollow.CreateTagFollowBody{
+		UserID: user.ID,
+		TagID:  tag.ID,
+	}
+
+	resp1 := api.Post("/api/v1/user/tag/", reqBody, authHeader)
+	if resp1.Code != http.StatusOK {
+		t.Fatalf("first create expected 200, got %d: %s", resp1.Code, resp1.Body.String())
+	}
+
+	resp2 := api.Post("/api/v1/user/tag/", reqBody, authHeader)
+	if resp2.Code != http.StatusConflict {
+		t.Errorf("expected 409 for duplicate tag follow, got %d: %s", resp2.Code, resp2.Body.String())
+	}
+}
+
+// Creating a tag follow with nonexistent user should error
+func TestCreateTagFollow_NonExistentUserReturnsError(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	_, tag := seedUserAndTag(t, testDB, "create-nonexistent-user")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
+	reqBody := tagfollow.CreateTagFollowBody{
+		UserID: uuid.New(),
+		TagID:  tag.ID,
+	}
+
+	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)
+
+	if resp.Code == http.StatusOK {
+		t.Fatalf("expected error for non-existent user, got 200: %s", resp.Body.String())
+	}
+}
+
+// Creating tag follow with a nonexistent tag should throw an error
+func TestCreateTagFollow_NonExistentTagReturnsError(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	user, _ := seedUserAndTag(t, testDB, "create-nonexistent-tag")
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
+	reqBody := tagfollow.CreateTagFollowBody{
+		UserID: user.ID,
+		TagID:  uuid.New(),
+	}
+
+	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)
+
+	if resp.Code == http.StatusOK {
+		t.Fatalf("expected error for non-existent tag, got 200: %s", resp.Body.String())
+	}
+}
+
+// Creating a tag follow with invalid body should return error
+func TestCreateTagFollow_InvalidBodyReturnsError(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+	})
+
+	// Invalid body: invalid random UUID strings
+	reqBody := map[string]any{
+		"user_id": "not-a-valid-uuid",
+		"tag_id":  "also-invalid",
+	}
+	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)
+
+	if resp.Code == http.StatusOK {
+		t.Fatalf("expected error for invalid UUIDs in body, got 200: %s", resp.Body.String())
+	}
+}
+
+// Deleting a nonexistent tag follow should throw an error
+func TestDeleteTagFollow_NonExistentReturns404(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionDelete, Resource: "user"},
+		{Action: models.PermissionDelete, Resource: "tag"},
+	})
+
+	nonExistentID := uuid.New()
+	resp := api.Delete("/api/v1/user/tag/"+nonExistentID.String(), authHeader)
+
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("expected 404 for non-existent tag follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+// Invalid UUID should throw error when deleting tag follow
+func TestDeleteTagFollow_InvalidUUID(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "user"},
+		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionDelete, Resource: "user"},
+		{Action: models.PermissionDelete, Resource: "tag"},
+	})
+
+	resp := api.Delete("/api/v1/user/tag/not-a-valid-uuid", authHeader)
+
+	if resp.Code == http.StatusOK {
+		t.Fatalf("expected non-200 for invalid UUID, got %d: %s", resp.Code, resp.Body.String())
+	}
+	if resp.Code != http.StatusUnprocessableEntity {
+		t.Logf("invalid UUID returned status %d (expected 422): %s", resp.Code, resp.Body.String())
 	}
 }

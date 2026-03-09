@@ -30,6 +30,11 @@ func (u *TagFollowDB) GetFollowingUsersByTag(tag_id uuid.UUID) (*[]uuid.UUID, er
 }
 
 func (u *TagFollowDB) CreateTagFollow(tagfollow *models.TagFollow) (*models.TagFollow, error) {
+	// Checking if this user already followed the tag
+	result := u.db.Where("user_id = ? AND tag_id = ?", tagfollow.UserID, tagfollow.TagID).First(&tagfollow)
+	if result.Error == nil {
+		return nil, huma.Error409Conflict("User has already followed this tag")
+	}
 	dbResponse := u.db.Create(tagfollow)
 	return utils.HandleDBError(tagfollow, dbResponse.Error)
 }

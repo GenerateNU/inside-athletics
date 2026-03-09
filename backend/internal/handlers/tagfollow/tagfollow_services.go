@@ -50,11 +50,11 @@ func (u *TagFollowService) GetFollowingUsersByTag(ctx context.Context, input *Ge
 	}, err
 }
 
-// Given a tag and a user, creates a tag follow
-func (u *TagFollowService) CreateTagFollow(ctx context.Context, input *CreateTagFollowBody) (*utils.ResponseBody[CreateTagFollowResponse], error) {
+// Given a tag and a user, creates a tag follow if doesn't already exist
+func (u *TagFollowService) CreateTagFollow(ctx context.Context, input *CreateTagFollowInput) (*utils.ResponseBody[CreateTagFollowResponse], error) {
 	tagfollow := &models.TagFollow{
-		TagID:  input.TagID,
-		UserID: input.UserID,
+		TagID:  input.Body.TagID,
+		UserID: input.Body.UserID,
 	}
 
 	createdTagFollow, err := u.tagfollowDB.CreateTagFollow(tagfollow)
