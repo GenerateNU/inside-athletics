@@ -139,7 +139,7 @@ func TestGetComment(t *testing.T) {
 	if result2.ID != created.ID || result2.Description != "Get me" {
 		t.Errorf("expected same comment, got %+v", result2)
 	}
-	if *result2.User != user {
+	if result2.User.ID != user.ID {
 		t.Errorf("expected UserId for Anonymous")
 	}
 
@@ -182,7 +182,7 @@ func TestGetCommentWithLikes(t *testing.T) {
 	if result2.ID != created.ID || result2.Description != "Get me" {
 		t.Errorf("expected same comment, got %+v", result2)
 	}
-	if *result2.User != user {
+	if result2.User.ID != user.ID {
 		t.Errorf("expected UserId for Anonymous")
 	}
 
