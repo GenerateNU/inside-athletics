@@ -42,10 +42,10 @@ func seedUserAndPost(t *testing.T, testDB *TestDatabase, unique string) (models.
 		Content:  "Test content",
 	}
 
-	if err := testDB.DB.Create(&soccer).Error; err != nil {
+	if err := testDB.DB.FirstOrCreate(&soccer).Error; err != nil {
 		t.Fatalf("failed to create sport: %v", err)
 	}
-	if err := testDB.DB.Create(&post).Error; err != nil {
+	if err := testDB.DB.FirstOrCreate(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
 	return user, post
