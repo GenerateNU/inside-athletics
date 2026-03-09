@@ -149,7 +149,7 @@ func TestGetCommentWithLikes(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
-	user, post := seedUserAndPost(t, testDB, "get-comment")
+	user, post := seedUserAndPost(t, testDB, "get-comment-2")
 	commentDB := comment.NewCommentDB(testDB.DB)
 	c := &models.Comment{UserID: user.ID, PostID: post.ID, Description: "Get me", IsAnonymous: true}
 	created, err := commentDB.CreateComment(c)
@@ -187,7 +187,7 @@ func TestGetCommentWithLikes(t *testing.T) {
 	}
 
 	if result2.LikeCount != 1 {
-		t.Errorf("expected 1 like got, %+v", result.LikeCount)
+		t.Errorf("expected 1 like got, %+v", result2.LikeCount)
 	}
 
 	if result2.IsLiked != true {
