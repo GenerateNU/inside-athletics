@@ -20,10 +20,12 @@ type Role struct {
 	CreatedAt       time.Time        `json:"created_at"`
 	UpdatedAt       time.Time        `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt   `json:"deleted_at,omitempty" gorm:"index"`
-	Name            RoleName         `json:"name" gorm:"type:varchar(50);not null;unique"`
+	Name            RoleName         `json:"name" gorm:"type:varchar(50);not null;uniqueIndex:roles_name_key"`
 }
 
 type RolePermission struct {
 	RoleID       uuid.UUID  `json:"role_id" gorm:"type:uuid;primaryKey"`
-	PermissionID uuid.UUID  `json:"permission_id" gorm:"type:uuid;primaryKey"`
+    PermissionID uuid.UUID  `json:"permission_id" gorm:"type:uuid;primaryKey"`
+    Role         Role       `json:"-" gorm:"foreignKey:RoleID;references:ID;constraint:OnDelete:CASCADE"`
+    Permission   Permission `json:"-" gorm:"foreignKey:PermissionID;references:ID;constraint:OnDelete:CASCADE"`
 }
