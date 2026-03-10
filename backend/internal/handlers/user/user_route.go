@@ -22,9 +22,9 @@ func Route(api huma.API, db *gorm.DB) {
 	{
 		grp := huma.NewGroup(api, "/api/v1/user")
 		huma.Get(grp, "/current", userService.GetCurrentUser)
-		huma.Post(grp, "/", userService.CreateUser)
+		huma.Post(grp, "", userService.CreateUser)
 		huma.Get(grp, "/{id}", userService.GetUser)
-		huma.Patch(grp, "/{id}", userService.UpdateUser)
+		huma.Patch(grp, "", userService.UpdateUser)
 		huma.Delete(grp, "/{id}", userService.DeleteUser)
 		huma.Post(grp, "/{id}/roles", userService.AssignRole)
 	}
