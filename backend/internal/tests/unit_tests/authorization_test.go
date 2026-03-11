@@ -1,4 +1,4 @@
-package server
+package unitTests
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"inside-athletics/internal/models"
+	"inside-athletics/internal/server"
 
 	"github.com/google/uuid"
 	"github.com/testcontainers/testcontainers-go"
@@ -69,22 +70,22 @@ func TestIsOwnerOfPostOrComment(t *testing.T) {
 		t.Fatalf("failed to create comment: %v", err)
 	}
 
-	owned, status, msg := isOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "post")
+	owned, status, msg := server.IsOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "post")
 	if status != 0 || msg != "" || !owned {
 		t.Fatalf("expected owner for post, got owned=%v status=%d msg=%q", owned, status, msg)
 	}
 
-	owned, status, msg = isOwnerOfPostOrComment(testDB.DB, otherUserID, post.ID.String(), "post")
+	owned, status, msg = server.IsOwnerOfPostOrComment(testDB.DB, otherUserID, post.ID.String(), "post")
 	if status != 0 || msg != "" || owned {
 		t.Fatalf("expected non-owner for post, got owned=%v status=%d msg=%q", owned, status, msg)
 	}
 
-	owned, status, msg = isOwnerOfPostOrComment(testDB.DB, userID, comment.ID.String(), "comment")
+	owned, status, msg = server.IsOwnerOfPostOrComment(testDB.DB, userID, comment.ID.String(), "comment")
 	if status != 0 || msg != "" || !owned {
 		t.Fatalf("expected owner for comment, got owned=%v status=%d msg=%q", owned, status, msg)
 	}
 
-	owned, status, _ = isOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "sport")
+	owned, status, _ = server.IsOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "sport")
 	if status != http.StatusBadRequest || owned {
 		t.Fatalf("expected bad request for unsupported resource, got owned=%v status=%d", owned, status)
 	}

@@ -51,7 +51,7 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
 			(resource == "post" || resource == "comment") &&
 			ctx.Param("id") != "" {
-			owned, status, msg := isOwnerOfPostOrComment(db, parsedUserID, ctx.Param("id"), resource)
+			owned, status, msg := IsOwnerOfPostOrComment(db, parsedUserID, ctx.Param("id"), resource)
 			if status != 0 {
 				_ = huma.WriteErr(api, ctx, status, msg)
 				return
@@ -94,7 +94,7 @@ func authorizeByPermission(db *gorm.DB, userID uuid.UUID, action models.Permissi
 	return true, 0, ""
 }
 
-func isOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, int, string) {
+func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, int, string) {
 	parsedResourceID, err := uuid.Parse(resourceID)
 	if err != nil {
 		return false, http.StatusBadRequest, "Invalid resource ID"
