@@ -32,6 +32,12 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 			return
 		}
 
+		parsedUserID, err := uuid.Parse(userID)
+		if err != nil {
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid user ID")
+			return
+		}
+
 		action, resource := resolveResourceAndAction(ctx.Method(), path, userID, ctx.Param("id"))
 		if action == "" || resource == "" {
 			next(ctx)
@@ -42,7 +48,24 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 			return
 		}
 
-		allowed, status, msg := authorizeByPermission(db, userID, action, resource)
+		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
+			(resource == "post" || resource == "comment") &&
+			ctx.Param("id") != "" {
+			owned, status, msg := isOwnerOfPostOrComment(db, parsedUserID, ctx.Param("id"), resource)
+			if status != 0 {
+				_ = huma.WriteErr(api, ctx, status, msg)
+				return
+			}
+			if owned {
+				if action == models.PermissionDelete {
+					action = models.PermissionDeleteOwn
+				} else {
+					action = models.PermissionUpdateOwn
+				}
+			}
+		}
+
+		allowed, status, msg := authorizeByPermission(db, parsedUserID, action, resource)
 		if !allowed {
 			_ = huma.WriteErr(api, ctx, status, msg)
 			return
@@ -52,19 +75,14 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 	}
 }
 
-func authorizeByPermission(db *gorm.DB, userID string, action models.PermissionAction, resource string) (bool, int, string) {
-	parsedUserID, err := uuid.Parse(userID)
-	if err != nil {
-		return false, http.StatusUnauthorized, "Invalid user ID"
-	}
-
+func authorizeByPermission(db *gorm.DB, userID uuid.UUID, action models.PermissionAction, resource string) (bool, int, string) {
 	authDB := NewAuthorizationDB(db)
 
-	if err := authDB.UserExists(parsedUserID); err != nil {
+	if err := authDB.UserExists(userID); err != nil {
 		return false, http.StatusUnauthorized, "User not found"
 	}
 
-	hasPermission, err := authDB.UserHasPermission(parsedUserID, action, resource)
+	hasPermission, err := authDB.UserHasPermission(userID, action, resource)
 	if err != nil {
 		return false, http.StatusInternalServerError, "Unable to check permissions"
 	}
@@ -74,6 +92,32 @@ func authorizeByPermission(db *gorm.DB, userID string, action models.PermissionA
 	}
 
 	return true, 0, ""
+}
+
+func isOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, int, string) {
+	parsedResourceID, err := uuid.Parse(resourceID)
+	if err != nil {
+		return false, http.StatusBadRequest, "Invalid resource ID"
+	}
+
+	var count int64
+	switch resource {
+	case "post":
+		err = db.Table("posts").
+			Where("id = ? AND author_id = ?", parsedResourceID, userID).
+			Count(&count).Error
+	case "comment":
+		err = db.Table("comments").
+			Where("id = ? AND user_id = ?", parsedResourceID, userID).
+			Count(&count).Error
+	default:
+		return false, http.StatusBadRequest, "Unsupported resource for ownership check"
+	}
+
+	if err != nil {
+		return false, http.StatusInternalServerError, "Unable to check ownership"
+	}
+	return count > 0, 0, ""
 }
 
 func resolveResourceAndAction(method, path, userID, pathID string) (models.PermissionAction, string) {
