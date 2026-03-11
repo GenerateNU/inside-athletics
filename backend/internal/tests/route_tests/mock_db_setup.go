@@ -4,12 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"inside-athletics/internal/models"
+
+	"fmt"
 	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/server"
 	"inside-athletics/internal/s3"
 	unitTests "inside-athletics/internal/tests/unit_tests"
 	"log"
 	"net/http/httptest"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -17,6 +20,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2/humatest"
+	"github.com/stripe/stripe-go/v81"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -34,6 +38,8 @@ type TestDatabase struct {
 // SetupTestDB creates a new PostgreSQL container and returns a connection
 func SetupTestDB(t *testing.T) *TestDatabase {
 	ctx := context.Background()
+
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	// Create PostgreSQL container
 	postgresContainer, err := postgres.Run(ctx,
@@ -120,7 +126,8 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 	// Run Atlas migrations using exec
 	cmd := exec.Command("atlas", "migrate", "apply",
-		"--dir", "file://"+filepath.ToSlash(migrationDir),
+		"--dir", fmt.Sprintf("file://%s", migrationDir),
+		//"--dir", "file://"+filepath.ToSlash(migrationDir),
 		"--url", connStr,
 	)
 
