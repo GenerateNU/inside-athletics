@@ -17,28 +17,22 @@ func NewService(client Client, cfg Config) *Service {
 	return &Service{client: client, cfg: cfg}
 }
 
-// Builds an S3 key, gets a presigned PUT URL, and returns upload details.
+// Builds a presigned PUT URL for the given key and returns upload details.
 func (s *Service) GetUploadURL(ctx context.Context, input GetUploadURLInput) (*GetUploadURLResponse, error) {
-	if input.FileName == "" || input.FileType == "" || input.ContentKind == "" {
-		return nil, fmt.Errorf("fileName, fileType, and contentKind are required")
+	if input.Key == "" || input.FileType == "" {
+		return nil, fmt.Errorf("key and fileType are required")
 	}
-	// Use contentID for key path when present, otherwise userID (e.g. profile uploads).
-	owner := input.ContentID
-	if owner == "" {
-		owner = input.UserID
-	}
-	if owner == "" {
-		return nil, fmt.Errorf("contentID or userID is required")
-	}
-	// Key format: premium/{kind}/{owner}/{fileName} so list/delete by content or user is easy.
-	key := path.Join("premium", input.ContentKind, owner, input.FileName)
+	key := input.Key
 	expiresIn := s.cfg.PresignedURLExpiry
 	if expiresIn == 0 {
 		expiresIn = DefaultPresignedURLExpiry
 	}
+	documentID := input.FileName
+	if documentID == "" {
+		documentID = path.Base(key)
+	}
 	metadata := map[string]string{
-		"content-kind": input.ContentKind,
-		"filename":     input.FileName,
+		"filename": documentID,
 	}
 	uploadURL, err := s.client.PresignedUploadURL(ctx, key, input.FileType, expiresIn, metadata)
 	if err != nil {
@@ -47,7 +41,7 @@ func (s *Service) GetUploadURL(ctx context.Context, input GetUploadURLInput) (*G
 	return &GetUploadURLResponse{
 		UploadURL:  uploadURL,
 		Key:        key,
-		DocumentID: input.FileName,
+		DocumentID: documentID,
 		ExpiresIn:  int(expiresIn.Seconds()),
 	}, nil
 }

@@ -2,11 +2,9 @@ package content
 
 // Request body for requesting a presigned upload URL.
 type GetUploadURLRequest struct {
-	FileName    string `json:"fileName" required:"true" doc:"Original filename"`
-	FileType    string `json:"fileType" required:"true" doc:"MIME type, e.g. image/jpeg, application/pdf"`
-	ContentKind string `json:"contentKind" required:"true" doc:"image, video, or pdf"`
-	ContentID   string `json:"contentId" doc:"Optional; preferred for key path if set"`
-	UserID      string `json:"userId" doc:"Optional; used for key path if ContentID empty"`
+	Key      string `json:"key" required:"true" doc:"Full S3 object key, e.g. premium/image/content-123/photo.jpg"`
+	FileType string `json:"fileType" required:"true" doc:"MIME type, e.g. image/jpeg, application/pdf"`
+	FileName string `json:"fileName" doc:"Optional; used as documentId in response (defaults to last segment of key)"`
 }
 
 // Input for POST /upload-url (body only).

@@ -19,11 +19,9 @@ func NewContentService(s3Service *s3.Service) *ContentService {
 // Returns a presigned upload URL and key/expiry for the request body.
 func (c *ContentService) GetUploadURL(ctx context.Context, input *GetUploadURLInput) (*utils.ResponseBody[s3.GetUploadURLResponse], error) {
 	resp, err := c.s3.GetUploadURL(ctx, s3.GetUploadURLInput{
-		FileName:    input.Body.FileName,
-		FileType:    input.Body.FileType,
-		ContentKind: input.Body.ContentKind,
-		ContentID:   input.Body.ContentID,
-		UserID:      input.Body.UserID,
+		Key:      input.Body.Key,
+		FileType: input.Body.FileType,
+		FileName: input.Body.FileName,
 	})
 	if err != nil {
 		return nil, err

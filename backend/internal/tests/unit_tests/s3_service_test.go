@@ -1,9 +1,12 @@
 package unitTests
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"errors"
 	"inside-athletics/internal/s3"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -20,10 +23,9 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 
 	t.Run("returns upload URL and correct key format for contentID", func(t *testing.T) {
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
-			FileName:    "photo.jpg",
-			FileType:    "image/jpeg",
-			ContentKind: s3.ContentKindImage,
-			ContentID:   "content-123",
+			Key:      "premium/image/content-123/photo.jpg",
+			FileType: "image/jpeg",
+			FileName: "photo.jpg",
 		})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -56,10 +58,9 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 		mock := NewMockS3Client()
 		svc := s3.NewService(mock, cfg)
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
-			FileName:    "doc.pdf",
-			FileType:    "application/pdf",
-			ContentKind: s3.ContentKindPDF,
-			UserID:      "user-456",
+			Key:      "premium/pdf/user-456/doc.pdf",
+			FileType: "application/pdf",
+			FileName: "doc.pdf",
 		})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -74,45 +75,57 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 		mock := NewMockS3Client()
 		svc := s3.NewService(mock, cfg)
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
-			FileName:    "vid.mp4",
-			FileType:    "video/mp4",
-			ContentKind: s3.ContentKindVideo,
-			ContentID:   "content-1",
-			UserID:      "user-1",
+			Key:      "premium/video/content-1/vid.mp4",
+			FileType: "video/mp4",
 		})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if !strings.Contains(resp.Key, "content-1") {
-			t.Errorf("key should contain contentID, got %s", resp.Key)
+			t.Errorf("key should contain content-1, got %s", resp.Key)
+		}
+		if resp.DocumentID != "vid.mp4" {
+			t.Errorf("document_id should default to path base, want vid.mp4, got %s", resp.DocumentID)
 		}
 	})
 
-	t.Run("missing fileName returns error", func(t *testing.T) {
-		_, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
-			FileType:    "image/jpeg",
-			ContentKind: s3.ContentKindImage,
-			ContentID:   "c1",
+	t.Run("missing fileName defaults documentId to path base", func(t *testing.T) {
+		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
+			Key:      "premium/image/c1/photo.jpg",
+			FileType: "image/jpeg",
 		})
-		if err == nil {
-			t.Fatal("expected error for missing fileName")
+		if err != nil {
+			t.Fatalf("fileName is optional: %v", err)
 		}
-		if !strings.Contains(err.Error(), "fileName") {
-			t.Errorf("error should mention fileName, got %v", err)
+		if resp.DocumentID != "photo.jpg" {
+			t.Errorf("document_id should default to path base when fileName empty, want photo.jpg, got %s", resp.DocumentID)
 		}
 	})
 
-	t.Run("missing contentID and userID returns error", func(t *testing.T) {
+	t.Run("missing key returns error", func(t *testing.T) {
 		_, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
-			FileName:    "x.jpg",
-			FileType:    "image/jpeg",
-			ContentKind: s3.ContentKindImage,
+			Key:      "",
+			FileType: "image/jpeg",
+			FileName: "x.jpg",
 		})
 		if err == nil {
-			t.Fatal("expected error when contentID and userID both empty")
+			t.Fatal("expected error when key empty")
 		}
-		if !strings.Contains(err.Error(), "contentID") && !strings.Contains(err.Error(), "userID") {
-			t.Errorf("error should mention contentID or userID, got %v", err)
+		if !strings.Contains(err.Error(), "key") {
+			t.Errorf("error should mention key, got %v", err)
+		}
+	})
+
+	t.Run("missing fileType returns error", func(t *testing.T) {
+		_, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
+			Key:      "premium/image/c1/x.jpg",
+			FileType: "",
+		})
+		if err == nil {
+			t.Fatal("expected error when fileType empty")
+		}
+		if !strings.Contains(err.Error(), "fileType") {
+			t.Errorf("error should mention fileType, got %v", err)
 		}
 	})
 }
@@ -165,7 +178,8 @@ func TestS3Service_GetUploadURL_defaultExpiry(t *testing.T) {
 	cfg := s3.Config{Bucket: "test", Region: "us-east-1"} // PresignedURLExpiry zero
 	svc := s3.NewService(mock, cfg)
 	resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
-		FileName: "x.pdf", FileType: "application/pdf", ContentKind: s3.ContentKindPDF, ContentID: "c1",
+		Key:      "premium/pdf/c1/x.pdf",
+		FileType: "application/pdf",
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -261,4 +275,107 @@ func TestS3Service_DeleteObject(t *testing.T) {
 			t.Errorf("error should mention key, got %v", err)
 		}
 	})
+}
+
+// --- CompressBytes tests (different media types) ---
+
+func TestCompressBytes_EmptyInput(t *testing.T) {
+	out, err := s3.CompressBytes(nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(out) == 0 {
+		t.Fatal("expected non-empty gzip output for nil input")
+	}
+	dec, err := gzip.NewReader(bytes.NewReader(out))
+	if err != nil {
+		t.Fatalf("output is not valid gzip: %v", err)
+	}
+	defer dec.Close()
+	got, err := io.ReadAll(dec)
+	if err != nil {
+		t.Fatalf("decompress failed: %v", err)
+	}
+	if len(got) != 0 {
+		t.Errorf("round-trip: got %d bytes, want 0", len(got))
+	}
+}
+
+func TestCompressBytes_PlainText(t *testing.T) {
+	src := []byte("Hello world. This is plain text that compresses well. " + "Repeated repeated repeated repeated repeated.")
+	out, err := s3.CompressBytes(src)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	// gzip overhead can make tiny inputs larger; we only assert valid round-trip.
+	roundTripCompress(t, out, src)
+}
+
+func TestCompressBytes_JSON(t *testing.T) {
+	src := []byte(`{"name":"test","kind":"image","items":[1,2,3],"nested":{"a":true}}`)
+	out, err := s3.CompressBytes(src)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	roundTripCompress(t, out, src)
+}
+
+func TestCompressBytes_HTML(t *testing.T) {
+	src := []byte(`<!DOCTYPE html><html><head><title>Test</title></head><body><p>Content</p></body></html>`)
+	out, err := s3.CompressBytes(src)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	roundTripCompress(t, out, src)
+}
+
+func TestCompressBytes_ImageLike(t *testing.T) {
+	src := make([]byte, 256)
+	src[0], src[1] = 0xFF, 0xD8 // JPEG magic
+	for i := 2; i < len(src); i++ {
+		src[i] = byte(i * 7)
+	}
+	out, err := s3.CompressBytes(src)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	roundTripCompress(t, out, src)
+}
+
+func TestCompressBytes_PDFLike(t *testing.T) {
+	src := []byte("%PDF-1.4\n%\xe2\xe3\xcf\xd3\n1 0 obj\n/Type /Catalog\nendobj\n" +
+		"stream\nstream stream stream stream stream\nendstream\n")
+	out, err := s3.CompressBytes(src)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	roundTripCompress(t, out, src)
+}
+
+func TestCompressBytes_VideoLike(t *testing.T) {
+	src := make([]byte, 1024)
+	for i := range src {
+		src[i] = byte(i*i + 1)
+	}
+	out, err := s3.CompressBytes(src)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	roundTripCompress(t, out, src)
+}
+
+func roundTripCompress(t *testing.T, compressed, want []byte) {
+	t.Helper()
+	dec, err := gzip.NewReader(bytes.NewReader(compressed))
+	if err != nil {
+		t.Fatalf("output is not valid gzip: %v", err)
+	}
+	defer dec.Close()
+	got, err := io.ReadAll(dec)
+	if err != nil {
+		t.Fatalf("decompress failed: %v", err)
+	}
+	if !bytes.Equal(got, want) {
+		t.Errorf("round-trip mismatch: got %d bytes, want %d", len(got), len(want))
+	}
 }

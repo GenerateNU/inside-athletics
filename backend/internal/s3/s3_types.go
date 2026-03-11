@@ -36,11 +36,9 @@ const (
 
 // Input for requesting a presigned upload URL.
 type GetUploadURLInput struct {
-	FileName    string // original filename (used in key and as documentId for confirm)
-	FileType    string // MIME type, e.g. image/jpeg, application/pdf
-	ContentKind string // image, video, or pdf
-	ContentID   string // optional; preferred for key path if set
-	UserID      string // optional; used for key path if ContentID empty
+	Key      string // full S3 object key, e.g. premium/image/content-123/photo.jpg
+	FileType string // MIME type, e.g. image/jpeg, application/pdf
+	FileName string // optional; used as documentId in response (if empty, last segment of Key is used)
 }
 
 // Response after generating a presigned upload URL.
