@@ -20,27 +20,47 @@ func NewPostDB(db *gorm.DB) *PostDB {
 }
 
 // CreatePost creates a new sport in the database
-func (s *PostDB) CreatePost(author_id uuid.UUID, sport_id uuid.UUID, title string, content string, is_anonymous bool) (*models.Post, error) {
-	post := models.Post{
-		AuthorId:    author_id,
-		SportId:     sport_id,
-		Title:       title,
-		Content:     content,
-		IsAnonymous: is_anonymous,
-	}
-	dbResponse := s.db.Create(&post)
-	return utils.HandleDBError(&post, dbResponse.Error)
+func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post, error) {
+	dbError := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&post).Error; err != nil {
+			return err
+		}
+		var tagModels []models.Tag
+		for _, t := range tags {
+			tagModels = append(tagModels, models.Tag{ID: t.ID})
+		}
+		if err := tx.Model(&post).Association("Tags").Append(&tagModels); err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return utils.HandleDBError(post, dbError)
 }
 
 // GetPostByID retrieves a post by its ID
-func (s *PostDB) GetPostByID(id uuid.UUID) (*models.Post, error) {
+func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, error) {
 	var post models.Post
-	dbResponse := s.db.First(&post, "id = ?", id)
+	dbResponse := s.db.
+		Model(&models.Post{}).
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+		}).
+		First(&post, "posts.id = ?", id)
+
 	return utils.HandleDBError(&post, dbResponse.Error)
 }
 
 // GetPostsBySportID retrieves all posts with the given sport ID
-func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]models.Post, int64, error) {
+func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID uuid.UUID) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
@@ -53,6 +73,18 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]mode
 
 	// Get paginated results
 	if err := s.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+		}).
 		Where("sport_id = ?", sportID).
 		Limit(limit).
 		Offset(offset).
@@ -64,7 +96,7 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID) ([]mode
 }
 
 // GetPostByAuthorID retrieves a post by its author ID
-func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]models.Post, int64, error) {
+func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userID uuid.UUID) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
@@ -77,6 +109,18 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]mo
 
 	// Get paginated results
 	if err := s.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+		}).
 		Where("author_id = ?", authorID).
 		Limit(limit).
 		Offset(offset).
@@ -90,18 +134,18 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]mo
 // DeletePost soft deletes a post by ID
 func (p *PostDB) DeletePost(id uuid.UUID) error {
 	dbResponse := p.db.Delete(&models.Post{}, "id = ?", id)
-	if dbResponse.Error != nil {
-		_, err := utils.HandleDBError(&models.Post{}, dbResponse.Error)
-		return err
-	}
 	if dbResponse.RowsAffected == 0 {
 		return huma.Error404NotFound("Resource not found")
+	}
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError(&models.User{}, dbResponse.Error)
+		return err
 	}
 	return nil
 }
 
 // GetAllPosts retrieves all posts with pagination
-func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) {
+func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.Post, int, error) {
 	var posts []models.Post
 	var total int64
 
@@ -111,7 +155,22 @@ func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) 
 	}
 
 	// Get paginated posts
-	dbResponse := p.db.Limit(limit).Offset(offset).Find(&posts)
+	dbResponse := p.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+		}).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts)
 	if dbResponse.Error != nil {
 		return nil, 0, dbResponse.Error
 	}
@@ -120,19 +179,26 @@ func (p *PostDB) GetAllPosts(limit int, offset int) ([]models.Post, int, error) 
 }
 
 // UpdatePost updates an existing post
-func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest) (*models.Post, error) {
+func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid.UUID) (*models.Post, error) {
 	var updatedPost models.Post
 	dbResponse := p.db.Model(&models.Post{}).
 		Clauses(clause.Returning{}).
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+		}).
 		Where("id = ?", id).
 		Updates(updates).
 		Scan(&updatedPost)
-	if dbResponse.Error != nil {
-		_, err := utils.HandleDBError(&models.Post{}, dbResponse.Error)
-		return nil, err
-	}
 	if dbResponse.RowsAffected == 0 {
 		return nil, huma.Error404NotFound("Resource not found")
 	}
-	return &updatedPost, nil
+	return utils.HandleDBError(&updatedPost, dbResponse.Error)
 }

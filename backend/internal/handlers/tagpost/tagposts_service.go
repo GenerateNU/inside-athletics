@@ -10,46 +10,6 @@ type TagPostService struct {
 	tagpostDB *TagPostDB
 }
 
-// Returns an array of tag ids that are tagged on a unique post, determined by the post id.
-func (u *TagPostService) GetTagsByPost(ctx context.Context, input *GetTagsByPostParam) (*utils.ResponseBody[GetTagsByPostResponse], error) {
-	postID := input.PostID
-	tags, err := u.tagpostDB.GetTagsByPost(postID)
-	respBody := &utils.ResponseBody[GetTagsByPostResponse]{}
-
-	if err != nil {
-		return respBody, err
-	}
-
-	response := &GetTagsByPostResponse{
-		PostID: postID,
-		TagIDs: *tags,
-	}
-
-	return &utils.ResponseBody[GetTagsByPostResponse]{
-		Body: response,
-	}, err
-}
-
-// Returns an array of post ids that are tagged with a unique tag, determined by the tag id.
-func (u *TagPostService) GetPostsByTag(ctx context.Context, input *GetPostsByTagParam) (*utils.ResponseBody[GetPostsbyTagResponse], error) {
-	tagID := input.TagID
-	posts, err := u.tagpostDB.GetPostsByTag(tagID)
-	respBody := &utils.ResponseBody[GetPostsbyTagResponse]{}
-
-	if err != nil {
-		return respBody, err
-	}
-
-	response := &GetPostsbyTagResponse{
-		TagID:   tagID,
-		PostIDs: *posts,
-	}
-
-	return &utils.ResponseBody[GetPostsbyTagResponse]{
-		Body: response,
-	}, err
-}
-
 func (u *TagPostService) GetTagPostById(ctx context.Context, input *GetTagPostByIdParam) (*utils.ResponseBody[GetTagPostByIDResponse], error) {
 	id := input.ID
 	tagpost, err := u.tagpostDB.GetTagPostById(id)

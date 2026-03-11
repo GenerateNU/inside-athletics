@@ -2,9 +2,12 @@ package post
 
 import (
 	"context"
+	"fmt"
 	"inside-athletics/internal/handlers/tagpost"
+	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -22,36 +25,51 @@ func NewPostService(db *gorm.DB) *PostService {
 	}
 }
 
-func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(
-		s.postDB.CreatePost(
-			input.Body.AuthorId,
-			input.Body.SportId,
-			input.Body.Title,
-			input.Body.Content,
-			input.Body.IsAnonymous,
-		),
+func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[CreatePostResponse], error) {
+	id, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(input.Body.Tags) == 0 && input.Body.SportId == nil && input.Body.CollegeId == nil {
+		return nil, huma.Error400BadRequest("Need to have at least a single tag on a post")
+	}
+	post := &models.Post{
+		AuthorID:    id,
+		SportID:     input.Body.SportId,
+		CollegeID:   input.Body.CollegeId,
+		Title:       input.Body.Title,
+		Content:     input.Body.Content,
+		IsAnonymous: input.Body.IsAnonymous,
+	}
+
+	createdPost, err := utils.HandleDBError(
+		s.postDB.CreatePost(post, input.Body.Tags),
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post),
+	return &utils.ResponseBody[CreatePostResponse]{
+		Body: ToCreatePostResponse(createdPost, id),
 	}, nil
 }
 
 // GetAllPosts retrieves all posts with pagination
 func (s *PostService) GetAllPosts(ctx context.Context, input *GetAllPostsParams) (*utils.ResponseBody[GetAllPostsResponse], error) {
-	posts, total, err := s.postDB.GetAllPosts(input.Limit, input.Offset)
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	posts, total, err := s.postDB.GetAllPosts(input.Limit, input.Offset, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		postResponses = append(postResponses, *ToPostResponse(&posts[i]))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
 	return &utils.ResponseBody[GetAllPostsResponse]{
@@ -67,55 +85,48 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 	ID   uuid.UUID `path:"id"`
 	Body UpdatePostRequest
 }) (*utils.ResponseBody[PostResponse], error) {
-	updatedPost, err := s.postDB.UpdatePost(input.ID, input.Body)
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	updatedPost, err := s.postDB.UpdatePost(input.ID, input.Body, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(updatedPost),
+		Body: ToPostResponse(updatedPost, userID),
 	}, nil
 }
 
 func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams) (*utils.ResponseBody[PostResponse], error) {
-	post, err := utils.HandleDBError(s.postDB.GetPostByID((input.ID)))
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	post, err := s.postDB.GetPostByID((input.ID), userID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &utils.ResponseBody[PostResponse]{
-		Body: ToPostResponse(post),
+		Body: ToPostResponse(post, userID),
 	}, nil
 }
 
-// GetTagsByPost retrieves tag IDs for a post
-func (s *PostService) GetTagsByPost(ctx context.Context, input *GetTagsByPostParams) (*utils.ResponseBody[GetTagsByPostResponse], error) {
-	tags, err := s.tagPostDB.GetTagsByPost(input.PostID)
-	respBody := &utils.ResponseBody[GetTagsByPostResponse]{}
-
-	if err != nil {
-		return respBody, err
-	}
-
-	response := &GetTagsByPostResponse{
-		PostID: input.PostID,
-		TagIDs: *tags,
-	}
-
-	return &utils.ResponseBody[GetTagsByPostResponse]{
-		Body: response,
-	}, err
-}
-
 func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySportIDParams) (*utils.ResponseBody[GetPostsBySportIDResponse], error) {
-	posts, total, err := s.postDB.GetPostsBySportID(input.Limit, input.Offset, input.SportId)
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	posts, total, err := s.postDB.GetPostsBySportID(input.Limit, input.Offset, input.SportId, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		postResponses = append(postResponses, *ToPostResponse(&posts[i]))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
 	return &utils.ResponseBody[GetPostsBySportIDResponse]{
@@ -127,14 +138,18 @@ func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySpo
 }
 
 func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostsByAuthorIDParams) (*utils.ResponseBody[GetPostsByAuthorIDResponse], error) {
-	posts, total, err := s.postDB.GetPostsByAuthorID(input.Limit, input.Offset, input.AuthorID)
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	posts, total, err := s.postDB.GetPostsByAuthorID(input.Limit, input.Offset, input.AuthorID, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		postResponses = append(postResponses, *ToPostResponse(&posts[i]))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
 	return &utils.ResponseBody[GetPostsByAuthorIDResponse]{
@@ -148,9 +163,21 @@ func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostsByAu
 // DeletePost soft deletes a post by ID
 func (s *PostService) DeletePost(ctx context.Context, input *struct {
 	ID uuid.UUID `path:"id"`
-}) (*struct{}, error) {
-	if err := s.postDB.DeletePost(input.ID); err != nil {
-		return nil, err
+}) (*utils.ResponseBody[DeletePostResponse], error) {
+	id := input.ID
+	err := s.postDB.DeletePost(id)
+
+	respBody := &utils.ResponseBody[DeletePostResponse]{}
+	if err != nil {
+		return respBody, err
 	}
-	return &struct{}{}, nil
+
+	response := &DeletePostResponse{
+		Message: fmt.Sprintf("Post %s deleted successfully", id.String()),
+		ID:      id,
+	}
+
+	return &utils.ResponseBody[DeletePostResponse]{
+		Body: response,
+	}, err
 }

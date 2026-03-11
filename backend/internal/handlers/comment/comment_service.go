@@ -12,23 +12,15 @@ type CommentService struct {
 	commentDB *CommentDB
 }
 
-// Checks if the caller can see user_id on anonymous comments.
-// Lowkenuinely not sure how we should do this, ask TLs in PR
-// In prod, when real auth/roles exist, should derive from role/permission instead of context.
-func (s *CommentService) forSuperUser(ctx context.Context) bool {
-	raw := ctx.Value("for_super_user")
-	if raw == nil {
-		return false
-	}
-	b, ok := raw.(bool)
-	return ok && b
-}
-
 // Creates a new comment.
-func (s *CommentService) CreateComment(ctx context.Context, input *CreateCommentInput) (*utils.ResponseBody[CommentResponse], error) {
+func (s *CommentService) CreateComment(ctx context.Context, input *CreateCommentInput) (*utils.ResponseBody[CreateCommentResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Enforce one layer of replies: parent must be top-level (parent_comment_id IS NULL)
 	if input.Body.ParentCommentID != nil {
-		parent, err := s.commentDB.GetCommentByID(*input.Body.ParentCommentID)
+		parent, err := s.commentDB.GetCommentByID(*input.Body.ParentCommentID, userID)
 		if err != nil {
 			return nil, err
 		}
@@ -39,7 +31,7 @@ func (s *CommentService) CreateComment(ctx context.Context, input *CreateComment
 
 	// Create the comment model
 	comment := &models.Comment{
-		UserID:          input.Body.UserID,
+		UserID:          userID,
 		IsAnonymous:     input.Body.IsAnonymous,
 		ParentCommentID: input.Body.ParentCommentID,
 		PostID:          input.Body.PostID,
@@ -53,29 +45,37 @@ func (s *CommentService) CreateComment(ctx context.Context, input *CreateComment
 	}
 
 	// Convert the comment to a response
-	return &utils.ResponseBody[CommentResponse]{
-		Body: ToCommentResponse(created, s.forSuperUser(ctx)),
+	return &utils.ResponseBody[CreateCommentResponse]{
+		Body: ToCreateCommentResponse(created, userID),
 	}, nil
 }
 
 // Retrieves a single comment by ID.
 func (s *CommentService) GetComment(ctx context.Context, input *GetCommentParams) (*utils.ResponseBody[CommentResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Get the comment from the database
-	comment, err := s.commentDB.GetCommentByID(input.ID)
+	comment, err := s.commentDB.GetCommentByID(input.ID, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert the comment to a response
 	return &utils.ResponseBody[CommentResponse]{
-		Body: ToCommentResponse(comment, s.forSuperUser(ctx)),
+		Body: ToCommentResponse(comment, userID),
 	}, nil
 }
 
 // Retrieves top-level comments for a post.
 func (s *CommentService) GetCommentsByPost(ctx context.Context, input *GetCommentsByPostParams) (*utils.ResponseBody[[]CommentResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Get the comments from the database
-	comments, err := s.commentDB.GetCommentsByPost(input.PostID)
+	comments, err := s.commentDB.GetCommentsByPost(input.PostID, userID)
 	if err != nil {
 		_, humaErr := utils.HandleDBError[[]CommentResponse](nil, err)
 		return nil, humaErr
@@ -84,7 +84,7 @@ func (s *CommentService) GetCommentsByPost(ctx context.Context, input *GetCommen
 	// Convert the comments to responses
 	responses := make([]CommentResponse, len(comments))
 	for i := range comments {
-		responses[i] = *ToCommentResponse(&comments[i], s.forSuperUser(ctx))
+		responses[i] = *ToCommentResponse(&comments[i], userID)
 	}
 
 	return &utils.ResponseBody[[]CommentResponse]{Body: &responses}, nil
@@ -92,8 +92,12 @@ func (s *CommentService) GetCommentsByPost(ctx context.Context, input *GetCommen
 
 // Retrieves replies to a comment.
 func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) (*utils.ResponseBody[[]CommentResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Get the replies from the database
-	comments, err := s.commentDB.GetReplies(input.ID)
+	comments, err := s.commentDB.GetReplies(input.ID, userID)
 	if err != nil {
 		_, humaErr := utils.HandleDBError[[]CommentResponse](nil, err)
 		return nil, humaErr
@@ -102,7 +106,7 @@ func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) 
 	// Convert the replies to responses
 	responses := make([]CommentResponse, len(comments))
 	for i := range comments {
-		responses[i] = *ToCommentResponse(&comments[i], s.forSuperUser(ctx))
+		responses[i] = *ToCommentResponse(&comments[i], userID)
 	}
 
 	return &utils.ResponseBody[[]CommentResponse]{Body: &responses}, nil
@@ -110,22 +114,30 @@ func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) 
 
 // Updates a comment's description by ID.
 func (s *CommentService) UpdateComment(ctx context.Context, input *UpdateCommentInput) (*utils.ResponseBody[CommentResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Update the comment in the database
-	updated, err := s.commentDB.UpdateComment(input.ID, input.Body)
+	updated, err := s.commentDB.UpdateComment(input.ID, input.Body, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert the comment to a response
 	return &utils.ResponseBody[CommentResponse]{
-		Body: ToCommentResponse(updated, s.forSuperUser(ctx)),
+		Body: ToCommentResponse(updated, userID),
 	}, nil
 }
 
 // Soft-deletes a comment by ID.
 func (s *CommentService) DeleteComment(ctx context.Context, input *DeleteCommentRequest) (*utils.ResponseBody[CommentResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
 	// Get the comment from the database
-	comment, err := s.commentDB.GetCommentByID(input.ID)
+	comment, err := s.commentDB.GetCommentByID(input.ID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +150,6 @@ func (s *CommentService) DeleteComment(ctx context.Context, input *DeleteComment
 
 	// Convert the comment to a response
 	return &utils.ResponseBody[CommentResponse]{
-		Body: ToCommentResponse(comment, s.forSuperUser(ctx)),
+		Body: ToCommentResponse(comment, userID),
 	}, nil
 }

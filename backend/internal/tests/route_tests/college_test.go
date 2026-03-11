@@ -25,7 +25,7 @@ func TestGetCollege(t *testing.T) {
 		State:        "Massachusetts",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
@@ -61,7 +61,7 @@ func TestCreateCollege(t *testing.T) {
 		State:        "Massachusetts",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 
 	// converting to json string format
@@ -97,7 +97,7 @@ func TestUpdateCollege(t *testing.T) {
 		State:        "Massachusetts",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
@@ -140,7 +140,7 @@ func TestUpdateCollege(t *testing.T) {
 	if response.City != "Boston" {
 		t.Fatalf("Unexpected city: got %s, expected Boston", response.City)
 	}
-	if response.DivisionRank != 1 {
+	if response.DivisionRank != models.DivisionI {
 		t.Fatalf("Unexpected division rank: got %d, expected 1", response.DivisionRank)
 	}
 }
@@ -161,7 +161,7 @@ func TestDeleteCollege(t *testing.T) {
 		State:        "Massachusetts",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
@@ -198,7 +198,7 @@ func TestCreateCollegeMissingName(t *testing.T) {
 		State:        "Massachusetts",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -229,7 +229,7 @@ func TestCreateCollegeMissingState(t *testing.T) {
 		Name:         "Northeastern University",
 		City:         "Boston",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -260,7 +260,7 @@ func TestCreateCollegeMissingCity(t *testing.T) {
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
 		Website:      "https://www.northeastern.edu",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -322,7 +322,7 @@ func TestCreateCollegeMissingWebsite(t *testing.T) {
 		Name:         "Northeastern University",
 		State:        "Massachusetts",
 		City:         "Boston",
-		DivisionRank: 1,
+		DivisionRank: models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)

@@ -66,6 +66,6 @@ type Permission struct {
 	CreatedAt       time.Time        `json:"created_at"`
 	UpdatedAt       time.Time        `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt   `json:"deleted_at,omitempty" gorm:"index"`
-	Action          PermissionAction `json:"action" gorm:"type:varchar(50);not null"`
-	Resource        string           `json:"resource" gorm:"type:varchar(50);not null"`
+	Action  		PermissionAction `json:"action" gorm:"type:varchar(50);not null;uniqueIndex:permissions_action_resource_key"`
+	Resource 		string           `json:"resource" gorm:"type:varchar(50);not null;uniqueIndex:permissions_action_resource_key"`
 }
