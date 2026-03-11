@@ -291,7 +291,9 @@ func TestCompressBytes_EmptyInput(t *testing.T) {
 	if err != nil {
 		t.Fatalf("output is not valid gzip: %v", err)
 	}
-	defer dec.Close()
+	defer func() {
+		_ = dec.Close()
+	}()
 	got, err := io.ReadAll(dec)
 	if err != nil {
 		t.Fatalf("decompress failed: %v", err)
@@ -370,7 +372,9 @@ func roundTripCompress(t *testing.T, compressed, want []byte) {
 	if err != nil {
 		t.Fatalf("output is not valid gzip: %v", err)
 	}
-	defer dec.Close()
+	defer func() {
+		_ = dec.Close()
+	}()
 	got, err := io.ReadAll(dec)
 	if err != nil {
 		t.Fatalf("decompress failed: %v", err)
