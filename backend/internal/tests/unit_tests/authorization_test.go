@@ -2,7 +2,6 @@ package unitTests
 
 import (
 	"context"
-	"net/http"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -70,24 +69,29 @@ func TestIsOwnerOfPostOrComment(t *testing.T) {
 		t.Fatalf("failed to create comment: %v", err)
 	}
 
-	owned, status, msg := server.IsOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "post")
-	if status != 0 || msg != "" || !owned {
-		t.Fatalf("expected owner for post, got owned=%v status=%d msg=%q", owned, status, msg)
+	owned, err := server.IsOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "post")
+	if err != nil || !owned {
+		t.Fatalf("expected owner for post, got owned=%v err=%v", owned, err)
 	}
 
-	owned, status, msg = server.IsOwnerOfPostOrComment(testDB.DB, otherUserID, post.ID.String(), "post")
-	if status != 0 || msg != "" || owned {
-		t.Fatalf("expected non-owner for post, got owned=%v status=%d msg=%q", owned, status, msg)
+	owned, err = server.IsOwnerOfPostOrComment(testDB.DB, otherUserID, post.ID.String(), "post")
+	if err != nil || owned {
+		t.Fatalf("expected non-owner for post, got owned=%v err=%v", owned, err)
 	}
 
-	owned, status, msg = server.IsOwnerOfPostOrComment(testDB.DB, userID, comment.ID.String(), "comment")
-	if status != 0 || msg != "" || !owned {
-		t.Fatalf("expected owner for comment, got owned=%v status=%d msg=%q", owned, status, msg)
+	owned, err = server.IsOwnerOfPostOrComment(testDB.DB, userID, comment.ID.String(), "comment")
+	if err != nil || !owned {
+		t.Fatalf("expected owner for comment, got owned=%v err=%v", owned, err)
 	}
 
-	owned, status, _ = server.IsOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "sport")
-	if status != http.StatusBadRequest || owned {
-		t.Fatalf("expected bad request for unsupported resource, got owned=%v status=%d", owned, status)
+	owned, err = server.IsOwnerOfPostOrComment(testDB.DB, userID, post.ID.String(), "sport")
+	if err == nil || owned {
+		t.Fatalf("expected error for unsupported resource, got owned=%v err=%v", owned, err)
+	}
+
+	owned, err = server.IsOwnerOfPostOrComment(testDB.DB, userID, "not-a-uuid", "post")
+	if err == nil || owned {
+		t.Fatalf("expected error for invalid resource ID, got owned=%v err=%v", owned, err)
 	}
 }
 

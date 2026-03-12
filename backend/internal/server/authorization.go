@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,6 +12,11 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+)
+
+var (
+	errInvalidResourceID   = errors.New("invalid resource ID")
+	errUnsupportedResource = errors.New("unsupported resource for ownership check")
 )
 
 func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func(huma.Context)) {
@@ -51,9 +58,13 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
 			(resource == "post" || resource == "comment") &&
 			ctx.Param("id") != "" {
-			owned, status, msg := IsOwnerOfPostOrComment(db, parsedUserID, ctx.Param("id"), resource)
-			if status != 0 {
-				_ = huma.WriteErr(api, ctx, status, msg)
+			owned, err := IsOwnerOfPostOrComment(db, parsedUserID, ctx.Param("id"), resource)
+			if err != nil {
+				status := http.StatusInternalServerError
+				if errors.Is(err, errInvalidResourceID) || errors.Is(err, errUnsupportedResource) {
+					status = http.StatusBadRequest
+				}
+				_ = huma.WriteErr(api, ctx, status, err.Error())
 				return
 			}
 			if owned {
@@ -94,10 +105,10 @@ func authorizeByPermission(db *gorm.DB, userID uuid.UUID, action models.Permissi
 	return true, 0, ""
 }
 
-func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, int, string) {
+func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, error) {
 	parsedResourceID, err := uuid.Parse(resourceID)
 	if err != nil {
-		return false, http.StatusBadRequest, "Invalid resource ID"
+		return false, errInvalidResourceID
 	}
 
 	var count int64
@@ -111,13 +122,13 @@ func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource 
 			Where("id = ? AND user_id = ?", parsedResourceID, userID).
 			Count(&count).Error
 	default:
-		return false, http.StatusBadRequest, "Unsupported resource for ownership check"
+		return false, errUnsupportedResource
 	}
 
 	if err != nil {
-		return false, http.StatusInternalServerError, "Unable to check ownership"
+		return false, fmt.Errorf("unable to check ownership: %w", err)
 	}
-	return count > 0, 0, ""
+	return count > 0, nil
 }
 
 func resolveResourceAndAction(method, path, userID, pathID string) (models.PermissionAction, string) {
