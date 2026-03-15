@@ -13,8 +13,8 @@ type CollegeFollow struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 
 	CollegeID uuid.UUID `json:"college_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"CollegeID of the college follow" gorm:"type:uuid;not null"`
-	College   College   `json:"-" gorm:"foreignKey:TagID;references:ID;constraint:OnDelete:CASCADE"`
+	College   College   `json:"-" gorm:"foreignKey:CollegeID;references:ID;constraint:OnDelete:CASCADE"`
 
 	UserID uuid.UUID `json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"UserID of the college follow" gorm:"type:uuid;not null"`
-	User   User
+	User   User       `json:"-" gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
 }

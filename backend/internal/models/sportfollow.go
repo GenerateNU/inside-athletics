@@ -13,8 +13,8 @@ type SportFollow struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 
 	SportID uuid.UUID `json:"sport_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"SportID of the sport follow" gorm:"type:uuid;not null"`
-	Sport   Sport       `json:"-" gorm:"foreignKey:TagID;references:ID;constraint:OnDelete:CASCADE"`
+	Sport   Sport     `json:"-" gorm:"foreignKey:SportID;references:ID;constraint:OnDelete:CASCADE"`
 
 	UserID uuid.UUID `json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"UserID of the sport follow" gorm:"type:uuid;not null"`
-	User   User
+	User   User      `json:"-" gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
 }
