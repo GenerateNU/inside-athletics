@@ -54,9 +54,9 @@ export type UpdateUserBody = {
     last_name?: string;
     /**
      * @description The sport(s) the user is interested in
-     * @type array | undefined
+     * @type string | undefined
     */
-    sport?: string[];
+    sport?: string;
     /**
      * @description The username of a user
      * @type string | undefined

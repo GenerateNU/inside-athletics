@@ -9,7 +9,7 @@ export const createCollegeResponseSchema = z.object({
     "$schema": z.optional(z.url().describe("A URL to the JSON Schema for this object.")),
 "academic_rank": z.nullable(z.int().describe("Academic rank of the college")),
 "city": z.string().describe("City of the college"),
-"division_rank": z.int().min(1).max(3).describe("NCAA division (1, 2, or 3)"),
+"division_rank": z.union([z.literal(1), z.literal(2), z.literal(3)]).describe("NCAA division (1, 2, or 3)"),
 "id": z.string().describe("ID of the college"),
 "logo": z.nullable(z.string().describe("Logo of the college")),
 "name": z.string().describe("Name of the college"),

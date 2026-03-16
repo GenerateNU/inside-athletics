@@ -9,7 +9,7 @@ export const updateCollegeRequestSchema = z.object({
     "$schema": z.optional(z.url().describe("A URL to the JSON Schema for this object.")),
 "academic_rank": z.nullable(z.int().describe("Academic rank of the college")),
 "city": z.nullable(z.string().max(100).describe("City of the college")),
-"division_rank": z.nullable(z.int().min(1).max(3).describe("NCAA division (1, 2, or 3)")),
+"division_rank": z.nullable(z.enum(["1", "2", "3"]).describe("NCAA division (1, 2, or 3)")),
 "logo": z.nullable(z.string().max(500).describe("Logo of the college")),
 "name": z.nullable(z.string().max(200).describe("Name of the college")),
 "state": z.nullable(z.string().max(100).describe("State of the college")),

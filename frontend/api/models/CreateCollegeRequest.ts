@@ -4,6 +4,14 @@
 */
 
 
+export const createCollegeRequestDivisionRankEnum = {
+    "1": 1,
+    "2": 2,
+    "3": 3
+} as const;
+
+export type CreateCollegeRequestDivisionRankEnumKey = (typeof createCollegeRequestDivisionRankEnum)[keyof typeof createCollegeRequestDivisionRankEnum];
+
 export type CreateCollegeRequest = {
     /**
      * @description A URL to the JSON Schema for this object.
@@ -24,11 +32,9 @@ export type CreateCollegeRequest = {
     city: string;
     /**
      * @description NCAA division (1, 2, or 3)
-     * @minLength 1
-     * @maxLength 3
-     * @type integer, int32
+     * @type integer, int64
     */
-    division_rank: number;
+    division_rank: CreateCollegeRequestDivisionRankEnumKey;
     /**
      * @description Logo of the college
      * @maxLength 500

@@ -4,13 +4,13 @@
 */
 
 import { errorModelSchema } from "./errorModelSchema.ts";
-import { getCurrentUserIDResponseSchema } from "./getCurrentUserIDResponseSchema.ts";
+import { getUserResponseSchema } from "./getUserResponseSchema.ts";
 import { z } from "zod/v4";
 
 /**
  * @description OK
  */
-export const getApiV1UserCurrent200Schema = z.lazy(() => getCurrentUserIDResponseSchema)
+export const getApiV1UserCurrent200Schema = z.lazy(() => getUserResponseSchema)
 
 /**
  * @description Error

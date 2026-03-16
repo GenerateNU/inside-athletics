@@ -9,7 +9,7 @@ export const createCollegeRequestSchema = z.object({
     "$schema": z.optional(z.url().describe("A URL to the JSON Schema for this object.")),
 "academic_rank": z.nullable(z.int().describe("Academic rank of the college")),
 "city": z.string().min(1).max(100).describe("City of the college"),
-"division_rank": z.int().min(1).max(3).describe("NCAA division (1, 2, or 3)"),
+"division_rank": z.union([z.literal(1), z.literal(2), z.literal(3)]).describe("NCAA division (1, 2, or 3)"),
 "logo": z.nullable(z.string().max(500).describe("Logo of the college")),
 "name": z.string().min(1).max(200).describe("Name of the college"),
 "state": z.string().min(1).max(100).describe("State of the college"),

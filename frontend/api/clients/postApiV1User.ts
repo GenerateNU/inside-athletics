@@ -8,13 +8,13 @@ import type { PostApiV1UserMutationRequest, PostApiV1UserMutationResponse } from
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getPostApiV1UserUrl() {
-  const res = { method: 'POST', url: `/api/v1/user/` as const }
+  const res = { method: 'POST', url: `/api/v1/user` as const }
   return res
 }
 
 /**
  * @summary Post API v1 user
- * {@link /api/v1/user/}
+ * {@link /api/v1/user}
  */
 export async function postApiV1User(data: PostApiV1UserMutationRequest, config: Partial<RequestConfig<PostApiV1UserMutationRequest>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config

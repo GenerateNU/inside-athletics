@@ -3,10 +3,14 @@
 * Do not edit manually.
 */
 
+import { userRoleResponseSchema } from "./userRoleResponseSchema.ts";
 import { z } from "zod/v4";
 
 export const createUserResponseSchema = z.object({
     "$schema": z.optional(z.url().describe("A URL to the JSON Schema for this object.")),
 "id": z.string().describe("ID of the user"),
-"name": z.string().describe("Name of the user")
+"name": z.string().describe("Name of the user"),
+get "role"(){
+                return userRoleResponseSchema.describe("Default role assigned to the user").optional()
+              }
     })

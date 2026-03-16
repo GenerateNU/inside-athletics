@@ -10,7 +10,7 @@ import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tansta
 import { postApiV1User } from "../clients/postApiV1User.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
 
-export const postApiV1UserMutationKey = () => [{ url: '/api/v1/user/' }] as const
+export const postApiV1UserMutationKey = () => [{ url: '/api/v1/user' }] as const
 
 export type PostApiV1UserMutationKey = ReturnType<typeof postApiV1UserMutationKey>
 
@@ -28,7 +28,7 @@ export function postApiV1UserMutationOptions<TContext = unknown>(config: Partial
 
 /**
  * @summary Post API v1 user
- * {@link /api/v1/user/}
+ * {@link /api/v1/user}
  */
 export function usePostApiV1User<TContext>(options: 
 {

@@ -15,7 +15,7 @@ export const createUserBodySchema = z.object({
 "expected_grad_year": z.optional(z.int().min(0).describe("The user's grad year")),
 "first_name": z.string().describe("The first name of a user"),
 "last_name": z.string().describe("The last name of a user"),
-"sport": z.array(z.string()).describe("The sport(s) the user is interested in").nullish(),
+"sport": z.optional(z.string().describe("The sport(s) the user is interested in")),
 "username": z.string().describe("The username of a user"),
 "verified_athlete_status": z.string().describe("Verification status for the athlete")
     })

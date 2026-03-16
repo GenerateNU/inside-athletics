@@ -6,7 +6,8 @@
     "dev": "doppler run --command=\"next dev\"",
     "build": "doppler run --command=\"next build\"",
     "start": "doppler run --command=\"next start\"",
-    "lint": "eslint"
+    "lint": "eslint",
+    "kubb": "bunx kubb generate"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

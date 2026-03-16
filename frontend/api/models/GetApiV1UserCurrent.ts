@@ -4,12 +4,12 @@
 */
 
 import type { ErrorModel } from "./ErrorModel.ts";
-import type { GetCurrentUserIDResponse } from "./GetCurrentUserIDResponse.ts";
+import type { GetUserResponse } from "./GetUserResponse.ts";
 
 /**
  * @description OK
 */
-export type GetApiV1UserCurrent200 = GetCurrentUserIDResponse;
+export type GetApiV1UserCurrent200 = GetUserResponse;
 
 /**
  * @description Error

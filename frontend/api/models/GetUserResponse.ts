@@ -3,6 +3,9 @@
 * Do not edit manually.
 */
 
+import type { College } from "./College.ts";
+import type { RoleResponse } from "./RoleResponse.ts";
+import type { Sport } from "./Sport.ts";
 
 export type GetUserResponse = {
     /**
@@ -22,9 +25,9 @@ export type GetUserResponse = {
     bio?: string;
     /**
      * @description The college of a user
-     * @type string | undefined
+     * @type object | undefined
     */
-    college?: string;
+    college?: College;
     /**
      * @description The division of their college
      * @minLength 0
@@ -58,10 +61,15 @@ export type GetUserResponse = {
     */
     last_name: string;
     /**
-     * @description The sport(s) the user is interested in
-     * @type string | undefined
+     * @description Roles assigned to the user
+     * @type array | undefined
     */
-    sport?: string;
+    roles?: RoleResponse[];
+    /**
+     * @description The sport(s) the user is interested in
+     * @type object | undefined
+    */
+    sport?: Sport;
     /**
      * @description The username of a user
      * @type string

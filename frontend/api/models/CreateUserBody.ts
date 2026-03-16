@@ -54,9 +54,9 @@ export type CreateUserBody = {
     last_name: string;
     /**
      * @description The sport(s) the user is interested in
-     * @type array,null
+     * @type string | undefined
     */
-    sport?: string[] | null;
+    sport?: string;
     /**
      * @description The username of a user
      * @type string

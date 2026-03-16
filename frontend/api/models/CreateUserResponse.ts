@@ -3,6 +3,7 @@
 * Do not edit manually.
 */
 
+import type { UserRoleResponse } from "./UserRoleResponse.ts";
 
 export type CreateUserResponse = {
     /**
@@ -20,4 +21,9 @@ export type CreateUserResponse = {
      * @type string
     */
     name: string;
+    /**
+     * @description Default role assigned to the user
+     * @type object | undefined
+    */
+    role?: UserRoleResponse;
 };

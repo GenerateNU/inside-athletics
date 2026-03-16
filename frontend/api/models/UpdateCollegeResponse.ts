@@ -4,6 +4,14 @@
 */
 
 
+export const updateCollegeResponseDivisionRankEnum = {
+    "1": 1,
+    "2": 2,
+    "3": 3
+} as const;
+
+export type UpdateCollegeResponseDivisionRankEnumKey = (typeof updateCollegeResponseDivisionRankEnum)[keyof typeof updateCollegeResponseDivisionRankEnum];
+
 export type UpdateCollegeResponse = {
     /**
      * @description A URL to the JSON Schema for this object.
@@ -22,11 +30,9 @@ export type UpdateCollegeResponse = {
     city: string;
     /**
      * @description NCAA division (1, 2, or 3)
-     * @minLength 1
-     * @maxLength 3
-     * @type integer, int32
+     * @type integer, int64
     */
-    division_rank: number;
+    division_rank: UpdateCollegeResponseDivisionRankEnumKey;
     /**
      * @description ID of the college
      * @type string
