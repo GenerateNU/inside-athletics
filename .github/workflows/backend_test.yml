@@ -10,18 +10,18 @@ on:
 jobs:
     test:
         runs-on: ubuntu-latest
-
         steps:
-            - name: Setup AtlasCLI
-              uses: ariga/setup-atlas@v0
-
             - name: Checkout code
               uses: actions/checkout@v4
-
+            - name: Setup AtlasCLI
+              uses: ariga/setup-atlas@v0
             - name: Set up Go
               uses: actions/setup-go@v5
               with:
                 go-version-file: 'backend/go.mod'
-
-            - name: Run tests
-              run: make run-all-tests
+            - name: Install Doppler CLI
+              run: (curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sudo sh
+            - name: Run route tests
+              run: make run-route-tests
+              env:
+                DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}

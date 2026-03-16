@@ -84,27 +84,15 @@ func (s *SportService) UpdateSport(ctx context.Context, input *struct {
 	ID   uuid.UUID `path:"id"`
 	Body UpdateSportRequest
 }) (*utils.ResponseBody[SportResponse], error) {
-	sport, err := utils.HandleDBError(s.sportDB.GetSportByID(input.ID))
-	if err != nil {
-		return nil, err
+	// Validate business rules for partial updates
+	if input.Body.Name != nil && *input.Body.Name == "" {
+		return nil, huma.Error422UnprocessableEntity("name cannot be empty")
+	}
+	if input.Body.Popularity != nil && *input.Body.Popularity < 0 {
+		return nil, huma.Error422UnprocessableEntity("popularity cannot be negative")
 	}
 
-	// Apply partial updates
-	if input.Body.Name != nil {
-		if *input.Body.Name == "" {
-			return nil, huma.Error422UnprocessableEntity("name cannot be empty")
-		}
-		sport.Name = *input.Body.Name
-	}
-
-	if input.Body.Popularity != nil {
-		if *input.Body.Popularity < 0 {
-			return nil, huma.Error422UnprocessableEntity("popularity cannot be negative")
-		}
-		sport.Popularity = input.Body.Popularity
-	}
-
-	updatedSport, err := utils.HandleDBError(s.sportDB.UpdateSport(sport))
+	updatedSport, err := utils.HandleDBError(s.sportDB.UpdateSport(input.ID, input.Body))
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +14,13 @@ returned by GORM
 */
 func handleGORMErrors(err error) error {
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				return huma.Error409Conflict("Resource already exists", err)
+			}
+		}
 		switch {
 		case errors.Is(err, gorm.ErrRecordNotFound):
 			return huma.Error404NotFound("Resource not found")
@@ -46,4 +54,11 @@ func HandleDBError[T any](entity *T, err error) (*T, error) {
 		return nil, handleGORMErrors(err)
 	}
 	return entity, nil
+}
+
+func HandleTwoOutputDBError[T any, U any](entity *T, entity2 *U, err error) (*T, *U, error) {
+	if err != nil {
+		return nil, nil, handleGORMErrors(err)
+	}
+	return entity, entity2, nil
 }

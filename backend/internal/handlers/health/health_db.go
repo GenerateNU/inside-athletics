@@ -11,6 +11,7 @@ type HealthDB struct {
 
 func (h *HealthDB) Ping() error {
 	sqlDB, err := h.db.DB()
+	
 	if err != nil {
 		return err
 	}

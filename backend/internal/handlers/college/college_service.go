@@ -94,7 +94,7 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	if err != nil {
 		return respBody, err
 	}
-
+	
 	response := &UpdateCollegeResponse{
 		ID:           college.ID,
 		Name:         college.Name,

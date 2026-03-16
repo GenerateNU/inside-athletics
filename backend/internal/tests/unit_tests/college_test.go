@@ -39,6 +39,7 @@ func TestStringPtrOrNil(t *testing.T) {
 			} else {
 				if result == nil {
 					t.Fatalf("expected pointer to %s, got nil", tt.input)
+					return
 				}
 				if *result != tt.input {
 					t.Fatalf("expected %s, got %s", tt.input, *result)

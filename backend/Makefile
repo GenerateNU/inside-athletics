@@ -29,6 +29,15 @@ migrate-prod:
 start-dev:
 	doppler run --command="cd cmd && APP_ENV=development go run ."
 
+start-dev-windows:
+	doppler run --command="cd cmd && set APP_ENV=development && go run ."
+
+start-supabase:
+	npx supabase start
+
+stop-supabase:
+	npx supabase stop
+
 # starts server utilizing prod supabase db
 .PHONY: start-prod
 start-prod:
@@ -38,6 +47,7 @@ start-prod:
 .PHONY: lint
 lint:
 	doppler run --command="golangci-lint run --timeout=5m"
+
 
 # reverts single migration for prod
 .PHONY: revert-prod
@@ -55,12 +65,12 @@ V_FLAG := $(if $(filter true,$(VERBOSE)),-v,)
 .PHONY: run-all-tests
 # Runs all tests, if passed verbose, log test details
 run-all-tests:
-	go test $(V_FLAG) ./internal/tests/route_tests ./internal/tests/unit_tests
+	doppler run --command="go test $(V_FLAG)  ./internal/tests/route_tests ./internal/tests/unit_tests"
 
 .PHONY: run-route-tests
 # Runs all the route tests, if passed verbose, log test details
 run-route-tests:
-	go test $(V_FLAG) ./internal/tests/route_tests
+	doppler run --command="go test $(V_FLAG) ./internal/tests/route_tests"
 
 .PHONY: run-unit-tests
 # Runs all the unit tests, if passed verbose, log test details
@@ -89,6 +99,27 @@ docker-run:
 		-e PROD_DB_CONNECTION_STRING \
 		--name inside-athletics-container \
 		inside-athletics-backend
+
+.PHONY: generate-colleges-data
+# Generates colleges.json from NCAA College Division Database (requires kagglehub)
+generate-colleges-data:
+	python3 -m pip install -r ./scripts/requirements.txt && \
+	cd scripts/seed && mkdir -p data && touch data/colleges.json && python3 seed_colleges.py --division 1
+
+.PHONY: generate-sports-data
+# Generates sports.json from NCAA sports data (requires kagglehub)
+generate-sports-data:
+	python3 -m pip install -r ./scripts/requirements.txt && \
+	cd scripts/seed && mkdir -p data && touch data/sports.json && python3 seed_sports.py
+
+.PHONY: generate-seed-data
+# Generates both colleges.json and sports.json
+generate-seed-data: generate-colleges-data generate-sports-data
+
+.PHONY: seed
+# Generates seed data and seeds the database with college and sports data
+seed: generate-seed-data
+	doppler run --command="go run scripts/seed/seed.go"
 
 
 # generate openapi.yaml file from server that is generated from huma. Server must

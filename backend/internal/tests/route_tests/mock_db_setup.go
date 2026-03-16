@@ -3,10 +3,16 @@ package routeTests
 import (
 	"context"
 	"encoding/json"
+	"inside-athletics/internal/models"
+
 	"fmt"
+	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/server"
+	"inside-athletics/internal/s3"
+	unitTests "inside-athletics/internal/tests/unit_tests"
 	"log"
 	"net/http/httptest"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -14,6 +20,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2/humatest"
+	"github.com/stripe/stripe-go/v81"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -31,6 +38,8 @@ type TestDatabase struct {
 // SetupTestDB creates a new PostgreSQL container and returns a connection
 func SetupTestDB(t *testing.T) *TestDatabase {
 	ctx := context.Background()
+
+	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
 
 	// Create PostgreSQL container
 	postgresContainer, err := postgres.Run(ctx,
@@ -58,7 +67,6 @@ func SetupTestDB(t *testing.T) *TestDatabase {
 
 	// Verify connection
 	sqlDb, err := db.DB()
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,6 +83,7 @@ func SetupTestDB(t *testing.T) *TestDatabase {
 
 	// Run migrations to sync schemas with temporary DB
 	testDB.RunMigrations(t)
+	testDB.SeedDefaultRoles(t)
 
 	return testDB
 }
@@ -85,14 +94,11 @@ func (td *TestDatabase) Teardown(t *testing.T) {
 
 	if td.DB != nil {
 		sqlDb, err := td.DB.DB()
-
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		err = sqlDb.Close()
-
-		if err != nil {
+		if err := sqlDb.Close(); err != nil {
 			t.Fatalf("Unable to close DB connection %s", err.Error())
 		}
 	}
@@ -115,14 +121,17 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 	_, filename, _, _ := runtime.Caller(0)
 	// Go up from current file to project root
-	backendDir := filepath.Join(filepath.Dir(filename), "..", "..")
-	migrationDir := filepath.Join(backendDir, "migrations")
+	backendDir := filepath.Join(filepath.Dir(filename), "..", "..", "..")
+	migrationDir := filepath.Join("internal", "migrations")
 
 	// Run Atlas migrations using exec
 	cmd := exec.Command("atlas", "migrate", "apply",
 		"--dir", fmt.Sprintf("file://%s", migrationDir),
+		//"--dir", "file://"+filepath.ToSlash(migrationDir),
 		"--url", connStr,
 	)
+
+	cmd.Dir = backendDir
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -130,35 +139,64 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 	}
 }
 
-// GENERIC HELPER FUNCS
+func (td *TestDatabase) SeedDefaultRoles(t *testing.T) {
+	t.Helper()
 
-/*
-Decode the given response JSON into the given struct entity. Reads the value into the struct
-*/
-func DecodeTo[T any](entity *T, resp *httptest.ResponseRecorder) {
-	dec := json.NewDecoder(resp.Body)
+	roleNames := []models.RoleName{
+		models.RoleUser,
+		models.RoleAdmin,
+		models.RoleModerator,
+		models.RoleName("coach"),
+	}
 
-	err := dec.Decode(entity)
-	if err != nil {
-		log.Fatalf("decode error: %v", err)
+	for _, name := range roleNames {
+		role := models.Role{Name: name}
+		if err := td.DB.Where("name = ?", name).FirstOrCreate(&role).Error; err != nil {
+			t.Fatalf("failed to seed role %s: %v", name, err)
+		}
 	}
 }
 
-/*
-Create API routing with test DB connection based on given dbUrl
-*/
+// GENERIC HELPER FUNCS
+
+// Decode the given response JSON into the given struct entity.
+func DecodeTo[T any](entity *T, resp *httptest.ResponseRecorder) {
+	var body = resp.Body.String()
+	dec := json.NewDecoder(resp.Body)
+	if err := dec.Decode(entity); err != nil {
+		log.Fatalf("decode error: %v. \nResp.Body is: %s", err, body)
+	}
+}
+
+// Create API routing with test DB connection based on given dbUrl
 func SetupTestAPI(t *testing.T, dbUrl string) (humatest.TestAPI, *gorm.DB) {
 	_, api := humatest.New(t) // setup test API
 
 	api.UseMiddleware(MockAuthMiddleware(api))
 
 	db, err := gorm.Open(gormPostgres.Open(dbUrl), &gorm.Config{})
-
 	if err != nil {
 		t.Errorf("Unable to connect to DB: %v", err)
 	}
 
 	server.CreateRoutes(db, api)
+	registerContentRoutesWithMock(api, db)
 
 	return api, db
+}
+
+// Returns an API with only content routes and mock S3.
+func RegisterContentTestAPI(t *testing.T) humatest.TestAPI {
+	_, api := humatest.New(t)
+	api.UseMiddleware(MockAuthMiddleware(api))
+	registerContentRoutesWithMock(api, nil)
+	return api
+}
+
+func registerContentRoutesWithMock(api humatest.TestAPI, db *gorm.DB) {
+	mockS3 := unitTests.NewMockS3Client()
+	mockS3.HeadObjectResponse.Size = 1024
+	mockS3.HeadObjectResponse.Metadata = map[string]string{"filename": "photo.jpg"}
+	s3Svc := s3.NewService(mockS3, s3.Config{Bucket: "test", Region: "us-east-1", PresignedURLExpiry: time.Hour})
+	content.Route(api, db, s3Svc)
 }

@@ -1,11 +1,23 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"inside-athletics/internal/handlers/college"
+	"inside-athletics/internal/handlers/comment"
+	"inside-athletics/internal/handlers/content"
+	"inside-athletics/internal/handlers/comment_like"
 	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/permission"
+	"inside-athletics/internal/handlers/post"
+	"inside-athletics/internal/handlers/post_like"
+	"inside-athletics/internal/handlers/role"
 	"inside-athletics/internal/handlers/sport"
+	"inside-athletics/internal/handlers/stripe"
+	"inside-athletics/internal/handlers/tag"
+	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/handlers/user"
+	"inside-athletics/internal/s3"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -30,6 +42,7 @@ type App struct {
 
 type RouteFN func(api huma.API, db *gorm.DB)
 
+// CreateApp initializes the Fiber app and returns the assembled App (server + Huma API).
 func CreateApp(db *gorm.DB) *App {
 
 	router := setupApp()
@@ -55,15 +68,23 @@ func CreateApp(db *gorm.DB) *App {
 	}
 }
 
+// CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
-	routeGroups := [...]RouteFN{health.Route, user.Route, sport.Route, college.Route}
+	api.UseMiddleware(PermissionHumaMiddleware(api, db))
+	routeGroups := [...]RouteFN{health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, tag.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
+	// S3 content routes when backend/.env has S3_BUCKET and AWS_REGION.
+	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
+		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
+			content.Route(api, db, s3.NewService(client, s3Cfg))
+		}
+	}
 }
 
-// Initialize Fiber app with middlewares / configs
+// setupApp initializes the Fiber app with middleware and returns the configured instance.
 func setupApp() *fiber.App {
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
