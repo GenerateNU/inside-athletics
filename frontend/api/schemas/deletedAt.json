@@ -1,1 +1,10 @@
-{"additionalProperties":false,"properties":{"Time":{"format":"date-time","type":"string"},"Valid":{"type":"boolean"}},"required":["Time","Valid"],"type":"object","x-readme-ref-name":"DeletedAt"}
+{
+  "additionalProperties": false,
+  "properties": {
+    "Time": { "format": "date-time", "type": "string" },
+    "Valid": { "type": "boolean" }
+  },
+  "required": ["Time", "Valid"],
+  "type": "object",
+  "x-readme-ref-name": "DeletedAt"
+}

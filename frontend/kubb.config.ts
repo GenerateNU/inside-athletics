@@ -1,40 +1,40 @@
-import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
-import { pluginTs } from '@kubb/plugin-ts'
-import { pluginClient } from '@kubb/plugin-client'
-import { pluginReactQuery } from '@kubb/plugin-react-query'
-import { pluginZod } from '@kubb/plugin-zod'
+import { defineConfig } from "@kubb/core";
+import { pluginOas } from "@kubb/plugin-oas";
+import { pluginTs } from "@kubb/plugin-ts";
+import { pluginClient } from "@kubb/plugin-client";
+import { pluginReactQuery } from "@kubb/plugin-react-query";
+import { pluginZod } from "@kubb/plugin-zod";
 
 export default defineConfig({
-  root: '.',
+  root: ".",
   input: {
-    path: '../openapi.yaml',
+    path: "../openapi.yaml",
   },
   output: {
-    path: './api',
+    path: "./api",
     clean: true,
   },
   plugins: [
     pluginOas(),
     pluginTs({
       output: {
-        path: './models',
+        path: "./models",
       },
     }),
     pluginClient({
       output: {
-        path: './clients',
+        path: "./clients",
       },
     }),
     pluginReactQuery({
       output: {
-        path: './hooks',
+        path: "./hooks",
       },
     }),
     pluginZod({
       output: {
-        path: './zod',
+        path: "./zod",
       },
     }),
   ],
-})
+});

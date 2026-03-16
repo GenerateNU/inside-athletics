@@ -1,1 +1,65 @@
-{"additionalProperties":false,"properties":{"$schema":{"description":"A URL to the JSON Schema for this object.","examples":["https://example.com/schemas/UpdateStripeCustomerBody.json"],"format":"uri","readOnly":true,"type":"string"},"balance":{"description":"Current balance in cents (can be negative)","format":"int64","type":"integer"},"coupon":{"description":"Coupon ID to apply discount","type":"string"},"default_source":{"description":"ID of default payment source","type":"string"},"description":{"description":"Description of customer","type":"string"},"email":{"description":"Customer email","examples":["newemail@example.com"],"type":"string"},"metadata":{"additionalProperties":{"type":"string"},"description":"Set of key-value pairs for metadata","type":"object"},"name":{"description":"Customer name","examples":["Jane Doe"],"type":"string"},"phone":{"description":"Customer phone number","examples":["+15555551234"],"type":"string"},"preferred_locales":{"description":"Customer's preferred languages","items":{"type":"string"},"type":["array","null"]},"promotion_code":{"description":"Promotion code to apply","type":"string"},"tax_exempt":{"description":"Tax exemption status: none, exempt, or reverse","examples":["none"],"type":"string"}},"type":"object","x-readme-ref-name":"UpdateStripeCustomerBody"}
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/UpdateStripeCustomerBody.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "balance": {
+      "description": "Current balance in cents (can be negative)",
+      "format": "int64",
+      "type": "integer"
+    },
+    "coupon": {
+      "description": "Coupon ID to apply discount",
+      "type": "string"
+    },
+    "default_source": {
+      "description": "ID of default payment source",
+      "type": "string"
+    },
+    "description": {
+      "description": "Description of customer",
+      "type": "string"
+    },
+    "email": {
+      "description": "Customer email",
+      "examples": ["newemail@example.com"],
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": { "type": "string" },
+      "description": "Set of key-value pairs for metadata",
+      "type": "object"
+    },
+    "name": {
+      "description": "Customer name",
+      "examples": ["Jane Doe"],
+      "type": "string"
+    },
+    "phone": {
+      "description": "Customer phone number",
+      "examples": ["+15555551234"],
+      "type": "string"
+    },
+    "preferred_locales": {
+      "description": "Customer's preferred languages",
+      "items": { "type": "string" },
+      "type": ["array", "null"]
+    },
+    "promotion_code": {
+      "description": "Promotion code to apply",
+      "type": "string"
+    },
+    "tax_exempt": {
+      "description": "Tax exemption status: none, exempt, or reverse",
+      "examples": ["none"],
+      "type": "string"
+    }
+  },
+  "type": "object",
+  "x-readme-ref-name": "UpdateStripeCustomerBody"
+}

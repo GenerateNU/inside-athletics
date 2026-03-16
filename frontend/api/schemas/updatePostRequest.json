@@ -1,1 +1,17 @@
-{"additionalProperties":false,"properties":{"$schema":{"description":"A URL to the JSON Schema for this object.","examples":["https://example.com/schemas/UpdatePostRequest.json"],"format":"uri","readOnly":true,"type":"string"},"content":{"maxLength":5000,"minLength":1,"type":"string"},"is_anonymous":{"type":"boolean"},"title":{"maxLength":100,"minLength":1,"type":"string"}},"type":"object","x-readme-ref-name":"UpdatePostRequest"}
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/UpdatePostRequest.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "content": { "maxLength": 5000, "minLength": 1, "type": "string" },
+    "is_anonymous": { "type": "boolean" },
+    "title": { "maxLength": 100, "minLength": 1, "type": "string" }
+  },
+  "type": "object",
+  "x-readme-ref-name": "UpdatePostRequest"
+}
