@@ -38,33 +38,6 @@ func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post,
 	return utils.HandleDBError(post, dbError)
 }
 
-// CountViewedPostsByUser returns the number of distinct posts the user has viewed (for free-tier limit).
-func (s *PostDB) CountViewedPostsByUser(userID uuid.UUID) (int64, error) {
-	var count int64
-	err := s.db.Model(&models.ViewedPost{}).Where("user_id = ?", userID).Count(&count).Error
-	return count, err
-}
-
-// HasUserViewedPost returns true if the user has already viewed this post.
-func (s *PostDB) HasUserViewedPost(userID, postID uuid.UUID) (bool, error) {
-	var count int64
-	err := s.db.Model(&models.ViewedPost{}).Where("user_id = ? AND post_id = ?", userID, postID).Count(&count).Error
-	return count > 0, err
-}
-
-// RecordPostView records that the user viewed the post (idempotent: safe to call if already viewed).
-func (s *PostDB) RecordPostView(userID, postID uuid.UUID) error {
-	v := &models.ViewedPost{UserID: userID, PostID: postID}
-	return s.db.Where("user_id = ? AND post_id = ?", userID, postID).FirstOrCreate(v).Error
-}
-
-// CountPostsByAuthor returns how many posts the user has created (for free-tier create limit).
-func (s *PostDB) CountPostsByAuthor(authorID uuid.UUID) (int64, error) {
-	var count int64
-	err := s.db.Model(&models.Post{}).Where("author_id = ?", authorID).Count(&count).Error
-	return count, err
-}
-
 // GetPostByID retrieves a post by its ID
 func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, error) {
 	var post models.Post

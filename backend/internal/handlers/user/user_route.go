@@ -16,7 +16,7 @@ Groups together all of the User routes. Huma is a wrapper here that automaticall
     error status code
 */
 func Route(api huma.API, db *gorm.DB) {
-	var userDB = NewUserDB(db)
+	var userDB = &UserDB{db}
 	var roleDB = role.NewRoleDB(db)                // create object storing all database level functions for user
 	var userService = &UserService{userDB, roleDB} // create object with user functionality
 	{
