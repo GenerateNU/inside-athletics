@@ -4,6 +4,8 @@
 # Generates a new migration if there have been changes
 # made to any of the models
 
+# makes it so command isn't echoed before executing
+.SILENT: 
 .PHONY: gen-migration
 gen-migration:
 	if [ -z "$(MIGRATION_NAME)" ]; then \
@@ -118,6 +120,17 @@ generate-seed-data: generate-colleges-data generate-sports-data
 # Generates seed data and seeds the database with college and sports data
 seed: generate-seed-data
 	doppler run --command="go run scripts/seed/seed.go"
+
+
+# generate openapi.yaml file from server that is generated from huma. Server must
+# be running to work
+fetch-openapi:
+	if curl -s http://localhost:8080/openapi.yaml > /dev/null 2>&1; then \
+		curl http://localhost:8080/openapi.yaml > ../openapi.yaml; \
+		echo "OpenAPI spec fetched successfully"; \
+	else \
+		echo "Server is not running, cannot generate openapi.yaml file"; \
+	fi
 
 
 

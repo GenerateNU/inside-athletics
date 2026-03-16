@@ -1,0 +1,35 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/CreateCommentBody.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "description": {
+      "description": "Content of the comment",
+      "examples": ["This is a helpful thread"],
+      "maxLength": 300,
+      "type": "string"
+    },
+    "is_anonymous": {
+      "description": "If true, user_id is hidden from regular users; super user always sees it",
+      "type": "boolean"
+    },
+    "parent_comment_id": {
+      "description": "CommentID the comment belongs to",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"],
+      "type": "string"
+    },
+    "post_id": {
+      "description": "PostID the comment belongs to",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"],
+      "type": "string"
+    }
+  },
+  "required": ["is_anonymous", "post_id", "description"],
+  "type": "object",
+  "x-readme-ref-name": "CreateCommentBody"
+}

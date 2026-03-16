@@ -1,0 +1,311 @@
+[2/16/2026, 4:47:28 PM]
+ℹ Config loaded kubb.config.ts
+
+[2/16/2026, 4:47:28 PM]
+✓ Config loaded successfully kubb.config.ts
+
+[2/16/2026, 4:47:28 PM]
+ℹ Setup generation ../openapi.yaml
+
+[2/16/2026, 4:47:28 PM]
+Configuration:
+  • Name: unnamed
+  • Root: .
+  • Output: ./api
+  • Plugins: 5
+Output Settings:
+  • Write: enabled
+  • Formatter: prettier
+  • Linter: none
+Environment:
+  • nodeVersion: v24.13.1
+  • KubbVersion: 4.23.0
+  • platform: darwin
+  • arch: arm64
+  • cwd: /Users/zainabimadulla/Projects/inside-athletics/frontend
+
+[2/16/2026, 4:47:28 PM]
+✓ Input file validated: ../openapi.yaml
+
+[2/16/2026, 4:47:28 PM]
+Cleaning output directories
+  • Output: ./api
+
+[2/16/2026, 4:47:28 PM]
+✓ Fabric initialized
+  • File writing: enabled
+  • Barrel type: named
+
+[2/16/2026, 4:47:28 PM]
+ℹ Build generation ../openapi.yaml
+
+[2/16/2026, 4:47:28 PM]
+Generating plugin-oas
+
+[2/16/2026, 4:47:28 PM]
+Installing plugin...
+  • Plugin Key: [plugin-oas, 1]
+
+[2/16/2026, 4:47:28 PM]
+Building 20 schemas
+  • Content Type: application/json
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+Building 17 operations
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+plugin-oas completed in 131ms
+
+[2/16/2026, 4:47:28 PM]
+✓ Plugin installed successfully (131ms)
+
+[2/16/2026, 4:47:28 PM]
+Generating plugin-ts
+
+[2/16/2026, 4:47:28 PM]
+Installing plugin...
+  • Plugin Key: [plugin-ts, 1]
+
+[2/16/2026, 4:47:28 PM]
+Building 20 schemas
+  • Content Type: application/json
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+Building 17 operations
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+plugin-ts completed in 86ms
+
+[2/16/2026, 4:47:28 PM]
+✓ Plugin installed successfully (86ms)
+
+[2/16/2026, 4:47:28 PM]
+Generating plugin-client
+
+[2/16/2026, 4:47:28 PM]
+Installing plugin...
+  • Plugin Key: [plugin-client, 1]
+
+[2/16/2026, 4:47:28 PM]
+Building 17 operations
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+plugin-client completed in 45ms
+
+[2/16/2026, 4:47:28 PM]
+✓ Plugin installed successfully (45ms)
+
+[2/16/2026, 4:47:28 PM]
+Generating plugin-react-query
+
+[2/16/2026, 4:47:28 PM]
+Installing plugin...
+  • Plugin Key: [plugin-react-query, 1]
+
+[2/16/2026, 4:47:28 PM]
+Building 17 operations
+  • Generators: 7
+
+[2/16/2026, 4:47:28 PM]
+plugin-react-query completed in 92ms
+
+[2/16/2026, 4:47:28 PM]
+✓ Plugin installed successfully (92ms)
+
+[2/16/2026, 4:47:28 PM]
+Generating plugin-zod
+
+[2/16/2026, 4:47:28 PM]
+Installing plugin...
+  • Plugin Key: [plugin-zod, 1]
+
+[2/16/2026, 4:47:28 PM]
+Building 20 schemas
+  • Content Type: application/json
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+Building 17 operations
+  • Generators: 1
+
+[2/16/2026, 4:47:28 PM]
+plugin-zod completed in 73ms
+
+[2/16/2026, 4:47:28 PM]
+✓ Plugin installed successfully (73ms)
+
+[2/16/2026, 4:47:28 PM]
+Generating barrel file
+  • Type: named
+  • Path: /Users/zainabimadulla/Projects/inside-athletics/frontend/api/index.ts
+
+[2/16/2026, 4:47:28 PM]
+Found 116 indexable files for barrel export
+
+[2/16/2026, 4:47:28 PM]
+✓ Generated barrel file (310 exports)
+
+[2/16/2026, 4:47:28 PM]
+ℹ Writing 142 files undefined
+
+[2/16/2026, 4:47:28 PM]
+Start 142 writing:
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/index.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/index.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/index.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/.kubb/config.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/index.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/index.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/ErrorModel.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/ErrorDetail.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/errorModel.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/SportResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/PostApiV1User.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/errorModelSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/errorDetail.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/CreateUserBody.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/HealthResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/UpdateUserBody.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1Health.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/PostApiV1Sport.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1Sports.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/postApiV1User.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/errorDetailSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetUserResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1Health.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/postApiV1Sport.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1Sports.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/usePostApiV1User.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/sportResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/PostApiV1College.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1Health.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1Sports.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/usePostApiV1Sport.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/sportResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/postApiV1UserSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/createUserBody.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/healthResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/updateUserBody.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/postApiV1College.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/createUserBodySchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/healthResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/updateUserBodySchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1HealthSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/postApiV1SportSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1SportsSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/getUserResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/CreateSportRequest.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/CreateUserResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/DeleteUserResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetCollegeResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/UpdateSportRequest.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/UpdateUserResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/PatchApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/usePostApiV1College.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getUserResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/PutApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/PatchApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1UserCurrent.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/DeleteApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/patchApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/postApiV1CollegeSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1UserByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/CreateCollegeRequest.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetAllSportsResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/UpdateCollegeRequest.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/DeleteApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/putApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/patchApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1UserCurrent.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/deleteApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/usePatchApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1SportByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/createSportRequest.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/createUserResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/deleteUserResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/getCollegeResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/updateSportRequest.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/updateUserResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/CreateCollegeResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/DeleteCollegeResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/UpdateCollegeResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/deleteApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1UserCurrent.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/usePutApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/usePatchApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useDeleteApiV1UserById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/createSportRequestSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/createUserResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/deleteUserResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getCollegeResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/updateSportRequestSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/updateUserResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/patchApiV1UserByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/DeleteApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useDeleteApiV1SportById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1CollegeByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/putApiV1CollegeByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/patchApiV1SportByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1UserCurrentSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/deleteApiV1UserByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/createCollegeRequest.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/getAllSportsResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/updateCollegeRequest.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/deleteApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/createCollegeRequestSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getAllSportsResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/updateCollegeRequestSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/deleteApiV1SportByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/createCollegeResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/deleteCollegeResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/updateCollegeResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetCurrentUserIDResponse.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1HealthSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1SportsSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useDeleteApiV1CollegeById.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/createCollegeResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/deleteCollegeResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/updateCollegeResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1HealthHealthcheck.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/models/GetApiV1SportByNameByName.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/deleteApiV1CollegeByIdSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1HealthHealthcheck.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/clients/getApiV1SportByNameByName.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1UserByIdSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/schemas/getCurrentUserIDResponse.json
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1HealthHealthcheck.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1SportByNameByName.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1SportByIdSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getCurrentUserIDResponseSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1HealthHealthcheckSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/zod/getApiV1SportByNameByNameSchema.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1CollegeByIdSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1UserCurrentSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1HealthHealthcheckSuspense.ts
+/Users/zainabimadulla/Projects/inside-athletics/frontend/api/hooks/useGetApiV1SportByNameByNameSuspense.ts
+
+[2/16/2026, 4:47:28 PM]
+Writing 142 files...
+
+[2/16/2026, 4:47:28 PM]
+✓ File write process completed for 142 files
+
+[2/16/2026, 4:47:28 PM]
+ℹ Load summary undefined
+
+[2/16/2026, 4:47:28 PM]
+✓ Generation successfully ../openapi.yaml
