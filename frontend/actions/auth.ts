@@ -2,17 +2,28 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSupabaseClient } from "@/utils/supabase/server";
-import { loginInitialState, signupInitialState } from "@/api/models/Auth";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/utils/auth";
+
+
+type loginInitialState = {
+    success: boolean;
+    message: string;
+};
+
+type signupInitialState = {
+    success: boolean;
+    message: string;
+    email?: string;
+};
 
 export async function login(prevState: loginInitialState, formData: FormData) {
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
     const payload = {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
     };
     const { error } = await supabase.auth.signInWithPassword(payload);
+    console.log(error)
     if (error) {
         return {
             success: false,
@@ -24,7 +35,7 @@ export async function login(prevState: loginInitialState, formData: FormData) {
 }
 
 export async function signup(prevState: signupInitialState, formData: FormData) {
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
     const payload = {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
@@ -42,42 +53,4 @@ export async function signup(prevState: signupInitialState, formData: FormData) 
     }
 
     return { success: true, message: "Form submitted successfully!", email: payload.email };
-}
-
-export async function setCompanyMetadata(companyID: string) {
-    const supabaseClient = await createSupabaseClient();
-    const supabaseService = createClient(
-        process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_SUPABASE_URL!
-            : process.env.NEXT_PUBLIC_DEV_SUPABASE_URL!,
-        process.env.NODE_ENV === "production"
-            ? process.env.SUPABASE_SERVICE_ROLE_KEY!
-            : process.env.SUPABASE_DEV_SERVICE_ROLE_KEY!
-    );
-
-    const { data, error } = await supabaseClient.auth.getUser();
-    if (error) {
-        throw new Error("User not logged in");
-    }
-    const user = data.user!.id;
-    const response = await supabaseService.auth.admin.updateUserById(user, {
-        app_metadata: {
-            company_id: companyID,
-        },
-    });
-    const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-
-    if (refreshError) {
-        throw new Error("Failed to refresh session");
-    }
-    return response;
-}
-
-export async function retrieveToken(): Promise<string> {
-    const supabase = await createSupabaseClient();
-    const { data } = await supabase.auth.getSession();
-    if (!data.session?.access_token) {
-        throw new Error("Authorization token is missing.");
-    }
-    return data.session.access_token;
 }

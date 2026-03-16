@@ -5,7 +5,13 @@ import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { signupInitialState } from "@/api/models/Auth";
+
+
+type signupInitialState = {
+    success: boolean;
+    message: string;
+    email?: string;
+};
 
 const initialState: signupInitialState = {
     success: false,

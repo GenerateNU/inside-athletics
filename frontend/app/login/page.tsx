@@ -2,10 +2,14 @@
 import { login } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { loginInitialState } from "@/api/models/Auth";
 import { redirect } from "next/navigation";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+
+type loginInitialState = {
+    success: boolean;
+    message: string;
+};
 
 const initialState: loginInitialState = {
     success: false,
@@ -26,7 +30,7 @@ export default function LoginPage() {
                     <div className="w-full flex flex-col items-center space-y-4">
                         <Input id="email" name="email" type="email" placeholder="Email" required />
                         <Input id="password" name="password" type="password" placeholder="Password" required />
-                        {state?.success && <p className="text-red-500 text-sm"> {state.message}</p>}
+                        {!state?.success && <p className="text-red-500 text-sm"> {state.message}</p>}
                     </div>
 
                     <div className="w-full flex flex-col gap-2 items-center">
