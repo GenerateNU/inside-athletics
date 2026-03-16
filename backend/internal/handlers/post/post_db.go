@@ -3,6 +3,7 @@ package post
 import (
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"math"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -52,7 +53,7 @@ func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, erro
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		First(&post, "posts.id = ?", id)
 
@@ -83,7 +84,7 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID 
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		Where("sport_id = ?", sportID).
 		Limit(limit).
@@ -119,7 +120,7 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userI
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		Where("author_id = ?", authorID).
 		Limit(limit).
@@ -166,7 +167,7 @@ func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		Limit(limit).
 		Offset(offset).
@@ -176,6 +177,126 @@ func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.
 	}
 
 	return posts, int(total), nil
+}
+
+func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID uuid.UUID) ([]models.Post, int, error) {
+	var posts []models.Post
+	var total int64
+
+	if limit <= 0 {
+		limit = 20
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	if windowHours <= 0 {
+		windowHours = 72
+	}
+	windowHours = min(windowHours, 24*30)
+	recencyWindow := float64(windowHours)
+
+	if err := p.db.Model(&models.Post{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	dbResponse := p.db.
+		Table("posts").
+		Select(`
+			posts.*,
+			COALESCE(all_likes.total_likes, 0) AS like_count,
+			COALESCE(all_comments.total_comments, 0) AS comment_count,
+			COALESCE(user_likes.is_liked, false) AS is_liked,
+			(
+				COALESCE(recent_comments.recent_comments, 0) * 8.0 +
+				COALESCE(all_comments.total_comments, 0) * 2.0 +
+				COALESCE(recent_likes.recent_likes, 0) * 3.0 +
+				COALESCE(all_likes.total_likes, 0) * 1.0 +
+				CASE
+					WHEN EXISTS (
+						SELECT 1
+						FROM user_tag_subscriptions uts
+						JOIN tag_posts tp_sub ON tp_sub.tag_id = uts.tag_id
+						WHERE uts.user_id = ? AND tp_sub.post_id = posts.id
+					) THEN 12.0
+					ELSE 0.0
+				END +
+				CASE
+					WHEN posts.sport_id IS NOT NULL AND posts.sport_id = (
+						SELECT sport_id FROM users WHERE id = ?
+					) THEN 4.0
+					ELSE 0.0
+				END +
+				CASE
+					WHEN posts.college_id IS NOT NULL AND posts.college_id = (
+						SELECT college_id FROM users WHERE id = ?
+					) THEN 2.0
+					ELSE 0.0
+				END +
+				GREATEST(0.0, ? - (EXTRACT(EPOCH FROM (NOW() - posts.created_at)) / 3600.0)) * 0.15
+			) AS popularity_score`,
+			userID, userID, userID, recencyWindow).
+		Joins(`
+			LEFT JOIN (
+				SELECT post_id, COUNT(*) AS total_likes
+				FROM post_likes
+				GROUP BY post_id
+			) AS all_likes ON all_likes.post_id = posts.id`).
+		Joins(`
+			LEFT JOIN (
+				SELECT post_id, COUNT(*) AS total_comments
+				FROM comments
+				GROUP BY post_id
+			) AS all_comments ON all_comments.post_id = posts.id`).
+		Joins(`
+			LEFT JOIN (
+				SELECT post_id, COUNT(*) AS recent_likes
+				FROM post_likes
+				WHERE created_at >= NOW() - (? * INTERVAL '1 hour')
+				GROUP BY post_id
+			) AS recent_likes ON recent_likes.post_id = posts.id`, windowHours).
+		Joins(`
+			LEFT JOIN (
+				SELECT post_id, COUNT(*) AS recent_comments
+				FROM comments
+				WHERE created_at >= NOW() - (? * INTERVAL '1 hour')
+				GROUP BY post_id
+			) AS recent_comments ON recent_comments.post_id = posts.id`, windowHours).
+		Joins(`
+			LEFT JOIN (
+				SELECT post_id, true AS is_liked
+				FROM post_likes
+				WHERE user_id = ?
+				GROUP BY post_id
+			) AS user_likes ON user_likes.post_id = posts.id`, userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+		}).
+		Order("popularity_score DESC").
+		Order("comment_count DESC").
+		Order("like_count DESC").
+		Order("posts.created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&posts)
+	if dbResponse.Error != nil {
+		return nil, 0, dbResponse.Error
+	}
+
+	for i := range posts {
+		posts[i].PopularityScore = math.Round(posts[i].PopularityScore*100) / 100
+	}
+
+	return posts, int(total), nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // UpdatePost updates an existing post
@@ -192,7 +313,7 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tag_posts AS tp").Joins("JOIN tags t ON t.id = tp.tag_id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		Where("id = ?", id).
 		Updates(updates).
