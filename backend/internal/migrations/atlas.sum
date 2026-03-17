@@ -1,4 +1,4 @@
-h1:b6oZEwS9Cpwy3LpPB6/OR3V+uGZIbrNNA1A3xg6a1zA=
+h1:k/KG/9uWiIcwbAODuuKbdgG7/oW+OT3nuwJ6K4v/XkA=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
@@ -15,7 +15,7 @@ h1:b6oZEwS9Cpwy3LpPB6/OR3V+uGZIbrNNA1A3xg6a1zA=
 20260217160000_UniqueUserPostCommentLikes.sql h1:xrkojTLdf7dR+0n5IsceuHxIznkjhw2nqog/EngXNf4=
 20260223120000_SeedRolePermissions.sql h1:kG0D9ZmvBOp0o8Uvk5cFYwfPhrVsKiPaQj5boMc4ob4=
 20260301215152_FixModelSqlDifferences.sql h1:5Cnl7uiKG3TffwK5osP2ALfRsUrEfctlwbgjdKExGgY=
-20260309170212_AddedTagFollowTable.sql h1:zQifvHK6XlcFEg8wbDb9qSD98zY/CC7mFF48OQpNjGI=
-20260315000000_AddSportFollowTable.sql h1:ENwMvFlA0Y+4+QrV5itmCsE0Ai3+uPWhpUbifi9SXJo=
-20260315100000_AddCollegeFollowTable.sql h1:gVC86qYb+Sv5QFoj3ElsX/wopO3xxpFYmEW+cdmwbmI=
 20260309011359_ModelFixes.sql h1:yoDHD5D8M625KUqZ93eSJn4S9j6/Qkc5t6b9+Lr4Z3k=
+20260309170212_AddedTagFollowTable.sql h1:TTRvoyOGb+kP0LRVuoyhhoBAGojABLPT0rucX5eit3k=
+20260315000000_AddSportFollowTable.sql h1:tq6ufmun7KXZ7mFtrjbB0wD4e2ARU3XGVL1WEIATsbs=
+20260315100000_AddCollegeFollowTable.sql h1:QM351flHYZOGxBit95/KNHzuZCo0z9JpyYPZPCVcAIA=
