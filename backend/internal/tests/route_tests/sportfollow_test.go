@@ -45,10 +45,14 @@ func TestGetSportFollowsByUser(t *testing.T) {
 	api := testDB.API
 	user, sport := seedUserAndSport(t, testDB, "get-sport-follows-by-user")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "sport"},
-	})
+	},
+		user.ID,
+	)
 
 	createdSportFollow := models.SportFollow{
 		ID:      uuid.New(),
@@ -60,7 +64,7 @@ func TestGetSportFollowsByUser(t *testing.T) {
 		t.Fatalf("Unable to add sport follow to table: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/sport/"+user.ID.String()+"/follows", authHeader)
+	resp := api.Get("/api/v1/user/sport/follows", authHeader)
 
 	var response sportfollow.GetSportFollowsByUserResponse
 
@@ -111,13 +115,16 @@ func TestCreateSportFollow(t *testing.T) {
 	api := testDB.API
 	user, sport := seedUserAndSport(t, testDB, "create-sport-follow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "sport"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := sportfollow.CreateSportFollowBody{
-		UserID:  user.ID,
 		SportID: sport.ID,
 	}
 
@@ -224,13 +231,16 @@ func TestCreateSportFollow_DuplicateReturns409(t *testing.T) {
 	api := testDB.API
 	user, sport := seedUserAndSport(t, testDB, "dup-sportfollow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "sport"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := sportfollow.CreateSportFollowBody{
-		UserID:  user.ID,
 		SportID: sport.ID,
 	}
 
@@ -245,42 +255,22 @@ func TestCreateSportFollow_DuplicateReturns409(t *testing.T) {
 	}
 }
 
-func TestCreateSportFollow_NonExistentUserReturnsError(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
-	_, sport := seedUserAndSport(t, testDB, "create-nonexistent-user-sport")
-
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
-	})
-
-	reqBody := sportfollow.CreateSportFollowBody{
-		UserID:  uuid.New(),
-		SportID: sport.ID,
-	}
-
-	resp := api.Post("/api/v1/user/sport/", reqBody, authHeader)
-
-	if resp.Code == http.StatusOK {
-		t.Fatalf("expected error for non-existent user, got 200: %s", resp.Body.String())
-	}
-}
-
 func TestCreateSportFollow_NonExistentSportReturnsError(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, _ := seedUserAndSport(t, testDB, "create-nonexistent-sport")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "sport"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := sportfollow.CreateSportFollowBody{
-		UserID:  user.ID,
 		SportID: uuid.New(),
 	}
 

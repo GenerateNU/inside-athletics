@@ -12,7 +12,7 @@ func Route(api huma.API, db *gorm.DB) {
 	{
 		grp := huma.NewGroup(api, "/api/v1/user/sport")
 		huma.Post(grp, "/", sportFollowService.CreateSportFollow)
-		huma.Get(grp, "/{user_id}/follows", sportFollowService.GetSportFollowsByUser)
+		huma.Get(grp, "/follows", sportFollowService.GetSportFollowsByUser)
 		huma.Get(grp, "/{sport_id}/users", sportFollowService.GetFollowingUsersBySport)
 		huma.Delete(grp, "/{id}", sportFollowService.DeleteSportFollow)
 	}
