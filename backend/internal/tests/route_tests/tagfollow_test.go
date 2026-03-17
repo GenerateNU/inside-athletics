@@ -126,8 +126,7 @@ func TestCreateTagFollow(t *testing.T) {
 	)
 
 	reqBody := tagfollow.CreateTagFollowBody{
-		UserID: user.ID,
-		TagID:  tag.ID,
+		TagID: tag.ID,
 	}
 
 	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)
@@ -248,8 +247,7 @@ func TestCreateTagFollow_DuplicateReturns409(t *testing.T) {
 	)
 
 	reqBody := tagfollow.CreateTagFollowBody{
-		UserID: user.ID,
-		TagID:  tag.ID,
+		TagID: tag.ID,
 	}
 
 	resp1 := api.Post("/api/v1/user/tag/", reqBody, authHeader)
@@ -280,8 +278,7 @@ func TestCreateTagFollow_NonExistentTagReturnsError(t *testing.T) {
 	)
 
 	reqBody := tagfollow.CreateTagFollowBody{
-		UserID: user.ID,
-		TagID:  uuid.New(),
+		TagID: uuid.New(),
 	}
 
 	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)

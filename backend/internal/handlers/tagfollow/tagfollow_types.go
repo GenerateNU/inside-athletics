@@ -27,7 +27,6 @@ type CreateTagFollowInput struct {
 
 type CreateTagFollowBody struct {
 	TagID  uuid.UUID `json:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the Tag"`
-	UserID uuid.UUID `json:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the user"`
 }
 
 type CreateTagFollowResponse struct {
