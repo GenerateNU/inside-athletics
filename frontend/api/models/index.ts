@@ -2,6 +2,8 @@ export type { AssignRoleRequest } from "./AssignRoleRequest.ts";
 export type { AssignRoleResponse } from "./AssignRoleResponse.ts";
 export type { CollegeDivisionRankEnumKey, College } from "./College.ts";
 export type { CommentResponse } from "./CommentResponse.ts";
+export type { CreateCollegeFollowBody } from "./CreateCollegeFollowBody.ts";
+export type { CreateCollegeFollowResponse } from "./CreateCollegeFollowResponse.ts";
 export type {
   CreateCollegeRequestDivisionRankEnumKey,
   CreateCollegeRequest,
@@ -20,11 +22,15 @@ export type { CreatePostLikeResponse } from "./CreatePostLikeResponse.ts";
 export type { CreatePostRequest } from "./CreatePostRequest.ts";
 export type { CreatePostResponse } from "./CreatePostResponse.ts";
 export type { CreateRoleRequest } from "./CreateRoleRequest.ts";
+export type { CreateSportFollowBody } from "./CreateSportFollowBody.ts";
+export type { CreateSportFollowResponse } from "./CreateSportFollowResponse.ts";
 export type { CreateSportRequest } from "./CreateSportRequest.ts";
 export type { CreateStripeCheckoutSessionRequest } from "./CreateStripeCheckoutSessionRequest.ts";
 export type { CreateStripePriceRequest } from "./CreateStripePriceRequest.ts";
 export type { CreateStripeProductRequest } from "./CreateStripeProductRequest.ts";
 export type { CreateTagBody } from "./CreateTagBody.ts";
+export type { CreateTagFollowBody } from "./CreateTagFollowBody.ts";
+export type { CreateTagFollowResponse } from "./CreateTagFollowResponse.ts";
 export type { CreateTagPostBody } from "./CreateTagPostBody.ts";
 export type { CreateTagPostsResponse } from "./CreateTagPostsResponse.ts";
 export type { CreateTagResponse } from "./CreateTagResponse.ts";
@@ -132,12 +138,36 @@ export type {
   DeleteApiV1UserByIdMutationResponse,
   DeleteApiV1UserByIdMutation,
 } from "./DeleteApiV1UserById.ts";
+export type {
+  DeleteApiV1UserCollegeByIdPathParams,
+  DeleteApiV1UserCollegeById200,
+  DeleteApiV1UserCollegeByIdError,
+  DeleteApiV1UserCollegeByIdMutationResponse,
+  DeleteApiV1UserCollegeByIdMutation,
+} from "./DeleteApiV1UserCollegeById.ts";
+export type {
+  DeleteApiV1UserSportByIdPathParams,
+  DeleteApiV1UserSportById200,
+  DeleteApiV1UserSportByIdError,
+  DeleteApiV1UserSportByIdMutationResponse,
+  DeleteApiV1UserSportByIdMutation,
+} from "./DeleteApiV1UserSportById.ts";
+export type {
+  DeleteApiV1UserTagByIdPathParams,
+  DeleteApiV1UserTagById200,
+  DeleteApiV1UserTagByIdError,
+  DeleteApiV1UserTagByIdMutationResponse,
+  DeleteApiV1UserTagByIdMutation,
+} from "./DeleteApiV1UserTagById.ts";
+export type { DeleteCollegeFollowResponse } from "./DeleteCollegeFollowResponse.ts";
 export type { DeleteCollegeResponse } from "./DeleteCollegeResponse.ts";
 export type { DeleteCommentLikeResponse } from "./DeleteCommentLikeResponse.ts";
 export type { DeletedAt } from "./DeletedAt.ts";
 export type { DeletePostLikeResponse } from "./DeletePostLikeResponse.ts";
 export type { DeletePostResponse } from "./DeletePostResponse.ts";
+export type { DeleteSportFollowResponse } from "./DeleteSportFollowResponse.ts";
 export type { DeleteStripeCustomerResponse } from "./DeleteStripeCustomerResponse.ts";
+export type { DeleteTagFollowResponse } from "./DeleteTagFollowResponse.ts";
 export type { DeleteTagPostResponse } from "./DeleteTagPostResponse.ts";
 export type { DeleteTagResponse } from "./DeleteTagResponse.ts";
 export type { DeleteUserResponse } from "./DeleteUserResponse.ts";
@@ -352,24 +382,72 @@ export type {
   GetApiV1UserByIdQuery,
 } from "./GetApiV1UserById.ts";
 export type {
+  GetApiV1UserCollegeByCollegeIdUsersPathParams,
+  GetApiV1UserCollegeByCollegeIdUsers200,
+  GetApiV1UserCollegeByCollegeIdUsersError,
+  GetApiV1UserCollegeByCollegeIdUsersQueryResponse,
+  GetApiV1UserCollegeByCollegeIdUsersQuery,
+} from "./GetApiV1UserCollegeByCollegeIdUsers.ts";
+export type {
+  GetApiV1UserCollegeByUserIdFollowsPathParams,
+  GetApiV1UserCollegeByUserIdFollows200,
+  GetApiV1UserCollegeByUserIdFollowsError,
+  GetApiV1UserCollegeByUserIdFollowsQueryResponse,
+  GetApiV1UserCollegeByUserIdFollowsQuery,
+} from "./GetApiV1UserCollegeByUserIdFollows.ts";
+export type {
   GetApiV1UserCurrent200,
   GetApiV1UserCurrentError,
   GetApiV1UserCurrentQueryResponse,
   GetApiV1UserCurrentQuery,
 } from "./GetApiV1UserCurrent.ts";
 export type {
+  GetApiV1UserSportBySportIdUsersPathParams,
+  GetApiV1UserSportBySportIdUsers200,
+  GetApiV1UserSportBySportIdUsersError,
+  GetApiV1UserSportBySportIdUsersQueryResponse,
+  GetApiV1UserSportBySportIdUsersQuery,
+} from "./GetApiV1UserSportBySportIdUsers.ts";
+export type {
+  GetApiV1UserSportByUserIdFollowsPathParams,
+  GetApiV1UserSportByUserIdFollows200,
+  GetApiV1UserSportByUserIdFollowsError,
+  GetApiV1UserSportByUserIdFollowsQueryResponse,
+  GetApiV1UserSportByUserIdFollowsQuery,
+} from "./GetApiV1UserSportByUserIdFollows.ts";
+export type {
+  GetApiV1UserTagByTagIdUsersPathParams,
+  GetApiV1UserTagByTagIdUsers200,
+  GetApiV1UserTagByTagIdUsersError,
+  GetApiV1UserTagByTagIdUsersQueryResponse,
+  GetApiV1UserTagByTagIdUsersQuery,
+} from "./GetApiV1UserTagByTagIdUsers.ts";
+export type {
+  GetApiV1UserTagByUserIdFollowsPathParams,
+  GetApiV1UserTagByUserIdFollows200,
+  GetApiV1UserTagByUserIdFollowsError,
+  GetApiV1UserTagByUserIdFollowsQueryResponse,
+  GetApiV1UserTagByUserIdFollowsQuery,
+} from "./GetApiV1UserTagByUserIdFollows.ts";
+export type { GetCollegeFollowsByUserResponse } from "./GetCollegeFollowsByUserResponse.ts";
+export type {
   GetCollegeResponseDivisionRankEnumKey,
   GetCollegeResponse,
 } from "./GetCollegeResponse.ts";
 export type { GetCommentLikeInfoResponse } from "./GetCommentLikeInfoResponse.ts";
 export type { GetCommentLikeResponse } from "./GetCommentLikeResponse.ts";
+export type { GetFollowingUsersByCollegeResponse } from "./GetFollowingUsersByCollegeResponse.ts";
+export type { GetFollowingUsersBySportResponse } from "./GetFollowingUsersBySportResponse.ts";
+export type { GetFollowingUsersByTagResponse } from "./GetFollowingUsersByTagResponse.ts";
 export type { GetPostLikeInfoResponse } from "./GetPostLikeInfoResponse.ts";
 export type { GetPostLikeResponse } from "./GetPostLikeResponse.ts";
 export type { GetPostsByAuthorIDResponse } from "./GetPostsByAuthorIDResponse.ts";
 export type { GetPostsBySportIDResponse } from "./GetPostsBySportIDResponse.ts";
 export type { GetPostsByTagResponse } from "./GetPostsByTagResponse.ts";
+export type { GetSportFollowsByUserResponse } from "./GetSportFollowsByUserResponse.ts";
 export type { GetStripeCustomerByEmailResponse } from "./GetStripeCustomerByEmailResponse.ts";
 export type { GetStripeCustomerResponse } from "./GetStripeCustomerResponse.ts";
+export type { GetTagFollowsByUserResponse } from "./GetTagFollowsByUserResponse.ts";
 export type { GetTagPostByIDResponse } from "./GetTagPostByIDResponse.ts";
 export type { GetTagResponse } from "./GetTagResponse.ts";
 export type { GetUserResponse } from "./GetUserResponse.ts";
@@ -618,6 +696,27 @@ export type {
   PostApiV1UserByIdRolesMutationResponse,
   PostApiV1UserByIdRolesMutation,
 } from "./PostApiV1UserByIdRoles.ts";
+export type {
+  PostApiV1UserCollege200,
+  PostApiV1UserCollegeError,
+  PostApiV1UserCollegeMutationRequest,
+  PostApiV1UserCollegeMutationResponse,
+  PostApiV1UserCollegeMutation,
+} from "./PostApiV1UserCollege.ts";
+export type {
+  PostApiV1UserSport200,
+  PostApiV1UserSportError,
+  PostApiV1UserSportMutationRequest,
+  PostApiV1UserSportMutationResponse,
+  PostApiV1UserSportMutation,
+} from "./PostApiV1UserSport.ts";
+export type {
+  PostApiV1UserTag200,
+  PostApiV1UserTagError,
+  PostApiV1UserTagMutationRequest,
+  PostApiV1UserTagMutationResponse,
+  PostApiV1UserTagMutation,
+} from "./PostApiV1UserTag.ts";
 export type { PostResponse } from "./PostResponse.ts";
 export type {
   PutApiV1CollegeByIdPathParams,
