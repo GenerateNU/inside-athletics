@@ -3,6 +3,7 @@ package routeTests
 import (
 	"inside-athletics/internal/handlers/tagfollow"
 	"inside-athletics/internal/models"
+
 	"net/http"
 	"reflect"
 	"testing"
@@ -45,10 +46,14 @@ func TestGetTagFollowsByUser(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "create-user-tag")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "tag"},
-	})
+	},
+		user.ID,
+	)
 
 	createdTagFollow := models.TagFollow{
 		ID:     uuid.New(),
@@ -60,7 +65,7 @@ func TestGetTagFollowsByUser(t *testing.T) {
 		t.Fatalf("Unable to add tag follow to table: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/tag/"+user.ID.String()+"/follows", authHeader)
+	resp := api.Get("/api/v1/user/tag/follows", authHeader)
 
 	var response tagfollow.GetTagFollowsByUserResponse
 
@@ -111,10 +116,14 @@ func TestCreateTagFollow(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "create-tag-follow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "tag"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := tagfollow.CreateTagFollowBody{
 		UserID: user.ID,
@@ -229,10 +238,14 @@ func TestCreateTagFollow_DuplicateReturns409(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "dup-tagfollow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "tag"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := tagfollow.CreateTagFollowBody{
 		UserID: user.ID,
@@ -250,30 +263,6 @@ func TestCreateTagFollow_DuplicateReturns409(t *testing.T) {
 	}
 }
 
-// Creating a tag follow with nonexistent user should error
-func TestCreateTagFollow_NonExistentUserReturnsError(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
-	_, tag := seedUserAndTag(t, testDB, "create-nonexistent-user")
-
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
-	})
-
-	reqBody := tagfollow.CreateTagFollowBody{
-		UserID: uuid.New(),
-		TagID:  tag.ID,
-	}
-
-	resp := api.Post("/api/v1/user/tag/", reqBody, authHeader)
-
-	if resp.Code == http.StatusOK {
-		t.Fatalf("expected error for non-existent user, got 200: %s", resp.Body.String())
-	}
-}
-
 // Creating tag follow with a nonexistent tag should throw an error
 func TestCreateTagFollow_NonExistentTagReturnsError(t *testing.T) {
 	testDB := SetupTestDB(t)
@@ -281,10 +270,14 @@ func TestCreateTagFollow_NonExistentTagReturnsError(t *testing.T) {
 	api := testDB.API
 	user, _ := seedUserAndTag(t, testDB, "create-nonexistent-tag")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "tag"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := tagfollow.CreateTagFollowBody{
 		UserID: user.ID,

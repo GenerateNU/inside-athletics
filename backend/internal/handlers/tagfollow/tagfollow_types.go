@@ -4,7 +4,6 @@ import "github.com/google/uuid"
 
 // Given UserID, get all tags that are followed
 type GetTagFollowsByUserParams struct {
-	UserID uuid.UUID `path:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the user"`
 }
 
 // Given tag, get list of UserIDs that follow this tag

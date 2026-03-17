@@ -83,7 +83,7 @@ func (u *SportFollowService) CreateSportFollow(ctx context.Context, input *Creat
 	
 	sportfollow := &models.SportFollow{
 		SportID: input.Body.SportID,
-		UserID:    userID,
+		UserID:  userID,
 	}
 
 	createdSportFollow, err := u.sportfollowDB.CreateSportFollow(sportfollow)
