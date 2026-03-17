@@ -28,4 +28,7 @@ type Post struct {
 	LikeCount    int64  `json:"like_count" gorm:"column:like_count;->;-:migration"`
 	CommentCount int64  `json:"comment_count" gorm:"column:comment_count;->;-:migration"`
 	IsLiked      bool `json:"is_liked" gorm:"column:is_liked;->;-:migration"`
+
+	//Video ID
+	VideoID uuid.UUID `json:"video_id" gorm:"foreignKey:ID"`
 }

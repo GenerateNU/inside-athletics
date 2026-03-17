@@ -14,6 +14,7 @@ type CreatePostRequest struct {
 	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
 	IsAnonymous bool         `json:"is_anonymous"`
+	VideoID   uuid.UUID    `json:"video_id" gorm:"foreignKey:ID"`
 }
 
 type TagRequest struct {
@@ -30,6 +31,7 @@ type CreatePostResponse struct {
 	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
 	IsAnonymous bool         `json:"is_anonymous"`
+	VideoID   uuid.UUID    `json:"video_id" gorm:"foreignKey:ID"`
 }
 
 // PostResponse defines the response structure for a post
@@ -46,6 +48,7 @@ type PostResponse struct {
 	IsLiked      bool            `json:"is_liked,omitempty" example:"true" gorm:"type:bool"`
 	IsAnonymous  bool            `json:"is_anonymous"`
 	IsVerifiedAthlete bool       `json:"is_verified_athlete"`
+	VideoID   uuid.UUID    `json:"video_id" gorm:"foreignKey:ID"`
 }
 
 // GetPostByIDParams defines parameters for getting a post by ID
@@ -137,6 +140,7 @@ func ToPostResponse(post *models.Post, id uuid.UUID) *PostResponse {
 		LikeCount:    post.LikeCount,
 		CommentCount: post.CommentCount,
 		IsVerifiedAthlete: post.Author.Verified_Athlete_Status == models.VerifiedAthleteStatusVerified,
+		VideoID:    post.VideoID,
 	}
 }
 
@@ -156,6 +160,7 @@ func ToCreatePostResponse(post *models.Post, id uuid.UUID) *CreatePostResponse {
 		Title:             post.Title,
 		Content:           post.Content,
 		IsAnonymous:       post.IsAnonymous,
+		VideoID:           post.VideoID,
 }
 }
 
