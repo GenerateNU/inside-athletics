@@ -4,7 +4,6 @@ import "github.com/google/uuid"
 
 // Given UserID, get all colleges that are followed
 type GetCollegeFollowsByUserParams struct {
-	UserID uuid.UUID `path:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the user"`
 }
 
 // Given college, get list of UserIDs that follow this college
@@ -28,7 +27,6 @@ type CreateCollegeFollowInput struct {
 
 type CreateCollegeFollowBody struct {
 	CollegeID uuid.UUID `json:"college_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the College"`
-	UserID    uuid.UUID `json:"user_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the user"`
 }
 
 type CreateCollegeFollowResponse struct {

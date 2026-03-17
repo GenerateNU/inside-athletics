@@ -25,12 +25,12 @@ func seedUserAndCollege(t *testing.T, testDB *TestDatabase, unique string) (mode
 	}
 
 	college := models.College{
-		ID:            uuid.New(),
-		Name:          "College-" + unique,
-		State:         "Massachusetts",
-		City:          "Boston",
-		Website:       "https://example.com",
-		DivisionRank:  1,
+		ID:           uuid.New(),
+		Name:         "College-" + unique,
+		State:        "Massachusetts",
+		City:         "Boston",
+		Website:      "https://example.com",
+		DivisionRank: 1,
 	}
 
 	if err := testDB.DB.Create(&user).Error; err != nil {
@@ -49,10 +49,14 @@ func TestGetCollegeFollowsByUser(t *testing.T) {
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "get-college-follows-by-user")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "college"},
-	})
+	},
+		user.ID,
+	)
 
 	createdCollegeFollow := models.CollegeFollow{
 		ID:        uuid.New(),
@@ -64,7 +68,7 @@ func TestGetCollegeFollowsByUser(t *testing.T) {
 		t.Fatalf("Unable to add college follow to table: %v", err)
 	}
 
-	resp := api.Get("/api/v1/user/college/"+user.ID.String()+"/follows", authHeader)
+	resp := api.Get("/api/v1/user/college/follows", authHeader)
 
 	var response collegefollow.GetCollegeFollowsByUserResponse
 
@@ -115,13 +119,14 @@ func TestCreateCollegeFollow(t *testing.T) {
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "create-college-follow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "college"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := collegefollow.CreateCollegeFollowBody{
-		UserID:    user.ID,
 		CollegeID: college.ID,
 	}
 
@@ -228,13 +233,14 @@ func TestCreateCollegeFollow_DuplicateReturns409(t *testing.T) {
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "dup-collegefollow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "college"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := collegefollow.CreateCollegeFollowBody{
-		UserID:    user.ID,
 		CollegeID: college.ID,
 	}
 
@@ -249,42 +255,20 @@ func TestCreateCollegeFollow_DuplicateReturns409(t *testing.T) {
 	}
 }
 
-func TestCreateCollegeFollow_NonExistentUserReturnsError(t *testing.T) {
-	testDB := SetupTestDB(t)
-	defer testDB.Teardown(t)
-	api := testDB.API
-	_, college := seedUserAndCollege(t, testDB, "create-nonexistent-user-college")
-
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
-	})
-
-	reqBody := collegefollow.CreateCollegeFollowBody{
-		UserID:    uuid.New(),
-		CollegeID: college.ID,
-	}
-
-	resp := api.Post("/api/v1/user/college/", reqBody, authHeader)
-
-	if resp.Code == http.StatusOK {
-		t.Fatalf("expected error for non-existent user, got 200: %s", resp.Body.String())
-	}
-}
-
 func TestCreateCollegeFollow_NonExistentCollegeReturnsError(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, _ := seedUserAndCollege(t, testDB, "create-nonexistent-college")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "college"},
-	})
+	},
+		user.ID,
+	)
 
 	reqBody := collegefollow.CreateCollegeFollowBody{
-		UserID:    user.ID,
 		CollegeID: uuid.New(),
 	}
 
