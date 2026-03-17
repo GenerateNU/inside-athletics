@@ -19,9 +19,17 @@ func NewCommentDB(db *gorm.DB) *CommentDB {
 }
 
 // Retrieves a comment by its ID
-func (c *CommentDB) GetCommentByID(id uuid.UUID) (*models.Comment, error) {
+func (c *CommentDB) GetCommentByID(id uuid.UUID, userID uuid.UUID) (*models.Comment, error) {
 	var comment models.Comment
-	dbResponse := c.db.Where("id = ?", id).First(&comment)
+	dbResponse := c.db.
+		Model(&models.Comment{}).
+		Select(`comments.*,
+            (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("User").
+		Where("id = ?", id).
+		First(&comment)
 	return utils.HandleDBError(&comment, dbResponse.Error)
 }
 
@@ -32,9 +40,18 @@ func (c *CommentDB) CreateComment(comment *models.Comment) (*models.Comment, err
 }
 
 // Retrieves top-level comments for a post
-func (c *CommentDB) GetCommentsByPost(postID uuid.UUID) ([]models.Comment, error) {
+func (c *CommentDB) GetCommentsByPost(postID uuid.UUID, userID uuid.UUID) ([]models.Comment, error) {
 	var comments []models.Comment
-	res := c.db.Where("post_id = ? AND parent_comment_id IS NULL", postID).Order("created_at ASC").Find(&comments)
+	res := c.db.
+		Model(&models.Comment{}).
+		Select(`comments.*,
+            (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("User").
+		Where("post_id = ? AND parent_comment_id IS NULL", postID).
+		Order("created_at ASC").
+		Find(&comments)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -42,9 +59,17 @@ func (c *CommentDB) GetCommentsByPost(postID uuid.UUID) ([]models.Comment, error
 }
 
 // Retrieves replies to a comment
-func (c *CommentDB) GetReplies(commentID uuid.UUID) ([]models.Comment, error) {
+func (c *CommentDB) GetReplies(commentID uuid.UUID, userID uuid.UUID) ([]models.Comment, error) {
 	var comments []models.Comment
-	res := c.db.Where("parent_comment_id = ?", commentID).Order("created_at ASC").Find(&comments)
+	res := c.db.
+		Select(`comments.*,
+            (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("User").
+		Where("parent_comment_id = ?", commentID).
+		Order("created_at ASC").
+		Find(&comments)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -52,8 +77,14 @@ func (c *CommentDB) GetReplies(commentID uuid.UUID) ([]models.Comment, error) {
 }
 
 // Updates an existing comment by ID
-func (c *CommentDB) UpdateComment(id uuid.UUID, updates UpdateCommentBody) (*models.Comment, error) {
+func (c *CommentDB) UpdateComment(id uuid.UUID, updates UpdateCommentBody, userID uuid.UUID) (*models.Comment, error) {
 	dbResponse := c.db.Model(&models.Comment{}).
+		Model(&models.Comment{}).
+		Select(`comments.*,
+            (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("User").
 		Where("id = ?", id).
 		Updates(updates)
 	if dbResponse.Error != nil {
@@ -63,7 +94,7 @@ func (c *CommentDB) UpdateComment(id uuid.UUID, updates UpdateCommentBody) (*mod
 	if dbResponse.RowsAffected == 0 {
 		return nil, huma.Error404NotFound("Resource not found")
 	}
-	return c.GetCommentByID(id)
+	return c.GetCommentByID(id, userID)
 }
 
 // Soft deletes a comment by ID

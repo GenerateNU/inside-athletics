@@ -17,15 +17,16 @@ func TestCreatePostLike(t *testing.T) {
 	user, post := seedUserAndPost(t, testDB, "create-like")
 
 	body := map[string]any{
-		"user_id": user.ID.String(),
 		"post_id": post.ID.String(),
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
-	})
+	},
+		user.ID,
+	)
 
 	resp := api.Post("/api/v1/post/like", body, authHeader)
 	if resp.Code != http.StatusOK {
@@ -56,9 +57,11 @@ func TestGetPostLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
-	})
+	},
+		user.ID,
+	)
 
 	resp := api.Get("/api/v1/post/like/"+like.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
@@ -82,11 +85,13 @@ func TestGetPostLikeInfo(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
-	})
+	},
+		user.ID,
+	)
 
-	resp := api.Get("/api/v1/post/like/"+post.ID.String()+"/likes?user_id="+user.ID.String(), authHeader)
+	resp := api.Get("/api/v1/post/like/"+post.ID.String()+"/likes", authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -112,15 +117,16 @@ func TestDeletePostLike(t *testing.T) {
 		t.Fatalf("create like: %v", err)
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "user"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionDelete, Resource: "post"},
+	},
+		user.ID,
+	)
 
-	})
-
-	resp := api.Delete("/api/v1/post/like/"+like.ID.String(), authHeader)
+	resp := api.Delete("/api/v1/post/like/"+post.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -151,15 +157,16 @@ func TestCreatePostLikeDuplicateReturns409(t *testing.T) {
 	user, post := seedUserAndPost(t, testDB, "dup-like")
 
 	body := map[string]any{
-		"user_id": user.ID.String(),
 		"post_id": post.ID.String(),
 	}
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "like"},
 		{Action: models.PermissionCreate, Resource: "post"},
 		{Action: models.PermissionCreate, Resource: "user"},
-	})
+	},
+		user.ID,
+	)
 
 	resp1 := api.Post("/api/v1/post/like", body, authHeader)
 	if resp1.Code != http.StatusOK {

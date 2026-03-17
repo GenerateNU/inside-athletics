@@ -39,11 +39,10 @@ func (u *CommentLikeDB) CreateCommentLike(commentLike *models.CommentLike) (*mod
 }
 
 // Permanently deletes a like by ID
-func (u *CommentLikeDB) DeleteCommentLike(id uuid.UUID) (commentID uuid.UUID, err error) {
+func (u *CommentLikeDB) DeleteCommentLike(commentID uuid.UUID, userID uuid.UUID) (CommentID uuid.UUID, err error) {
 	var like models.CommentLike
-
 	// checks that like exists to be deleted
-	if err := u.db.Where("id = ?", id).First(&like).Error; err != nil {
+	if err := u.db.Model(&models.CommentLike{}).Where("comment_id = ? and user_id = ?", commentID, userID).First(&like).Error; err != nil {
 		_, handleErr := utils.HandleDBError(&like, err)
 		return uuid.Nil, handleErr
 	}

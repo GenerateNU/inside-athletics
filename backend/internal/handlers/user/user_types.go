@@ -5,7 +5,6 @@ import (
 	models "inside-athletics/internal/models"
 
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 )
 
 type GetUserParams struct {
@@ -20,10 +19,10 @@ type GetUserResponse struct {
 	Username              string                       `json:"username" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                      `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
 	AccountType           bool                         `json:"account_type" example:"true" doc:"If the user has access to premium features"`
-	Sport                 datatypes.JSON               `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
+	Sport                 *models.Sport                `json:"sport,omitempty" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear      uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
-	College               *string                      `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
+	College               *models.College              `json:"college,omitempty" doc:"The college of a user"`
 	Division              *models.Division             `json:"division,omitempty" example:"1" doc:"The division of their college"`
 	Roles                 *[]role.RoleResponse         `json:"roles,omitempty" doc:"Roles assigned to the user"`
 }
@@ -44,10 +43,10 @@ type CreateUserBody struct {
 	Username              string                       `json:"username" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                      `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
 	AccountType           bool                         `json:"account_type" example:"true" doc:"If the user has access to premium features"`
-	Sport                 []string                     `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
+	SportID               *uuid.UUID                   `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear      uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
-	College               *string                      `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
+	CollegeID             *uuid.UUID                   `json:"college,omitempty" doc:"The college of a user"`
 	Division              *models.Division             `json:"division,omitempty" example:"1" doc:"The division of their college"`
 }
 
@@ -58,7 +57,6 @@ type CreateUserResponse struct {
 }
 
 type UpdateUserInput struct {
-	ID   uuid.UUID `path:"id" maxLength:"36" example:"1" doc:"ID to identify the user"`
 	Body UpdateUserBody
 }
 
@@ -69,17 +67,14 @@ type UpdateUserBody struct {
 	Username              *string                       `json:"username,omitempty" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                       `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
 	AccountType           *bool                         `json:"account_type,omitempty" example:"true" doc:"If the user has access to premium features"`
-	Sport                 *[]string                     `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in" gorm:"type:jsonb;serializer:json"`
+	SportID               *uuid.UUID                    `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in" gorm:"type:jsonb;serializer:json"`
 	ExpectedGradYear      *uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus *models.VerifiedAthleteStatus `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`
-	College               *string                       `json:"college,omitempty" example:"Northeastern University" doc:"The college of a user"`
+	CollegeID             *uuid.UUID                    `json:"college,omitempty" doc:"The college of a user"`
 	Division              *models.Division              `json:"division,omitempty" example:"1" doc:"The division of their college"`
 }
 
-type UpdateUserResponse struct {
-	ID   uuid.UUID `json:"id" example:"1" doc:"ID of the user"`
-	Name string    `json:"name" example:"Joe" doc:"Name of the user"`
-}
+type UpdateUserResponse = GetUserResponse
 
 type DeleteUserResponse struct {
 	ID uuid.UUID `json:"id" example:"1" doc:"ID of the deleted user"`

@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -107,11 +106,6 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		return respBody, err
 	}
 
-	sportJSON, err := marshalSport(input.Body.Sport)
-	if err != nil {
-		return respBody, err
-	}
-
 	roleID, err := u.roleDB.GetRoleIDByName(models.RoleUser)
 	if err != nil {
 		return respBody, err
@@ -125,10 +119,10 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Username:                input.Body.Username,
 		Bio:                     input.Body.Bio,
 		Account_Type:            input.Body.AccountType,
-		Sport:                   sportJSON,
+		SportID:                 input.Body.SportID,
 		Expected_Grad_Year:      input.Body.ExpectedGradYear,
 		Verified_Athlete_Status: input.Body.VerifiedAthleteStatus,
-		College:                 input.Body.College,
+		CollegeID:               input.Body.CollegeID,
 		Division:                input.Body.Division,
 	}
 
@@ -155,15 +149,35 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 
 func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*utils.ResponseBody[UpdateUserResponse], error) {
 	respBody := &utils.ResponseBody[UpdateUserResponse]{}
-
-	updatedUser, err := u.userDB.UpdateUser(input.ID, input.Body)
+	currentUserID, err := u.getCurrentUserID(ctx)
 	if err != nil {
 		return respBody, err
 	}
 
+	updatedUser, err := u.userDB.UpdateUser(currentUserID, input.Body)
+	if err != nil {
+		return respBody, err
+	}
+
+	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(currentUserID)
+	if err != nil {
+		return nil, err
+	}
+
 	respBody.Body = &UpdateUserResponse{
-		ID:   updatedUser.ID,
-		Name: updatedUser.FirstName,
+		ID:                    updatedUser.ID,
+		FirstName:             updatedUser.FirstName,
+		LastName:              updatedUser.LastName,
+		Email:                 updatedUser.Email,
+		Username:              updatedUser.Username,
+		Bio:                   updatedUser.Bio,
+		AccountType:           updatedUser.Account_Type,
+		Sport:                 updatedUser.Sport,
+		ExpectedGradYear:      updatedUser.Expected_Grad_Year,
+		VerifiedAthleteStatus: updatedUser.Verified_Athlete_Status,
+		College:               updatedUser.College,
+		Division:              updatedUser.Division,
+		Roles:                 roleResponses,
 	}
 
 	return respBody, nil
@@ -212,17 +226,6 @@ func (u *UserService) AssignRole(ctx context.Context, input *AssignRoleInput) (*
 			},
 		},
 	}, nil
-}
-
-func marshalSport(sport []string) ([]byte, error) {
-	if sport == nil {
-		return nil, nil
-	}
-	sportJSON, err := json.Marshal(sport)
-	if err != nil {
-		return nil, huma.Error400BadRequest("Invalid sport values", err)
-	}
-	return sportJSON, nil
 }
 
 func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {

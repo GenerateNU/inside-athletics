@@ -38,11 +38,11 @@ func (u *PostLikeDB) CreatePostLike(postLike *models.PostLike) (*models.PostLike
 	return postLike, true, nil
 }
 
-/// Permanently deletes a like by ID
-func (u *PostLikeDB) DeletePostLike(id uuid.UUID) (postID uuid.UUID, err error) {
+// / Permanently deletes a like by ID
+func (u *PostLikeDB) DeletePostLike(PostID uuid.UUID, userID uuid.UUID) (postID uuid.UUID, err error) {
 	var like models.PostLike
 	// checking if like that needs to be deleted exists
-	if err := u.db.Where("id = ?", id).First(&like).Error; err != nil {
+	if err := u.db.Where("user_id = ? AND post_id = ?", userID, PostID).First(&like).Error; err != nil {
 		_, handleErr := utils.HandleDBError(&like, err)
 		return uuid.Nil, handleErr
 	}

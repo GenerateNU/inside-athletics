@@ -13,6 +13,29 @@ type TagDB struct {
 	db *gorm.DB
 }
 
+func (u *TagDB) GetPostsByTag(tag_id uuid.UUID, limit int, offset int, userID uuid.UUID) (*[]models.Post, error) {
+	var posts []models.Post
+	dbResponse := u.db.
+		Table("posts").
+		Select(`posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Joins("JOIN tag_posts tp ON tp.post_id = posts.id").
+		Where("tp.tag_id = ?", tag_id).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+		}).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts)
+	return utils.HandleDBError(&posts, dbResponse.Error)
+}
+
 func (u *TagDB) GetTagByName(name string) (*models.Tag, error) {
 	var tag models.Tag
 	dbResponse := u.db.Where("name = ?", name).First(&tag)

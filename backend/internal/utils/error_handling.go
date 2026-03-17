@@ -55,3 +55,10 @@ func HandleDBError[T any](entity *T, err error) (*T, error) {
 	}
 	return entity, nil
 }
+
+func HandleTwoOutputDBError[T any, U any](entity *T, entity2 *U, err error) (*T, *U, error) {
+	if err != nil {
+		return nil, nil, handleGORMErrors(err)
+	}
+	return entity, entity2, nil
+}

@@ -1,0 +1,18 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "ID of the role",
+      "examples": ["1"],
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of the role",
+      "examples": ["user"],
+      "type": "string"
+    }
+  },
+  "required": ["id", "name"],
+  "type": "object",
+  "x-readme-ref-name": "UserRoleResponse"
+}

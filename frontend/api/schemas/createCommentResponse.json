@@ -1,0 +1,50 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/CreateCommentResponse.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "description": {
+      "description": "Content of the comment",
+      "examples": ["This is a helpful thread"],
+      "maxLength": 1500,
+      "type": "string"
+    },
+    "id": {
+      "description": "ID of comment",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"],
+      "type": "string"
+    },
+    "is_anonymous": {
+      "description": "True if posted as anonymous; frontend can show 'Anonymous' when user_id is omitted",
+      "type": "boolean"
+    },
+    "parent_comment_id": {
+      "description": "CommentID the comment belongs to",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"],
+      "type": "string"
+    },
+    "post_id": {
+      "description": "PostID the comment belongs to",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"],
+      "type": "string"
+    },
+    "user": {
+      "description": "The user who commented; omitted for anonymous comments",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "is_anonymous",
+    "parent_comment_id",
+    "post_id",
+    "description"
+  ],
+  "type": "object",
+  "x-readme-ref-name": "CreateCommentResponse"
+}
