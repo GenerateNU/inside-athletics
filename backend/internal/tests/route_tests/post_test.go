@@ -4,6 +4,8 @@ import (
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/models"
 	"net/http"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -631,6 +633,130 @@ func TestDeletePostNotFound(t *testing.T) {
 	resp := api.Delete("/api/v1/post/"+uuid.New().String(), authHeader)
 	if resp.Code != http.StatusNotFound {
 		t.Errorf("expected 404, got %d", resp.Code)
+	}
+}
+
+// TestFreeUserCannotCreateSecondPost asserts free users get 403 when creating a second post.
+func TestFreeUserCannotCreateSecondPost(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	}, JohnID)
+
+	body := map[string]any{
+		"sport_id": SoccerID, "title": "First post", "content": "Content.", "is_anonymous": false, "tags": []map[string]any{},
+	}
+	resp1 := api.Post("/api/v1/post/", body, authHeader)
+	if resp1.Code != http.StatusOK {
+		t.Fatalf("first post expected 200, got %d: %s", resp1.Code, resp1.Body.String())
+	}
+
+	body["title"] = "Second post"
+	resp2 := api.Post("/api/v1/post/", body, authHeader)
+	if resp2.Code != http.StatusForbidden {
+		t.Fatalf("second post (free user) expected 403, got %d: %s", resp2.Code, resp2.Body.String())
+	}
+	if resp2.Body.String() != "" && !strings.Contains(resp2.Body.String(), "free post views") {
+		t.Logf("response body (expected free limit message): %s", resp2.Body.String())
+	}
+}
+
+// TestFreeUserGetPostReturns403AfterMaxViews asserts free users get 403 when viewing more than FreeUserMaxPostViews distinct posts.
+func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
+	const maxViews = 5
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	postDB := post.NewPostDB(testDB.DB)
+
+	CreateUserAndSport(testDB, t)
+
+	freeUserID := uuid.New()
+	freeUser := models.User{
+		ID:                      freeUserID,
+		FirstName:               "Free",
+		LastName:                "User",
+		Email:                   "free@example.com",
+		Username:                "freeuser",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&freeUser).Error; err != nil {
+		t.Fatalf("failed to create free user: %v", err)
+	}
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	}, freeUserID)
+
+	var postIDs []uuid.UUID
+	for i := 0; i < maxViews+1; i++ {
+		p, err := postDB.CreatePost(&models.Post{
+			AuthorID: JohnID, SportID: &SoccerID,
+			Title: "Post " + strconv.Itoa(i), Content: "Content", IsAnonymous: false,
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, p.ID)
+	}
+
+	for i := 0; i < maxViews; i++ {
+		resp := api.Get("/api/v1/post/"+postIDs[i].String(), authHeader)
+		if resp.Code != http.StatusOK {
+			t.Fatalf("view %d (post %s) expected 200, got %d: %s", i, postIDs[i], resp.Code, resp.Body.String())
+		}
+	}
+
+	resp := api.Get("/api/v1/post/"+postIDs[maxViews].String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("view %d (over limit) expected 403, got %d: %s", maxViews, resp.Code, resp.Body.String())
+	}
+
+	respAgain := api.Get("/api/v1/post/"+postIDs[0].String(), authHeader)
+	if respAgain.Code != http.StatusOK {
+		t.Fatalf("re-viewing first post should still be 200, got %d: %s", respAgain.Code, respAgain.Body.String())
+	}
+}
+
+// TestPremiumUserCanCreateMultiplePosts asserts premium users can create more than one post.
+func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	if err := testDB.DB.Model(&models.User{}).Where("id = ?", JohnID).Update("Account_Type", true).Error; err != nil {
+		t.Fatalf("failed to set premium: %v", err)
+	}
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	}, JohnID)
+
+	body := map[string]any{
+		"sport_id": SoccerID, "title": "First", "content": "Content.", "is_anonymous": false, "tags": []map[string]any{},
+	}
+	resp1 := api.Post("/api/v1/post/", body, authHeader)
+	if resp1.Code != http.StatusOK {
+		t.Fatalf("first post expected 200, got %d: %s", resp1.Code, resp1.Body.String())
+	}
+	body["title"] = "Second"
+	resp2 := api.Post("/api/v1/post/", body, authHeader)
+	if resp2.Code != http.StatusOK {
+		t.Fatalf("second post (premium) expected 200, got %d: %s", resp2.Code, resp2.Body.String())
 	}
 }
 
