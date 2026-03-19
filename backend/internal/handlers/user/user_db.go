@@ -16,6 +16,11 @@ type UserDB struct {
 	db *gorm.DB
 }
 
+// NewUserDB returns a new UserDB instance.
+func NewUserDB(db *gorm.DB) *UserDB {
+	return &UserDB{db: db}
+}
+
 /*
 *
 Here we are using GORM to interact with the database. This is an ORM (Object Relational Mapping)
