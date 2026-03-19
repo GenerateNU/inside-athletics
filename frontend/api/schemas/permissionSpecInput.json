@@ -1,0 +1,18 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "description": "Permission action",
+      "examples": ["create"],
+      "type": "string"
+    },
+    "resource": {
+      "description": "Permission resource",
+      "examples": ["sport"],
+      "type": "string"
+    }
+  },
+  "required": ["action", "resource"],
+  "type": "object",
+  "x-readme-ref-name": "PermissionSpecInput"
+}

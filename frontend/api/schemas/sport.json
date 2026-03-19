@@ -1,0 +1,23 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "created_at": { "format": "date-time", "type": "string" },
+    "deleted_at": {
+      "additionalProperties": false,
+      "properties": {
+        "Time": { "format": "date-time", "type": "string" },
+        "Valid": { "type": "boolean" }
+      },
+      "required": ["Time", "Valid"],
+      "type": "object",
+      "x-readme-ref-name": "DeletedAt"
+    },
+    "id": { "type": "string" },
+    "name": { "examples": ["Women's Soccer"], "type": "string" },
+    "popularity": { "examples": [20000], "format": "int32", "type": "integer" },
+    "updated_at": { "format": "date-time", "type": "string" }
+  },
+  "required": ["id", "created_at", "updated_at", "name"],
+  "type": "object",
+  "x-readme-ref-name": "Sport"
+}
