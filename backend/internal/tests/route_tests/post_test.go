@@ -5,7 +5,6 @@ import (
 	"inside-athletics/internal/models"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 )

@@ -13,11 +13,16 @@ type VideoDB struct {
 	db *gorm.DB
 }
 
+// NewVideoDB creates a new VideoDB instance
+func NewVideoDB(db *gorm.DB) *VideoDB {
+	return &VideoDB{db: db}
+}
+
 func (v *VideoDB) GetVideo(id uuid.UUID) (*models.Video, error) {
 	var video models.Video
-	dpResponse := v.db.Where("id = ?", id).First(&video)
-	if dpResponse.Error != nil {
-		return nil, dpResponse.Error
+	dbResponse := v.db.Where("id = ?", id).First(&video)
+	if dbResponse.Error != nil {
+		return utils.HandleDBError(&video, dbResponse.Error)
 	}
 	return &video, nil
 }
