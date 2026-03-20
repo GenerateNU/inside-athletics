@@ -40,7 +40,7 @@ func (s *VideoService) CreateVideo(ctx context.Context, input *struct{ Body Crea
 }
 
 func (s *VideoService) GetVideo(ctx context.Context, input *GetVideoParams) (*utils.ResponseBody[VideoResponse], error) {
-	video, err := s.videoDB.GetVideo(input.ID)
+	video, err := s.videoDB.GetVideo(&input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *VideoService) GetVideo(ctx context.Context, input *GetVideoParams) (*ut
 func (s *VideoService) DeleteVideo(ctx context.Context, input *struct {
 	ID uuid.UUID `path:"id"`
 }) (*utils.ResponseBody[VideoResponse], error) {
-	id := input.ID
+	id := &input.ID
 	err := s.videoDB.DeleteVideo(id)
 
 	respBody := &utils.ResponseBody[VideoResponse]{}

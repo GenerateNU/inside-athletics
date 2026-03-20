@@ -30,5 +30,5 @@ type Post struct {
 	IsLiked      bool `json:"is_liked" gorm:"column:is_liked;->;-:migration"`
 
 	//Video ID
-	VideoID uuid.UUID `json:"video_id" gorm:"foreignKey:ID"`
+	VideoID *uuid.UUID `json:"video_id" gorm:"foreignKey:ID"`
 }

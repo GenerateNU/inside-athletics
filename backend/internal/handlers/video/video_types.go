@@ -15,7 +15,7 @@ type CreateVideoRequest struct {
 
 // VideoResponse defines the response structure for a video
 type VideoResponse struct {
-	ID          uuid.UUID        `json:"id,omitempty"`
+	ID          *uuid.UUID        `json:"id,omitempty"`
 	S3Key       string       `json:"s3key" example:"example_s3_key"`
 	Title       string       `json:"title" example:"Suli doing a backflip !!"`
 }
@@ -28,7 +28,7 @@ type GetVideoParams struct {
 // ToCreateVideoResponse converts a Video model to a videoResponse
 func ToVideoResponse(video *models.Video) *VideoResponse {
 	return &VideoResponse{
-		ID: video.ID,
+		ID:   video.ID,
 		S3Key: video.S3Key,
 		Title: video.Title,
 	}

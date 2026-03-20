@@ -18,7 +18,7 @@ func NewVideoDB(db *gorm.DB) *VideoDB {
 	return &VideoDB{db: db}
 }
 
-func (v *VideoDB) GetVideo(id uuid.UUID) (*models.Video, error) {
+func (v *VideoDB) GetVideo(id *uuid.UUID) (*models.Video, error) {
 	var video models.Video
 	dbResponse := v.db.Where("id = ?", id).First(&video)
 	if dbResponse.Error != nil {
@@ -32,7 +32,7 @@ func (v *VideoDB) CreateVideo(video *models.Video) (*models.Video, error) {
 	return utils.HandleDBError(video, dbResponse.Error)
 }
 
-func (v *VideoDB) DeleteVideo(id uuid.UUID) error {
+func (v *VideoDB) DeleteVideo(id *uuid.UUID) error {
 	dbResponse := v.db.Delete(&models.Video{}, id)
 	if dbResponse.Error != nil {
 		_, err := utils.HandleDBError(&models.Video{}, dbResponse.Error)

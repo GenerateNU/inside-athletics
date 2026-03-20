@@ -35,9 +35,8 @@ func CreateUserAndSportAndVideo(testDB *TestDatabase, t *testing.T) {
 		t.Fatalf("failed to create sport: %v", err)
 	}
 
-	videoID := uuid.New()
 	vid := models.Video{
-		ID:    videoID,
+		ID:    Video1ID,
 		S3Key: "test s3key",
 		Title: "test title",
 	}
@@ -122,7 +121,7 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		"is_anonymous": false,
 		"tags":         []map[string]any{},
-		"video_id":     Video1ID,
+		"video_id":     &Video1ID,
 	}
 
 	resp := api.Post("/api/v1/post/", body, authHeader)
@@ -161,7 +160,7 @@ func TestCreatePostWithTags(t *testing.T) {
 			{"id": tag1.ID},
 			{"id": tag2.ID},
 		},
-		"video_id": Video1ID,
+		"video_id": &Video1ID,
 	}
 
 	resp := api.Post("/api/v1/post/", body, authHeader)
@@ -197,7 +196,7 @@ func TestGetPostById(t *testing.T) {
 		Title:       "Looking for thoughts on NEU Fencing!",
 		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		IsAnonymous: false,
-		VideoID: Video1ID,
+		VideoID:     Video1ID,
 	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
@@ -256,7 +255,7 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 		Title:       "Looking for thoughts on NEU Fencing!",
 		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		IsAnonymous: false,
-		VideoID: Video1ID,
+		VideoID:     Video1ID,
 	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
