@@ -351,9 +351,9 @@ func TestBadValidation(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-		t.Fatalf("failed to migrate posts table: %v", err)
-	}
+	// if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
+	// 	t.Fatalf("failed to migrate posts table: %v", err)
+	// }
 
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
