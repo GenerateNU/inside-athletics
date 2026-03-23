@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Plus, X, Search, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 //Component for an individual tag
 function TagButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
@@ -42,8 +44,12 @@ function TagSection({ header, tags, activeTags, onToggle }: {
 }
 
 export default function SearchPopup() {
-  const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
+  const searchParams = useSearchParams();
+  const initialTags = searchParams.getAll("tag");
+  const [activeTags, setActiveTags] = useState<Set<string>>(new Set(initialTags));
   const [search, setSearch] = useState("");
+
+  const router = useRouter();
 
   //filter logic for searchbar (matches based on whether tag label contains string input)
   const filter = (tags: string[]) =>
@@ -79,10 +85,11 @@ export default function SearchPopup() {
       <div className="max-w-lg w-full space-y-4">
         <div className="flex gap-4">
           {/* onclick function left undefined for later popup logic */}
-          <Button
-            variant="ghost"
-            onClick={() => { }}
-          >
+            <Button variant="ghost" onClick={() => {
+              const params = new URLSearchParams();
+              [...activeTags].forEach(tag => params.append("tag", tag));
+              router.push(`/create_post_popup?${params.toString()}`);
+            }}>
             <ArrowLeft className="!w-8 !h-8" />
           </Button>
           <label className="block text-3xl text-black font-bold">Add Tag</label>
