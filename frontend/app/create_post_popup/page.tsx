@@ -11,7 +11,7 @@ import { Settings, Image, Link, Video, BarChart2, File } from "lucide-react";
 //Component for an individual tag
 function TagButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
-    <div className={`p-[1px] rounded-lg ${active ? "bg-gradient-to-b from-blue-500 to-yellow-400" : "bg-gray-300"}`}>
+    <div className={`p-[1px] rounded-md ${active ? "bg-gradient-to-b from-blue-500 to-yellow-400" : "bg-gray-300"}`}>
       <Button
         variant="ghost"
         onClick={onClick}
