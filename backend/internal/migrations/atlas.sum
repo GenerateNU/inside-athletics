@@ -1,4 +1,4 @@
-h1:k/KG/9uWiIcwbAODuuKbdgG7/oW+OT3nuwJ6K4v/XkA=
+h1:eStD83Fk9h19J9daSVscAB9rlhN5QV3Fe0LCp/BgYag=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
@@ -19,3 +19,4 @@ h1:k/KG/9uWiIcwbAODuuKbdgG7/oW+OT3nuwJ6K4v/XkA=
 20260309170212_AddedTagFollowTable.sql h1:TTRvoyOGb+kP0LRVuoyhhoBAGojABLPT0rucX5eit3k=
 20260315000000_AddSportFollowTable.sql h1:tq6ufmun7KXZ7mFtrjbB0wD4e2ARU3XGVL1WEIATsbs=
 20260315100000_AddCollegeFollowTable.sql h1:QM351flHYZOGxBit95/KNHzuZCo0z9JpyYPZPCVcAIA=
+20260323000652_AddUniqueIndexFollowCollegeSportTag.sql h1:gk9O2wnA2SyUyjhSrnuRP2t73Vd0KofHkrtJgm7OWlY=

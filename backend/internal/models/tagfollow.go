@@ -12,9 +12,9 @@ type TagFollow struct {
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 
-	TagID uuid.UUID `json:"tag_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"TagID of the tag follow" gorm:"type:uuid;not null"`
+	TagID uuid.UUID `json:"tag_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"TagID of the tag follow" gorm:"type:uuid;not null;uniqueIndex:idx_user_tag"`
 	Tag   Tag       `json:"-" gorm:"foreignKey:TagID;references:ID;constraint:OnDelete:CASCADE"`
 
-	UserID uuid.UUID `json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"UserID of the tag follow" gorm:"type:uuid;not null"`
+	UserID uuid.UUID `json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"UserID of the tag follow" gorm:"type:uuid;not null;uniqueIndex:idx_user_tag"`
 	User   User      `json:"-" gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
 }
