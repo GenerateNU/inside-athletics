@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Plus, Search } from "lucide-react";
+import { BookOpen, Briefcase, Home, Plus, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,15 @@ const navItems = [
   { label: "Post", icon: Plus },
 ];
 
+const followingItems = [
+  { label: "Swim", type: "tag" as const },
+  { label: "Airbnb", type: "tag" as const },
+  { label: "Coaching", type: "tag" as const },
+  { label: "Northwestern", type: "school" as const },
+  { label: "Georgia Tech", type: "school" as const },
+  { label: "University of Michigan", type: "school" as const },
+];
+
 type NavbarProps = React.ComponentProps<"aside">;
 
 export function Navbar({ className, ...props }: NavbarProps) {
@@ -20,7 +29,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
     <aside
       data-slot="navbar"
       className={cn(
-        "flex min-h-screen w-72 flex-col border-r border-black/5 bg-white px-5 py-6",
+        "flex h-full w-full max-w-[clamp(16rem,24vw,22rem)] shrink-0 flex-col overflow-y-auto border-r border-black/5 bg-white px-4 py-5 sm:px-5 sm:py-6",
         className,
       )}
       {...props}
@@ -59,6 +68,35 @@ export function Navbar({ className, ...props }: NavbarProps) {
           </Button>
         ))}
       </nav>
+
+      <div className="mt-6 space-y-3">
+        <div className="flex items-center gap-3 px-3">
+          <Briefcase className="size-4 text-zinc-700" />
+          <span className="text-sm font-medium text-zinc-800">
+            Schools/Tags Following
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          {followingItems.map(({ label, type }) => (
+            <button
+              key={label}
+              type="button"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+            >
+              {type === "school" ? (
+                <BookOpen className="size-4 text-zinc-700" />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="h-1.5 w-1.5 rounded-full bg-black"
+                />
+              )}
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </aside>
   );
 }
