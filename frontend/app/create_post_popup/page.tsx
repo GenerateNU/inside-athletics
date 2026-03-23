@@ -12,14 +12,14 @@ import { Settings, Image, Link, Video, BarChart2, File } from "lucide-react";
 function TagButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <div className={`p-[1px] rounded-lg ${active ? "bg-gradient-to-b from-blue-500 to-yellow-400" : "bg-gray-300"}`}>
-    <Button
-      variant="ghost"
-      onClick={onClick}
-      className={`rounded-md text-gray-400 border-black flex items-center gap-2 h-full px-1 py-1 ${active ? "text-white" : "text-black"} 1${active ? "bg-blue" : "bg-white"}`}
-    >
-      {active ? <X size={16} /> : <Plus size={16} />}
-      {label}
-    </Button>
+      <Button
+        variant="ghost"
+        onClick={onClick}
+        className={`rounded-md text-gray-400 border-black flex items-center gap-2 h-full px-1 py-1 text-black bg-white`}
+      >
+        {active ? <X size={16} /> : <Plus size={16} />}
+        {label}
+      </Button>
     </div>
   );
 }
@@ -28,7 +28,8 @@ export default function CreatePostPopup() {
   const searchParams = useSearchParams();
   const initialTags = searchParams.getAll("tag");
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set(initialTags));
-  const [text, setText] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const router = useRouter();
 
   //handler function that takes tags off the section
@@ -36,11 +37,6 @@ export default function CreatePostPopup() {
     setActiveTags((prev) => {
       const next = new Set(prev);
       next.delete(tag);
-
-      const params = new URLSearchParams();
-      [...next].forEach(t => params.append("tag", t));
-      router.replace(`/create_post_popup?${params.toString()}`);
-
       return next;
     });
   };
@@ -61,9 +57,9 @@ export default function CreatePostPopup() {
         <Input
           type="text"
           placeholder="New Post Title"
-          value={text}
+          value={title}
           className="block text-1xl text-gray-400"
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
         />
         {/* Added tags */}
         <div className="flex flex-wrap gap-2 mt-2">
@@ -85,12 +81,12 @@ export default function CreatePostPopup() {
         </div>
         <Textarea
           placeholder="Begin typing..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           className="min-h-[200px]"
         />
         <div className="flex justify-between">
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Button variant="ghost"><Settings size={20} /></Button>
             <Button variant="ghost"><Image size={20} /></Button>
             <Button variant="ghost"><Link size={20} /></Button>
@@ -98,7 +94,7 @@ export default function CreatePostPopup() {
             <Button variant="ghost"><BarChart2 size={20} /></Button>
             <Button variant="ghost"><File size={20} /></Button>
           </div>
-                      <Button
+          <Button
             variant="ghost"
             className={`rounded-md text-gray-400 border-black bg-white flex items-center gap-2 h-full px-1 py-1`}
             onClick={() => { }}

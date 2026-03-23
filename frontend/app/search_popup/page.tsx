@@ -9,16 +9,16 @@ import { useSearchParams } from "next/navigation";
 //Component for an individual tag
 function TagButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
-<div className={`p-[1px] rounded-lg ${active ? "bg-gradient-to-b from-blue-500 to-yellow-400" : "bg-gray-300"}`}>
-  <Button
-    variant="ghost"
-    onClick={onClick}
-    className={`rounded-md bg-white flex items-center gap-2 w-full h-full ${active ? "text-black" : "text-gray-500"}`}
-  >
-    {active ? <X size={16} /> : <Plus size={16} />}
-    {label}
-  </Button>
-</div>
+    <div className={`p-[1px] rounded-lg ${active ? "bg-gradient-to-b from-blue-500 to-yellow-400" : "bg-gray-300"}`}>
+      <Button
+        variant="ghost"
+        onClick={onClick}
+        className={`rounded-md bg-white flex items-center gap-2 w-full h-full px-1 py-1 ${active ? "text-black" : "text-gray-500"}`}
+      >
+        {active ? <X size={16} /> : <Plus size={16} />}
+        {label}
+      </Button>
+    </div>
   );
 }
 
@@ -85,11 +85,14 @@ export default function SearchPopup() {
       <div className="max-w-lg w-full space-y-4">
         <div className="flex gap-4">
           {/* onclick function left undefined for later popup logic */}
-            <Button variant="ghost" onClick={() => {
+          <Button
+            variant="ghost"
+            onClick={() => {
               const params = new URLSearchParams();
               [...activeTags].forEach(tag => params.append("tag", tag));
               router.push(`/create_post_popup?${params.toString()}`);
-            }}>
+            }}
+          >
             <ArrowLeft className="!w-8 !h-8" />
           </Button>
           <label className="block text-3xl text-black font-bold">Add Tag</label>
