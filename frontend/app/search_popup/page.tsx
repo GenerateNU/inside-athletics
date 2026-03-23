@@ -11,7 +11,7 @@ function TagButton({ label, active, onClick }: { label: string; active: boolean;
   <Button
     variant="ghost"
     onClick={onClick}
-    className={`rounded-md bg-white flex items-center gap-2 w-full h-full ${active ? "text-black" : "text-gray-500"}`}
+    className={`rounded-md bg-white flex items-center gap-2 w-full h-full px-1 py-1 ${active ? "text-black" : "text-gray-500"}`}
   >
     {active ? <X size={16} /> : <Plus size={16} />}
     {label}
