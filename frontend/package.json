@@ -10,9 +10,10 @@
     "kubb": "bunx kubb generate"
   },
   "dependencies": {
-    "@base-ui/react": "^1.2.0",
+    "@base-ui/react": "^1.3.0",
     "@eslint/eslintrc": "^3.3.5",
     "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.99.3",
     "@tanstack/react-query": "^5.90.21",
     "ajv": "^8.18.0",
     "class-variance-authority": "^0.7.1",
@@ -42,7 +43,7 @@
     "eslint-config-next": "^16.1.6",
     "prettier": "3.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "5.9.3"
   },
   "ignoreScripts": [
     "sharp",
