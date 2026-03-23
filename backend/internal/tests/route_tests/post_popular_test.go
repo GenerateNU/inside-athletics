@@ -35,8 +35,16 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 		t.Fatalf("create sport: %v", err)
 	}
 
-	if err := testDB.DB.Model(&currentUser).Update("sport_id", SoccerID).Error; err != nil {
-		t.Fatalf("update current user sport: %v", err)
+	college := models.College{
+		ID:           NortheasternID,
+		Name:         "Northeastern University",
+		State:        "MA",
+		City:         "Boston",
+		DivisionRank: models.DivisionI,
+		Website:      "https://example.edu",
+	}
+	if err := testDB.DB.Create(&college).Error; err != nil {
+		t.Fatalf("create college: %v", err)
 	}
 
 	subscribedTag := models.Tag{Name: "recruiting"}
@@ -52,6 +60,7 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 		ID:          uuid.New(),
 		AuthorID:    currentUser.ID,
 		SportID:     &SoccerID,
+		CollegeID:   &NortheasternID,
 		Title:       "Relevant and active",
 		Content:     "This should rank first.",
 		IsAnonymous: false,
@@ -92,8 +101,14 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 	if err := testDB.DB.Create(&models.TagPost{ID: uuid.New(), PostID: likedPost.ID, TagID: otherTag.ID}).Error; err != nil {
 		t.Fatalf("tag liked post: %v", err)
 	}
-	if err := testDB.DB.Create(&models.UserTagSubscription{ID: uuid.New(), UserID: currentUser.ID, TagID: subscribedTag.ID}).Error; err != nil {
-		t.Fatalf("create user tag subscription: %v", err)
+	if err := testDB.DB.Create(&models.TagFollow{ID: uuid.New(), UserID: currentUser.ID, TagID: subscribedTag.ID}).Error; err != nil {
+		t.Fatalf("create tag follow: %v", err)
+	}
+	if err := testDB.DB.Create(&models.SportFollow{ID: uuid.New(), UserID: currentUser.ID, SportID: SoccerID}).Error; err != nil {
+		t.Fatalf("create sport follow: %v", err)
+	}
+	if err := testDB.DB.Create(&models.CollegeFollow{ID: uuid.New(), UserID: currentUser.ID, CollegeID: NortheasternID}).Error; err != nil {
+		t.Fatalf("create college follow: %v", err)
 	}
 
 	for i := 0; i < 2; i++ {
