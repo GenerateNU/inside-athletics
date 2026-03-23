@@ -29,31 +29,31 @@ export function Navbar({ className, ...props }: NavbarProps) {
     <aside
       data-slot="navbar"
       className={cn(
-        "flex h-full w-full max-w-[clamp(16rem,24vw,22rem)] shrink-0 flex-col overflow-y-auto border-r border-black/5 bg-white px-4 py-5 sm:px-5 sm:py-6",
+        "flex h-full w-[clamp(14rem,24vw,22rem)] min-w-[14rem] max-w-[22rem] shrink-0 flex-col overflow-y-auto border-r border-black/5 bg-white px-[clamp(0.875rem,1.5vw,1.25rem)] py-[clamp(1rem,1.75vw,1.5rem)]",
         className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]">
         <div
           aria-hidden="true"
-          className="h-10 w-10 shrink-0 rounded-sm bg-zinc-300"
+          className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300"
         />
-        <span className="text-lg font-bold tracking-tight text-black">
+        <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
           Inside Athletics
         </span>
       </div>
 
-      <div className="pt-4">
+      <div className="pt-[clamp(0.75rem,1.2vw,1rem)]">
         <Input
           type="search"
           placeholder="Search"
           aria-label="Search"
-          className="h-10 rounded-lg border-zinc-200 bg-white px-3 text-sm text-zinc-700 placeholder:text-zinc-400"
+          className="h-[clamp(2.25rem,3.2vw,2.5rem)] rounded-lg border-zinc-200 bg-white px-[clamp(0.625rem,1vw,0.75rem)] text-[clamp(0.8rem,1.1vw,0.9rem)] text-zinc-700 placeholder:text-zinc-400"
         />
       </div>
 
-      <Separator className="my-4 bg-zinc-200/80" />
+      <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
 
       <nav aria-label="Primary" className="flex flex-col gap-1">
         {navItems.map(({ label, icon: Icon }) => (
@@ -61,18 +61,18 @@ export function Navbar({ className, ...props }: NavbarProps) {
             key={label}
             variant="ghost"
             size="lg"
-            className="h-11 justify-start gap-3 rounded-lg px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
+            className="h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 justify-start gap-[clamp(0.5rem,1vw,0.75rem)] rounded-lg px-[clamp(0.625rem,1vw,0.75rem)] text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
           >
-            <Icon className="size-4 text-zinc-700" />
-            <span>{label}</span>
+            <Icon className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
+            <span className="truncate">{label}</span>
           </Button>
         ))}
       </nav>
 
-      <div className="mt-6 space-y-3">
-        <div className="flex items-center gap-3 px-3">
-          <Briefcase className="size-4 text-zinc-700" />
-          <span className="text-sm font-medium text-zinc-800">
+      <div className="mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]">
+        <div className="flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]">
+          <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
+          <span className="truncate text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-800">
             Schools/Tags Following
           </span>
         </div>
@@ -82,17 +82,17 @@ export function Navbar({ className, ...props }: NavbarProps) {
             <button
               key={label}
               type="button"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+              className="flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] rounded-lg px-[clamp(0.625rem,1vw,0.75rem)] py-[clamp(0.45rem,0.9vw,0.55rem)] text-left text-[clamp(0.78rem,1.05vw,0.88rem)] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
             >
               {type === "school" ? (
-                <BookOpen className="size-4 text-zinc-700" />
+                <BookOpen className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
               ) : (
                 <span
                   aria-hidden="true"
-                  className="h-1.5 w-1.5 rounded-full bg-black"
+                  className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black"
                 />
               )}
-              <span>{label}</span>
+              <span className="truncate">{label}</span>
             </button>
           ))}
         </div>
