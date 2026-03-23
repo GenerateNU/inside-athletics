@@ -11,14 +11,16 @@ import { Settings, Image, Link, Video, BarChart2, File } from "lucide-react";
 //Component for an individual tag
 function TagButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
+    <div className={`p-[1px] rounded-lg ${active ? "bg-gradient-to-b from-blue-500 to-yellow-400" : "bg-gray-300"}`}>
     <Button
       variant="ghost"
       onClick={onClick}
-      className={`rounded-md text-gray-400 border-black bg-white flex items-center gap-2 h-full px-1 py-1`}
+      className={`rounded-md text-gray-400 border-black flex items-center gap-2 h-full px-1 py-1 ${active ? "text-white" : "text-black"} 1${active ? "bg-blue" : "bg-white"}`}
     >
       {active ? <X size={16} /> : <Plus size={16} />}
       {label}
     </Button>
+    </div>
   );
 }
 
