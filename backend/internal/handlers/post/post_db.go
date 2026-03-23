@@ -214,21 +214,25 @@ func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID 
 				CASE
 					WHEN EXISTS (
 						SELECT 1
-						FROM user_tag_subscriptions uts
-						JOIN tag_posts tp_sub ON tp_sub.tag_id = uts.tag_id
-						WHERE uts.user_id = ? AND tp_sub.post_id = posts.id
+						FROM tag_follows tf
+						JOIN tag_posts tp_sub ON tp_sub.tag_id = tf.tag_id
+						WHERE tf.user_id = ? AND tp_sub.post_id = posts.id
 					) THEN 12.0
 					ELSE 0.0
 				END +
 				CASE
-					WHEN posts.sport_id IS NOT NULL AND posts.sport_id = (
-						SELECT sport_id FROM users WHERE id = ?
+					WHEN posts.sport_id IS NOT NULL AND EXISTS (
+						SELECT 1
+						FROM sport_follows sf
+						WHERE sf.user_id = ? AND sf.sport_id = posts.sport_id
 					) THEN 4.0
 					ELSE 0.0
 				END +
 				CASE
-					WHEN posts.college_id IS NOT NULL AND posts.college_id = (
-						SELECT college_id FROM users WHERE id = ?
+					WHEN posts.college_id IS NOT NULL AND EXISTS (
+						SELECT 1
+						FROM college_follows cf
+						WHERE cf.user_id = ? AND cf.college_id = posts.college_id
 					) THEN 2.0
 					ELSE 0.0
 				END +
