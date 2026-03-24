@@ -48,8 +48,7 @@ func TestGetSportFollowsByUser(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	},
 		user.ID,
 	)
@@ -83,8 +82,7 @@ func TestGetFollowingUsersBySport(t *testing.T) {
 	user, sport := seedUserAndSport(t, testDB, "get-following-users-by-sport")
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	})
 
 	createdSportFollow := models.SportFollow{
@@ -118,8 +116,7 @@ func TestCreateSportFollow(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	},
 		user.ID,
 	)
@@ -152,12 +149,9 @@ func TestDeleteSportFollow(t *testing.T) {
 	api := testDB.API
 	user, sport := seedUserAndSport(t, testDB, "delete-sport-follow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "sport"},
-	})
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "sportfollow"},
+	}, user.ID)
 
 	createdSportFollow := models.SportFollow{
 		ID:      uuid.New(),
@@ -185,14 +179,44 @@ func TestDeleteSportFollow(t *testing.T) {
 	}
 }
 
+func TestDeleteSportFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, sport := seedUserAndSport(t, testDB, "delete-other-sport-follow-owner")
+	otherUser, _ := seedUserAndSport(t, testDB, "delete-other-sport-follow-actor")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+	assignRoleToUser(t, testDB.DB, otherUser.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "sportfollow"},
+	}, otherUser.ID)
+
+	createdSportFollow := models.SportFollow{
+		ID:      uuid.New(),
+		UserID:  owner.ID,
+		SportID: sport.ID,
+	}
+
+	if err := testDB.DB.Create(&createdSportFollow).Error; err != nil {
+		t.Fatalf("Unable to add sport follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/sport/"+createdSportFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when deleting another user's sport follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestGetSportFollowsByUser_InvalidUUID(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	})
 
 	resp := api.Get("/api/v1/user/sport/not-a-valid-uuid/follows", authHeader)
@@ -211,8 +235,7 @@ func TestGetFollowingUsersBySport_InvalidUUID(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	})
 
 	resp := api.Get("/api/v1/user/sport/invalid-uuid/users", authHeader)
@@ -234,8 +257,7 @@ func TestCreateSportFollow_DuplicateReturns409(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	},
 		user.ID,
 	)
@@ -264,8 +286,7 @@ func TestCreateSportFollow_NonExistentSportReturnsError(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "sportfollow"},
 	},
 		user.ID,
 	)
@@ -287,10 +308,7 @@ func TestDeleteSportFollow_NonExistentReturns404(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "sport"},
+		{Action: models.PermissionDelete, Resource: "sportfollow"},
 	})
 
 	nonExistentID := uuid.New()
@@ -307,10 +325,7 @@ func TestDeleteSportFollow_InvalidUUID(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "sport"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "sport"},
+		{Action: models.PermissionDelete, Resource: "sportfollow"},
 	})
 
 	resp := api.Delete("/api/v1/user/sport/not-a-valid-uuid", authHeader)
