@@ -192,7 +192,7 @@ func TestDeleteCollegeFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
 	assignRoleToUser(t, testDB.DB, otherUser.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
-	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{
 		{Action: models.PermissionDeleteOwn, Resource: "collegefollow"},
 	}, otherUser.ID)
 
