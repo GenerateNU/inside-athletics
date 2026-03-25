@@ -242,6 +242,36 @@ func TestDeleteCollegeFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.
 	}
 }
 
+func TestDeleteCollegeFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, college := seedUserAndCollege(t, testDB, "delete-other-college-follow-owner-admin")
+	adminUser, _ := seedUserAndCollege(t, testDB, "delete-other-college-follow-admin")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "collegefollow"},
+	}, adminUser.ID)
+
+	createdCollegeFollow := models.CollegeFollow{
+		ID:        uuid.New(),
+		UserID:    owner.ID,
+		CollegeID: college.ID,
+	}
+
+	if err := testDB.DB.Create(&createdCollegeFollow).Error; err != nil {
+		t.Fatalf("Unable to add college follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200 when admin deletes another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestGetCollegeFollowsByUser_InvalidUUID(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)

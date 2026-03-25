@@ -240,6 +240,36 @@ func TestDeleteSportFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T)
 	}
 }
 
+func TestDeleteSportFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, sport := seedUserAndSport(t, testDB, "delete-other-sport-follow-owner-admin")
+	adminUser, _ := seedUserAndSport(t, testDB, "delete-other-sport-follow-admin")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "sportfollow"},
+	}, adminUser.ID)
+
+	createdSportFollow := models.SportFollow{
+		ID:      uuid.New(),
+		UserID:  owner.ID,
+		SportID: sport.ID,
+	}
+
+	if err := testDB.DB.Create(&createdSportFollow).Error; err != nil {
+		t.Fatalf("Unable to add sport follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/sport/"+createdSportFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200 when admin deletes another user's sport follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestGetSportFollowsByUser_InvalidUUID(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
