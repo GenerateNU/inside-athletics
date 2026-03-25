@@ -45,11 +45,6 @@ func authHeaderWithPermissions(t *testing.T, db *gorm.DB, perms []permissionSpec
 	return header
 }
 
-func authHeaderWithPermissionsForRole(t *testing.T, db *gorm.DB, roleName models.RoleName, perms []permissionSpec) string {
-	_, header := seedUserWithRoleAndPermissions(t, db, roleName, perms)
-	return header
-}
-
 func authHeaderWithPermissionsGivenUser(t *testing.T, db *gorm.DB, perms []permissionSpec, userID uuid.UUID) string {
 	return authHeaderWithPermissionsGivenUserForRole(t, db, models.RoleAdmin, perms, userID)
 }
