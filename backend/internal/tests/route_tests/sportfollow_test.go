@@ -210,6 +210,36 @@ func TestDeleteSportFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
 	}
 }
 
+func TestDeleteSportFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, sport := seedUserAndSport(t, testDB, "delete-other-sport-follow-owner-moderator")
+	moderatorUser, _ := seedUserAndSport(t, testDB, "delete-other-sport-follow-moderator")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleModerator, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "sportfollow"},
+	}, moderatorUser.ID)
+
+	createdSportFollow := models.SportFollow{
+		ID:      uuid.New(),
+		UserID:  owner.ID,
+		SportID: sport.ID,
+	}
+
+	if err := testDB.DB.Create(&createdSportFollow).Error; err != nil {
+		t.Fatalf("Unable to add sport follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/sport/"+createdSportFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when moderator deletes another user's sport follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestGetSportFollowsByUser_InvalidUUID(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)

@@ -213,6 +213,36 @@ func TestDeleteTagFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
 	}
 }
 
+func TestDeleteTagFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, tag := seedUserAndTag(t, testDB, "delete-other-tag-follow-owner-moderator")
+	moderatorUser, _ := seedUserAndTag(t, testDB, "delete-other-tag-follow-moderator")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleModerator, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "tagfollow"},
+	}, moderatorUser.ID)
+
+	createdTagFollow := models.TagFollow{
+		ID:     uuid.New(),
+		UserID: owner.ID,
+		TagID:  tag.ID,
+	}
+
+	if err := testDB.DB.Create(&createdTagFollow).Error; err != nil {
+		t.Fatalf("Unable to add tag follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/tag/"+createdTagFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when moderator deletes another user's tag follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 // Retrieving list of tags by user with an invalid tag UUID should throw errors
 func TestGetTagFollowsByUser_InvalidUUID(t *testing.T) {
 	testDB := SetupTestDB(t)
