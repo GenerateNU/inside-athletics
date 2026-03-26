@@ -49,6 +49,34 @@ func (s *PremiumPostDB) GetAllPremiumPosts(limit, offset int) ([]models.PremiumP
 	return posts, total, nil
 }
 
+// GetPremiumPostsByAuthorID returns all premium posts related to a given author
+func (s *PremiumPostDB) GetPremiumPostsByAuthorID(limit, offset int, authorID uuid.UUID) ([]models.PremiumPost, int64, error) {
+	var posts []models.PremiumPost
+	var total int64
+
+	// check if there are actually premium posts where the given author is the author
+	if err := s.db.Model(&models.PremiumPost{}).
+		Where("author_id = ?", authorID).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := s.db.
+		Model(&models.PremiumPost{}).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags").
+		Where("author_id = ?", authorID).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return posts, total, nil
+}
+
 // GetPremiumPostsBySportID returns all premium posts related to a given sport
 func (s *PremiumPostDB) GetPremiumPostsBySportID(limit, offset int, sportID uuid.UUID) ([]models.PremiumPost, int64, error) {
 	var posts []models.PremiumPost
