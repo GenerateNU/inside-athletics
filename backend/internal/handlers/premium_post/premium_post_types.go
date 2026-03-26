@@ -30,6 +30,13 @@ type GetAllPremiumPostsParams struct {
 	Offset int `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
 }
 
+// Given an AuthorID, return all posts that the author has posted (with pagination)
+type GetPremiumPostsByAuthorIDParams struct {
+	AuthorID uuid.UUID `path:"author_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Author ID to filter posts"`
+	Limit    int       `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
+	Offset   int       `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
+}
+
 // Given a SportID, return all posts related to the sport (with pagnination)
 type GetPremiumPostsBySportIDParams struct {
 	SportID uuid.UUID `path:"sport_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Sport ID to filter posts"`
@@ -66,6 +73,11 @@ type PremiumPostResponse struct {
 type GetAllPremiumPostsResponse struct {
 	Posts []PremiumPostResponse `json:"posts" doc:"List of premium posts"`
 	Total int                   `json:"total" example:"100" doc:"Total number of premium posts"`
+}
+
+type GetPremiumPostsByAuthorIDResponse struct {
+	Posts []PremiumPostResponse `json:"posts" doc:"List of premium posts for the author"`
+	Total int                   `json:"total" example:"25" doc:"Total number of premium posts for this author"`
 }
 
 type GetPremiumPostsBySportIDResponse struct {
