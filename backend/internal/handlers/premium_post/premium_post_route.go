@@ -14,10 +14,10 @@ func Route(api huma.API, db *gorm.DB) {
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/posts/premium")
-		huma.Get(grp, "/", premiumPostService.GetAllPremiumPosts)
-		huma.Get(grp, "/by-author/{author_id}", premiumPostService.GetPremiumPostsByAuthorID)
-		huma.Get(grp, "/by-sport/{sport_id}", premiumPostService.GetPremiumPostsBySportID)
-		huma.Get(grp, "/by-college/{college_id}", premiumPostService.GetPremiumPostsByCollegeID)
-		huma.Get(grp, "/by-tag/{tag_id}", premiumPostService.GetPremiumPostsByTagID)
+		huma.Get(grp, "/", premiumPostService.GetAllPremiumPosts)                                // Get all PremiumPosts in db
+		huma.Get(grp, "/by-author/{author_id}", premiumPostService.GetPremiumPostsByAuthorID)    // Get all premium posts created by this author
+		huma.Get(grp, "/by-sport/{sport_id}", premiumPostService.GetPremiumPostsBySportID)       // Get all premium posts tagged to this sport
+		huma.Get(grp, "/by-college/{college_id}", premiumPostService.GetPremiumPostsByCollegeID) // Get all premium posts tagged to this college
+		huma.Get(grp, "/by-tag/{tag_id}", premiumPostService.GetPremiumPostsByTagID)             // Get all premium posts tagged to this tag
 	}
 }
