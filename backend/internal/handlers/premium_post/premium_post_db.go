@@ -4,8 +4,10 @@ import (
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
+	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PremiumPostDB struct {
@@ -160,4 +162,43 @@ func (s *PremiumPostDB) GetPremiumPostsByTagID(limit, offset int, tagID uuid.UUI
 	}
 
 	return posts, total, nil
+}
+
+// UpdatePremiumPost updates an existing premium post
+func (s *PremiumPostDB) UpdatePremiumPost(id uuid.UUID, updates UpdatePremiumPostRequest, userID uuid.UUID) (*models.PremiumPost, error) {
+	var updatedPost models.PremiumPost
+	dbResponse := s.db.Model(&models.PremiumPost{}).
+		Clauses(clause.Returning{}).
+		Select(`premium_posts.*,
+			(SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = premium_posts.id) AS like_count,
+			(SELECT COUNT(*) FROM comments WHERE comments.post_id = premium_posts.id) AS comment_count,
+			(SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = premium_posts.id AND post_likes.user_id = ?) AS is_liked`,
+			userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+		}).
+		Where("id = ?", id).
+		Updates(updates).
+		Scan(&updatedPost)
+
+	if dbResponse.RowsAffected == 0 {
+		return nil, huma.Error404NotFound("Resource not found")
+	}
+	return utils.HandleDBError(&updatedPost, dbResponse.Error)
+}
+
+// DeletePremiumPost soft deletes a premium post by ID
+func (s *PremiumPostDB) DeletePremiumPost(id uuid.UUID) error {
+	dbResponse := s.db.Delete(&models.PremiumPost{}, "id = ?", id)
+	if dbResponse.RowsAffected == 0 {
+		return huma.Error404NotFound("Resource not found")
+	}
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError(&models.PremiumPost{}, dbResponse.Error)
+		return err
+	}
+	return nil
 }

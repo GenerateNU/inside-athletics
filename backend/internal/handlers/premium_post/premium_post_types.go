@@ -14,16 +14,6 @@ import (
 // get all posts by college - limit int for how many posts they want
 // get all posts by tag - limit int for how many posts they want i dont think we need this
 
-// an attachmenttype is a
-type AttachmentType string
-
-// for optional pdf, image or video
-const (
-	AttachmentTypePDF   AttachmentType = "pdf"
-	AttachmentTypeImage AttachmentType = "image"
-	AttachmentTypeVideo AttachmentType = "video"
-)
-
 // Retrieve all posts
 type GetAllPremiumPostsParams struct {
 	Limit  int `query:"limit" default:"50" example:"50" doc:"Number of posts to return"`
@@ -152,7 +142,13 @@ func ToPremiumPostResponse(post *models.PremiumPost) *PremiumPostResponse {
 }
 
 type UpdatePremiumPostRequest struct {
+	Title          *string                `json:"title,omitempty" minLength:"1" maxLength:"100"`
+	Content        *string                `json:"content,omitempty" minLength:"1" maxLength:"5000"`
+	AttachmentKey  *string                `json:"attachment_key,omitempty"`
+	AttachmentType *models.AttachmentType `json:"attachment_type,omitempty" validate:"omitempty,oneof=pdf image video"`
 }
 
 type DeletePremiumPostRequest struct {
+	Message string    `json:"message" example:"Premium post deleted successfully" doc:"Success message"`
+	ID      uuid.UUID `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the deleted premium post"`
 }
