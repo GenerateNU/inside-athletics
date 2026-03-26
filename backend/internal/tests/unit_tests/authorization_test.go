@@ -6,15 +6,12 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
-	"time"
 
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/server"
 
 	"github.com/google/uuid"
-	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 	gormPostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -109,10 +106,7 @@ func setupAuthTestDB(t *testing.T) *authTestDB {
 		postgres.WithDatabase("test_db"),
 		postgres.WithUsername("test_user"),
 		postgres.WithPassword("test_password"),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(60*time.Second)),
+		postgres.BasicWaitStrategies(),
 	)
 	if err != nil {
 		t.Fatalf("failed to start postgres container: %s", err)
@@ -176,7 +170,7 @@ func (td *authTestDB) runMigrations(t *testing.T) {
 	}
 
 	_, filename, _, _ := runtime.Caller(0)
-	backendDir := filepath.Join(filepath.Dir(filename), "..", "..")
+	backendDir := filepath.Join(filepath.Dir(filename), "..", "..", "..")
 	migrationDir := filepath.Join("internal", "migrations")
 
 	cmd := exec.Command("atlas", "migrate", "apply",

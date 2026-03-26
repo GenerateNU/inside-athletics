@@ -174,6 +174,60 @@ components:
         - is_liked
         - is_verified_athlete
       type: object
+    CreateCollegeFollowBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeFollowBody.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          description: ID of the College
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - college_id
+        - user_id
+      type: object
+    CreateCollegeFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          description: ID of the College
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        id:
+          description: ID of the college follow created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - college_id
+        - user_id
+      type: object
     CreateCollegeRequest:
       additionalProperties: false
       properties:
@@ -623,6 +677,60 @@ components:
       required:
         - name
       type: object
+    CreateSportFollowBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSportFollowBody.json
+          format: uri
+          readOnly: true
+          type: string
+        sport_id:
+          description: ID of the Sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - sport_id
+        - user_id
+      type: object
+    CreateSportFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSportFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the sport follow created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        sport_id:
+          description: ID of the Sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - sport_id
+        - user_id
+      type: object
     CreateSportRequest:
       additionalProperties: false
       properties:
@@ -758,6 +866,60 @@ components:
           type: string
       required:
         - name
+      type: object
+    CreateTagFollowBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagFollowBody.json
+          format: uri
+          readOnly: true
+          type: string
+        tag_id:
+          description: ID of the Tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - tag_id
+        - user_id
+      type: object
+    CreateTagFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tag follow created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: ID of the Tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - tag_id
+        - user_id
       type: object
     CreateTagPostBody:
       additionalProperties: false
@@ -939,6 +1101,24 @@ components:
         - id
         - name
       type: object
+    DeleteCollegeFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteCollegeFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - College follow was deleted successfully
+          type: string
+      required:
+        - message
+      type: object
     DeleteCollegeResponse:
       additionalProperties: false
       properties:
@@ -1049,6 +1229,24 @@ components:
         - message
         - id
       type: object
+    DeleteSportFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteSportFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - Sport follow was deleted successfully
+          type: string
+      required:
+        - message
+      type: object
     DeleteStripeCustomerResponse:
       additionalProperties: false
       properties:
@@ -1078,6 +1276,24 @@ components:
         - id
         - object
         - deleted
+      type: object
+    DeleteTagFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteTagFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - Tag follow was deleted successfully
+          type: string
+      required:
+        - message
       type: object
     DeleteTagPostResponse:
       additionalProperties: false
@@ -1308,6 +1524,35 @@ components:
         - sports
         - total
       type: object
+    GetCollegeFollowsByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCollegeFollowsByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        college_ids:
+          description: The colleges the given user follows
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - college_ids
+      type: object
     GetCollegeResponse:
       additionalProperties: false
       properties:
@@ -1427,6 +1672,93 @@ components:
       required:
         - user_id
         - comment_id
+      type: object
+    GetFollowingUsersByCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetFollowingUsersByCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          description: ID of the College
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_ids:
+          description: All users that follow this college
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      required:
+        - college_id
+        - user_ids
+      type: object
+    GetFollowingUsersBySportResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetFollowingUsersBySportResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        sport_id:
+          description: ID of the Sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_ids:
+          description: All users that follow this sport
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      required:
+        - sport_id
+        - user_ids
+      type: object
+    GetFollowingUsersByTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetFollowingUsersByTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        tag_id:
+          description: ID of the Tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_ids:
+          description: All users that follow this tag
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      required:
+        - tag_id
+        - user_ids
       type: object
     GetPostLikeInfoResponse:
       additionalProperties: false
@@ -1550,6 +1882,35 @@ components:
             - "null"
       required:
         - post_ids
+      type: object
+    GetSportFollowsByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetSportFollowsByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        sport_ids:
+          description: The sports the given user follows
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - sport_ids
       type: object
     GetStripeCustomerByEmailResponse:
       additionalProperties: false
@@ -1717,6 +2078,35 @@ components:
         - shipping
         - tax_exempt
         - test_clock
+      type: object
+    GetTagFollowsByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetTagFollowsByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        tag_ids:
+          description: The tags the given user follows
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - tag_ids
       type: object
     GetTagPostByIDResponse:
       additionalProperties: false
@@ -5110,6 +5500,113 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 user
+  /api/v1/user/college/:
+    post:
+      operationId: post-api-v1-user-college
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCollegeFollowBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCollegeFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user college
+  /api/v1/user/college/{college_id}/users:
+    get:
+      operationId: get-api-v1-user-college-by-college-id-users
+      parameters:
+        - description: ID of the College
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: college_id
+          required: true
+          schema:
+            description: ID of the College
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowingUsersByCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user college by college ID users
+  /api/v1/user/college/{id}:
+    delete:
+      operationId: delete-api-v1-user-college-by-id
+      parameters:
+        - description: ID of the college follow to be deleted
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college follow to be deleted
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCollegeFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user college by ID
+  /api/v1/user/college/{user_id}/follows:
+    get:
+      operationId: get-api-v1-user-college-by-user-id-follows
+      parameters:
+        - description: ID of the user
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: user_id
+          required: true
+          schema:
+            description: ID of the user
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCollegeFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user college by user ID follows
   /api/v1/user/current:
     get:
       operationId: get-api-v1-user-current
@@ -5127,6 +5624,220 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 user current
+  /api/v1/user/sport/:
+    post:
+      operationId: post-api-v1-user-sport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSportFollowBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSportFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user sport
+  /api/v1/user/sport/{id}:
+    delete:
+      operationId: delete-api-v1-user-sport-by-id
+      parameters:
+        - description: ID of the sport follow to be deleted
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the sport follow to be deleted
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteSportFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user sport by ID
+  /api/v1/user/sport/{sport_id}/users:
+    get:
+      operationId: get-api-v1-user-sport-by-sport-id-users
+      parameters:
+        - description: ID of the Sport
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: sport_id
+          required: true
+          schema:
+            description: ID of the Sport
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowingUsersBySportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user sport by sport ID users
+  /api/v1/user/sport/{user_id}/follows:
+    get:
+      operationId: get-api-v1-user-sport-by-user-id-follows
+      parameters:
+        - description: ID of the user
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: user_id
+          required: true
+          schema:
+            description: ID of the user
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSportFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user sport by user ID follows
+  /api/v1/user/tag/:
+    post:
+      operationId: post-api-v1-user-tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagFollowBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTagFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user tag
+  /api/v1/user/tag/{id}:
+    delete:
+      operationId: delete-api-v1-user-tag-by-id
+      parameters:
+        - description: ID of the tag follow to be deleted
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the tag follow to be deleted
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTagFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user tag by ID
+  /api/v1/user/tag/{tag_id}/users:
+    get:
+      operationId: get-api-v1-user-tag-by-tag-id-users
+      parameters:
+        - description: ID of the Tag
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: tag_id
+          required: true
+          schema:
+            description: ID of the Tag
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowingUsersByTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user tag by tag ID users
+  /api/v1/user/tag/{user_id}/follows:
+    get:
+      operationId: get-api-v1-user-tag-by-user-id-follows
+      parameters:
+        - description: ID of the user
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: user_id
+          required: true
+          schema:
+            description: ID of the user
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user tag by user ID follows
   /api/v1/user/{id}:
     delete:
       operationId: delete-api-v1-user-by-id

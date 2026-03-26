@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"inside-athletics/internal/handlers/college"
+	"inside-athletics/internal/handlers/collegefollow"
 	"inside-athletics/internal/handlers/comment"
 	"inside-athletics/internal/handlers/comment_like"
 	"inside-athletics/internal/handlers/content"
@@ -14,8 +15,10 @@ import (
 	"inside-athletics/internal/handlers/post_like"
 	"inside-athletics/internal/handlers/role"
 	"inside-athletics/internal/handlers/sport"
+	"inside-athletics/internal/handlers/sportfollow"
 	"inside-athletics/internal/handlers/stripe"
 	"inside-athletics/internal/handlers/tag"
+	"inside-athletics/internal/handlers/tagfollow"
 	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/handlers/user"
 	"inside-athletics/internal/s3"
@@ -73,7 +76,7 @@ func CreateApp(db *gorm.DB) *App {
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-	routeGroups := [...]RouteFN{media.Route, health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, tag.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route}
+	routeGroups := [...]RouteFN{media.Route, health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
