@@ -49,8 +49,7 @@ func TestGetTagFollowsByUser(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	},
 		user.ID,
 	)
@@ -84,8 +83,7 @@ func TestGetFollowingUsersByTag(t *testing.T) {
 	user, tag := seedUserAndTag(t, testDB, "get-following-users-by-tag")
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	})
 
 	createdTagFollow := models.TagFollow{
@@ -119,8 +117,7 @@ func TestCreateTagFollow(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	},
 		user.ID,
 	)
@@ -154,12 +151,9 @@ func TestDeleteTagFollow(t *testing.T) {
 	api := testDB.API
 	user, tag := seedUserAndTag(t, testDB, "delete-tag-follow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "tag"},
-	})
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "tagfollow"},
+	}, user.ID)
 
 	createdTagFollow := models.TagFollow{
 		ID:     uuid.New(),
@@ -188,6 +182,97 @@ func TestDeleteTagFollow(t *testing.T) {
 	}
 }
 
+func TestDeleteTagFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, tag := seedUserAndTag(t, testDB, "delete-other-tag-follow-owner")
+	otherUser, _ := seedUserAndTag(t, testDB, "delete-other-tag-follow-actor")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+	assignRoleToUser(t, testDB.DB, otherUser.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "tagfollow"},
+	}, otherUser.ID)
+
+	createdTagFollow := models.TagFollow{
+		ID:     uuid.New(),
+		UserID: owner.ID,
+		TagID:  tag.ID,
+	}
+
+	if err := testDB.DB.Create(&createdTagFollow).Error; err != nil {
+		t.Fatalf("Unable to add tag follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/tag/"+createdTagFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when deleting another user's tag follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestDeleteTagFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, tag := seedUserAndTag(t, testDB, "delete-other-tag-follow-owner-moderator")
+	moderatorUser, _ := seedUserAndTag(t, testDB, "delete-other-tag-follow-moderator")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleModerator, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "tagfollow"},
+	}, moderatorUser.ID)
+
+	createdTagFollow := models.TagFollow{
+		ID:     uuid.New(),
+		UserID: owner.ID,
+		TagID:  tag.ID,
+	}
+
+	if err := testDB.DB.Create(&createdTagFollow).Error; err != nil {
+		t.Fatalf("Unable to add tag follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/tag/"+createdTagFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when moderator deletes another user's tag follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestDeleteTagFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, tag := seedUserAndTag(t, testDB, "delete-other-tag-follow-owner-admin")
+	adminUser, _ := seedUserAndTag(t, testDB, "delete-other-tag-follow-admin")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "tagfollow"},
+	}, adminUser.ID)
+
+	createdTagFollow := models.TagFollow{
+		ID:     uuid.New(),
+		UserID: owner.ID,
+		TagID:  tag.ID,
+	}
+
+	if err := testDB.DB.Create(&createdTagFollow).Error; err != nil {
+		t.Fatalf("Unable to add tag follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/tag/"+createdTagFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200 when admin deletes another user's tag follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 // Retrieving list of tags by user with an invalid tag UUID should throw errors
 func TestGetTagFollowsByUser_InvalidUUID(t *testing.T) {
 	testDB := SetupTestDB(t)
@@ -195,8 +280,7 @@ func TestGetTagFollowsByUser_InvalidUUID(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	})
 
 	resp := api.Get("/api/v1/user/tag/not-a-valid-uuid/follows", authHeader)
@@ -216,8 +300,7 @@ func TestGetFollowingUsersByTag_InvalidUUID(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	})
 
 	resp := api.Get("/api/v1/user/tag/invalid-uuid/users", authHeader)
@@ -240,8 +323,7 @@ func TestCreateTagFollow_DuplicateReturns409(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	},
 		user.ID,
 	)
@@ -271,8 +353,7 @@ func TestCreateTagFollow_NonExistentTagReturnsError(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	},
 		user.ID,
 	)
@@ -295,8 +376,7 @@ func TestCreateTagFollow_InvalidBodyReturnsError(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
+		{Action: models.PermissionCreate, Resource: "tagfollow"},
 	})
 
 	// Invalid body: invalid random UUID strings
@@ -318,10 +398,7 @@ func TestDeleteTagFollow_NonExistentReturns404(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "tag"},
+		{Action: models.PermissionDelete, Resource: "tagfollow"},
 	})
 
 	nonExistentID := uuid.New()
@@ -339,10 +416,7 @@ func TestDeleteTagFollow_InvalidUUID(t *testing.T) {
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "tag"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "tag"},
+		{Action: models.PermissionDelete, Resource: "tagfollow"},
 	})
 
 	resp := api.Delete("/api/v1/user/tag/not-a-valid-uuid", authHeader)
