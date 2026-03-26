@@ -176,3 +176,12 @@ type DeletePostResponse struct {
 	Message string    `json:"message" example:"College deleted successfully" doc:"Success message"`
 	ID      uuid.UUID `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the deleted college"`
 }
+
+type GetSearchParam struct {
+	SearchStr string `query:"search_str" binding:"required" example:"Northeastern University" doc:"String to fuzzy search posts/tags/colleges/sports on"`
+}
+
+type GetSearchResponse struct {
+	Posts []PostResponse `json:"posts" doc:"List of post responses found for given search"`
+	Count int64          `json:"count" example:"5" doc:"Count of search results found for given search"`
+}

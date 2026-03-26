@@ -20,5 +20,6 @@ func Route(api huma.API, db *gorm.DB) {
 		huma.Get(grp, "/popular", postService.GetPopularPosts)                 // Read popular posts
 		huma.Get(grp, "/by-sport/{sport_id}", postService.GetPostBySportID)    // Read posts by sport id
 		huma.Get(grp, "/by-author/{author_id}", postService.GetPostByAuthorID) // Read posts by author id
+		huma.Get(grp, "/search", postService.FuzzySearchForPost)               // Find all posts based on title for given search string
 	}
 }

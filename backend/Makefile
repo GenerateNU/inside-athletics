@@ -62,10 +62,15 @@ revert-single-dev:
 VERBOSE ?=
 V_FLAG := $(if $(filter true,$(VERBOSE)),-v,)
 
+TEST_NAME ?=
+
 .PHONY: run-all-tests
 # Runs all tests, if passed verbose, log test details
 run-all-tests:
 	doppler run --command="go test $(V_FLAG)  ./internal/tests/route_tests ./internal/tests/unit_tests"
+
+run-test:
+	doppler run --command="go test $(V_FLAG) -run "^$(TEST_NAME)" ./internal/tests/route_tests "
 
 .PHONY: run-route-tests
 # Runs all the route tests, if passed verbose, log test details

@@ -205,3 +205,26 @@ func (s *PostService) DeletePost(ctx context.Context, input *struct {
 		Body: response,
 	}, err
 }
+
+func (s *PostService) FuzzySearchForPost(ctx context.Context, input *GetSearchParam) (*utils.ResponseBody[GetSearchResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
+	}
+	searchStr := input.SearchStr
+	posts, total, err := s.postDB.FuzzySearchForPost(userID, searchStr)
+	if err != nil {
+		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
+	}
+	postResponses := make([]PostResponse, 0, len(posts))
+	for i := range posts {
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
+	}
+
+	return &utils.ResponseBody[GetSearchResponse]{
+		Body: &GetSearchResponse{
+			Posts: postResponses,
+			Count: total,
+		},
+	}, nil
+}

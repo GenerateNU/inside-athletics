@@ -634,6 +634,97 @@ func TestDeletePostNotFound(t *testing.T) {
 	}
 }
 
+func TestPostSearch(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	post1, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northwestern University Soccer Is LIT!", Content: "Wow I love NWU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	// Test searching for substring of title, expecting post1 to have higher similarity score
+	resp := api.Get("/api/v1/posts/search?search_str=NorthE", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
+	}
+	var searchResp post.GetSearchResponse
+	DecodeTo(&searchResp, resp)
+
+	if searchResp.Count != 2 {
+		t.Errorf("Expected 2 entries but got %d", searchResp.Count)
+	}
+	if searchResp.Posts[0].Title != post1.Title {
+		t.Error("Expected post1 to have higher similarity score to search string")
+	}
+}
+
+func TestTypoStillReturns(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	post1, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/search?search_str=northeustern", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
+	}
+	var searchResp post.GetSearchResponse
+	DecodeTo(&searchResp, resp)
+
+	if searchResp.Count != 1 {
+		t.Errorf("Expected 1 entries but got %d", searchResp.Count)
+	}
+	if searchResp.Posts[0].Title != post1.Title {
+		t.Error("Expected to retrieve post 1")
+	}
+}
+
 func uuidDereference(v *uuid.UUID) uuid.UUID {
 	return *v
 }
