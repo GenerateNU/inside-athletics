@@ -33,6 +33,7 @@ func (s *PremiumPostService) CreatePremiumPost(ctx context.Context, input *struc
 	if len(input.Body.Tags) == 0 && input.Body.SportID == nil && input.Body.CollegeID == nil {
 		return nil, huma.Error400BadRequest("Need to have at least a single tag on a post")
 	}
+
 	premiumPost := &models.PremiumPost{
 		AuthorID:       id,
 		SportID:        input.Body.SportID,
