@@ -105,6 +105,30 @@ func (s *PostService) GetAllPosts(ctx context.Context, input *GetAllPostsParams)
 	}, nil
 }
 
+func (s *PostService) GetPopularPosts(ctx context.Context, input *GetPopularPostsParams) (*utils.ResponseBody[GetPopularPostsResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	posts, total, err := s.postDB.GetPopularPosts(input.Limit, input.Offset, input.WindowHours, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	postResponses := make([]PostResponse, 0, len(posts))
+	for i := range posts {
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
+	}
+
+	return &utils.ResponseBody[GetPopularPostsResponse]{
+		Body: &GetPopularPostsResponse{
+			Posts: postResponses,
+			Total: total,
+		},
+	}, nil
+}
+
 // UpdatePost updates an existing post with partial updates
 func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 	ID   uuid.UUID `path:"id"`

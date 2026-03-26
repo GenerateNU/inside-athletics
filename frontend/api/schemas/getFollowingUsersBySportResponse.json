@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": [
+        "https://example.com/schemas/GetFollowingUsersBySportResponse.json"
+      ],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "sport_id": {
+      "description": "ID of the Sport",
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
+      "type": "string"
+    },
+    "user_ids": {
+      "description": "All users that follow this sport",
+      "examples": [
+        [
+          "123e4567-e89b-12d3-a456-426614174000",
+          "123e4567-e89b-12d3-a456-426614174001"
+        ]
+      ],
+      "items": { "type": "string" },
+      "type": ["array", "null"]
+    }
+  },
+  "required": ["sport_id", "user_ids"],
+  "type": "object",
+  "x-readme-ref-name": "GetFollowingUsersBySportResponse"
+}
