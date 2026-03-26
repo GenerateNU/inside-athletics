@@ -77,6 +77,26 @@ func (s *PremiumPostService) GetAllPremiumPosts(ctx context.Context, input *GetA
 	}, nil
 }
 
+// GetPremiumPostsByAuthorID returns all premium posts related to a given author
+func (s *PremiumPostService) GetPremiumPostsByAuthorID(ctx context.Context, input *GetPremiumPostsByAuthorIDParams) (*utils.ResponseBody[GetPremiumPostsByAuthorIDResponse], error) {
+	posts, total, err := s.premiumPostDB.GetPremiumPostsByAuthorID(input.Limit, input.Offset, input.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	postResponses := make([]PremiumPostResponse, 0, len(posts))
+	for i := range posts {
+		postResponses = append(postResponses, *ToPremiumPostResponse(&posts[i]))
+	}
+
+	return &utils.ResponseBody[GetPremiumPostsByAuthorIDResponse]{
+		Body: &GetPremiumPostsByAuthorIDResponse{
+			Posts: postResponses,
+			Total: int(total),
+		},
+	}, nil
+}
+
 // GetPremiumPostsBySportID returns all premium posts related to a given sport
 func (s *PremiumPostService) GetPremiumPostsBySportID(ctx context.Context, input *GetPremiumPostsBySportIDParams) (*utils.ResponseBody[GetPremiumPostsBySportIDResponse], error) {
 	posts, total, err := s.premiumPostDB.GetPremiumPostsBySportID(input.Limit, input.Offset, input.SportID)
