@@ -41,7 +41,6 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 		Title:       input.Body.Title,
 		Content:     input.Body.Content,
 		IsAnonymous: input.Body.IsAnonymous,
-		VideoID:   input.Body.VideoID,
 	}
 
 	createdPost, err := utils.HandleDBError(

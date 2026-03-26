@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateUserAndSportAndVideo(testDB *TestDatabase, t *testing.T) {
+func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
 	user := models.User{
 		ID:                      JohnID,
 		FirstName:               "Test",
@@ -34,18 +34,7 @@ func CreateUserAndSportAndVideo(testDB *TestDatabase, t *testing.T) {
 	if err := testDB.DB.Create(&soccer).Error; err != nil {
 		t.Fatalf("failed to create sport: %v", err)
 	}
-
-	vid := models.Video{
-		ID:    Video1ID,
-		S3Key: "test s3key",
-		Title: "test title",
-	}
-
-	if err := testDB.DB.Create(&vid).Error; err != nil {
-		t.Fatalf("failed to create video: %v", err)
-	}
 }
-
 func TestCreatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -53,7 +42,7 @@ func TestCreatePost(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
@@ -68,7 +57,6 @@ func TestCreatePost(t *testing.T) {
 		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		"is_anonymous": false,
 		"tags":         []map[string]any{},
-		"video_id":     Video1ID,
 	}
 
 	resp := api.Post("/api/v1/post/", body, authHeader)
@@ -107,7 +95,7 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
@@ -121,7 +109,6 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 		"content":      "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		"is_anonymous": false,
 		"tags":         []map[string]any{},
-		"video_id":     &Video1ID,
 	}
 
 	resp := api.Post("/api/v1/post/", body, authHeader)
@@ -137,7 +124,7 @@ func TestCreatePostWithTags(t *testing.T) {
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
@@ -160,7 +147,6 @@ func TestCreatePostWithTags(t *testing.T) {
 			{"id": tag1.ID},
 			{"id": tag2.ID},
 		},
-		"video_id": &Video1ID,
 	}
 
 	resp := api.Post("/api/v1/post/", body, authHeader)
@@ -188,7 +174,7 @@ func TestGetPostById(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	createdPost, err := postDB.CreatePost(&models.Post{
 		AuthorID:    JohnID,
@@ -196,7 +182,6 @@ func TestGetPostById(t *testing.T) {
 		Title:       "Looking for thoughts on NEU Fencing!",
 		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		IsAnonymous: false,
-		VideoID:     Video1ID,
 	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
@@ -247,7 +232,7 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	createdPost, err := postDB.CreatePost(&models.Post{
 		AuthorID:    JohnID,
@@ -255,7 +240,6 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 		Title:       "Looking for thoughts on NEU Fencing!",
 		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		IsAnonymous: false,
-		VideoID:     Video1ID,
 	}, []post.TagRequest{})
 	if err != nil {
 		t.Fatalf("failed to create post: %v", err)
@@ -351,9 +335,9 @@ func TestBadValidation(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	// if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
-	// 	t.Fatalf("failed to migrate posts table: %v", err)
-	// }
+	if err := testDB.DB.AutoMigrate(&models.Post{}); err != nil {
+		t.Fatalf("failed to migrate posts table: %v", err)
+	}
 
 	post.Route(testDB.API, testDB.DB)
 	api := testDB.API
@@ -388,7 +372,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	post1, err1 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
@@ -450,7 +434,7 @@ func TestGetPostsBySportId(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	_, err1 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
@@ -497,7 +481,7 @@ func TestGetAllPosts(t *testing.T) {
 		{Action: models.PermissionCreate, Resource: "sport"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	_, err1 := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
@@ -545,7 +529,7 @@ func TestUpdatePost(t *testing.T) {
 		{Action: models.PermissionUpdate, Resource: "post"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	createdPost, err := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
@@ -612,7 +596,7 @@ func TestDeletePost(t *testing.T) {
 		{Action: models.PermissionDelete, Resource: "post"},
 	})
 
-	CreateUserAndSportAndVideo(testDB, t)
+	CreateUserAndSport(testDB, t)
 
 	createdPost, err := postDB.CreatePost(&models.Post{
 		AuthorID: JohnID, SportID: &SoccerID,
