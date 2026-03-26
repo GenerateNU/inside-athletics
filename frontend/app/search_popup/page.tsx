@@ -36,8 +36,6 @@ function TagSection({ header, tags, activeTags, onToggle }: {
         {tags.map((tag) => (
           <TagButton key={tag} label={tag} active={activeTags.has(tag)} onClick={() => onToggle(tag)} />
         ))}
-        {/* Function left undefined for later request tag modal feature implementation */}
-        <TagButton key={`${header}_request`} label="Request New Tag" active={false} onClick={() => { }} />
       </div>
     </div>
   );
