@@ -1,25 +1,25 @@
 package routeTests
 
 import (
-	"inside-athletics/internal/handlers/video"
+	"inside-athletics/internal/handlers/media"
 	"inside-athletics/internal/models"
 	"net/http"
 	"testing"
 )
 
-func TestCreateVideo(t *testing.T) {
+func TestCreateMedia(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Video{}); err != nil {
-		t.Fatalf("failed to migrate video table: %v", err)
+	if err := testDB.DB.AutoMigrate(&models.Media{}); err != nil {
+		t.Fatalf("failed to migrate media table: %v", err)
 	}
 
-	video.Route(testDB.API, testDB.DB)
+	media.Route(testDB.API, testDB.DB)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "video"},
+		{Action: models.PermissionCreate, Resource: "media"},
 	})
 
 	body := map[string]any{
@@ -27,13 +27,13 @@ func TestCreateVideo(t *testing.T) {
 		"title": "test title",
 	}
 
-	resp := api.Post("/api/v1/video/", body, authHeader)
+	resp := api.Post("/api/v1/media/", body, authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result video.VideoResponse
+	var result media.MediaResponse
 	DecodeTo(&result, resp)
 
 	if result.S3Key != "test s3key" {
@@ -45,37 +45,37 @@ func TestCreateVideo(t *testing.T) {
 	}
 }
 
-func TestGetVideo(t *testing.T) {
+func TestGetMedia(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Video{}); err != nil {
-		t.Fatalf("failed to migrate video table: %v", err)
+	if err := testDB.DB.AutoMigrate(&models.Media{}); err != nil {
+		t.Fatalf("failed to migrate media table: %v", err)
 	}
 
-	video.Route(testDB.API, testDB.DB)
+	media.Route(testDB.API, testDB.DB)
 	api := testDB.API
-	videoDB := video.NewVideoDB(testDB.DB)
+	mediaDB := media.NewMediaDB(testDB.DB)
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
 
-	vid := &models.Video{
+	vid := &models.Media{
 		S3Key: "test s3key",
 		Title: "test title",
 	}
 
-	createdVideo, err := videoDB.CreateVideo(vid)
+	createdMedia, err := mediaDB.CreateMedia(vid)
 	if err != nil {
 		t.Fatalf("failed to create title: %v", err)
 	}
 
-	resp := api.Get("/api/v1/video/"+createdVideo.ID.String(), authHeader)
+	resp := api.Get("/api/v1/media/"+createdMedia.ID.String(), authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	var result video.VideoResponse
+	var result media.MediaResponse
 	DecodeTo(&result, resp)
 
 	if result.S3Key != "test s3key" {
@@ -87,39 +87,39 @@ func TestGetVideo(t *testing.T) {
 	}
 }
 
-func TestDeleteVideo(t *testing.T) {
+func TestDeleteMedia(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	if err := testDB.DB.AutoMigrate(&models.Video{}); err != nil {
-		t.Fatalf("failed to migrate video table: %v", err)
+	if err := testDB.DB.AutoMigrate(&models.Media{}); err != nil {
+		t.Fatalf("failed to migrate media table: %v", err)
 	}
 
-	video.Route(testDB.API, testDB.DB)
+	media.Route(testDB.API, testDB.DB)
 	api := testDB.API
-	videoDB := video.NewVideoDB(testDB.DB)
+	mediaDB := media.NewMediaDB(testDB.DB)
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionDelete, Resource: "video"},
+		{Action: models.PermissionDelete, Resource: "media"},
 	})
 
-	vid := &models.Video{
+	vid := &models.Media{
 		S3Key: "test s3key",
 		Title: "test title",
 	}
-	createdVideo, err := videoDB.CreateVideo(vid)
+	createdMedia, err := mediaDB.CreateMedia(vid)
 	if err != nil {
-		t.Fatalf("failed to create video: %v", err)
+		t.Fatalf("failed to create media: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/video/"+createdVideo.ID.String(), authHeader)
+	resp := api.Delete("/api/v1/media/"+createdMedia.ID.String(), authHeader)
 
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
 
-	// Verify the video is deleted
-	getResp := api.Get("/api/v1/video/"+createdVideo.ID.String(), authHeader)
+	// Verify the media is deleted
+	getResp := api.Get("/api/v1/media/"+createdMedia.ID.String(), authHeader)
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
