@@ -104,7 +104,7 @@ docker-run:
 # Generates colleges.json from NCAA College Division Database (requires kagglehub)
 generate-colleges-data:
 	python3 -m pip install -r ./scripts/requirements.txt && \
-	cd scripts/seed && mkdir -p data && touch data/colleges.json && python3 seed_colleges.py --division 1
+	cd scripts/seed && mkdir -p data && touch data/colleges.json && python3 seed_colleges.py
 
 .PHONY: generate-sports-data
 # Generates sports.json from NCAA sports data (requires kagglehub)
@@ -121,6 +121,9 @@ generate-seed-data: generate-colleges-data generate-sports-data
 seed: generate-seed-data
 	doppler run --command="go run scripts/seed/seed.go"
 
+generate-college-info:
+	python3 -m pip install -r ./scripts/requirements.txt && \
+	cd scripts/athlete_scraping && doppler run --command="python3 crawl.py"
 
 # generate openapi.yaml file from server that is generated from huma. Server must
 # be running to work

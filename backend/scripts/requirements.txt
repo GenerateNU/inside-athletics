@@ -1,3 +1,4 @@
 jwcrypto
 pandas
 kagglehub
+beautifulsoup4

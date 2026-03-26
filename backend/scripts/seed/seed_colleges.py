@@ -131,6 +131,9 @@ def transform_colleges(df, output_path="data/colleges.json", limit=None, divisio
         if not name or not state:
             continue
 
+        if "\u2013" in name:
+            name = name.replace("\u2013", "at")
+
         college = {
             "name": name,
             "state": state,
