@@ -46,13 +46,16 @@ func authHeaderWithPermissions(t *testing.T, db *gorm.DB, perms []permissionSpec
 }
 
 func authHeaderWithPermissionsGivenUser(t *testing.T, db *gorm.DB, perms []permissionSpec, userID uuid.UUID) string {
-	roleID := getRoleID(t, db, models.RoleAdmin)
+	return authHeaderWithPermissionsGivenUserForRole(t, db, models.RoleAdmin, perms, userID)
+}
+
+func authHeaderWithPermissionsGivenUserForRole(t *testing.T, db *gorm.DB, roleName models.RoleName, perms []permissionSpec, userID uuid.UUID) string {
+	roleID := getRoleID(t, db, roleName)
 	assignRoleToUser(t, db, userID, roleID)
 	for _, perm := range perms {
 		ensurePermissionForRole(t, db, roleID, perm.Action, perm.Resource)
 	}
 	return "Authorization: Bearer " + userID.String()
-
 }
 
 func ensurePermissionForRole(t *testing.T, db *gorm.DB, roleID uuid.UUID, action models.PermissionAction, resource string) {
@@ -89,7 +92,7 @@ func assignRoleToUser(t *testing.T, db *gorm.DB, userID, roleID uuid.UUID) {
 		UserID: userID,
 		RoleID: roleID,
 	}
-	if err := db.Create(&userRole).Error; err != nil {
+	if err := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&userRole).Error; err != nil {
 		t.Fatalf("failed to assign role to user: %v", err)
 	}
 }

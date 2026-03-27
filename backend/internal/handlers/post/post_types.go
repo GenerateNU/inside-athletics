@@ -34,18 +34,19 @@ type CreatePostResponse struct {
 
 // PostResponse defines the response structure for a post
 type PostResponse struct {
-	ID           uuid.UUID       `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Author       *models.User    `json:"author" type:"user"`
-	Sport        *models.Sport   `json:"sport" type:"sport"`
-	College      *models.College `json:"college" type:"college"`
-	Tags         []models.Tag    `json:"tags" type:"tag"`
-	Title        string          `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
-	Content      string          `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
-	LikeCount    int64           `json:"like_count,omitempty" example:"20000" gorm:"type:int"`
-	CommentCount int64           `json:"comment_count,omitempty" example:"20" gorm:"type:int"`
-	IsLiked      bool            `json:"is_liked,omitempty" example:"true" gorm:"type:bool"`
-	IsAnonymous  bool            `json:"is_anonymous"`
-	IsVerifiedAthlete bool       `json:"is_verified_athlete"`
+	ID                uuid.UUID       `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Author            *models.User    `json:"author" type:"user"`
+	Sport             *models.Sport   `json:"sport" type:"sport"`
+	College           *models.College `json:"college" type:"college"`
+	Tags              []models.Tag    `json:"tags" type:"tag"`
+	Title             string          `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
+	Content           string          `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
+	LikeCount         int64           `json:"like_count,omitempty" example:"20000" gorm:"type:int"`
+	CommentCount      int64           `json:"comment_count,omitempty" example:"20" gorm:"type:int"`
+	IsLiked           bool            `json:"is_liked,omitempty" example:"true" gorm:"type:bool"`
+	IsAnonymous       bool            `json:"is_anonymous"`
+	IsVerifiedAthlete bool            `json:"is_verified_athlete"`
+	PopularityScore   float64         `json:"popularity_score,omitempty" example:"42.5"`
 }
 
 // GetPostByIDParams defines parameters for getting a post by ID
@@ -110,6 +111,17 @@ type GetAllPostsResponse struct {
 	Total int            `json:"total" example:"100" doc:"Total number of posts"`
 }
 
+type GetPopularPostsParams struct {
+	Limit       int `query:"limit" default:"20" example:"20" doc:"Number of posts to return"`
+	Offset      int `query:"offset" default:"0" example:"0" doc:"Number of posts to skip"`
+	WindowHours int `query:"window_hours" default:"72" example:"72" doc:"Rolling window used for rapid-engagement scoring"`
+}
+
+type GetPopularPostsResponse struct {
+	Posts []PostResponse `json:"posts" doc:"List of popular posts"`
+	Total int            `json:"total" example:"100" doc:"Total number of posts considered"`
+}
+
 // UpdatePostRequest defines the request body for updating a post (all fields optional)
 type UpdatePostRequest struct {
 	Title       *string `json:"title,omitempty" minLength:"1" maxLength:"100"`
@@ -125,17 +137,18 @@ func ToPostResponse(post *models.Post, id uuid.UUID) *PostResponse {
 		author = &a
 	}
 	return &PostResponse{
-		ID:           post.ID,
-		Author:       author,
-		Sport:        post.Sport,
-		College:      post.College,
-		Tags:         post.Tags,
-		Title:        post.Title,
-		Content:      post.Content,
-		IsAnonymous:  post.IsAnonymous,
-		IsLiked:      post.IsLiked,
-		LikeCount:    post.LikeCount,
-		CommentCount: post.CommentCount,
+		ID:                post.ID,
+		Author:            author,
+		Sport:             post.Sport,
+		College:           post.College,
+		Tags:              post.Tags,
+		Title:             post.Title,
+		Content:           post.Content,
+		IsAnonymous:       post.IsAnonymous,
+		IsLiked:           post.IsLiked,
+		LikeCount:         post.LikeCount,
+		CommentCount:      post.CommentCount,
+		PopularityScore:   post.PopularityScore,
 		IsVerifiedAthlete: post.Author.Verified_Athlete_Status == models.VerifiedAthleteStatusVerified,
 	}
 }
@@ -148,15 +161,15 @@ func ToCreatePostResponse(post *models.Post, id uuid.UUID) *CreatePostResponse {
 		userId = &uid
 	}
 	return &CreatePostResponse{
-		ID:                post.ID,
-		AuthorID:          userId,
-		SportID:           post.SportID,
-		CollegeID:         post.CollegeID,
-		Tags:              post.Tags,
-		Title:             post.Title,
-		Content:           post.Content,
-		IsAnonymous:       post.IsAnonymous,
-}
+		ID:          post.ID,
+		AuthorID:    userId,
+		SportID:     post.SportID,
+		CollegeID:   post.CollegeID,
+		Tags:        post.Tags,
+		Title:       post.Title,
+		Content:     post.Content,
+		IsAnonymous: post.IsAnonymous,
+	}
 }
 
 type DeletePostResponse struct {
