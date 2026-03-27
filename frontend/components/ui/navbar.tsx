@@ -19,12 +19,42 @@ import {
   useGetApiV1UserSportByUserIdFollows,
   useGetApiV1UserTagByUserIdFollows,
 } from "@/api/hooks";
+import type { GetCollegeFollowsByUserResponse } from "@/api/models/GetCollegeFollowsByUserResponse";
+import type { GetCollegeResponse } from "@/api/models/GetCollegeResponse";
+import type { GetSportFollowsByUserResponse } from "@/api/models/GetSportFollowsByUserResponse";
+import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
+import type { GetTagResponse } from "@/api/models/GetTagResponse";
+import type { SportResponse } from "@/api/models/SportResponse";
 
 const navItems = [
   { label: "Home", icon: Home },
   { label: "Explore", icon: Search },
   { label: "Post", icon: Plus },
 ];
+
+function unwrapBody<T>(value: unknown): T | undefined {
+  let current = value;
+
+  for (let depth = 0; depth < 5; depth += 1) {
+    if (!current || typeof current !== "object") {
+      return current as T | undefined;
+    }
+
+    if ("body" in current && current.body !== undefined) {
+      current = current.body;
+      continue;
+    }
+
+    if ("Body" in current && current.Body !== undefined) {
+      current = current.Body;
+      continue;
+    }
+
+    return current as T | undefined;
+  }
+
+  return current as T | undefined;
+}
 
 type NavbarProps = React.ComponentProps<"aside">;
 
@@ -38,7 +68,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
 
-  // Resize observer — unchanged
+  // Resize observer
   useEffect(() => {
     const el = navRef.current;
     if (!el) return;
@@ -49,7 +79,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
     return () => observer.disconnect();
   }, []);
 
-  // Step 1: Fetch the followed IDs for all three types in parallel
+  // Fetch the followed IDs for all three types in parallel
   const { data: tagFollows } = useGetApiV1UserTagByUserIdFollows(userId ?? "", {
     query: { enabled: enabled && !!userId },
     client: { headers: authHeaders },
@@ -69,30 +99,34 @@ export function Navbar({ className, ...props }: NavbarProps) {
     },
   );
 
-  const tagIds = tagFollows?.tag_ids ?? [];
-  const sportIds = sportFollows?.sport_ids ?? [];
-  const collegeIds = collegeFollows?.college_ids ?? [];
+  const tagIds =
+    unwrapBody<GetTagFollowsByUserResponse>(tagFollows)?.tag_ids ?? [];
+  const sportIds =
+    unwrapBody<GetSportFollowsByUserResponse>(sportFollows)?.sport_ids ?? [];
+  const collegeIds =
+    unwrapBody<GetCollegeFollowsByUserResponse>(collegeFollows)?.college_ids ??
+    [];
 
-  // Step 2: Fetch each individual item using useQueries (parallel, no waterfalls)
+  // Fetch each individual item using useQueries (parallel, no waterfalls)
   const tagResults = useQueries({
-    queries: tagIds.map((id) =>
+    queries: tagIds.map((id: string) =>
       getApiV1TagByIdQueryOptions(id, { headers: authHeaders }),
     ),
   });
 
   const sportResults = useQueries({
-    queries: sportIds.map((id) =>
+    queries: sportIds.map((id: string) =>
       getApiV1SportByIdQueryOptions(id, { headers: authHeaders }),
     ),
   });
 
   const collegeResults = useQueries({
-    queries: collegeIds.map((id) =>
+    queries: collegeIds.map((id: string) =>
       getApiV1CollegeByIdQueryOptions(id, { headers: authHeaders }),
     ),
   });
 
-  // Step 3: Derive loading state and following items from query results
+  // Derive loading state and following items from query results
   const isLoadingFollowing =
     tagResults.some((r) => r.isLoading) ||
     sportResults.some((r) => r.isLoading) ||
@@ -100,13 +134,19 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
   const followingItems = [
     ...sportResults.flatMap((r) =>
-      r.data ? [{ label: r.data.name, type: "sport" as const }] : []
+      unwrapBody<SportResponse>(r.data)
+        ? [{ label: unwrapBody<SportResponse>(r.data)!.name, type: "sport" as const }]
+        : []
     ),
     ...tagResults.flatMap((r) =>
-      r.data ? [{ label: r.data.name, type: "tag" as const }] : []
+      unwrapBody<GetTagResponse>(r.data)
+        ? [{ label: unwrapBody<GetTagResponse>(r.data)!.name, type: "tag" as const }]
+        : []
     ),
     ...collegeResults.flatMap((r) =>
-      r.data ? [{ label: r.data.name, type: "school" as const }] : []
+      unwrapBody<GetCollegeResponse>(r.data)
+        ? [{ label: unwrapBody<GetCollegeResponse>(r.data)!.name, type: "school" as const }]
+        : []
     ),
   ];
 
