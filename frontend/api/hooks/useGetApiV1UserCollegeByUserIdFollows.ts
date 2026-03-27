@@ -27,7 +27,7 @@ export const getApiV1UserCollegeByUserIdFollowsQueryKey = (
 ) =>
   [
     {
-      url: "/api/v1/user/college/:user_id/follows",
+      url: "/api/v1/user/college/follows",
       params: { user_id: user_id },
     },
   ] as const;
@@ -58,7 +58,7 @@ export function getApiV1UserCollegeByUserIdFollowsQueryOptions(
 
 /**
  * @summary Get API v1 user college by user ID follows
- * {@link /api/v1/user/college/:user_id/follows}
+ * {@link /api/v1/user/college/follows}
  */
 export function useGetApiV1UserCollegeByUserIdFollows<
   TData = GetApiV1UserCollegeByUserIdFollowsQueryResponse,

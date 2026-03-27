@@ -25,9 +25,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 export const getApiV1UserTagByUserIdFollowsQueryKey = (
   user_id: GetApiV1UserTagByUserIdFollowsPathParams["user_id"],
 ) =>
-  [
-    { url: "/api/v1/user/tag/:user_id/follows", params: { user_id: user_id } },
-  ] as const;
+  [{ url: "/api/v1/user/tag/follows", params: { user_id: user_id } }] as const;
 
 export type GetApiV1UserTagByUserIdFollowsQueryKey = ReturnType<
   typeof getApiV1UserTagByUserIdFollowsQueryKey
@@ -55,7 +53,7 @@ export function getApiV1UserTagByUserIdFollowsQueryOptions(
 
 /**
  * @summary Get API v1 user tag by user ID follows
- * {@link /api/v1/user/tag/:user_id/follows}
+ * {@link /api/v1/user/tag/follows}
  */
 export function useGetApiV1UserTagByUserIdFollows<
   TData = GetApiV1UserTagByUserIdFollowsQueryResponse,
