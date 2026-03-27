@@ -2,10 +2,12 @@ package premiumpost
 
 import (
 	"context"
+	"fmt"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -153,6 +155,44 @@ func (s *PremiumPostService) GetPremiumPostsByTagID(ctx context.Context, input *
 		Body: &GetPremiumPostsByTagIDResponse{
 			Posts: postResponses,
 			Total: int(total),
+		},
+	}, nil
+}
+
+// UpdatePremiumPost updates an existing premium post
+func (s *PremiumPostService) UpdatePremiumPost(ctx context.Context, input *struct {
+	ID   uuid.UUID `path:"id"`
+	Body UpdatePremiumPostRequest
+}) (*utils.ResponseBody[PremiumPostResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedPost, err := s.premiumPostDB.UpdatePremiumPost(input.ID, input.Body, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[PremiumPostResponse]{
+		Body: ToPremiumPostResponse(updatedPost),
+	}, nil
+}
+
+// DeletePremiumPost soft deletes a premium post by ID
+func (s *PremiumPostService) DeletePremiumPost(ctx context.Context, input *struct {
+	ID uuid.UUID `path:"id"`
+}) (*utils.ResponseBody[DeletePremiumPostRequest], error) {
+	id := input.ID
+	err := s.premiumPostDB.DeletePremiumPost(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[DeletePremiumPostRequest]{
+		Body: &DeletePremiumPostRequest{
+			Message: fmt.Sprintf("Premium post %s deleted successfully", id.String()),
+			ID:      id,
 		},
 	}, nil
 }
