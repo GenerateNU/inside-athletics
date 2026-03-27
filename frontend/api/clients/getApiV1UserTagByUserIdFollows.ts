@@ -17,9 +17,10 @@ import type {
 function getGetApiV1UserTagByUserIdFollowsUrl(
   user_id: GetApiV1UserTagByUserIdFollowsPathParams["user_id"],
 ) {
+  void user_id;
   const res = {
     method: "GET",
-    url: `/api/v1/user/tag/${user_id}/follows` as const,
+    url: `/api/v1/user/tag/follows` as const,
   };
   return res;
 }
