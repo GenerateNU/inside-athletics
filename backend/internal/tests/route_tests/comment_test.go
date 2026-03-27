@@ -132,6 +132,9 @@ func TestGetComment(t *testing.T) {
 		t.Errorf("expected nil UserId for Anonymous")
 	}
 
+	// Free-tier users must have accessed the post before viewing its comments.
+	_ = api.Get("/api/v1/post/"+post.ID.String(), "Authorization: Bearer "+user.ID.String())
+
 	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+user.ID.String())
 	if resp2.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp2.Code, resp2.Body.String())
@@ -174,6 +177,9 @@ func TestGetCommentWithLikes(t *testing.T) {
 	if result.User != nil {
 		t.Errorf("expected nil UserId for Anonymous")
 	}
+
+	// Free-tier users must have accessed the post before viewing its comments.
+	_ = api.Get("/api/v1/post/"+post.ID.String(), "Authorization: Bearer "+user.ID.String())
 
 	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+user.ID.String())
 	if resp2.Code != http.StatusOK {
