@@ -1,13 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { BookOpen, Briefcase, Home, Plus, Search } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/utils/SessionContext";
+
+// Generated hooks from Kubb
+import {
+  getApiV1CollegeByIdQueryOptions,
+  getApiV1SportByIdQueryOptions,
+  getApiV1TagByIdQueryOptions,
+  useGetApiV1UserCollegeByUserIdFollows,
+  useGetApiV1UserSportByUserIdFollows,
+  useGetApiV1UserTagByUserIdFollows,
+} from "@/api/hooks";
 
 const navItems = [
   { label: "Home", icon: Home },
@@ -16,150 +27,88 @@ const navItems = [
 ];
 
 type NavbarProps = React.ComponentProps<"aside">;
-type FollowingItem = {
-  label: string;
-  type: "tag" | "sport" | "school";
-};
-
-type TagFollowResponse = {
-  tag_ids: string[] | null;
-};
-
-type SportFollowResponse = {
-  sport_ids: string[] | null;
-};
-
-type CollegeFollowResponse = {
-  college_ids: string[] | null;
-};
-
-type TagResponse = {
-  id: string;
-  name: string;
-};
-
-type SportResponse = {
-  id: string;
-  name: string;
-};
-
-type CollegeResponse = {
-  id: string;
-  name: string;
-};
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
-
-function getApiUrl(path: string) {
-  return `${apiBaseUrl}${path}`;
-}
 
 export function Navbar({ className, ...props }: NavbarProps) {
   const navRef = useRef<HTMLElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [followingItems, setFollowingItems] = useState<FollowingItem[]>([]);
-  const [isLoadingFollowing, setIsLoadingFollowing] = useState(true);
   const session = useSession();
+  const userId = session?.user?.id;
+  const enabled = !!session?.access_token;
+  const authHeaders = session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : undefined;
 
+  // Resize observer — unchanged
   useEffect(() => {
-    const element = navRef.current;
-    if (!element) return;
-
+    const el = navRef.current;
+    if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
       setIsCollapsed(entry.contentRect.width < 160);
     });
-
-    observer.observe(element);
-
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const accessToken = session?.access_token;
+  // Step 1: Fetch the followed IDs for all three types in parallel
+  const { data: tagFollows } = useGetApiV1UserTagByUserIdFollows(userId ?? "", {
+    query: { enabled: enabled && !!userId },
+    client: { headers: authHeaders },
+  });
+  const { data: sportFollows } = useGetApiV1UserSportByUserIdFollows(
+    userId ?? "",
+    {
+      query: { enabled: enabled && !!userId },
+      client: { headers: authHeaders },
+    },
+  );
+  const { data: collegeFollows } = useGetApiV1UserCollegeByUserIdFollows(
+    userId ?? "",
+    {
+      query: { enabled: enabled && !!userId },
+      client: { headers: authHeaders },
+    },
+  );
 
-    if (!accessToken) {
-      setFollowingItems([]);
-      setIsLoadingFollowing(false);
-      return;
-    }
+  const tagIds = tagFollows?.tag_ids ?? [];
+  const sportIds = sportFollows?.sport_ids ?? [];
+  const collegeIds = collegeFollows?.college_ids ?? [];
 
-    const controller = new AbortController();
+  // Step 2: Fetch each individual item using useQueries (parallel, no waterfalls)
+  const tagResults = useQueries({
+    queries: tagIds.map((id) =>
+      getApiV1TagByIdQueryOptions(id, { headers: authHeaders }),
+    ),
+  });
 
-    async function fetchJson<T>(path: string): Promise<T> {
-      const response = await fetch(getApiUrl(path), {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        signal: controller.signal,
-      });
+  const sportResults = useQueries({
+    queries: sportIds.map((id) =>
+      getApiV1SportByIdQueryOptions(id, { headers: authHeaders }),
+    ),
+  });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch ${path}: ${response.status}`);
-      }
+  const collegeResults = useQueries({
+    queries: collegeIds.map((id) =>
+      getApiV1CollegeByIdQueryOptions(id, { headers: authHeaders }),
+    ),
+  });
 
-      return response.json() as Promise<T>;
-    }
+  // Step 3: Derive loading state and following items from query results
+  const isLoadingFollowing =
+    tagResults.some((r) => r.isLoading) ||
+    sportResults.some((r) => r.isLoading) ||
+    collegeResults.some((r) => r.isLoading);
 
-    async function loadFollowing() {
-      setIsLoadingFollowing(true);
-
-      try {
-        const [tagFollows, sportFollows, collegeFollows] = await Promise.all([
-          fetchJson<TagFollowResponse>("/api/v1/user/tag/follows"),
-          fetchJson<SportFollowResponse>("/api/v1/user/sport/follows"),
-          fetchJson<CollegeFollowResponse>("/api/v1/user/college/follows"),
-        ]);
-
-        const [tags, sports, colleges] = await Promise.all([
-          Promise.all(
-            (tagFollows.tag_ids ?? []).map((id) =>
-              fetchJson<TagResponse>(`/api/v1/tag/${id}`),
-            ),
-          ),
-          Promise.all(
-            (sportFollows.sport_ids ?? []).map((id) =>
-              fetchJson<SportResponse>(`/api/v1/sport/${id}`),
-            ),
-          ),
-          Promise.all(
-            (collegeFollows.college_ids ?? []).map((id) =>
-              fetchJson<CollegeResponse>(`/api/v1/college/${id}`),
-            ),
-          ),
-        ]);
-
-        setFollowingItems([
-          ...sports.map((sport) => ({
-            label: sport.name,
-            type: "sport" as const,
-          })),
-          ...tags.map((tag) => ({
-            label: tag.name,
-            type: "tag" as const,
-          })),
-          ...colleges.map((college) => ({
-            label: college.name,
-            type: "school" as const,
-          })),
-        ]);
-      } catch (error) {
-        if (controller.signal.aborted) {
-          return;
-        }
-
-        console.error("Unable to load followed items", error);
-        setFollowingItems([]);
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoadingFollowing(false);
-        }
-      }
-    }
-
-    loadFollowing();
-
-    return () => controller.abort();
-  }, [session?.access_token]);
+  const followingItems = [
+    ...sportResults.flatMap((r) =>
+      r.data ? [{ label: r.data.name, type: "sport" as const }] : []
+    ),
+    ...tagResults.flatMap((r) =>
+      r.data ? [{ label: r.data.name, type: "tag" as const }] : []
+    ),
+    ...collegeResults.flatMap((r) =>
+      r.data ? [{ label: r.data.name, type: "school" as const }] : []
+    ),
+  ];
 
   return (
     <aside
@@ -172,16 +121,9 @@ export function Navbar({ className, ...props }: NavbarProps) {
       )}
       {...props}
     >
-      <div
-        className={cn(
-          "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]",
-          isCollapsed && "w-full justify-center",
-        )}
-      >
-        <div
-          aria-hidden="true"
-          className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300"
-        />
+      {/* Logo */}
+      <div className={cn("flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]", isCollapsed && "w-full justify-center")}>
+        <div aria-hidden="true" className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300" />
         {!isCollapsed && (
           <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
             Inside Athletics
@@ -189,12 +131,8 @@ export function Navbar({ className, ...props }: NavbarProps) {
         )}
       </div>
 
-      <div
-        className={cn(
-          "pt-[clamp(0.75rem,1.2vw,1rem)]",
-          isCollapsed && "w-full",
-        )}
-      >
+      {/* Search */}
+      <div className={cn("pt-[clamp(0.75rem,1.2vw,1rem)]", isCollapsed && "w-full")}>
         <Input
           type="search"
           placeholder={isCollapsed ? "" : "Search"}
@@ -205,10 +143,8 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
       <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
 
-      <nav
-        aria-label="Primary"
-        className={cn("flex flex-col gap-1", isCollapsed && "w-full")}
-      >
+      {/* Nav items — unchanged */}
+      <nav aria-label="Primary" className={cn("flex flex-col gap-1", isCollapsed && "w-full")}>
         {navItems.map(({ label, icon: Icon }) => (
           <Button
             key={label}
@@ -224,12 +160,8 @@ export function Navbar({ className, ...props }: NavbarProps) {
         ))}
       </nav>
 
-      <div
-        className={cn(
-          "mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]",
-          isCollapsed && "w-full",
-        )}
-      >
+      {/* Following section — same JSX, driven by new data */}
+      <div className={cn("mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]", isCollapsed && "w-full")}>
         <div className="flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]">
           <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
           {!isCollapsed && (
@@ -263,10 +195,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
               ) : type === "sport" ? (
                 <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
               ) : (
-                <span
-                  aria-hidden="true"
-                  className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black"
-                />
+                <span aria-hidden="true" className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black" />
               )}
               {!isCollapsed && <span className="truncate">{label}</span>}
             </button>
