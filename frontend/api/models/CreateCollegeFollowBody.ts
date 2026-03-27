@@ -14,9 +14,4 @@ export type CreateCollegeFollowBody = {
    * @type string
    */
   college_id: string;
-  /**
-   * @description ID of the user
-   * @type string
-   */
-  user_id: string;
 };
