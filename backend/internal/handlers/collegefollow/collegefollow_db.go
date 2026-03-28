@@ -31,7 +31,7 @@ func (u *CollegeFollowDB) GetFollowingUsersByCollege(college_id uuid.UUID) (*[]u
 
 func (u *CollegeFollowDB) CreateCollegeFollow(collegefollow *models.CollegeFollow) (*models.CollegeFollow, error) {
 	// checking if this user already followed the college
-	result := u.db.Where("user_id = ? AND college_id = ?", collegefollow.UserID, collegefollow.CollegeID).First(&collegefollow)
+	result := u.db.Where("user_id = ? AND college_id = ?", collegefollow.UserID, collegefollow.CollegeID).First(collegefollow)
 	if result.Error == nil {
 		return nil, huma.Error409Conflict("User has already followed this college")
 	}

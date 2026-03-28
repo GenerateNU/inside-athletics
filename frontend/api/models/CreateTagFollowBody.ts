@@ -14,9 +14,4 @@ export type CreateTagFollowBody = {
    * @type string
    */
   tag_id: string;
-  /**
-   * @description ID of the user
-   * @type string
-   */
-  user_id: string;
 };

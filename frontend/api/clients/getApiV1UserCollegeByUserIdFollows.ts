@@ -17,9 +17,10 @@ import type {
 function getGetApiV1UserCollegeByUserIdFollowsUrl(
   user_id: GetApiV1UserCollegeByUserIdFollowsPathParams["user_id"],
 ) {
+  void user_id;
   const res = {
     method: "GET",
-    url: `/api/v1/user/college/${user_id}/follows` as const,
+    url: `/api/v1/user/college/follows` as const,
   };
   return res;
 }
