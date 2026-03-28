@@ -69,6 +69,7 @@ export default function CreatePostPopup() {
           value={title}
           className="block text-1xl text-[#000000]"
           onChange={(e) => setTitle(e.target.value)}
+          required
         />
         {/* Added tags */}
         <div className="flex flex-wrap gap-2 mt-2">
@@ -100,6 +101,7 @@ export default function CreatePostPopup() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="min-h-[200px] text-[#000000]"
+          required
         />
         <div className="flex justify-between">
           <div className="flex gap-1">
@@ -124,13 +126,13 @@ export default function CreatePostPopup() {
                 className="accent-[#377DC0]"
               />
               <div className="text-xs">Comments</div>
-            <input
-              type="checkbox"
-              checked={isShareable}
-              onChange={(e) => setIsShareable(e.target.checked)}
-              className="accent-[#377DC0]"
-            />
-            <div className="text-xs">Shareable</div>
+              <input
+                type="checkbox"
+                checked={isShareable}
+                onChange={(e) => setIsShareable(e.target.checked)}
+                className="accent-[#377DC0]"
+              />
+              <div className="text-xs">Shareable</div>
             </div>
           </div>
           <Button

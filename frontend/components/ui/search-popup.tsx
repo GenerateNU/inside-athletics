@@ -84,7 +84,7 @@ export default function SearchPopup() {
 
   //mock data
   const schools = [
-    { Name: "Northeastern University", IsSchool: true }, 
+    { Name: "Northeastern University", IsSchool: true },
     { Name: "Northwestern University", IsSchool: true },
     { Name: "Southwestern University", IsSchool: true },
     { Name: "Southeastern University", IsSchool: true },
