@@ -174,6 +174,48 @@ components:
         - is_liked
         - is_verified_athlete
       type: object
+    ConfirmUploadRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ConfirmUploadRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        key:
+          description: S3 object key from upload-url response
+          type: string
+      required:
+        - key
+      type: object
+    ConfirmUploadResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ConfirmUploadResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        download_url:
+          type: string
+        key:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        size:
+          format: int64
+          type: integer
+      required:
+        - key
+        - download_url
+        - size
+      type: object
     CreateCollegeFollowBody:
       additionalProperties: false
       properties:
@@ -189,14 +231,8 @@ components:
           examples:
             - 123e4567-e89b-12d3-a456-426614174000
           type: string
-        user_id:
-          description: ID of the user
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
-          type: string
       required:
         - college_id
-        - user_id
       type: object
     CreateCollegeFollowResponse:
       additionalProperties: false
@@ -692,14 +728,8 @@ components:
           examples:
             - 123e4567-e89b-12d3-a456-426614174000
           type: string
-        user_id:
-          description: ID of the user
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
-          type: string
       required:
         - sport_id
-        - user_id
       type: object
     CreateSportFollowResponse:
       additionalProperties: false
@@ -882,14 +912,8 @@ components:
           examples:
             - 123e4567-e89b-12d3-a456-426614174000
           type: string
-        user_id:
-          description: ID of the user
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
-          type: string
       required:
         - tag_id
-        - user_id
       type: object
     CreateTagFollowResponse:
       additionalProperties: false
@@ -1173,6 +1197,22 @@ components:
         - message
         - total
         - liked
+      type: object
+    DeleteContentResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteContentResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Success message
+          type: string
+      required:
+        - message
       type: object
     DeletePostLikeResponse:
       additionalProperties: false
@@ -1673,6 +1713,25 @@ components:
         - user_id
         - comment_id
       type: object
+    GetDownloadURLResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetDownloadURLResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        download_url:
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+      required:
+        - download_url
+        - expires_in
+      type: object
     GetFollowingUsersByCollegeResponse:
       additionalProperties: false
       properties:
@@ -1759,6 +1818,33 @@ components:
       required:
         - tag_id
         - user_ids
+      type: object
+    GetPopularPostsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPopularPostsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of popular posts
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of posts considered
+          examples:
+            - 100
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
       type: object
     GetPostLikeInfoResponse:
       additionalProperties: false
@@ -2162,6 +2248,55 @@ components:
         - id
         - name
       type: object
+    GetUploadURLRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUploadURLRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        fileName:
+          description: Optional; used as documentId in response (defaults to last segment of key)
+          type: string
+        fileType:
+          description: MIME type, e.g. image/jpeg, application/pdf
+          type: string
+        key:
+          description: Full S3 object key, e.g. premium/image/content-123/photo.jpg
+          type: string
+      required:
+        - key
+        - fileType
+        - fileName
+      type: object
+    GetUploadURLResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUploadURLResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        document_id:
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+        key:
+          type: string
+        upload_url:
+          type: string
+      required:
+        - upload_url
+        - key
+        - document_id
+        - expires_in
+      type: object
     GetUserResponse:
       additionalProperties: false
       properties:
@@ -2374,6 +2509,11 @@ components:
             - 20000
           format: int64
           type: integer
+        popularity_score:
+          examples:
+            - 42.5
+          format: double
+          type: number
         sport:
           $ref: "#/components/schemas/Sport"
         tags:
@@ -3863,6 +4003,104 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: List API v1 comment by ID replies
+  /api/v1/content:
+    delete:
+      operationId: delete-api-v1-content
+      parameters:
+        - description: S3 object key to delete
+          explode: false
+          in: query
+          name: key
+          required: true
+          schema:
+            description: S3 object key to delete
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteContentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 content
+  /api/v1/content/confirm-upload:
+    post:
+      operationId: post-api-v1-content-confirm-upload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmUploadRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmUploadResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 content confirm upload
+  /api/v1/content/download-url:
+    get:
+      operationId: get-api-v1-content-download-url
+      parameters:
+        - description: S3 object key
+          explode: false
+          in: query
+          name: key
+          required: true
+          schema:
+            description: S3 object key
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDownloadURLResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 content download URL
+  /api/v1/content/upload-url:
+    post:
+      operationId: post-api-v1-content-upload-url
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUploadURLRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUploadURLResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 content upload URL
   /api/v1/health/:
     get:
       operationId: get-api-v1-health
@@ -4542,6 +4780,60 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 posts by sport by sport ID
+  /api/v1/posts/popular:
+    get:
+      operationId: get-api-v1-posts-popular
+      parameters:
+        - description: Number of posts to return
+          example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            description: Number of posts to return
+            examples:
+              - 20
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+        - description: Rolling window used for rapid-engagement scoring
+          example: 72
+          explode: false
+          in: query
+          name: window_hours
+          schema:
+            default: 72
+            description: Rolling window used for rapid-engagement scoring
+            examples:
+              - 72
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPopularPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts popular
   /api/v1/role/:
     post:
       operationId: post-api-v1-role
@@ -5523,6 +5815,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 user college
+  /api/v1/user/college/follows:
+    get:
+      operationId: get-api-v1-user-college-follows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCollegeFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user college follows
   /api/v1/user/college/{college_id}/users:
     get:
       operationId: get-api-v1-user-college-by-college-id-users
@@ -5579,34 +5888,6 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Delete API v1 user college by ID
-  /api/v1/user/college/{user_id}/follows:
-    get:
-      operationId: get-api-v1-user-college-by-user-id-follows
-      parameters:
-        - description: ID of the user
-          example: 123e4567-e89b-12d3-a456-426614174000
-          in: path
-          name: user_id
-          required: true
-          schema:
-            description: ID of the user
-            examples:
-              - 123e4567-e89b-12d3-a456-426614174000
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetCollegeFollowsByUserResponse"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get API v1 user college by user ID follows
   /api/v1/user/current:
     get:
       operationId: get-api-v1-user-current
@@ -5647,6 +5928,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 user sport
+  /api/v1/user/sport/follows:
+    get:
+      operationId: get-api-v1-user-sport-follows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSportFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user sport follows
   /api/v1/user/sport/{id}:
     delete:
       operationId: delete-api-v1-user-sport-by-id
@@ -5703,34 +6001,6 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 user sport by sport ID users
-  /api/v1/user/sport/{user_id}/follows:
-    get:
-      operationId: get-api-v1-user-sport-by-user-id-follows
-      parameters:
-        - description: ID of the user
-          example: 123e4567-e89b-12d3-a456-426614174000
-          in: path
-          name: user_id
-          required: true
-          schema:
-            description: ID of the user
-            examples:
-              - 123e4567-e89b-12d3-a456-426614174000
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetSportFollowsByUserResponse"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get API v1 user sport by user ID follows
   /api/v1/user/tag/:
     post:
       operationId: post-api-v1-user-tag
@@ -5754,6 +6024,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 user tag
+  /api/v1/user/tag/follows:
+    get:
+      operationId: get-api-v1-user-tag-follows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user tag follows
   /api/v1/user/tag/{id}:
     delete:
       operationId: delete-api-v1-user-tag-by-id
@@ -5810,34 +6097,6 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 user tag by tag ID users
-  /api/v1/user/tag/{user_id}/follows:
-    get:
-      operationId: get-api-v1-user-tag-by-user-id-follows
-      parameters:
-        - description: ID of the user
-          example: 123e4567-e89b-12d3-a456-426614174000
-          in: path
-          name: user_id
-          required: true
-          schema:
-            description: ID of the user
-            examples:
-              - 123e4567-e89b-12d3-a456-426614174000
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetTagFollowsByUserResponse"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get API v1 user tag by user ID follows
   /api/v1/user/{id}:
     delete:
       operationId: delete-api-v1-user-by-id

@@ -164,6 +164,11 @@
     "is_liked": { "examples": [true], "type": "boolean" },
     "is_verified_athlete": { "type": "boolean" },
     "like_count": { "examples": [20000], "format": "int64", "type": "integer" },
+    "popularity_score": {
+      "examples": [42.5],
+      "format": "double",
+      "type": "number"
+    },
     "sport": {
       "additionalProperties": false,
       "properties": {

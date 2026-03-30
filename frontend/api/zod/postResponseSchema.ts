@@ -26,6 +26,7 @@ export const postResponseSchema = z.object({
   is_liked: z.optional(z.boolean()),
   is_verified_athlete: z.boolean(),
   like_count: z.optional(z.int()),
+  popularity_score: z.optional(z.number()),
   get sport() {
     return sportSchema;
   },

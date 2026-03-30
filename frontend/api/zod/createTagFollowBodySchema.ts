@@ -10,5 +10,4 @@ export const createTagFollowBodySchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   tag_id: z.string().describe("ID of the Tag"),
-  user_id: z.string().describe("ID of the user"),
 });

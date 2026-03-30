@@ -51,6 +51,10 @@ export type PostResponse = {
    */
   like_count?: number;
   /**
+   * @type number | undefined, double
+   */
+  popularity_score?: number;
+  /**
    * @type object
    */
   sport: Sport;
