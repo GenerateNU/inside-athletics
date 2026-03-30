@@ -1,7 +1,13 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { BookOpen, Briefcase, Home, Plus, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  BookOpen,
+  Briefcase,
+  Home,
+  Plus,
+  Search,
+} from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -59,24 +65,22 @@ function unwrapBody<T>(value: unknown): T | undefined {
 type NavbarProps = React.ComponentProps<"aside">;
 
 export function Navbar({ className, ...props }: NavbarProps) {
-  const navRef = useRef<HTMLElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const session = useSession();
-  const userId = session?.user?.id;
   const enabled = !!session?.access_token;
   const authHeaders = session?.access_token
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
 
-  // Resize observer
+  // Collapse to an icon rail when the viewport gets narrow enough.
   useEffect(() => {
-    const el = navRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setIsCollapsed(entry.contentRect.width < 160);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
+    const updateCollapsed = () => {
+      setIsCollapsed(window.innerWidth < 900);
+    };
+
+    updateCollapsed();
+    window.addEventListener("resize", updateCollapsed);
+    return () => window.removeEventListener("resize", updateCollapsed);
   }, []);
 
   // Fetch the followed IDs for all three types in parallel
@@ -148,45 +152,65 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
   return (
     <aside
-      ref={navRef}
       data-slot="navbar"
       className={cn(
-        "flex h-full w-[clamp(0rem,24vw,22rem)] min-w-0 max-w-[22rem] flex-col overflow-x-hidden overflow-y-auto border-r border-black/5 bg-white px-[clamp(0.5rem,1.5vw,1.25rem)] py-[clamp(0.75rem,1.75vw,1.5rem)]",
-        isCollapsed && "items-center px-2 py-4",
+        "flex h-full max-w-[22rem] flex-col overflow-x-hidden overflow-y-auto border-r border-black/5 bg-white py-[clamp(0.75rem,1.75vw,1.5rem)] transition-[width,padding] duration-200",
+        isCollapsed
+          ? "w-20 min-w-20 items-center px-2"
+          : "w-[clamp(16rem,24vw,22rem)] min-w-[16rem] px-[clamp(0.5rem,1.5vw,1.25rem)]",
         className,
       )}
       {...props}
     >
       {/* Logo */}
-      <div className={cn("flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]", isCollapsed && "w-full justify-center")}>
-        <div aria-hidden="true" className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300" />
-        {!isCollapsed && (
-          <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
-            Inside Athletics
-          </span>
+      <div
+        className={cn(
+          "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]",
+          isCollapsed ? "w-full justify-center" : "justify-between",
         )}
+      >
+        <div
+          className={cn(
+            "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]",
+            isCollapsed && "justify-center",
+          )}
+        >
+          <div aria-hidden="true" className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300" />
+          {!isCollapsed && (
+            <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
+              Inside Athletics
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Search */}
-      <div className={cn("pt-[clamp(0.75rem,1.2vw,1rem)]", isCollapsed && "w-full")}>
-        <Input
-          type="search"
-          placeholder={isCollapsed ? "" : "Search"}
-          aria-label="Search"
-          className="h-[clamp(2.25rem,3.2vw,2.5rem)] rounded-lg border-zinc-200 bg-white px-[clamp(0.625rem,1vw,0.75rem)] text-[clamp(0.8rem,1.1vw,0.9rem)] text-zinc-700 placeholder:text-zinc-400"
-        />
-      </div>
+      {!isCollapsed && (
+        <div className="pt-[clamp(0.75rem,1.2vw,1rem)]">
+          <Input
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+            className="h-[clamp(2.25rem,3.2vw,2.5rem)] rounded-lg border-zinc-200 bg-white px-[clamp(0.625rem,1vw,0.75rem)] text-[clamp(0.8rem,1.1vw,0.9rem)] text-zinc-700 placeholder:text-zinc-400"
+          />
+        </div>
+      )}
 
       <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
 
       {/* Nav items — unchanged */}
-      <nav aria-label="Primary" className={cn("flex flex-col gap-1", isCollapsed && "w-full")}>
+      <nav aria-label="Primary" className={cn("flex flex-col gap-1", isCollapsed && "w-full items-center")}>
         {navItems.map(({ label, icon: Icon }) => (
           <Button
             key={label}
             variant="ghost"
             size="lg"
-            className="h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 justify-start gap-[clamp(0.5rem,1vw,0.75rem)] rounded-lg px-[clamp(0.625rem,1vw,0.75rem)] text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
+            className={cn(
+              "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900",
+              isCollapsed
+                ? "w-12 justify-center px-0"
+                : "justify-start gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+            )}
             aria-label={label}
             title={label}
           >
@@ -198,7 +222,12 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
       {/* Following section — same JSX, driven by new data */}
       <div className={cn("mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]", isCollapsed && "w-full")}>
-        <div className="flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]">
+        <div
+          className={cn(
+            "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+            isCollapsed && "justify-center px-0",
+          )}
+        >
           <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
           {!isCollapsed && (
             <span className="truncate text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-800">
@@ -222,7 +251,12 @@ export function Navbar({ className, ...props }: NavbarProps) {
             <button
               key={`${type}-${label}`}
               type="button"
-              className="flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] rounded-lg px-[clamp(0.625rem,1vw,0.75rem)] py-[clamp(0.45rem,0.9vw,0.55rem)] text-left text-[clamp(0.78rem,1.05vw,0.88rem)] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+              className={cn(
+                "flex min-w-0 items-center rounded-lg py-[clamp(0.45rem,0.9vw,0.55rem)] text-left text-[clamp(0.78rem,1.05vw,0.88rem)] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900",
+                isCollapsed
+                  ? "w-12 justify-center px-0"
+                  : "gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+              )}
               aria-label={label}
               title={label}
             >
