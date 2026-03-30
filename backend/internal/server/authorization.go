@@ -62,7 +62,7 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 		}
 
 		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
-			(resource == "post" || resource == "comment" || resource == "tagfollow" || resource == "sportfollow" || resource == "collegefollow") &&
+			(resource == "post" || resource == "comment" || resource == "tagfollow" || resource == "premiumpost" || resource == "sportfollow" || resource == "collegefollow") &&
 			ctx.Param("id") != "" {
 			owned, err := IsOwnerOfResource(db, parsedUserID, ctx.Param("id"), resource)
 			if err != nil {
@@ -139,6 +139,10 @@ func IsOwnerOfResource(db *gorm.DB, userID uuid.UUID, resourceID, resource strin
 		err = db.Table("college_follows").
 			Where("id = ? AND user_id = ?", parsedResourceID, userID).
 			Count(&count).Error
+	case "premiumpost":
+		err = db.Table("premium_posts").
+			Where("id = ? AND author_id = ?", parsedResourceID, userID).
+			Count(&count).Error
 	default:
 		return false, errUnsupportedResource
 	}
@@ -187,18 +191,20 @@ func resolveResourceAndAction(method, path, userID, pathID string) (models.Permi
 
 // change this to map so that you can just change the map if you need to update
 var resourceByPathSegment = map[string]string{
-	"user":        "user",
-	"users":       "user",
-	"post":        "post",
-	"posts":       "post",
-	"sport":       "sport",
-	"sports":      "sport",
-	"college":     "college",
-	"colleges":    "college",
-	"role":        "role",
-	"roles":       "role",
-	"permission":  "permission",
-	"permissions": "permission",
+	"user":          "user",
+	"users":         "user",
+	"post":          "post",
+	"posts":         "post",
+	"sport":         "sport",
+	"sports":        "sport",
+	"college":       "college",
+	"colleges":      "college",
+	"role":          "role",
+	"roles":         "role",
+	"permission":    "permission",
+	"permissions":   "permission",
+	"premium_post":  "premium_post",
+	"premium_posts": "premium_post",
 }
 
 func resolveResourceFromPath(path string) string {

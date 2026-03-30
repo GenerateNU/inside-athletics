@@ -1,4 +1,4 @@
-h1:VsHIZU3H+qjKv54Exp0lfwCjfQsns7Grlk+bD4v3L18=
+h1:SBPzgsybWEmr6hjgaIyvkLAxIrIfKciifvdEhqr+X8c=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
@@ -22,3 +22,5 @@ h1:VsHIZU3H+qjKv54Exp0lfwCjfQsns7Grlk+bD4v3L18=
 20260315100000_AddCollegeFollowTable.sql h1:xJZQdPrjYv5dzWXj68BnWuocbYSd+lTDz29mL8RKN44=
 20260323000652_AddUniqueIndexFollowCollegeSportTag.sql h1:FMxeNRY6jUg/yfqroCYpC/BkXM1Waq0oysYZmXk5pr4=
 20260324190000_SeedFollowRolePermissions.sql h1:/uW3Qti19K0fAA19H/uyD6oNM9CgADxokbJhjGeX/Xs=
+20260326164132_CreatePremiumPosts.sql h1:Wk5WqoCfDV5FH7YxlfVu0SFhN6o5kTwZmMtqLo+OBeg=
+20260330030738_AddPremiumPostPermissions.sql h1:xPeT4tkF+9xp/Bzm6ZqcvkTo5IyX7efTH5Ph8a8M88Y=
