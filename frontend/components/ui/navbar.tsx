@@ -15,9 +15,9 @@ import {
   getApiV1CollegeByIdQueryOptions,
   getApiV1SportByIdQueryOptions,
   getApiV1TagByIdQueryOptions,
-  useGetApiV1UserCollegeByUserIdFollows,
-  useGetApiV1UserSportByUserIdFollows,
-  useGetApiV1UserTagByUserIdFollows,
+  useGetApiV1UserCollegeFollows,
+  useGetApiV1UserSportFollows,
+  useGetApiV1UserTagFollows,
 } from "@/api/hooks";
 import type { GetCollegeFollowsByUserResponse } from "@/api/models/GetCollegeFollowsByUserResponse";
 import type { GetCollegeResponse } from "@/api/models/GetCollegeResponse";
@@ -80,24 +80,20 @@ export function Navbar({ className, ...props }: NavbarProps) {
   }, []);
 
   // Fetch the followed IDs for all three types in parallel
-  const { data: tagFollows } = useGetApiV1UserTagByUserIdFollows(userId ?? "", {
-    query: { enabled: enabled && !!userId },
+  const { data: tagFollows } = useGetApiV1UserTagFollows({
+    query: { enabled },
     client: { headers: authHeaders },
   });
-  const { data: sportFollows } = useGetApiV1UserSportByUserIdFollows(
-    userId ?? "",
-    {
-      query: { enabled: enabled && !!userId },
-      client: { headers: authHeaders },
-    },
-  );
-  const { data: collegeFollows } = useGetApiV1UserCollegeByUserIdFollows(
-    userId ?? "",
-    {
-      query: { enabled: enabled && !!userId },
-      client: { headers: authHeaders },
-    },
-  );
+
+  const { data: sportFollows } = useGetApiV1UserSportFollows({
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+
+  const { data: collegeFollows } = useGetApiV1UserCollegeFollows({
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
 
   const tagIds =
     unwrapBody<GetTagFollowsByUserResponse>(tagFollows)?.tag_ids ?? [];
