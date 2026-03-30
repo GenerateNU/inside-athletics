@@ -2,6 +2,8 @@ export type { AssignRoleRequest } from "./AssignRoleRequest.ts";
 export type { AssignRoleResponse } from "./AssignRoleResponse.ts";
 export type { CollegeDivisionRankEnumKey, College } from "./College.ts";
 export type { CommentResponse } from "./CommentResponse.ts";
+export type { ConfirmUploadRequest } from "./ConfirmUploadRequest.ts";
+export type { ConfirmUploadResponse } from "./ConfirmUploadResponse.ts";
 export type { CreateCollegeFollowBody } from "./CreateCollegeFollowBody.ts";
 export type { CreateCollegeFollowResponse } from "./CreateCollegeFollowResponse.ts";
 export type {
@@ -64,6 +66,13 @@ export type {
   DeleteApiV1CommentLikeByIdMutationResponse,
   DeleteApiV1CommentLikeByIdMutation,
 } from "./DeleteApiV1CommentLikeById.ts";
+export type {
+  DeleteApiV1ContentQueryParams,
+  DeleteApiV1Content200,
+  DeleteApiV1ContentError,
+  DeleteApiV1ContentMutationResponse,
+  DeleteApiV1ContentMutation,
+} from "./DeleteApiV1Content.ts";
 export type {
   DeleteApiV1PermissionByIdPathParams,
   DeleteApiV1PermissionById200,
@@ -162,6 +171,7 @@ export type {
 export type { DeleteCollegeFollowResponse } from "./DeleteCollegeFollowResponse.ts";
 export type { DeleteCollegeResponse } from "./DeleteCollegeResponse.ts";
 export type { DeleteCommentLikeResponse } from "./DeleteCommentLikeResponse.ts";
+export type { DeleteContentResponse } from "./DeleteContentResponse.ts";
 export type { DeletedAt } from "./DeletedAt.ts";
 export type { DeletePostLikeResponse } from "./DeletePostLikeResponse.ts";
 export type { DeletePostResponse } from "./DeletePostResponse.ts";
@@ -212,6 +222,13 @@ export type {
   GetApiV1CommentLikeByIdQueryResponse,
   GetApiV1CommentLikeByIdQuery,
 } from "./GetApiV1CommentLikeById.ts";
+export type {
+  GetApiV1ContentDownloadUrlQueryParams,
+  GetApiV1ContentDownloadUrl200,
+  GetApiV1ContentDownloadUrlError,
+  GetApiV1ContentDownloadUrlQueryResponse,
+  GetApiV1ContentDownloadUrlQuery,
+} from "./GetApiV1ContentDownloadUrl.ts";
 export type {
   GetApiV1Health200,
   GetApiV1HealthError,
@@ -282,6 +299,13 @@ export type {
   GetApiV1PostsBySportBySportIdQueryResponse,
   GetApiV1PostsBySportBySportIdQuery,
 } from "./GetApiV1PostsBySportBySportId.ts";
+export type {
+  GetApiV1PostsPopularQueryParams,
+  GetApiV1PostsPopular200,
+  GetApiV1PostsPopularError,
+  GetApiV1PostsPopularQueryResponse,
+  GetApiV1PostsPopularQuery,
+} from "./GetApiV1PostsPopular.ts";
 export type {
   GetApiV1PostTagByIdPathParams,
   GetApiV1PostTagById200,
@@ -389,12 +413,11 @@ export type {
   GetApiV1UserCollegeByCollegeIdUsersQuery,
 } from "./GetApiV1UserCollegeByCollegeIdUsers.ts";
 export type {
-  GetApiV1UserCollegeByUserIdFollowsPathParams,
-  GetApiV1UserCollegeByUserIdFollows200,
-  GetApiV1UserCollegeByUserIdFollowsError,
-  GetApiV1UserCollegeByUserIdFollowsQueryResponse,
-  GetApiV1UserCollegeByUserIdFollowsQuery,
-} from "./GetApiV1UserCollegeByUserIdFollows.ts";
+  GetApiV1UserCollegeFollows200,
+  GetApiV1UserCollegeFollowsError,
+  GetApiV1UserCollegeFollowsQueryResponse,
+  GetApiV1UserCollegeFollowsQuery,
+} from "./GetApiV1UserCollegeFollows.ts";
 export type {
   GetApiV1UserCurrent200,
   GetApiV1UserCurrentError,
@@ -409,12 +432,11 @@ export type {
   GetApiV1UserSportBySportIdUsersQuery,
 } from "./GetApiV1UserSportBySportIdUsers.ts";
 export type {
-  GetApiV1UserSportByUserIdFollowsPathParams,
-  GetApiV1UserSportByUserIdFollows200,
-  GetApiV1UserSportByUserIdFollowsError,
-  GetApiV1UserSportByUserIdFollowsQueryResponse,
-  GetApiV1UserSportByUserIdFollowsQuery,
-} from "./GetApiV1UserSportByUserIdFollows.ts";
+  GetApiV1UserSportFollows200,
+  GetApiV1UserSportFollowsError,
+  GetApiV1UserSportFollowsQueryResponse,
+  GetApiV1UserSportFollowsQuery,
+} from "./GetApiV1UserSportFollows.ts";
 export type {
   GetApiV1UserTagByTagIdUsersPathParams,
   GetApiV1UserTagByTagIdUsers200,
@@ -423,12 +445,11 @@ export type {
   GetApiV1UserTagByTagIdUsersQuery,
 } from "./GetApiV1UserTagByTagIdUsers.ts";
 export type {
-  GetApiV1UserTagByUserIdFollowsPathParams,
-  GetApiV1UserTagByUserIdFollows200,
-  GetApiV1UserTagByUserIdFollowsError,
-  GetApiV1UserTagByUserIdFollowsQueryResponse,
-  GetApiV1UserTagByUserIdFollowsQuery,
-} from "./GetApiV1UserTagByUserIdFollows.ts";
+  GetApiV1UserTagFollows200,
+  GetApiV1UserTagFollowsError,
+  GetApiV1UserTagFollowsQueryResponse,
+  GetApiV1UserTagFollowsQuery,
+} from "./GetApiV1UserTagFollows.ts";
 export type { GetCollegeFollowsByUserResponse } from "./GetCollegeFollowsByUserResponse.ts";
 export type {
   GetCollegeResponseDivisionRankEnumKey,
@@ -436,9 +457,11 @@ export type {
 } from "./GetCollegeResponse.ts";
 export type { GetCommentLikeInfoResponse } from "./GetCommentLikeInfoResponse.ts";
 export type { GetCommentLikeResponse } from "./GetCommentLikeResponse.ts";
+export type { GetDownloadURLResponse } from "./GetDownloadURLResponse.ts";
 export type { GetFollowingUsersByCollegeResponse } from "./GetFollowingUsersByCollegeResponse.ts";
 export type { GetFollowingUsersBySportResponse } from "./GetFollowingUsersBySportResponse.ts";
 export type { GetFollowingUsersByTagResponse } from "./GetFollowingUsersByTagResponse.ts";
+export type { GetPopularPostsResponse } from "./GetPopularPostsResponse.ts";
 export type { GetPostLikeInfoResponse } from "./GetPostLikeInfoResponse.ts";
 export type { GetPostLikeResponse } from "./GetPostLikeResponse.ts";
 export type { GetPostsByAuthorIDResponse } from "./GetPostsByAuthorIDResponse.ts";
@@ -450,6 +473,8 @@ export type { GetStripeCustomerResponse } from "./GetStripeCustomerResponse.ts";
 export type { GetTagFollowsByUserResponse } from "./GetTagFollowsByUserResponse.ts";
 export type { GetTagPostByIDResponse } from "./GetTagPostByIDResponse.ts";
 export type { GetTagResponse } from "./GetTagResponse.ts";
+export type { GetUploadURLRequest } from "./GetUploadURLRequest.ts";
+export type { GetUploadURLResponse } from "./GetUploadURLResponse.ts";
 export type { GetUserResponse } from "./GetUserResponse.ts";
 export type { HealthResponse } from "./HealthResponse.ts";
 export type { InvoiceSettings } from "./InvoiceSettings.ts";
@@ -604,6 +629,20 @@ export type {
   PostApiV1CommentLikeMutationResponse,
   PostApiV1CommentLikeMutation,
 } from "./PostApiV1CommentLike.ts";
+export type {
+  PostApiV1ContentConfirmUpload200,
+  PostApiV1ContentConfirmUploadError,
+  PostApiV1ContentConfirmUploadMutationRequest,
+  PostApiV1ContentConfirmUploadMutationResponse,
+  PostApiV1ContentConfirmUploadMutation,
+} from "./PostApiV1ContentConfirmUpload.ts";
+export type {
+  PostApiV1ContentUploadUrl200,
+  PostApiV1ContentUploadUrlError,
+  PostApiV1ContentUploadUrlMutationRequest,
+  PostApiV1ContentUploadUrlMutationResponse,
+  PostApiV1ContentUploadUrlMutation,
+} from "./PostApiV1ContentUploadUrl.ts";
 export type {
   PostApiV1Permission200,
   PostApiV1PermissionError,

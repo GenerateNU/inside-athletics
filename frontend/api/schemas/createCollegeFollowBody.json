@@ -12,14 +12,9 @@
       "description": "ID of the College",
       "examples": ["123e4567-e89b-12d3-a456-426614174000"],
       "type": "string"
-    },
-    "user_id": {
-      "description": "ID of the user",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
     }
   },
-  "required": ["college_id", "user_id"],
+  "required": ["college_id"],
   "type": "object",
   "x-readme-ref-name": "CreateCollegeFollowBody"
 }
