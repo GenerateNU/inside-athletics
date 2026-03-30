@@ -23,8 +23,9 @@ func TestCreateMedia(t *testing.T) {
 	})
 
 	body := map[string]any{
-		"s3key": "test s3key",
-		"title": "test title",
+		"s3key":      "test s3key",
+		"title":      "test title",
+		"media_type": "jpeg",
 	}
 
 	resp := api.Post("/api/v1/media/", body, authHeader)
@@ -43,6 +44,11 @@ func TestCreateMedia(t *testing.T) {
 	if result.Title != "test title" {
 		t.Errorf("expected title test title, got %v", result.Title)
 	}
+
+	if result.MediaType != "jpeg" {
+		t.Errorf("expected media type jpeg, got %v", result.MediaType)
+	}
+
 }
 
 func TestGetMedia(t *testing.T) {

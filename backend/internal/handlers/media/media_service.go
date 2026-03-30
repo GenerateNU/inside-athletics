@@ -22,8 +22,9 @@ func NewMediaService(db *gorm.DB) *MediaService {
 
 func (s *MediaService) CreateMedia(ctx context.Context, input *struct{ Body CreateMediaRequest }) (*utils.ResponseBody[MediaResponse], error) {
 	media := &models.Media{
-		S3Key: input.Body.S3Key,
-		Title: input.Body.Title,
+		S3Key:     input.Body.S3Key,
+		Title:     input.Body.Title,
+		MediaType: input.Body.MediaType,
 	}
 
 	createdMedia, err := utils.HandleDBError(
