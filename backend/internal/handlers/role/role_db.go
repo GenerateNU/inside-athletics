@@ -7,6 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type RoleDB struct {
@@ -124,7 +125,7 @@ func (r *RoleDB) UpdateRoleWithPermissionsStrict(id uuid.UUID, updates UpdateRol
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var role models.Role
-		if err := tx.First(&role, "id = ?", id).Error; err != nil {
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&role, "id = ?", id).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return huma.Error404NotFound("Resource not found")
 			}
