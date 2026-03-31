@@ -105,7 +105,7 @@ func TestCreateRoleDuplicateReturnsConflict(t *testing.T) {
 	}
 	assignRoleToUser(t, testDB.DB, adminUserID, adminRoleID)
 
-	roleName := "duplicate_role_" + uuid.NewString()
+	roleName := "dup_role_" + uuid.NewString()[:8]
 	createBody := role.CreateRoleRequest{Name: roleName}
 
 	firstResp := api.Post("/api/v1/role/", createBody, "Authorization: Bearer "+adminUserID.String())
