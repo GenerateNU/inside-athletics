@@ -10,5 +10,4 @@ export const createCollegeFollowBodySchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   college_id: z.string().describe("ID of the College"),
-  user_id: z.string().describe("ID of the user"),
 });

@@ -7,24 +7,20 @@ import { errorModelSchema } from "./errorModelSchema.ts";
 import { getSportFollowsByUserResponseSchema } from "./getSportFollowsByUserResponseSchema.ts";
 import { z } from "zod/v4";
 
-export const getApiV1UserSportByUserIdFollowsPathParamsSchema = z.object({
-  user_id: z.string().describe("ID of the user"),
-});
-
 /**
  * @description OK
  */
-export const getApiV1UserSportByUserIdFollows200Schema = z.lazy(
+export const getApiV1UserSportFollows200Schema = z.lazy(
   () => getSportFollowsByUserResponseSchema,
 );
 
 /**
  * @description Error
  */
-export const getApiV1UserSportByUserIdFollowsErrorSchema = z.lazy(
+export const getApiV1UserSportFollowsErrorSchema = z.lazy(
   () => errorModelSchema,
 );
 
-export const getApiV1UserSportByUserIdFollowsQueryResponseSchema = z.lazy(
-  () => getApiV1UserSportByUserIdFollows200Schema,
+export const getApiV1UserSportFollowsQueryResponseSchema = z.lazy(
+  () => getApiV1UserSportFollows200Schema,
 );

@@ -7,24 +7,20 @@ import { errorModelSchema } from "./errorModelSchema.ts";
 import { getCollegeFollowsByUserResponseSchema } from "./getCollegeFollowsByUserResponseSchema.ts";
 import { z } from "zod/v4";
 
-export const getApiV1UserCollegeByUserIdFollowsPathParamsSchema = z.object({
-  user_id: z.string().describe("ID of the user"),
-});
-
 /**
  * @description OK
  */
-export const getApiV1UserCollegeByUserIdFollows200Schema = z.lazy(
+export const getApiV1UserCollegeFollows200Schema = z.lazy(
   () => getCollegeFollowsByUserResponseSchema,
 );
 
 /**
  * @description Error
  */
-export const getApiV1UserCollegeByUserIdFollowsErrorSchema = z.lazy(
+export const getApiV1UserCollegeFollowsErrorSchema = z.lazy(
   () => errorModelSchema,
 );
 
-export const getApiV1UserCollegeByUserIdFollowsQueryResponseSchema = z.lazy(
-  () => getApiV1UserCollegeByUserIdFollows200Schema,
+export const getApiV1UserCollegeFollowsQueryResponseSchema = z.lazy(
+  () => getApiV1UserCollegeFollows200Schema,
 );

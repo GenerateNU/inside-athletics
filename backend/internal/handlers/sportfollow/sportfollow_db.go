@@ -31,7 +31,7 @@ func (u *SportFollowDB) GetFollowingUsersBySport(sport_id uuid.UUID) (*[]uuid.UU
 
 func (u *SportFollowDB) CreateSportFollow(sportfollow *models.SportFollow) (*models.SportFollow, error) {
 	// checking if user already followed the sport
-	result := u.db.Where("user_id = ? AND sport_id = ?", sportfollow.UserID, sportfollow.SportID).First(&sportfollow)
+	result := u.db.Where("user_id = ? AND sport_id = ?", sportfollow.UserID, sportfollow.SportID).First(sportfollow)
 	if result.Error == nil {
 		return nil, huma.Error409Conflict("User has already followed this sport")
 	}

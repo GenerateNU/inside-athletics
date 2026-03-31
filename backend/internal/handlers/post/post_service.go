@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"inside-athletics/internal/handlers/tagpost"
+	"inside-athletics/internal/handlers/user"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -12,16 +13,26 @@ import (
 	"gorm.io/gorm"
 )
 
+// Free-tier limits for users without premium (Account_Type == false).
+const (
+	FreeUserMaxPostViews = 5
+	FreeUserMaxPosts     = 1
+)
+
+const freeLimitMessage = "You have used up your free post views. Upgrade to view more posts."
+
 type PostService struct {
 	postDB    *PostDB
 	tagPostDB *tagpost.TagPostDB
+	userDB    *user.UserDB
 }
 
-// NewPostService creates a new PostService instance
-func NewPostService(db *gorm.DB) *PostService {
+// NewPostService creates a new PostService instance.
+func NewPostService(db *gorm.DB, userDB *user.UserDB) *PostService {
 	return &PostService{
 		postDB:    NewPostDB(db),
 		tagPostDB: tagpost.NewTagPostDB(db),
+		userDB:    userDB,
 	}
 }
 
@@ -29,6 +40,20 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 	id, err := utils.GetCurrentUserID(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	u, err := s.userDB.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+	if !u.Account_Type {
+		count, err := s.postDB.CountPostsByAuthor(id)
+		if err != nil {
+			return nil, err
+		}
+		if count >= FreeUserMaxPosts {
+			return nil, huma.Error403Forbidden(freeLimitMessage)
+		}
 	}
 
 	if len(input.Body.Tags) == 0 && input.Body.SportId == nil && input.Body.CollegeId == nil {
@@ -128,9 +153,32 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 	if err != nil {
 		return nil, err
 	}
-	post, err := s.postDB.GetPostByID((input.ID), userID)
+	post, err := s.postDB.GetPostByID(input.ID, userID)
 	if err != nil {
 		return nil, err
+	}
+
+	u, err := s.userDB.GetUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	if !u.Account_Type {
+		alreadyViewed, err := s.postDB.HasUserViewedPost(userID, input.ID)
+		if err != nil {
+			return nil, err
+		}
+		if !alreadyViewed {
+			count, err := s.postDB.CountViewedPostsByUser(userID)
+			if err != nil {
+				return nil, err
+			}
+			if count >= FreeUserMaxPostViews {
+				return nil, huma.Error403Forbidden(freeLimitMessage)
+			}
+			if err := s.postDB.RecordPostView(userID, input.ID); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return &utils.ResponseBody[PostResponse]{

@@ -6,8 +6,10 @@ import (
 )
 
 func Route(api huma.API, db *gorm.DB) {
-	commentDB := &CommentDB{db}
-	commentService := &CommentService{commentDB}
+	commentDB := NewCommentDB(db)
+	commentService := &CommentService{
+		commentDB: commentDB,
+	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/comment")
 		huma.Post(grp, "/", commentService.CreateComment)         // Create comment
