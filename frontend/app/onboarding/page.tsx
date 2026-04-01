@@ -72,7 +72,7 @@ export default function SignUpPage() {
             <Button
               type="button"
               variant="default"
-              className="h-10 w-full text-sm font-semibold"
+              className="h-10 w-full rounded-xl text-sm font-semibold"
               style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
               onClick={() => {
                 router.push("/onboarding/role");
@@ -81,7 +81,6 @@ export default function SignUpPage() {
             >
               Continue
             </Button>
-            <p> Forgot Password?</p>
           </div>
         </form>
       </div>
