@@ -48,6 +48,18 @@ export default function OnboardingRolePage() {
 
   const canContinue = Boolean(role && primarySport && program && university);
 
+  const handleRoleChange = (value: string | null) => {
+    setRole(value ?? "");
+  };
+
+  const handlePrimarySportChange = (value: string | null) => {
+    setPrimarySport(value ?? "");
+  };
+
+  const handleUniversityChange = (value: string | null) => {
+    setUniversity(value ?? "");
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
@@ -63,7 +75,7 @@ export default function OnboardingRolePage() {
           <label htmlFor="role" className="block text-sm font-medium text-black">
             Role
           </label>
-          <Select value={role} onValueChange={setRole}>
+          <Select value={role} onValueChange={handleRoleChange}>
             <SelectTrigger id="role" className="h-10 w-full text-sm">
               <SelectValue placeholder="Select a role" />
             </SelectTrigger>
@@ -83,7 +95,7 @@ export default function OnboardingRolePage() {
           >
             Primary Sport
           </label>
-          <Select value={primarySport} onValueChange={setPrimarySport}>
+          <Select value={primarySport} onValueChange={handlePrimarySportChange}>
             <SelectTrigger id="primary-sport" className="h-10 w-full text-sm">
               <SelectValue placeholder="Select a primary sport" />
             </SelectTrigger>
@@ -134,7 +146,7 @@ export default function OnboardingRolePage() {
           >
             University
           </label>
-          <Select value={university} onValueChange={setUniversity}>
+          <Select value={university} onValueChange={handleUniversityChange}>
             <SelectTrigger id="university" className="h-10 w-full text-sm">
               <SelectValue placeholder="Select a university" />
             </SelectTrigger>
@@ -153,7 +165,7 @@ export default function OnboardingRolePage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
-            router.push("/");
+            router.push("/onboarding/preferences");
           }}
           disabled={!canContinue}
         >

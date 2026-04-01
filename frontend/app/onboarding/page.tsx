@@ -1,33 +1,17 @@
 "use client";
-import { signup } from "@/actions/auth";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect, useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
-import { useFormStatus } from "react-dom";
-
-type signupInitialState = {
-  success: boolean;
-  message: string;
-  email?: string;
-};
-
-const initialState: signupInitialState = {
-  success: false,
-  message: "",
-  email: "",
-};
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignUpPage() {
-  const [state, signupAction] = useActionState(signup, initialState);
-  const status = useFormStatus();
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    if (state.success) {
-      redirect("/");
-    }
-  }, [state]);
+  const canContinue = Boolean(name.trim() && username.trim() && password);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
@@ -40,32 +24,41 @@ export default function SignUpPage() {
             Placeholder Image
           </div>
         </div>
-        <form className="space-y-6 rounded-md bg-white p-8 shadow-sm">
+        <div className="space-y-6 rounded-md bg-white p-8 shadow-sm">
           <div className="flex w-full flex-col space-y-4">
             <Input
               id="name"
               name="name"
-              type="name"
+              type="text"
+              value={name}
               placeholder="Name"
               required
+              onChange={(event) => {
+                setName(event.target.value);
+              }}
             />
             <Input
               id="username"
               name="username"
-              type="username"
+              type="text"
+              value={username}
               placeholder="Username"
               required
+              onChange={(event) => {
+                setUsername(event.target.value);
+              }}
             />
             <Input
               id="password"
               name="password"
               type="password"
+              value={password}
               placeholder="Password"
               required
+              onChange={(event) => {
+                setPassword(event.target.value);
+              }}
             />
-            {!state?.success && (
-              <p className="text-red-500 text-sm"> {state.message}</p>
-            )}
           </div>
 
           <div className="flex w-full flex-col items-center gap-2">
@@ -77,12 +70,12 @@ export default function SignUpPage() {
               onClick={() => {
                 router.push("/onboarding/role");
               }}
-              disabled={status.pending}
+              disabled={!canContinue}
             >
               Continue
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
