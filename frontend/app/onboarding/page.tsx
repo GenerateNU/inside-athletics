@@ -2,8 +2,8 @@
 import { signup } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 
 type signupInitialState = {
@@ -21,6 +21,7 @@ const initialState: signupInitialState = {
 export default function SignUpPage() {
   const [state, signupAction] = useActionState(signup, initialState);
   const status = useFormStatus();
+  const router = useRouter();
 
   useEffect(() => {
     if (state.success) {
@@ -71,8 +72,10 @@ export default function SignUpPage() {
             <Button
               type="button"
               variant="default"
+              className="h-10 w-full text-sm font-semibold"
+              style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
               onClick={() => {
-                redirect("/login");
+                router.push("/onboarding/role");
               }}
               disabled={status.pending}
             >
