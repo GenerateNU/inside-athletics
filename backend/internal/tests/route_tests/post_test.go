@@ -1,11 +1,13 @@
 package routeTests
 
 import (
+	"errors"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/models"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/google/uuid"
@@ -669,6 +671,66 @@ func TestFreeUserCannotCreateSecondPost(t *testing.T) {
 	}
 }
 
+func TestFreeUserConcurrentPostCreationEnforcesLimit(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	CreateUserAndSport(testDB, t)
+	postDB := post.NewPostDB(testDB.DB)
+
+	errs := make(chan error, 2)
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			<-start
+			_, err := postDB.CreatePostWithAuthorLimit(&models.Post{
+				AuthorID:    JohnID,
+				SportID:     &SoccerID,
+				Title:       "Concurrent post " + strconv.Itoa(i),
+				Content:     "Content",
+				IsAnonymous: false,
+			}, []post.TagRequest{}, post.FreeUserMaxPosts)
+			errs <- err
+		}(i)
+	}
+
+	close(start)
+	wg.Wait()
+	close(errs)
+
+	var successCount int
+	var limitErrorCount int
+	for err := range errs {
+		switch {
+		case err == nil:
+			successCount++
+		case errors.Is(err, post.ErrFreePostCreationLimitReached):
+			limitErrorCount++
+		default:
+			t.Fatalf("unexpected error: %v", err)
+		}
+	}
+
+	if successCount != 1 {
+		t.Fatalf("expected exactly one successful post creation, got %d", successCount)
+	}
+	if limitErrorCount != 1 {
+		t.Fatalf("expected exactly one free-tier limit error, got %d", limitErrorCount)
+	}
+
+	count, err := postDB.CountPostsByAuthor(JohnID)
+	if err != nil {
+		t.Fatalf("failed to count posts by author: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("expected exactly one persisted post, got %d", count)
+	}
+}
+
 // TestFreeUserGetPostReturns403AfterMaxViews asserts free users get 403 when viewing more than FreeUserMaxPostViews distinct posts.
 func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 	const maxViews = 5
@@ -725,6 +787,88 @@ func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 	respAgain := api.Get("/api/v1/post/"+postIDs[0].String(), authHeader)
 	if respAgain.Code != http.StatusOK {
 		t.Fatalf("re-viewing first post should still be 200, got %d: %s", respAgain.Code, respAgain.Body.String())
+	}
+}
+
+func TestFreeUserConcurrentDistinctPostViewsEnforceLimit(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	postDB := post.NewPostDB(testDB.DB)
+	CreateUserAndSport(testDB, t)
+
+	freeUserID := uuid.New()
+	freeUser := models.User{
+		ID:                      freeUserID,
+		FirstName:               "Free",
+		LastName:                "User",
+		Email:                   "free-concurrent@example.com",
+		Username:                "freeuser-concurrent",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&freeUser).Error; err != nil {
+		t.Fatalf("failed to create free user: %v", err)
+	}
+
+	postIDs := make([]uuid.UUID, 0, post.FreeUserMaxPostViews+1)
+	for i := 0; i < post.FreeUserMaxPostViews+1; i++ {
+		createdPost, err := postDB.CreatePost(&models.Post{
+			AuthorID:    JohnID,
+			SportID:     &SoccerID,
+			Title:       "Concurrent view target " + strconv.Itoa(i),
+			Content:     "Content",
+			IsAnonymous: false,
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, createdPost.ID)
+	}
+
+	errs := make(chan error, len(postIDs))
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+
+	for _, postID := range postIDs {
+		wg.Add(1)
+		go func(postID uuid.UUID) {
+			defer wg.Done()
+			<-start
+			errs <- postDB.RecordPostViewIfAllowed(freeUserID, postID, post.FreeUserMaxPostViews)
+		}(postID)
+	}
+
+	close(start)
+	wg.Wait()
+	close(errs)
+
+	var successCount int
+	var limitErrorCount int
+	for err := range errs {
+		switch {
+		case err == nil:
+			successCount++
+		case errors.Is(err, post.ErrFreePostViewLimitReached):
+			limitErrorCount++
+		default:
+			t.Fatalf("unexpected error: %v", err)
+		}
+	}
+
+	if successCount != post.FreeUserMaxPostViews {
+		t.Fatalf("expected %d successful view records, got %d", post.FreeUserMaxPostViews, successCount)
+	}
+	if limitErrorCount != 1 {
+		t.Fatalf("expected exactly one free-tier view limit error, got %d", limitErrorCount)
+	}
+
+	count, err := postDB.CountViewedPostsByUser(freeUserID)
+	if err != nil {
+		t.Fatalf("failed to count viewed posts: %v", err)
+	}
+	if count != post.FreeUserMaxPostViews {
+		t.Fatalf("expected %d persisted viewed posts, got %d", post.FreeUserMaxPostViews, count)
 	}
 }
 

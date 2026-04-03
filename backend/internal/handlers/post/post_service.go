@@ -2,6 +2,7 @@ package post
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/handlers/user"
@@ -19,7 +20,10 @@ const (
 	FreeUserMaxPosts     = 1
 )
 
-const freeLimitMessage = "You have used up your free post views. Upgrade to view more posts."
+const (
+	freePostCreateLimitMessage = "You have used up your free post creation limit. Upgrade to create more posts."
+	freePostViewLimitMessage   = "You have used up your free post views. Upgrade to view more posts."
+)
 
 type PostService struct {
 	postDB    *PostDB
@@ -47,15 +51,13 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 		return nil, err
 	}
 	if !u.Account_Type {
-		count, err := s.postDB.CountPostsByAuthor(id)
-		if err != nil {
-			return nil, err
-		}
-		if count >= FreeUserMaxPosts {
-			return nil, huma.Error403Forbidden(freeLimitMessage)
-		}
+		return s.createPost(id, input, true)
 	}
 
+	return s.createPost(id, input, false)
+}
+
+func (s *PostService) createPost(id uuid.UUID, input *struct{ Body CreatePostRequest }, enforceFreeTierLimit bool) (*utils.ResponseBody[CreatePostResponse], error) {
 	if len(input.Body.Tags) == 0 && input.Body.SportId == nil && input.Body.CollegeId == nil {
 		return nil, huma.Error400BadRequest("Need to have at least a single tag on a post")
 	}
@@ -68,11 +70,21 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 		IsAnonymous: input.Body.IsAnonymous,
 	}
 
-	createdPost, err := utils.HandleDBError(
-		s.postDB.CreatePost(post, input.Body.Tags),
+	var (
+		createdPost *models.Post
+		err         error
 	)
-
+	if enforceFreeTierLimit {
+		createdPost, err = s.postDB.CreatePostWithAuthorLimit(post, input.Body.Tags, FreeUserMaxPosts)
+	} else {
+		createdPost, err = utils.HandleDBError(
+			s.postDB.CreatePost(post, input.Body.Tags),
+		)
+	}
 	if err != nil {
+		if errors.Is(err, ErrFreePostCreationLimitReached) {
+			return nil, huma.Error403Forbidden(freePostCreateLimitMessage)
+		}
 		return nil, err
 	}
 
@@ -163,21 +175,11 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 		return nil, err
 	}
 	if !u.Account_Type {
-		alreadyViewed, err := s.postDB.HasUserViewedPost(userID, input.ID)
-		if err != nil {
+		if err := s.postDB.RecordPostViewIfAllowed(userID, input.ID, FreeUserMaxPostViews); err != nil {
+			if errors.Is(err, ErrFreePostViewLimitReached) {
+				return nil, huma.Error403Forbidden(freePostViewLimitMessage)
+			}
 			return nil, err
-		}
-		if !alreadyViewed {
-			count, err := s.postDB.CountViewedPostsByUser(userID)
-			if err != nil {
-				return nil, err
-			}
-			if count >= FreeUserMaxPostViews {
-				return nil, huma.Error403Forbidden(freeLimitMessage)
-			}
-			if err := s.postDB.RecordPostView(userID, input.ID); err != nil {
-				return nil, err
-			}
 		}
 	}
 
