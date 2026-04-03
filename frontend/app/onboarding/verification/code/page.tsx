@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function OnboardingVerificationCodePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") ?? "";
   const [code, setCode] = useState("");
 
   const canContinue = Boolean(code.trim());
@@ -43,7 +45,11 @@ export default function OnboardingVerificationCodePage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
-            router.push("/onboarding/plan");
+            router.push(
+              role === "athlete"
+                ? `/onboarding/teams-of-interest?role=${encodeURIComponent(role)}`
+                : "/onboarding/plan",
+            );
           }}
           disabled={!canContinue}
         >

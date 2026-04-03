@@ -5,24 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const primarySports = [
-  { label: "Basketball", value: "basketball" },
-  { label: "Soccer", value: "soccer" },
-  { label: "Track & Field", value: "track-and-field" },
-  { label: "Volleyball", value: "volleyball" },
-  { label: "Tennis", value: "tennis" },
-  { label: "Swimming", value: "swimming" },
-  { label: "Softball", value: "softball" },
-  { label: "Baseball", value: "baseball" },
-] as const;
 
 export default function OnboardingVerificationPage() {
   const router = useRouter();
@@ -34,22 +16,12 @@ export default function OnboardingVerificationPage() {
   const [fullName, setFullName] = useState("");
   const [institutionEmail, setInstitutionEmail] = useState("");
   const [school, setSchool] = useState("");
-  const [primarySport, setPrimarySport] = useState("");
 
   const isAthlete = role === "athlete";
 
   const canContinue = isAthlete
-    ? Boolean(
-        fullName.trim() &&
-          institutionEmail.trim() &&
-          school.trim() &&
-          primarySport,
-      )
+    ? Boolean(fullName.trim() && institutionEmail.trim() && school.trim())
     : Boolean(name.trim() && email.trim());
-
-  const handlePrimarySportChange = (value: string | null) => {
-    setPrimarySport(value ?? "");
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
@@ -120,33 +92,6 @@ export default function OnboardingVerificationPage() {
                   setSchool(event.target.value);
                 }}
               />
-            </div>
-
-            <div className="space-y-3">
-              <label
-                htmlFor="primary-sport"
-                className="block text-sm font-medium text-black"
-              >
-                Primary Sport
-              </label>
-              <Select
-                value={primarySport}
-                onValueChange={handlePrimarySportChange}
-              >
-                <SelectTrigger
-                  id="primary-sport"
-                  className="h-10 w-full text-sm"
-                >
-                  <SelectValue placeholder="Select a primary sport" />
-                </SelectTrigger>
-                <SelectContent>
-                  {primarySports.map((sport) => (
-                    <SelectItem key={sport.value} value={sport.value}>
-                      {sport.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </>
         ) : (
