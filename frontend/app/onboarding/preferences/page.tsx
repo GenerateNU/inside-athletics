@@ -1,19 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { XIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const divisions = [
   { label: "Division I", value: "division-i" },
@@ -47,6 +40,8 @@ const universityOptions = [
 
 export default function OnboardingPreferencesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") ?? "";
   const [division, setDivision] = useState("");
   const [association, setAssociation] = useState("");
   const [search, setSearch] = useState("");
@@ -88,45 +83,59 @@ export default function OnboardingPreferencesPage() {
         </div>
 
         <div className="space-y-3">
-          <label
-            htmlFor="division"
-            className="block text-sm font-medium text-black"
-          >
-            Division
-          </label>
-          <Select value={division} onValueChange={handleDivisionChange}>
-            <SelectTrigger id="division" className="h-10 w-full text-sm">
-              <SelectValue placeholder="Select a division" />
-            </SelectTrigger>
-            <SelectContent>
-              {divisions.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+          <p className="block text-sm font-medium text-black">Division</p>
+          <div className="grid grid-cols-3 gap-3">
+            {divisions.map((item) => {
+              const isSelected = division === item.value;
+
+              return (
+                <Button
+                  key={item.value}
+                  type="button"
+                  variant="outline"
+                  className="h-12 rounded-xl text-sm font-semibold"
+                  style={{
+                    borderColor: "#16A34A",
+                    backgroundColor: isSelected ? "#16A34A" : "#FFFFFF",
+                    color: isSelected ? "#FFFFFF" : "#000000",
+                  }}
+                  onClick={() => {
+                    handleDivisionChange(item.value);
+                  }}
+                >
                   {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </Button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-3">
-          <label
-            htmlFor="association"
-            className="block text-sm font-medium text-black"
-          >
-            Association
-          </label>
-          <Select value={association} onValueChange={handleAssociationChange}>
-            <SelectTrigger id="association" className="h-10 w-full text-sm">
-              <SelectValue placeholder="Select NCAA or NJCAA" />
-            </SelectTrigger>
-            <SelectContent>
-              {associations.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+          <p className="block text-sm font-medium text-black">Association</p>
+          <div className="grid grid-cols-2 gap-3">
+            {associations.map((item) => {
+              const isSelected = association === item.value;
+
+              return (
+                <Button
+                  key={item.value}
+                  type="button"
+                  variant="outline"
+                  className="h-12 rounded-xl text-sm font-semibold"
+                  style={{
+                    borderColor: "#16A34A",
+                    backgroundColor: isSelected ? "#16A34A" : "#FFFFFF",
+                    color: isSelected ? "#FFFFFF" : "#000000",
+                  }}
+                  onClick={() => {
+                    handleAssociationChange(item.value);
+                  }}
+                >
                   {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </Button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -199,7 +208,9 @@ export default function OnboardingPreferencesPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
-            router.push("/");
+            router.push(
+              `/onboarding/verification?role=${encodeURIComponent(role)}`,
+            );
           }}
           disabled={!canContinue}
         >

@@ -165,7 +165,9 @@ export default function OnboardingRolePage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
-            router.push("/onboarding/preferences");
+            router.push(
+              `/onboarding/preferences?role=${encodeURIComponent(role)}`,
+            );
           }}
           disabled={!canContinue}
         >
