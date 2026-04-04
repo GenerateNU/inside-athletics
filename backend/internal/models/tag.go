@@ -9,9 +9,13 @@ import (
 type TagType string
 
 const (
-    TagTypeSports              TagType = "sports"
-    TagTypeDivisions           TagType = "divisions"
+    TagTypeSports               TagType = "sports"
+    TagTypeSchools              TagType = "schools"
+    TagTypeDivisions            TagType = "divisions"
     TagTypeAthleticsPerformance TagType = "athletics_performance"
+    TagTypeHealthWellness       TagType = "health_wellness"
+    TagTypeStudentAthleteLife   TagType = "student_athlete_life"
+    TagTypeRecruitingLogistics  TagType = "recruiting_logistics"
 )
 
 type Tag struct {

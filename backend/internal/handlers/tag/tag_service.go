@@ -53,24 +53,27 @@ func (u *TagService) GetTagById(ctx context.Context, input *GetTagByIDParams) (*
 	}, err
 }
 
-func (u *TagService) GetTagByType(ctx context.Context, input *GetTagByTypeParams) (*utils.ResponseBody[GetTagResponse], error) {
+func (u *TagService) GetTagsByType(ctx context.Context, input *GetTagsByTypeParams) (*utils.ResponseBody[[]GetTagResponse], error) {
 	tagType := input.Type
-	tag, err := u.tagDB.GetTagByType(tagType)
-	respBody := &utils.ResponseBody[GetTagResponse]{}
+	tags, err := u.tagDB.GetTagsByType(tagType)
+	respBody := &utils.ResponseBody[[]GetTagResponse]{}
 
 	if err != nil {
 		return respBody, err
 	}
 
-	response := &GetTagResponse{
-		ID:   tag.ID,
-		Name: tag.Name,
-		Type: tag.Type,
+	responses := make([]GetTagResponse, len(tags))
+	for i, tag := range tags {
+		responses[i] = GetTagResponse{
+			ID:   tag.ID,
+			Name: tag.Name,
+			Type: tag.Type,
+		}
 	}
 
-	return &utils.ResponseBody[GetTagResponse]{
-		Body: response,
-	}, err
+	return &utils.ResponseBody[[]GetTagResponse]{
+		Body: &responses,
+	}, nil
 }
 
 // Returns an array of post ids that are tagged with a unique tag, determined by the tag id.
