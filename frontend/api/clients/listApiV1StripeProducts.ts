@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/axios";
+import type { ListApiV1StripeProductsQueryResponse } from "../models/ListApiV1StripeProducts.ts";
 import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type { ListApiV1StripeProductsQueryResponse } from "../models/ListApiV1StripeProducts.ts";
 
 function getListApiV1StripeProductsUrl() {
   const res = { method: "GET", url: `/api/v1/stripe_products/` as const };

@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  PostApiV1SportMutationRequest,
+  PostApiV1SportMutationResponse,
+} from "../models/PostApiV1Sport.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1SportMutationRequest,
-  PostApiV1SportMutationResponse,
-} from "../models/PostApiV1Sport.ts";
 
 function getPostApiV1SportUrl() {
   const res = { method: "POST", url: `/api/v1/sport/` as const };

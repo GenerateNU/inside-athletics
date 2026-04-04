@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  Client,
-  RequestConfig,
-  ResponseErrorConfig,
-} from "@kubb/plugin-client/clients/axios";
-import type {
   PatchApiV1CommentByIdMutationRequest,
   PatchApiV1CommentByIdMutationResponse,
   PatchApiV1CommentByIdPathParams,
 } from "../models/PatchApiV1CommentById.ts";
+import type {
+  Client,
+  RequestConfig,
+  ResponseErrorConfig,
+} from "@kubb/plugin-client/clients/axios";
 
 function getPatchApiV1CommentByIdUrl(
   id: PatchApiV1CommentByIdPathParams["id"],

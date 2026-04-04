@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  Client,
-  RequestConfig,
-  ResponseErrorConfig,
-} from "@kubb/plugin-client/clients/axios";
-import type {
   PatchApiV1PermissionByIdMutationRequest,
   PatchApiV1PermissionByIdMutationResponse,
   PatchApiV1PermissionByIdPathParams,
 } from "../models/PatchApiV1PermissionById.ts";
+import type {
+  Client,
+  RequestConfig,
+  ResponseErrorConfig,
+} from "@kubb/plugin-client/clients/axios";
 
 function getPatchApiV1PermissionByIdUrl(
   id: PatchApiV1PermissionByIdPathParams["id"],

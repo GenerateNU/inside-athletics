@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  GetApiV1TagNameByNameQueryResponse,
+  GetApiV1TagNameByNamePathParams,
+} from "../models/GetApiV1TagNameByName.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1TagNameByNameQueryResponse,
-  GetApiV1TagNameByNamePathParams,
-} from "../models/GetApiV1TagNameByName.ts";
 
 function getGetApiV1TagNameByNameUrl(
   name: GetApiV1TagNameByNamePathParams["name"],

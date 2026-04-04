@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  DeleteApiV1RoleByIdMutationResponse,
+  DeleteApiV1RoleByIdPathParams,
+} from "../models/DeleteApiV1RoleById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1RoleByIdMutationResponse,
-  DeleteApiV1RoleByIdPathParams,
-} from "../models/DeleteApiV1RoleById.ts";
 
 function getDeleteApiV1RoleByIdUrl(id: DeleteApiV1RoleByIdPathParams["id"]) {
   const res = { method: "DELETE", url: `/api/v1/role/${id}` as const };

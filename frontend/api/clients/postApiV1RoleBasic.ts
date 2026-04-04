@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  PostApiV1RoleBasicMutationRequest,
+  PostApiV1RoleBasicMutationResponse,
+} from "../models/PostApiV1RoleBasic.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1RoleBasicMutationRequest,
-  PostApiV1RoleBasicMutationResponse,
-} from "../models/PostApiV1RoleBasic.ts";
 
 function getPostApiV1RoleBasicUrl() {
   const res = { method: "POST", url: `/api/v1/role/basic` as const };

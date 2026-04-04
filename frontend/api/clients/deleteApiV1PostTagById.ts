@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  DeleteApiV1PostTagByIdMutationResponse,
+  DeleteApiV1PostTagByIdPathParams,
+} from "../models/DeleteApiV1PostTagById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1PostTagByIdMutationResponse,
-  DeleteApiV1PostTagByIdPathParams,
-} from "../models/DeleteApiV1PostTagById.ts";
 
 function getDeleteApiV1PostTagByIdUrl(
   id: DeleteApiV1PostTagByIdPathParams["id"],

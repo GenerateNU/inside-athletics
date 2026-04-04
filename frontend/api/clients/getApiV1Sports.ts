@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  GetApiV1SportsQueryResponse,
+  GetApiV1SportsQueryParams,
+} from "../models/GetApiV1Sports.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1SportsQueryResponse,
-  GetApiV1SportsQueryParams,
-} from "../models/GetApiV1Sports.ts";
 
 function getGetApiV1SportsUrl() {
   const res = { method: "GET", url: `/api/v1/sports/` as const };

@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  ListApiV1StripePricesByIdQueryResponse,
+  ListApiV1StripePricesByIdPathParams,
+} from "../models/ListApiV1StripePricesById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  ListApiV1StripePricesByIdQueryResponse,
-  ListApiV1StripePricesByIdPathParams,
-} from "../models/ListApiV1StripePricesById.ts";
 
 function getListApiV1StripePricesByIdUrl(
   id: ListApiV1StripePricesByIdPathParams["id"],

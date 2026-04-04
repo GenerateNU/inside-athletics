@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  GetApiV1PermissionsQueryResponse,
+  GetApiV1PermissionsQueryParams,
+} from "../models/GetApiV1Permissions.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1PermissionsQueryResponse,
-  GetApiV1PermissionsQueryParams,
-} from "../models/GetApiV1Permissions.ts";
 
 function getGetApiV1PermissionsUrl() {
   const res = { method: "GET", url: `/api/v1/permissions/` as const };

@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  DeleteApiV1PostLikeByIdMutationResponse,
+  DeleteApiV1PostLikeByIdPathParams,
+} from "../models/DeleteApiV1PostLikeById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1PostLikeByIdMutationResponse,
-  DeleteApiV1PostLikeByIdPathParams,
-} from "../models/DeleteApiV1PostLikeById.ts";
 
 function getDeleteApiV1PostLikeByIdUrl(
   id: DeleteApiV1PostLikeByIdPathParams["id"],

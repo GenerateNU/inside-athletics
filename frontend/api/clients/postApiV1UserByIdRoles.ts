@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  Client,
-  RequestConfig,
-  ResponseErrorConfig,
-} from "@kubb/plugin-client/clients/axios";
-import type {
   PostApiV1UserByIdRolesMutationRequest,
   PostApiV1UserByIdRolesMutationResponse,
   PostApiV1UserByIdRolesPathParams,
 } from "../models/PostApiV1UserByIdRoles.ts";
+import type {
+  Client,
+  RequestConfig,
+  ResponseErrorConfig,
+} from "@kubb/plugin-client/clients/axios";
 
 function getPostApiV1UserByIdRolesUrl(
   id: PostApiV1UserByIdRolesPathParams["id"],

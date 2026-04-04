@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  PostApiV1CommentLikeMutationRequest,
+  PostApiV1CommentLikeMutationResponse,
+} from "../models/PostApiV1CommentLike.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1CommentLikeMutationRequest,
-  PostApiV1CommentLikeMutationResponse,
-} from "../models/PostApiV1CommentLike.ts";
 
 function getPostApiV1CommentLikeUrl() {
   const res = { method: "POST", url: `/api/v1/comment/like` as const };

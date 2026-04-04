@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  GetApiV1UserByIdQueryResponse,
+  GetApiV1UserByIdPathParams,
+} from "../models/GetApiV1UserById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1UserByIdQueryResponse,
-  GetApiV1UserByIdPathParams,
-} from "../models/GetApiV1UserById.ts";
 
 function getGetApiV1UserByIdUrl(id: GetApiV1UserByIdPathParams["id"]) {
   const res = { method: "GET", url: `/api/v1/user/${id}` as const };

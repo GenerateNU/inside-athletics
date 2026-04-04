@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  DeleteApiV1CheckoutSessionsByIdMutationResponse,
+  DeleteApiV1CheckoutSessionsByIdPathParams,
+} from "../models/DeleteApiV1CheckoutSessionsById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1CheckoutSessionsByIdMutationResponse,
-  DeleteApiV1CheckoutSessionsByIdPathParams,
-} from "../models/DeleteApiV1CheckoutSessionsById.ts";
 
 function getDeleteApiV1CheckoutSessionsByIdUrl(
   id: DeleteApiV1CheckoutSessionsByIdPathParams["id"],

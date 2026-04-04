@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  DeleteApiV1PermissionByIdMutationResponse,
+  DeleteApiV1PermissionByIdPathParams,
+} from "../models/DeleteApiV1PermissionById.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1PermissionByIdMutationResponse,
-  DeleteApiV1PermissionByIdPathParams,
-} from "../models/DeleteApiV1PermissionById.ts";
 
 function getDeleteApiV1PermissionByIdUrl(
   id: DeleteApiV1PermissionByIdPathParams["id"],

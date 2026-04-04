@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  GetApiV1CommentLikeByCommentIdLikesQueryResponse,
+  GetApiV1CommentLikeByCommentIdLikesPathParams,
+} from "../models/GetApiV1CommentLikeByCommentIdLikes.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1CommentLikeByCommentIdLikesQueryResponse,
-  GetApiV1CommentLikeByCommentIdLikesPathParams,
-} from "../models/GetApiV1CommentLikeByCommentIdLikes.ts";
 
 function getGetApiV1CommentLikeByCommentIdLikesUrl(
   comment_id: GetApiV1CommentLikeByCommentIdLikesPathParams["comment_id"],

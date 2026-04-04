@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  Client,
-  RequestConfig,
-  ResponseErrorConfig,
-} from "@kubb/plugin-client/clients/axios";
-import type {
   PatchApiV1StripePriceByIdMutationRequest,
   PatchApiV1StripePriceByIdMutationResponse,
   PatchApiV1StripePriceByIdPathParams,
 } from "../models/PatchApiV1StripePriceById.ts";
+import type {
+  Client,
+  RequestConfig,
+  ResponseErrorConfig,
+} from "@kubb/plugin-client/clients/axios";
 
 function getPatchApiV1StripePriceByIdUrl(
   id: PatchApiV1StripePriceByIdPathParams["id"],

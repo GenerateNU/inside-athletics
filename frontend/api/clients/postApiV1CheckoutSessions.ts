@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
+  PostApiV1CheckoutSessionsMutationRequest,
+  PostApiV1CheckoutSessionsMutationResponse,
+} from "../models/PostApiV1CheckoutSessions.ts";
+import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1CheckoutSessionsMutationRequest,
-  PostApiV1CheckoutSessionsMutationResponse,
-} from "../models/PostApiV1CheckoutSessions.ts";
 
 function getPostApiV1CheckoutSessionsUrl() {
   const res = { method: "POST", url: `/api/v1/checkout/sessions/` as const };
