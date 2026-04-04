@@ -26,6 +26,8 @@ type User struct {
 	CollegeID               *uuid.UUID            `json:"college" doc:"The college of a user" gorm:"type:uuid"` //nullable
 	College                 *College              `json:"-" gorm:"foreignKey:CollegeID;references:ID"`
 	Division                *Division             `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint;"`
+	Profile_Picture_ID      *uuid.UUID            `json:"profile_picture_id" example:"1" doc:"The id of the profile picture media id" gorm:"type:uuid;"`
+	Profile_Picture_Media   *Media                `json:"-" gorm:"foreignKey:Profile_Picture_ID;references:ID"`
 }
 
 type VerifiedAthleteStatus string

@@ -53,6 +53,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
+		ProfilePictureMedia:   user.Profile_Picture_Media,
 		Roles:                 roleResponses,
 	}
 
@@ -92,6 +93,7 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		VerifiedAthleteStatus: user.Verified_Athlete_Status,
 		College:               user.College,
 		Division:              user.Division,
+		ProfilePictureMedia:   user.Profile_Picture_Media,
 		Roles:                 roleResponses,
 	}
 
@@ -124,6 +126,7 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Verified_Athlete_Status: input.Body.VerifiedAthleteStatus,
 		CollegeID:               input.Body.CollegeID,
 		Division:                input.Body.Division,
+		Profile_Picture_ID:      input.Body.ProfilePictureID,
 	}
 
 	createdUser, err := u.userDB.CreateUser(user)
@@ -177,6 +180,7 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 		VerifiedAthleteStatus: updatedUser.Verified_Athlete_Status,
 		College:               updatedUser.College,
 		Division:              updatedUser.Division,
+		ProfilePictureMedia:   updatedUser.Profile_Picture_Media,
 		Roles:                 roleResponses,
 	}
 

@@ -25,6 +25,7 @@ type GetUserResponse struct {
 	College               *models.College              `json:"college,omitempty" doc:"The college of a user"`
 	Division              *models.Division             `json:"division,omitempty" example:"1" doc:"The division of their college"`
 	Roles                 *[]role.RoleResponse         `json:"roles,omitempty" doc:"Roles assigned to the user"`
+	ProfilePictureMedia   *models.Media                `json:"profile_picture,omitempty" doc:"The media of the profile picture"`
 }
 
 type UserRoleResponse struct {
@@ -48,6 +49,7 @@ type CreateUserBody struct {
 	VerifiedAthleteStatus models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
 	CollegeID             *uuid.UUID                   `json:"college,omitempty" doc:"The college of a user"`
 	Division              *models.Division             `json:"division,omitempty" example:"1" doc:"The division of their college"`
+	ProfilePictureID      *uuid.UUID                   `json:"profile_picture_id,omitempty" doc:"The id of the media object of the profile picture"`
 }
 
 type CreateUserResponse struct {
@@ -72,6 +74,7 @@ type UpdateUserBody struct {
 	VerifiedAthleteStatus *models.VerifiedAthleteStatus `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`
 	CollegeID             *uuid.UUID                    `json:"college,omitempty" doc:"The college of a user"`
 	Division              *models.Division              `json:"division,omitempty" example:"1" doc:"The division of their college"`
+	ProfilePictureID      *uuid.UUID                    `json:"profile_picture_id,omitempty" doc:"The id of the media object of the profile picture"`
 }
 
 type UpdateUserResponse = GetUserResponse
