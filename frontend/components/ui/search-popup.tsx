@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Plus, X, Search } from "lucide-react";
-
-// Generated hooks from Kubb
 import { useGetApiV1TagByType } from "@/api/hooks";
 
 function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClick: () => void }) {
