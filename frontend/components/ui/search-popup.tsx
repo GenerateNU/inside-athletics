@@ -19,15 +19,17 @@ function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClic
   );
 }
 
-function TagSection({ header, tags, activeTags, onToggle }: {
+function TagSection({ header, tags, activeTags, maxTagNum, onToggle }: {
   header: string;
   tags: Tag[];
   activeTags: Tag[];
+  maxTagNum: number,
   onToggle: (tag: Tag) => void;
 }) {
   return (
     <div className="mt-8">
       <label className="block text-1xl text-black font-bold">{header}</label>
+      <label className="block text-xs text-[#001225]">Select Max {maxTagNum}</label>
       <div className="flex flex-wrap gap-2 mt-2">
         {tags.map((tag) => (
           <TagButton key={tag.Name} tag={tag} active={activeTags.some((t) => t.Name === tag.Name)} onClick={() => onToggle(tag)} />
@@ -133,10 +135,37 @@ export default function SearchPopup({ activeTags, setActiveTagsAction, onBackAct
             ))}
           </div>
         )}
-        <TagSection header="Sports" tags={filter(sports)} activeTags={activeTags} onToggle={toggleTag} />
-        <TagSection header="Recruitment" tags={filter(recruitments)} activeTags={activeTags} onToggle={toggleTag} />
-        <TagSection header="Academics" tags={filter(academics)} activeTags={activeTags} onToggle={toggleTag} />
-        <TagSection header="Advice" tags={filter(advice)} activeTags={activeTags} onToggle={toggleTag} />
+        <div className="mt-8">
+          <label className="block text-1xl text-black font-bold">Sports</label>
+          <label className="block text-xs text-[#001225]">Select Max 2</label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {filter(sports).map((tag) => (
+              <TagButton key={tag.Name} tag={tag} active={activeTags.some((t) => t.Name === tag.Name)} onClick={() => toggleTag(tag)} />
+            ))}
+          </div>
+        </div>
+        <hr className="border-t border-gray-300" />
+        <div className="mt-8">
+          <label className="block text-1xl text-black font-bold">Divisions</label>
+          <label className="block text-xs text-[#001225]">Select Max 3</label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {filter(recruitments).map((tag) => (
+              <TagButton key={tag.Name} tag={tag} active={activeTags.some((t) => t.Name === tag.Name)} onClick={() => toggleTag(tag)} />
+            ))}
+          </div>
+        </div>
+        <hr className="border-t border-gray-300" />
+                <div className="mt-8">
+          <label className="block text-1xl text-black font-bold">Other Tags</label>
+          <label className="block text-xs text-[#001225]">Select Max 5</label>
+          <label className="block text-sm text-black font-bold pt-2">Athletics & Performance</label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {filter(recruitments).map((tag) => (
+              <TagButton key={tag.Name} tag={tag} active={activeTags.some((t) => t.Name === tag.Name)} onClick={() => toggleTag(tag)} />
+            ))}
+          </div>
+        </div>
+        <hr className="border-t border-gray-300" />
         <div className="flex justify-end">
           <Button
             variant="ghost"
