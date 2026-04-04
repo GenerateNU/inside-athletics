@@ -3,7 +3,7 @@ import { signup } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 type signupInitialState = {
@@ -21,12 +21,6 @@ const initialState: signupInitialState = {
 export default function SignUpPage() {
   const [state, signupAction] = useActionState(signup, initialState);
   const status = useFormStatus();
-
-  useEffect(() => {
-    if (state.success) {
-      redirect("/");
-    }
-  }, [state]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone">

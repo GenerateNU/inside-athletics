@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { OnboardingComplete } from "@/components/onboarding-complete";
 import { Navbar } from "@/components/ui/navbar";
 import { CiUser } from "react-icons/ci";
 
@@ -10,6 +11,7 @@ export default function Page() {
         <Navbar className="h-screen shrink-0" />
         <main className="flex min-w-0 flex-1 items-center justify-center p-6">
           <div className="flex flex-col items-center gap-4 text-center">
+            <OnboardingComplete />
             <p className="text-6xl">🐸</p>
             <h1 className="text-4xl font-bold">Welcome to Inside Athletics</h1>
             <p className="text-muted-foreground">
