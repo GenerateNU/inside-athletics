@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1PermissionByIdMutationRequest,
-  PatchApiV1PermissionByIdMutationResponse,
-  PatchApiV1PermissionByIdPathParams,
-} from "../models/PatchApiV1PermissionById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1PermissionById } from "../clients/patchApiV1PermissionById.ts";
+import type {
+  PatchApiV1PermissionByIdMutationRequest,
+  PatchApiV1PermissionByIdMutationResponse,
+  PatchApiV1PermissionByIdPathParams,
+} from "../models/PatchApiV1PermissionById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1PermissionById } from "../clients/patchApiV1PermissionById.ts";
 
 export const patchApiV1PermissionByIdMutationKey = () =>
   [{ url: "/api/v1/permission/:id" }] as const;
@@ -40,7 +39,7 @@ export function patchApiV1PermissionByIdMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >({
@@ -62,7 +61,7 @@ export function usePatchApiV1PermissionById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1PermissionByIdPathParams["id"];
-        data?: PatchApiV1PermissionByIdMutationRequest;
+        data: PatchApiV1PermissionByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -83,7 +82,7 @@ export function usePatchApiV1PermissionById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >;
@@ -93,7 +92,7 @@ export function usePatchApiV1PermissionById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >(
@@ -108,7 +107,7 @@ export function usePatchApiV1PermissionById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >;

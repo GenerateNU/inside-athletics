@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PutApiV1CollegeByIdMutationRequest,
-  PutApiV1CollegeByIdMutationResponse,
-  PutApiV1CollegeByIdPathParams,
-} from "../models/PutApiV1CollegeById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { putApiV1CollegeById } from "../clients/putApiV1CollegeById.ts";
+import type {
+  PutApiV1CollegeByIdMutationRequest,
+  PutApiV1CollegeByIdMutationResponse,
+  PutApiV1CollegeByIdPathParams,
+} from "../models/PutApiV1CollegeById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { putApiV1CollegeById } from "../clients/putApiV1CollegeById.ts";
 
 export const putApiV1CollegeByIdMutationKey = () =>
   [{ url: "/api/v1/college/:id" }] as const;

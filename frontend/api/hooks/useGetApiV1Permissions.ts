@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1PermissionsQueryResponse,
-  GetApiV1PermissionsQueryParams,
-} from "../models/GetApiV1Permissions.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,11 +14,15 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1Permissions } from "../clients/getApiV1Permissions.ts";
+import type {
+  GetApiV1PermissionsQueryResponse,
+  GetApiV1PermissionsQueryParams,
+} from "../models/GetApiV1Permissions.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1Permissions } from "../clients/getApiV1Permissions.ts";
 
 export const getApiV1PermissionsQueryKey = (
-  params: GetApiV1PermissionsQueryParams = {},
+  params?: GetApiV1PermissionsQueryParams,
 ) => [{ url: "/api/v1/permissions/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PermissionsQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1PermissionsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1Permissions(params, config);
+      return getApiV1Permissions(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -73,15 +74,15 @@ export function useGetApiV1Permissions<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PermissionsQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1PermissionsQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1PermissionsQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

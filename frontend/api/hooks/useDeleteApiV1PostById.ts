@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1PostByIdMutationResponse,
-  DeleteApiV1PostByIdPathParams,
-} from "../models/DeleteApiV1PostById.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { deleteApiV1PostById } from "../clients/deleteApiV1PostById.ts";
+import type {
+  DeleteApiV1PostByIdMutationResponse,
+  DeleteApiV1PostByIdPathParams,
+} from "../models/DeleteApiV1PostById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { deleteApiV1PostById } from "../clients/deleteApiV1PostById.ts";
 
 export const deleteApiV1PostByIdMutationKey = () =>
   [{ url: "/api/v1/post/:id" }] as const;

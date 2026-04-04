@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetApiV1UserCurrentQueryResponse } from "../models/GetApiV1UserCurrent.ts";
 import type {
   Client,
   RequestConfig,
@@ -16,8 +14,9 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1UserCurrent } from "../clients/getApiV1UserCurrent.ts";
+import type { GetApiV1UserCurrentQueryResponse } from "../models/GetApiV1UserCurrent.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1UserCurrent } from "../clients/getApiV1UserCurrent.ts";
 
 export const getApiV1UserCurrentQueryKey = () =>
   [{ url: "/api/v1/user/current" }] as const;
@@ -38,8 +37,10 @@ export function getApiV1UserCurrentQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1UserCurrent(config);
+      return getApiV1UserCurrent({
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -67,14 +68,14 @@ export function useGetApiV1UserCurrent<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1UserCurrentQueryKey();
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1UserCurrentQueryKey();
 
   const query = useQuery(
     {
       ...getApiV1UserCurrentQueryOptions(config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1PostTagByIdMutationRequest,
-  PatchApiV1PostTagByIdMutationResponse,
-  PatchApiV1PostTagByIdPathParams,
-} from "../models/PatchApiV1PostTagById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1PostTagById } from "../clients/patchApiV1PostTagById.ts";
+import type {
+  PatchApiV1PostTagByIdMutationRequest,
+  PatchApiV1PostTagByIdMutationResponse,
+  PatchApiV1PostTagByIdPathParams,
+} from "../models/PatchApiV1PostTagById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1PostTagById } from "../clients/patchApiV1PostTagById.ts";
 
 export const patchApiV1PostTagByIdMutationKey = () =>
   [{ url: "/api/v1/post/tag/:id" }] as const;

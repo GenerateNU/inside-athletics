@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1RoleByIdMutationRequest,
-  PatchApiV1RoleByIdMutationResponse,
-  PatchApiV1RoleByIdPathParams,
-} from "../models/PatchApiV1RoleById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1RoleById } from "../clients/patchApiV1RoleById.ts";
+import type {
+  PatchApiV1RoleByIdMutationRequest,
+  PatchApiV1RoleByIdMutationResponse,
+  PatchApiV1RoleByIdPathParams,
+} from "../models/PatchApiV1RoleById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1RoleById } from "../clients/patchApiV1RoleById.ts";
 
 export const patchApiV1RoleByIdMutationKey = () =>
   [{ url: "/api/v1/role/:id" }] as const;
@@ -40,7 +39,7 @@ export function patchApiV1RoleByIdMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data?: PatchApiV1RoleByIdMutationRequest;
+      data: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >({
@@ -62,7 +61,7 @@ export function usePatchApiV1RoleById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1RoleByIdPathParams["id"];
-        data?: PatchApiV1RoleByIdMutationRequest;
+        data: PatchApiV1RoleByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -83,7 +82,7 @@ export function usePatchApiV1RoleById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data?: PatchApiV1RoleByIdMutationRequest;
+      data: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >;
@@ -93,7 +92,7 @@ export function usePatchApiV1RoleById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data?: PatchApiV1RoleByIdMutationRequest;
+      data: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >(
@@ -108,7 +107,7 @@ export function usePatchApiV1RoleById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data?: PatchApiV1RoleByIdMutationRequest;
+      data: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >;

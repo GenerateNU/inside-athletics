@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1RoleByIdMutationResponse,
-  DeleteApiV1RoleByIdPathParams,
-} from "../models/DeleteApiV1RoleById.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { deleteApiV1RoleById } from "../clients/deleteApiV1RoleById.ts";
+import type {
+  DeleteApiV1RoleByIdMutationResponse,
+  DeleteApiV1RoleByIdPathParams,
+} from "../models/DeleteApiV1RoleById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { deleteApiV1RoleById } from "../clients/deleteApiV1RoleById.ts";
 
 export const deleteApiV1RoleByIdMutationKey = () =>
   [{ url: "/api/v1/role/:id" }] as const;

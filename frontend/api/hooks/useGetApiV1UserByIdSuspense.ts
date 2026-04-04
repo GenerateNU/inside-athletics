@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1UserByIdQueryResponse,
-  GetApiV1UserByIdPathParams,
-} from "../models/GetApiV1UserById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1UserById } from "../clients/getApiV1UserById.ts";
+import type {
+  GetApiV1UserByIdQueryResponse,
+  GetApiV1UserByIdPathParams,
+} from "../models/GetApiV1UserById.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1UserById } from "../clients/getApiV1UserById.ts";
 
 export const getApiV1UserByIdSuspenseQueryKey = (
   id: GetApiV1UserByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1UserByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1UserById(id, config);
+      return getApiV1UserById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useGetApiV1UserByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1UserByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1UserByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1UserByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

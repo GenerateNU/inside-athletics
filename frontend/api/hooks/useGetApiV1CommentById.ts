@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1CommentByIdQueryResponse,
-  GetApiV1CommentByIdPathParams,
-} from "../models/GetApiV1CommentById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1CommentById } from "../clients/getApiV1CommentById.ts";
+import type {
+  GetApiV1CommentByIdQueryResponse,
+  GetApiV1CommentByIdPathParams,
+} from "../models/GetApiV1CommentById.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1CommentById } from "../clients/getApiV1CommentById.ts";
 
 export const getApiV1CommentByIdQueryKey = (
   id: GetApiV1CommentByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1CommentByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1CommentById(id, config);
+      return getApiV1CommentById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,14 +75,14 @@ export function useGetApiV1CommentById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1CommentByIdQueryKey(id);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1CommentByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1CommentByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

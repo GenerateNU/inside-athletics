@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  ListApiV1StripePricesByIdQueryResponse,
-  ListApiV1StripePricesByIdPathParams,
-} from "../models/ListApiV1StripePricesById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { listApiV1StripePricesById } from "../clients/listApiV1StripePricesById.ts";
+import type {
+  ListApiV1StripePricesByIdQueryResponse,
+  ListApiV1StripePricesByIdPathParams,
+} from "../models/ListApiV1StripePricesById.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { listApiV1StripePricesById } from "../clients/listApiV1StripePricesById.ts";
 
 export const listApiV1StripePricesByIdSuspenseQueryKey = (
   id: ListApiV1StripePricesByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function listApiV1StripePricesByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return listApiV1StripePricesById(id, config);
+      return listApiV1StripePricesById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useListApiV1StripePricesByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? listApiV1StripePricesByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? listApiV1StripePricesByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...listApiV1StripePricesByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

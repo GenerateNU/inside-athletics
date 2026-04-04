@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1StripeCustomersMutationRequest,
-  PostApiV1StripeCustomersMutationResponse,
-} from "../models/PostApiV1StripeCustomers.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1StripeCustomers } from "../clients/postApiV1StripeCustomers.ts";
+import type {
+  PostApiV1StripeCustomersMutationRequest,
+  PostApiV1StripeCustomersMutationResponse,
+} from "../models/PostApiV1StripeCustomers.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1StripeCustomers } from "../clients/postApiV1StripeCustomers.ts";
 
 export const postApiV1StripeCustomersMutationKey = () =>
   [{ url: "/api/v1/stripe_customers/" }] as const;

@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { DeleteApiV1StripeCustomersByIdMutationResponse } from "../models/DeleteApiV1StripeCustomersById.ts";
 import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type { DeleteApiV1StripeCustomersByIdMutationResponse } from "../models/DeleteApiV1StripeCustomersById.ts";
 
 function getDeleteApiV1StripeCustomersByIdUrl() {
   const res = {

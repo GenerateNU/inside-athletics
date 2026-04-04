@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1StripePriceMutationRequest,
-  PostApiV1StripePriceMutationResponse,
-} from "../models/PostApiV1StripePrice.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1StripePrice } from "../clients/postApiV1StripePrice.ts";
+import type {
+  PostApiV1StripePriceMutationRequest,
+  PostApiV1StripePriceMutationResponse,
+} from "../models/PostApiV1StripePrice.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1StripePrice } from "../clients/postApiV1StripePrice.ts";
 
 export const postApiV1StripePriceMutationKey = () =>
   [{ url: "/api/v1/stripe_price/" }] as const;

@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1UserByIdRolesMutationRequest,
-  PostApiV1UserByIdRolesMutationResponse,
-  PostApiV1UserByIdRolesPathParams,
-} from "../models/PostApiV1UserByIdRoles.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1UserByIdRoles } from "../clients/postApiV1UserByIdRoles.ts";
+import type {
+  PostApiV1UserByIdRolesMutationRequest,
+  PostApiV1UserByIdRolesMutationResponse,
+  PostApiV1UserByIdRolesPathParams,
+} from "../models/PostApiV1UserByIdRoles.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1UserByIdRoles } from "../clients/postApiV1UserByIdRoles.ts";
 
 export const postApiV1UserByIdRolesMutationKey = () =>
   [{ url: "/api/v1/user/:id/roles" }] as const;

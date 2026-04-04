@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1PermissionMutationRequest,
-  PostApiV1PermissionMutationResponse,
-} from "../models/PostApiV1Permission.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1Permission } from "../clients/postApiV1Permission.ts";
+import type {
+  PostApiV1PermissionMutationRequest,
+  PostApiV1PermissionMutationResponse,
+} from "../models/PostApiV1Permission.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1Permission } from "../clients/postApiV1Permission.ts";
 
 export const postApiV1PermissionMutationKey = () =>
   [{ url: "/api/v1/permission/" }] as const;

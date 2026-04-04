@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1SportsQueryResponse,
-  GetApiV1SportsQueryParams,
-} from "../models/GetApiV1Sports.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,12 +14,15 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1Sports } from "../clients/getApiV1Sports.ts";
+import type {
+  GetApiV1SportsQueryResponse,
+  GetApiV1SportsQueryParams,
+} from "../models/GetApiV1Sports.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1Sports } from "../clients/getApiV1Sports.ts";
 
-export const getApiV1SportsQueryKey = (
-  params: GetApiV1SportsQueryParams = {},
-) => [{ url: "/api/v1/sports/" }, ...(params ? [params] : [])] as const;
+export const getApiV1SportsQueryKey = (params?: GetApiV1SportsQueryParams) =>
+  [{ url: "/api/v1/sports/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1SportsQueryKey = ReturnType<typeof getApiV1SportsQueryKey>;
 
@@ -41,8 +39,10 @@ export function getApiV1SportsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1Sports(params, config);
+      return getApiV1Sports(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -71,14 +71,14 @@ export function useGetApiV1Sports<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1SportsQueryKey(params);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1SportsQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1SportsQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

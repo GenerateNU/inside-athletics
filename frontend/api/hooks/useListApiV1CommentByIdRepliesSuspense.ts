@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  ListApiV1CommentByIdRepliesQueryResponse,
-  ListApiV1CommentByIdRepliesPathParams,
-} from "../models/ListApiV1CommentByIdReplies.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { listApiV1CommentByIdReplies } from "../clients/listApiV1CommentByIdReplies.ts";
+import type {
+  ListApiV1CommentByIdRepliesQueryResponse,
+  ListApiV1CommentByIdRepliesPathParams,
+} from "../models/ListApiV1CommentByIdReplies.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { listApiV1CommentByIdReplies } from "../clients/listApiV1CommentByIdReplies.ts";
 
 export const listApiV1CommentByIdRepliesSuspenseQueryKey = (
   id: ListApiV1CommentByIdRepliesPathParams["id"],
@@ -44,8 +43,10 @@ export function listApiV1CommentByIdRepliesSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return listApiV1CommentByIdReplies(id, config);
+      return listApiV1CommentByIdReplies(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,16 @@ export function useListApiV1CommentByIdRepliesSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? listApiV1CommentByIdRepliesSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ??
+    listApiV1CommentByIdRepliesSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...listApiV1CommentByIdRepliesSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

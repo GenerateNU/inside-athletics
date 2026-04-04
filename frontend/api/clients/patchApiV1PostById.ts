@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1PostByIdMutationRequest,
-  PatchApiV1PostByIdMutationResponse,
-  PatchApiV1PostByIdPathParams,
-} from "../models/PatchApiV1PostById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1PostByIdMutationRequest,
+  PatchApiV1PostByIdMutationResponse,
+  PatchApiV1PostByIdPathParams,
+} from "../models/PatchApiV1PostById.ts";
 
 function getPatchApiV1PostByIdUrl(id: PatchApiV1PostByIdPathParams["id"]) {
   const res = { method: "PATCH", url: `/api/v1/post/${id}` as const };
@@ -26,7 +26,7 @@ function getPatchApiV1PostByIdUrl(id: PatchApiV1PostByIdPathParams["id"]) {
  */
 export async function patchApiV1PostById(
   id: PatchApiV1PostByIdPathParams["id"],
-  data?: PatchApiV1PostByIdMutationRequest,
+  data: PatchApiV1PostByIdMutationRequest,
   config: Partial<RequestConfig<PatchApiV1PostByIdMutationRequest>> & {
     client?: Client;
   } = {},

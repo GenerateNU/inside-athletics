@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1PostTagMutationRequest,
-  PostApiV1PostTagMutationResponse,
-} from "../models/PostApiV1PostTag.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1PostTag } from "../clients/postApiV1PostTag.ts";
+import type {
+  PostApiV1PostTagMutationRequest,
+  PostApiV1PostTagMutationResponse,
+} from "../models/PostApiV1PostTag.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1PostTag } from "../clients/postApiV1PostTag.ts";
 
 export const postApiV1PostTagMutationKey = () =>
   [{ url: "/api/v1/post/tag/" }] as const;

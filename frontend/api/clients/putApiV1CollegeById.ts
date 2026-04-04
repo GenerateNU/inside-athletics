@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PutApiV1CollegeByIdMutationRequest,
-  PutApiV1CollegeByIdMutationResponse,
-  PutApiV1CollegeByIdPathParams,
-} from "../models/PutApiV1CollegeById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PutApiV1CollegeByIdMutationRequest,
+  PutApiV1CollegeByIdMutationResponse,
+  PutApiV1CollegeByIdPathParams,
+} from "../models/PutApiV1CollegeById.ts";
 
 function getPutApiV1CollegeByIdUrl(id: PutApiV1CollegeByIdPathParams["id"]) {
   const res = { method: "PUT", url: `/api/v1/college/${id}` as const };

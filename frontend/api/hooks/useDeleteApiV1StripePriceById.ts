@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { DeleteApiV1StripePriceByIdMutationResponse } from "../models/DeleteApiV1StripePriceById.ts";
 import type {
   Client,
   RequestConfig,
@@ -15,8 +13,9 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { deleteApiV1StripePriceById } from "../clients/deleteApiV1StripePriceById.ts";
+import type { DeleteApiV1StripePriceByIdMutationResponse } from "../models/DeleteApiV1StripePriceById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { deleteApiV1StripePriceById } from "../clients/deleteApiV1StripePriceById.ts";
 
 export const deleteApiV1StripePriceByIdMutationKey = () =>
   [{ url: "/api/v1/stripe_price/:id" }] as const;

@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1PostsQueryResponse,
-  GetApiV1PostsQueryParams,
-} from "../models/GetApiV1Posts.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1PostsQueryResponse,
+  GetApiV1PostsQueryParams,
+} from "../models/GetApiV1Posts.ts";
 
 function getGetApiV1PostsUrl() {
   const res = { method: "GET", url: `/api/v1/posts/` as const };

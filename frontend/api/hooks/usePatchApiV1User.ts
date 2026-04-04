@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1UserMutationRequest,
-  PatchApiV1UserMutationResponse,
-} from "../models/PatchApiV1User.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1User } from "../clients/patchApiV1User.ts";
+import type {
+  PatchApiV1UserMutationRequest,
+  PatchApiV1UserMutationResponse,
+} from "../models/PatchApiV1User.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1User } from "../clients/patchApiV1User.ts";
 
 export const patchApiV1UserMutationKey = () =>
   [{ url: "/api/v1/user" }] as const;
@@ -37,7 +36,7 @@ export function patchApiV1UserMutationOptions<TContext = unknown>(
   return mutationOptions<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data?: PatchApiV1UserMutationRequest },
+    { data: PatchApiV1UserMutationRequest },
     TContext
   >({
     mutationKey,
@@ -56,7 +55,7 @@ export function usePatchApiV1User<TContext>(
     mutation?: UseMutationOptions<
       PatchApiV1UserMutationResponse,
       ResponseErrorConfig<Error>,
-      { data?: PatchApiV1UserMutationRequest },
+      { data: PatchApiV1UserMutationRequest },
       TContext
     > & { client?: QueryClient };
     client?: Partial<RequestConfig<PatchApiV1UserMutationRequest>> & {
@@ -74,14 +73,14 @@ export function usePatchApiV1User<TContext>(
   ) as UseMutationOptions<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data?: PatchApiV1UserMutationRequest },
+    { data: PatchApiV1UserMutationRequest },
     TContext
   >;
 
   return useMutation<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data?: PatchApiV1UserMutationRequest },
+    { data: PatchApiV1UserMutationRequest },
     TContext
   >(
     {
@@ -93,7 +92,7 @@ export function usePatchApiV1User<TContext>(
   ) as UseMutationResult<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data?: PatchApiV1UserMutationRequest },
+    { data: PatchApiV1UserMutationRequest },
     TContext
   >;
 }

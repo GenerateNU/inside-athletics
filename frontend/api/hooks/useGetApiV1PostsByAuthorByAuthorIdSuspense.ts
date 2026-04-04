@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1PostsByAuthorByAuthorIdQueryResponse,
-  GetApiV1PostsByAuthorByAuthorIdPathParams,
-  GetApiV1PostsByAuthorByAuthorIdQueryParams,
-} from "../models/GetApiV1PostsByAuthorByAuthorId.ts";
 import type {
   Client,
   RequestConfig,
@@ -20,12 +14,17 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1PostsByAuthorByAuthorId } from "../clients/getApiV1PostsByAuthorByAuthorId.ts";
+import type {
+  GetApiV1PostsByAuthorByAuthorIdQueryResponse,
+  GetApiV1PostsByAuthorByAuthorIdPathParams,
+  GetApiV1PostsByAuthorByAuthorIdQueryParams,
+} from "../models/GetApiV1PostsByAuthorByAuthorId.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1PostsByAuthorByAuthorId } from "../clients/getApiV1PostsByAuthorByAuthorId.ts";
 
 export const getApiV1PostsByAuthorByAuthorIdSuspenseQueryKey = (
   author_id: GetApiV1PostsByAuthorByAuthorIdPathParams["author_id"],
-  params: GetApiV1PostsByAuthorByAuthorIdQueryParams = {},
+  params?: GetApiV1PostsByAuthorByAuthorIdQueryParams,
 ) =>
   [
     {
@@ -57,8 +56,10 @@ export function getApiV1PostsByAuthorByAuthorIdSuspenseQueryOptions(
     enabled: !!author_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsByAuthorByAuthorId(author_id, params, config);
+      return getApiV1PostsByAuthorByAuthorId(author_id, params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -86,9 +87,9 @@ export function useGetApiV1PostsByAuthorByAuthorIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1PostsByAuthorByAuthorIdSuspenseQueryKey(author_id, params);
 
   const query = useSuspenseQuery(
@@ -98,8 +99,8 @@ export function useGetApiV1PostsByAuthorByAuthorIdSuspense<
         params,
         config,
       ),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

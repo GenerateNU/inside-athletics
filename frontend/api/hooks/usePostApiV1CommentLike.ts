@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1CommentLikeMutationRequest,
-  PostApiV1CommentLikeMutationResponse,
-} from "../models/PostApiV1CommentLike.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1CommentLike } from "../clients/postApiV1CommentLike.ts";
+import type {
+  PostApiV1CommentLikeMutationRequest,
+  PostApiV1CommentLikeMutationResponse,
+} from "../models/PostApiV1CommentLike.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1CommentLike } from "../clients/postApiV1CommentLike.ts";
 
 export const postApiV1CommentLikeMutationKey = () =>
   [{ url: "/api/v1/comment/like" }] as const;

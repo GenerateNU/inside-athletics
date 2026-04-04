@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1CommentByIdMutationRequest,
-  PatchApiV1CommentByIdMutationResponse,
-  PatchApiV1CommentByIdPathParams,
-} from "../models/PatchApiV1CommentById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1CommentById } from "../clients/patchApiV1CommentById.ts";
+import type {
+  PatchApiV1CommentByIdMutationRequest,
+  PatchApiV1CommentByIdMutationResponse,
+  PatchApiV1CommentByIdPathParams,
+} from "../models/PatchApiV1CommentById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1CommentById } from "../clients/patchApiV1CommentById.ts";
 
 export const patchApiV1CommentByIdMutationKey = () =>
   [{ url: "/api/v1/comment/:id" }] as const;

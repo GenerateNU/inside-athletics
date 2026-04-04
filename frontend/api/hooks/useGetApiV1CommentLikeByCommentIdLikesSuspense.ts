@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1CommentLikeByCommentIdLikesQueryResponse,
-  GetApiV1CommentLikeByCommentIdLikesPathParams,
-} from "../models/GetApiV1CommentLikeByCommentIdLikes.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1CommentLikeByCommentIdLikes } from "../clients/getApiV1CommentLikeByCommentIdLikes.ts";
+import type {
+  GetApiV1CommentLikeByCommentIdLikesQueryResponse,
+  GetApiV1CommentLikeByCommentIdLikesPathParams,
+} from "../models/GetApiV1CommentLikeByCommentIdLikes.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1CommentLikeByCommentIdLikes } from "../clients/getApiV1CommentLikeByCommentIdLikes.ts";
 
 export const getApiV1CommentLikeByCommentIdLikesSuspenseQueryKey = (
   comment_id: GetApiV1CommentLikeByCommentIdLikesPathParams["comment_id"],
@@ -51,8 +50,10 @@ export function getApiV1CommentLikeByCommentIdLikesSuspenseQueryOptions(
     enabled: !!comment_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1CommentLikeByCommentIdLikes(comment_id, config);
+      return getApiV1CommentLikeByCommentIdLikes(comment_id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -80,9 +81,9 @@ export function useGetApiV1CommentLikeByCommentIdLikesSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1CommentLikeByCommentIdLikesSuspenseQueryKey(comment_id);
 
   const query = useSuspenseQuery(
@@ -91,8 +92,8 @@ export function useGetApiV1CommentLikeByCommentIdLikesSuspense<
         comment_id,
         config,
       ),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1SportsQueryResponse,
-  GetApiV1SportsQueryParams,
-} from "../models/GetApiV1Sports.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,11 +14,15 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1Sports } from "../clients/getApiV1Sports.ts";
+import type {
+  GetApiV1SportsQueryResponse,
+  GetApiV1SportsQueryParams,
+} from "../models/GetApiV1Sports.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1Sports } from "../clients/getApiV1Sports.ts";
 
 export const getApiV1SportsSuspenseQueryKey = (
-  params: GetApiV1SportsQueryParams = {},
+  params?: GetApiV1SportsQueryParams,
 ) => [{ url: "/api/v1/sports/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1SportsSuspenseQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1SportsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1Sports(params, config);
+      return getApiV1Sports(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -71,15 +72,15 @@ export function useGetApiV1SportsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1SportsSuspenseQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1SportsSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1SportsSuspenseQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

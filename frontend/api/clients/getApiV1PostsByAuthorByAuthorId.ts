@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1PostsByAuthorByAuthorIdQueryResponse,
-  GetApiV1PostsByAuthorByAuthorIdPathParams,
-  GetApiV1PostsByAuthorByAuthorIdQueryParams,
-} from "../models/GetApiV1PostsByAuthorByAuthorId.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1PostsByAuthorByAuthorIdQueryResponse,
+  GetApiV1PostsByAuthorByAuthorIdPathParams,
+  GetApiV1PostsByAuthorByAuthorIdQueryParams,
+} from "../models/GetApiV1PostsByAuthorByAuthorId.ts";
 
 function getGetApiV1PostsByAuthorByAuthorIdUrl(
   author_id: GetApiV1PostsByAuthorByAuthorIdPathParams["author_id"],

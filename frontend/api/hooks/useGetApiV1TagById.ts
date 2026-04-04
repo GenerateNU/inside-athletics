@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1TagByIdQueryResponse,
-  GetApiV1TagByIdPathParams,
-} from "../models/GetApiV1TagById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1TagById } from "../clients/getApiV1TagById.ts";
+import type {
+  GetApiV1TagByIdQueryResponse,
+  GetApiV1TagByIdPathParams,
+} from "../models/GetApiV1TagById.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1TagById } from "../clients/getApiV1TagById.ts";
 
 export const getApiV1TagByIdQueryKey = (id: GetApiV1TagByIdPathParams["id"]) =>
   [{ url: "/api/v1/tag/:id", params: { id: id } }] as const;
@@ -43,8 +42,10 @@ export function getApiV1TagByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1TagById(id, config);
+      return getApiV1TagById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -73,14 +74,14 @@ export function useGetApiV1TagById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1TagByIdQueryKey(id);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1TagByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1TagByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

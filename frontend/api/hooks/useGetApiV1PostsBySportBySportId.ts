@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1PostsBySportBySportIdQueryResponse,
-  GetApiV1PostsBySportBySportIdPathParams,
-  GetApiV1PostsBySportBySportIdQueryParams,
-} from "../models/GetApiV1PostsBySportBySportId.ts";
 import type {
   Client,
   RequestConfig,
@@ -20,12 +14,17 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1PostsBySportBySportId } from "../clients/getApiV1PostsBySportBySportId.ts";
+import type {
+  GetApiV1PostsBySportBySportIdQueryResponse,
+  GetApiV1PostsBySportBySportIdPathParams,
+  GetApiV1PostsBySportBySportIdQueryParams,
+} from "../models/GetApiV1PostsBySportBySportId.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1PostsBySportBySportId } from "../clients/getApiV1PostsBySportBySportId.ts";
 
 export const getApiV1PostsBySportBySportIdQueryKey = (
   sport_id: GetApiV1PostsBySportBySportIdPathParams["sport_id"],
-  params: GetApiV1PostsBySportBySportIdQueryParams = {},
+  params?: GetApiV1PostsBySportBySportIdQueryParams,
 ) =>
   [
     { url: "/api/v1/posts/by-sport/:sport_id", params: { sport_id: sport_id } },
@@ -51,8 +50,10 @@ export function getApiV1PostsBySportBySportIdQueryOptions(
     enabled: !!sport_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsBySportBySportId(sport_id, params, config);
+      return getApiV1PostsBySportBySportId(sport_id, params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -82,16 +83,16 @@ export function useGetApiV1PostsBySportBySportId<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1PostsBySportBySportIdQueryKey(sport_id, params);
 
   const query = useQuery(
     {
       ...getApiV1PostsBySportBySportIdQueryOptions(sport_id, params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

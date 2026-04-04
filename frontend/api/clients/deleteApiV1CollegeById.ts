@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  DeleteApiV1CollegeByIdMutationResponse,
-  DeleteApiV1CollegeByIdPathParams,
-} from "../models/DeleteApiV1CollegeById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  DeleteApiV1CollegeByIdMutationResponse,
+  DeleteApiV1CollegeByIdPathParams,
+} from "../models/DeleteApiV1CollegeById.ts";
 
 function getDeleteApiV1CollegeByIdUrl(
   id: DeleteApiV1CollegeByIdPathParams["id"],

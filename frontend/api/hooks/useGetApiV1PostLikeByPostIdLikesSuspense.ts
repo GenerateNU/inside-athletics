@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1PostLikeByPostIdLikesQueryResponse,
-  GetApiV1PostLikeByPostIdLikesPathParams,
-} from "../models/GetApiV1PostLikeByPostIdLikes.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1PostLikeByPostIdLikes } from "../clients/getApiV1PostLikeByPostIdLikes.ts";
+import type {
+  GetApiV1PostLikeByPostIdLikesQueryResponse,
+  GetApiV1PostLikeByPostIdLikesPathParams,
+} from "../models/GetApiV1PostLikeByPostIdLikes.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1PostLikeByPostIdLikes } from "../clients/getApiV1PostLikeByPostIdLikes.ts";
 
 export const getApiV1PostLikeByPostIdLikesSuspenseQueryKey = (
   post_id: GetApiV1PostLikeByPostIdLikesPathParams["post_id"],
@@ -47,8 +46,10 @@ export function getApiV1PostLikeByPostIdLikesSuspenseQueryOptions(
     enabled: !!post_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostLikeByPostIdLikes(post_id, config);
+      return getApiV1PostLikeByPostIdLikes(post_id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -75,16 +76,16 @@ export function useGetApiV1PostLikeByPostIdLikesSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1PostLikeByPostIdLikesSuspenseQueryKey(post_id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PostLikeByPostIdLikesSuspenseQueryOptions(post_id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

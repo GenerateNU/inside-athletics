@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  ListApiV1CheckoutSessionsQueryResponse,
-  ListApiV1CheckoutSessionsQueryParams,
-} from "../models/ListApiV1CheckoutSessions.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,11 +14,15 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { listApiV1CheckoutSessions } from "../clients/listApiV1CheckoutSessions.ts";
+import type {
+  ListApiV1CheckoutSessionsQueryResponse,
+  ListApiV1CheckoutSessionsQueryParams,
+} from "../models/ListApiV1CheckoutSessions.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { listApiV1CheckoutSessions } from "../clients/listApiV1CheckoutSessions.ts";
 
 export const listApiV1CheckoutSessionsSuspenseQueryKey = (
-  params: ListApiV1CheckoutSessionsQueryParams = {},
+  params?: ListApiV1CheckoutSessionsQueryParams,
 ) =>
   [{ url: "/api/v1/checkout/sessions/" }, ...(params ? [params] : [])] as const;
 
@@ -44,8 +43,10 @@ export function listApiV1CheckoutSessionsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return listApiV1CheckoutSessions(params, config);
+      return listApiV1CheckoutSessions(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,16 @@ export function useListApiV1CheckoutSessionsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? listApiV1CheckoutSessionsSuspenseQueryKey(params);
+    resolvedOptions?.queryKey ??
+    listApiV1CheckoutSessionsSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...listApiV1CheckoutSessionsSuspenseQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1RolesQueryResponse,
-  GetApiV1RolesQueryParams,
-} from "../models/GetApiV1Roles.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,10 +14,14 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1Roles } from "../clients/getApiV1Roles.ts";
+import type {
+  GetApiV1RolesQueryResponse,
+  GetApiV1RolesQueryParams,
+} from "../models/GetApiV1Roles.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1Roles } from "../clients/getApiV1Roles.ts";
 
-export const getApiV1RolesQueryKey = (params: GetApiV1RolesQueryParams = {}) =>
+export const getApiV1RolesQueryKey = (params?: GetApiV1RolesQueryParams) =>
   [{ url: "/api/v1/roles/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1RolesQueryKey = ReturnType<typeof getApiV1RolesQueryKey>;
@@ -40,8 +39,10 @@ export function getApiV1RolesQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1Roles(params, config);
+      return getApiV1Roles(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -70,14 +71,14 @@ export function useGetApiV1Roles<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1RolesQueryKey(params);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1RolesQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1RolesQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

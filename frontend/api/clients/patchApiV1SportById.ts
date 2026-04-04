@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1SportByIdMutationRequest,
-  PatchApiV1SportByIdMutationResponse,
-  PatchApiV1SportByIdPathParams,
-} from "../models/PatchApiV1SportById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1SportByIdMutationRequest,
+  PatchApiV1SportByIdMutationResponse,
+  PatchApiV1SportByIdPathParams,
+} from "../models/PatchApiV1SportById.ts";
 
 function getPatchApiV1SportByIdUrl(id: PatchApiV1SportByIdPathParams["id"]) {
   const res = { method: "PATCH", url: `/api/v1/sport/${id}` as const };

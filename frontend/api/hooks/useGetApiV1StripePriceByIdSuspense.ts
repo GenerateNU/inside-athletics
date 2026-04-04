@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1StripePriceByIdQueryResponse,
-  GetApiV1StripePriceByIdPathParams,
-} from "../models/GetApiV1StripePriceById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1StripePriceById } from "../clients/getApiV1StripePriceById.ts";
+import type {
+  GetApiV1StripePriceByIdQueryResponse,
+  GetApiV1StripePriceByIdPathParams,
+} from "../models/GetApiV1StripePriceById.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1StripePriceById } from "../clients/getApiV1StripePriceById.ts";
 
 export const getApiV1StripePriceByIdSuspenseQueryKey = (
   id: GetApiV1StripePriceByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1StripePriceByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1StripePriceById(id, config);
+      return getApiV1StripePriceById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useGetApiV1StripePriceByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1StripePriceByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1StripePriceByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1StripePriceByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

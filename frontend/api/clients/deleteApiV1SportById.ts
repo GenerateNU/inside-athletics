@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  DeleteApiV1SportByIdMutationResponse,
-  DeleteApiV1SportByIdPathParams,
-} from "../models/DeleteApiV1SportById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  DeleteApiV1SportByIdMutationResponse,
+  DeleteApiV1SportByIdPathParams,
+} from "../models/DeleteApiV1SportById.ts";
 
 function getDeleteApiV1SportByIdUrl(id: DeleteApiV1SportByIdPathParams["id"]) {
   const res = { method: "DELETE", url: `/api/v1/sport/${id}` as const };

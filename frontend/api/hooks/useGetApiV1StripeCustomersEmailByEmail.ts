@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1StripeCustomersEmailByEmailQueryResponse,
-  GetApiV1StripeCustomersEmailByEmailPathParams,
-} from "../models/GetApiV1StripeCustomersEmailByEmail.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1StripeCustomersEmailByEmail } from "../clients/getApiV1StripeCustomersEmailByEmail.ts";
+import type {
+  GetApiV1StripeCustomersEmailByEmailQueryResponse,
+  GetApiV1StripeCustomersEmailByEmailPathParams,
+} from "../models/GetApiV1StripeCustomersEmailByEmail.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1StripeCustomersEmailByEmail } from "../clients/getApiV1StripeCustomersEmailByEmail.ts";
 
 export const getApiV1StripeCustomersEmailByEmailQueryKey = (
   email: GetApiV1StripeCustomersEmailByEmailPathParams["email"],
@@ -47,8 +46,10 @@ export function getApiV1StripeCustomersEmailByEmailQueryOptions(
     enabled: !!email,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1StripeCustomersEmailByEmail(email, config);
+      return getApiV1StripeCustomersEmailByEmail(email, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -77,16 +78,16 @@ export function useGetApiV1StripeCustomersEmailByEmail<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1StripeCustomersEmailByEmailQueryKey(email);
 
   const query = useQuery(
     {
       ...getApiV1StripeCustomersEmailByEmailQueryOptions(email, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

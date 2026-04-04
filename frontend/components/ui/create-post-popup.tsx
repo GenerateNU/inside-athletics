@@ -1,12 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import Select from 'react-select';
 import SearchPopup from "./search-popup";
-import {userQueries} from "@tanstack/react-query"
+import { useSession } from "@/utils/SessionContext";
+import { useGetApiV1Colleges } from "@/api/hooks";
 
 type Tag = {
   id: string;
@@ -36,21 +37,22 @@ export default function CreatePostPopup() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<{ value: string; label: string } | null>(null);
   const [showSearchPopup, setShowSearchPopup] = useState(false);
-  const [schools, setSchools] = useState<{ value: string; label: string }[]>([]);
 
-  useEffect(() => {
-    async function loadSchools() {
-      try {
-        const res = await fetch("/api/v1/colleges/");
-        if (!res.ok) throw new Error(`Failed: ${res.status}`);
-        const data: { colleges: { id: string; name: string }[] } = await res.json();
-        setSchools(data.colleges.map((c) => ({ value: c.id, label: c.name })));
-      } catch (err) {
-        console.error("Fetch schools error:", err);
-      }
-    }
-    loadSchools();
-  }, []);
+  const session = useSession();
+  const authHeaders = session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : undefined;
+  const enabled = !!session?.access_token;
+
+  const { data: collegesData } = useGetApiV1Colleges({
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+
+  const schools = (collegesData?.colleges ?? []).map((c) => ({
+    value: c.id,
+    label: c.name,
+  }));
 
   const toggleSchoolTag = (option: { value: string; label: string } | null) => {
     if (!option) return;

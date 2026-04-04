@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetApiV1HealthHealthcheckQueryResponse } from "../models/GetApiV1HealthHealthcheck.ts";
 import type {
   Client,
   RequestConfig,
@@ -16,8 +14,9 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1HealthHealthcheck } from "../clients/getApiV1HealthHealthcheck.ts";
+import type { GetApiV1HealthHealthcheckQueryResponse } from "../models/GetApiV1HealthHealthcheck.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1HealthHealthcheck } from "../clients/getApiV1HealthHealthcheck.ts";
 
 export const getApiV1HealthHealthcheckSuspenseQueryKey = () =>
   [{ url: "/api/v1/health/healthcheck" }] as const;
@@ -38,8 +37,10 @@ export function getApiV1HealthHealthcheckSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1HealthHealthcheck(config);
+      return getApiV1HealthHealthcheck({
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -65,15 +66,15 @@ export function useGetApiV1HealthHealthcheckSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1HealthHealthcheckSuspenseQueryKey();
+    resolvedOptions?.queryKey ?? getApiV1HealthHealthcheckSuspenseQueryKey();
 
   const query = useSuspenseQuery(
     {
       ...getApiV1HealthHealthcheckSuspenseQueryOptions(config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1StripeCustomersByIdMutationRequest,
-  PatchApiV1StripeCustomersByIdMutationResponse,
-  PatchApiV1StripeCustomersByIdPathParams,
-} from "../models/PatchApiV1StripeCustomersById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1StripeCustomersById } from "../clients/patchApiV1StripeCustomersById.ts";
+import type {
+  PatchApiV1StripeCustomersByIdMutationRequest,
+  PatchApiV1StripeCustomersByIdMutationResponse,
+  PatchApiV1StripeCustomersByIdPathParams,
+} from "../models/PatchApiV1StripeCustomersById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1StripeCustomersById } from "../clients/patchApiV1StripeCustomersById.ts";
 
 export const patchApiV1StripeCustomersByIdMutationKey = () =>
   [{ url: "/api/v1/stripe_customers/:id" }] as const;
@@ -42,7 +41,7 @@ export function patchApiV1StripeCustomersByIdMutationOptions<
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1StripeCustomersByIdPathParams["id"];
-      data?: PatchApiV1StripeCustomersByIdMutationRequest;
+      data: PatchApiV1StripeCustomersByIdMutationRequest;
     },
     TContext
   >({
@@ -64,7 +63,7 @@ export function usePatchApiV1StripeCustomersById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1StripeCustomersByIdPathParams["id"];
-        data?: PatchApiV1StripeCustomersByIdMutationRequest;
+        data: PatchApiV1StripeCustomersByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -85,7 +84,7 @@ export function usePatchApiV1StripeCustomersById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1StripeCustomersByIdPathParams["id"];
-      data?: PatchApiV1StripeCustomersByIdMutationRequest;
+      data: PatchApiV1StripeCustomersByIdMutationRequest;
     },
     TContext
   >;
@@ -95,7 +94,7 @@ export function usePatchApiV1StripeCustomersById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1StripeCustomersByIdPathParams["id"];
-      data?: PatchApiV1StripeCustomersByIdMutationRequest;
+      data: PatchApiV1StripeCustomersByIdMutationRequest;
     },
     TContext
   >(
@@ -110,7 +109,7 @@ export function usePatchApiV1StripeCustomersById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1StripeCustomersByIdPathParams["id"];
-      data?: PatchApiV1StripeCustomersByIdMutationRequest;
+      data: PatchApiV1StripeCustomersByIdMutationRequest;
     },
     TContext
   >;

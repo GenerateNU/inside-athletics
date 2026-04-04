@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1CheckoutSessionsMutationRequest,
-  PostApiV1CheckoutSessionsMutationResponse,
-} from "../models/PostApiV1CheckoutSessions.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1CheckoutSessions } from "../clients/postApiV1CheckoutSessions.ts";
+import type {
+  PostApiV1CheckoutSessionsMutationRequest,
+  PostApiV1CheckoutSessionsMutationResponse,
+} from "../models/PostApiV1CheckoutSessions.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1CheckoutSessions } from "../clients/postApiV1CheckoutSessions.ts";
 
 export const postApiV1CheckoutSessionsMutationKey = () =>
   [{ url: "/api/v1/checkout/sessions/" }] as const;

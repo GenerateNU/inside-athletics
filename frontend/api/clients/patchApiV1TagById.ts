@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1TagByIdMutationRequest,
-  PatchApiV1TagByIdMutationResponse,
-  PatchApiV1TagByIdPathParams,
-} from "../models/PatchApiV1TagById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1TagByIdMutationRequest,
+  PatchApiV1TagByIdMutationResponse,
+  PatchApiV1TagByIdPathParams,
+} from "../models/PatchApiV1TagById.ts";
 
 function getPatchApiV1TagByIdUrl(id: PatchApiV1TagByIdPathParams["id"]) {
   const res = { method: "PATCH", url: `/api/v1/tag/${id}` as const };

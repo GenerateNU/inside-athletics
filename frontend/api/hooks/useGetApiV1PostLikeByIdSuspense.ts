@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1PostLikeByIdQueryResponse,
-  GetApiV1PostLikeByIdPathParams,
-} from "../models/GetApiV1PostLikeById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1PostLikeById } from "../clients/getApiV1PostLikeById.ts";
+import type {
+  GetApiV1PostLikeByIdQueryResponse,
+  GetApiV1PostLikeByIdPathParams,
+} from "../models/GetApiV1PostLikeById.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1PostLikeById } from "../clients/getApiV1PostLikeById.ts";
 
 export const getApiV1PostLikeByIdSuspenseQueryKey = (
   id: GetApiV1PostLikeByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1PostLikeByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostLikeById(id, config);
+      return getApiV1PostLikeById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useGetApiV1PostLikeByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostLikeByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1PostLikeByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PostLikeByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

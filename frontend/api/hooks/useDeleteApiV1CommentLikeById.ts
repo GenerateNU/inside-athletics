@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1CommentLikeByIdMutationResponse,
-  DeleteApiV1CommentLikeByIdPathParams,
-} from "../models/DeleteApiV1CommentLikeById.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { deleteApiV1CommentLikeById } from "../clients/deleteApiV1CommentLikeById.ts";
+import type {
+  DeleteApiV1CommentLikeByIdMutationResponse,
+  DeleteApiV1CommentLikeByIdPathParams,
+} from "../models/DeleteApiV1CommentLikeById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { deleteApiV1CommentLikeById } from "../clients/deleteApiV1CommentLikeById.ts";
 
 export const deleteApiV1CommentLikeByIdMutationKey = () =>
   [{ url: "/api/v1/comment/like/:id" }] as const;

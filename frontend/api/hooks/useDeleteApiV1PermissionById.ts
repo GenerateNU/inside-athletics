@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  DeleteApiV1PermissionByIdMutationResponse,
-  DeleteApiV1PermissionByIdPathParams,
-} from "../models/DeleteApiV1PermissionById.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { deleteApiV1PermissionById } from "../clients/deleteApiV1PermissionById.ts";
+import type {
+  DeleteApiV1PermissionByIdMutationResponse,
+  DeleteApiV1PermissionByIdPathParams,
+} from "../models/DeleteApiV1PermissionById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { deleteApiV1PermissionById } from "../clients/deleteApiV1PermissionById.ts";
 
 export const deleteApiV1PermissionByIdMutationKey = () =>
   [{ url: "/api/v1/permission/:id" }] as const;

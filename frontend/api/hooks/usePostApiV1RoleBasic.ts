@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1RoleBasicMutationRequest,
-  PostApiV1RoleBasicMutationResponse,
-} from "../models/PostApiV1RoleBasic.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1RoleBasic } from "../clients/postApiV1RoleBasic.ts";
+import type {
+  PostApiV1RoleBasicMutationRequest,
+  PostApiV1RoleBasicMutationResponse,
+} from "../models/PostApiV1RoleBasic.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1RoleBasic } from "../clients/postApiV1RoleBasic.ts";
 
 export const postApiV1RoleBasicMutationKey = () =>
   [{ url: "/api/v1/role/basic" }] as const;

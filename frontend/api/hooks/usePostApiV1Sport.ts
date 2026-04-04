@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PostApiV1SportMutationRequest,
-  PostApiV1SportMutationResponse,
-} from "../models/PostApiV1Sport.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,8 +13,12 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { postApiV1Sport } from "../clients/postApiV1Sport.ts";
+import type {
+  PostApiV1SportMutationRequest,
+  PostApiV1SportMutationResponse,
+} from "../models/PostApiV1Sport.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { postApiV1Sport } from "../clients/postApiV1Sport.ts";
 
 export const postApiV1SportMutationKey = () =>
   [{ url: "/api/v1/sport/" }] as const;

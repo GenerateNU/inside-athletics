@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1SportByIdQueryResponse,
-  GetApiV1SportByIdPathParams,
-} from "../models/GetApiV1SportById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1SportById } from "../clients/getApiV1SportById.ts";
+import type {
+  GetApiV1SportByIdQueryResponse,
+  GetApiV1SportByIdPathParams,
+} from "../models/GetApiV1SportById.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1SportById } from "../clients/getApiV1SportById.ts";
 
 export const getApiV1SportByIdQueryKey = (
   id: GetApiV1SportByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1SportByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1SportById(id, config);
+      return getApiV1SportById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,14 +75,14 @@ export function useGetApiV1SportById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1SportByIdQueryKey(id);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1SportByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1SportByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

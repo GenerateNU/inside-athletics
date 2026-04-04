@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1RoleByIdMutationRequest,
-  PatchApiV1RoleByIdMutationResponse,
-  PatchApiV1RoleByIdPathParams,
-} from "../models/PatchApiV1RoleById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1RoleByIdMutationRequest,
+  PatchApiV1RoleByIdMutationResponse,
+  PatchApiV1RoleByIdPathParams,
+} from "../models/PatchApiV1RoleById.ts";
 
 function getPatchApiV1RoleByIdUrl(id: PatchApiV1RoleByIdPathParams["id"]) {
   const res = { method: "PATCH", url: `/api/v1/role/${id}` as const };
@@ -26,7 +26,7 @@ function getPatchApiV1RoleByIdUrl(id: PatchApiV1RoleByIdPathParams["id"]) {
  */
 export async function patchApiV1RoleById(
   id: PatchApiV1RoleByIdPathParams["id"],
-  data?: PatchApiV1RoleByIdMutationRequest,
+  data: PatchApiV1RoleByIdMutationRequest,
   config: Partial<RequestConfig<PatchApiV1RoleByIdMutationRequest>> & {
     client?: Client;
   } = {},

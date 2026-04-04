@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  ListApiV1CheckoutSessionsQueryResponse,
-  ListApiV1CheckoutSessionsQueryParams,
-} from "../models/ListApiV1CheckoutSessions.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  ListApiV1CheckoutSessionsQueryResponse,
+  ListApiV1CheckoutSessionsQueryParams,
+} from "../models/ListApiV1CheckoutSessions.ts";
 
 function getListApiV1CheckoutSessionsUrl() {
   const res = { method: "GET", url: `/api/v1/checkout/sessions/` as const };

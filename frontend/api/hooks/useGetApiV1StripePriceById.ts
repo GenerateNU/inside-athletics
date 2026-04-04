@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1StripePriceByIdQueryResponse,
-  GetApiV1StripePriceByIdPathParams,
-} from "../models/GetApiV1StripePriceById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1StripePriceById } from "../clients/getApiV1StripePriceById.ts";
+import type {
+  GetApiV1StripePriceByIdQueryResponse,
+  GetApiV1StripePriceByIdPathParams,
+} from "../models/GetApiV1StripePriceById.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1StripePriceById } from "../clients/getApiV1StripePriceById.ts";
 
 export const getApiV1StripePriceByIdQueryKey = (
   id: GetApiV1StripePriceByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1StripePriceByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1StripePriceById(id, config);
+      return getApiV1StripePriceById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,15 +75,15 @@ export function useGetApiV1StripePriceById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1StripePriceByIdQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1StripePriceByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1StripePriceByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

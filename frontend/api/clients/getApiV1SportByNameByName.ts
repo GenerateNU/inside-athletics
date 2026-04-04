@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1SportByNameByNameQueryResponse,
-  GetApiV1SportByNameByNamePathParams,
-} from "../models/GetApiV1SportByNameByName.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1SportByNameByNameQueryResponse,
+  GetApiV1SportByNameByNamePathParams,
+} from "../models/GetApiV1SportByNameByName.ts";
 
 function getGetApiV1SportByNameByNameUrl(
   name: GetApiV1SportByNameByNamePathParams["name"],

@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1RoleByIdQueryResponse,
-  GetApiV1RoleByIdPathParams,
-} from "../models/GetApiV1RoleById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1RoleById } from "../clients/getApiV1RoleById.ts";
+import type {
+  GetApiV1RoleByIdQueryResponse,
+  GetApiV1RoleByIdPathParams,
+} from "../models/GetApiV1RoleById.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getApiV1RoleById } from "../clients/getApiV1RoleById.ts";
 
 export const getApiV1RoleByIdQueryKey = (
   id: GetApiV1RoleByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1RoleByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1RoleById(id, config);
+      return getApiV1RoleById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,14 +75,14 @@ export function useGetApiV1RoleById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1RoleByIdQueryKey(id);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1RoleByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1RoleByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

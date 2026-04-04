@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1PostByIdMutationRequest,
-  PatchApiV1PostByIdMutationResponse,
-  PatchApiV1PostByIdPathParams,
-} from "../models/PatchApiV1PostById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1PostById } from "../clients/patchApiV1PostById.ts";
+import type {
+  PatchApiV1PostByIdMutationRequest,
+  PatchApiV1PostByIdMutationResponse,
+  PatchApiV1PostByIdPathParams,
+} from "../models/PatchApiV1PostById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1PostById } from "../clients/patchApiV1PostById.ts";
 
 export const patchApiV1PostByIdMutationKey = () =>
   [{ url: "/api/v1/post/:id" }] as const;
@@ -40,7 +39,7 @@ export function patchApiV1PostByIdMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data?: PatchApiV1PostByIdMutationRequest;
+      data: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >({
@@ -62,7 +61,7 @@ export function usePatchApiV1PostById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1PostByIdPathParams["id"];
-        data?: PatchApiV1PostByIdMutationRequest;
+        data: PatchApiV1PostByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -83,7 +82,7 @@ export function usePatchApiV1PostById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data?: PatchApiV1PostByIdMutationRequest;
+      data: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >;
@@ -93,7 +92,7 @@ export function usePatchApiV1PostById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data?: PatchApiV1PostByIdMutationRequest;
+      data: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >(
@@ -108,7 +107,7 @@ export function usePatchApiV1PostById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data?: PatchApiV1PostByIdMutationRequest;
+      data: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >;

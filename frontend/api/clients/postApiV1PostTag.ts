@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PostApiV1PostTagMutationRequest,
-  PostApiV1PostTagMutationResponse,
-} from "../models/PostApiV1PostTag.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PostApiV1PostTagMutationRequest,
+  PostApiV1PostTagMutationResponse,
+} from "../models/PostApiV1PostTag.ts";
 
 function getPostApiV1PostTagUrl() {
   const res = { method: "POST", url: `/api/v1/post/tag/` as const };

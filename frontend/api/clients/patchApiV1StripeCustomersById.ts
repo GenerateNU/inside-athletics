@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1StripeCustomersByIdMutationRequest,
-  PatchApiV1StripeCustomersByIdMutationResponse,
-  PatchApiV1StripeCustomersByIdPathParams,
-} from "../models/PatchApiV1StripeCustomersById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1StripeCustomersByIdMutationRequest,
+  PatchApiV1StripeCustomersByIdMutationResponse,
+  PatchApiV1StripeCustomersByIdPathParams,
+} from "../models/PatchApiV1StripeCustomersById.ts";
 
 function getPatchApiV1StripeCustomersByIdUrl(
   id: PatchApiV1StripeCustomersByIdPathParams["id"],
@@ -31,7 +31,7 @@ function getPatchApiV1StripeCustomersByIdUrl(
  */
 export async function patchApiV1StripeCustomersById(
   id: PatchApiV1StripeCustomersByIdPathParams["id"],
-  data?: PatchApiV1StripeCustomersByIdMutationRequest,
+  data: PatchApiV1StripeCustomersByIdMutationRequest,
   config: Partial<
     RequestConfig<PatchApiV1StripeCustomersByIdMutationRequest>
   > & { client?: Client } = {},

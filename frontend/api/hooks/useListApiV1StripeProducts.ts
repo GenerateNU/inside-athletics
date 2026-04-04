@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { ListApiV1StripeProductsQueryResponse } from "../models/ListApiV1StripeProducts.ts";
 import type {
   Client,
   RequestConfig,
@@ -16,8 +14,9 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { listApiV1StripeProducts } from "../clients/listApiV1StripeProducts.ts";
+import type { ListApiV1StripeProductsQueryResponse } from "../models/ListApiV1StripeProducts.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { listApiV1StripeProducts } from "../clients/listApiV1StripeProducts.ts";
 
 export const listApiV1StripeProductsQueryKey = () =>
   [{ url: "/api/v1/stripe_products/" }] as const;
@@ -38,8 +37,10 @@ export function listApiV1StripeProductsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return listApiV1StripeProducts(config);
+      return listApiV1StripeProducts({
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -67,14 +68,15 @@ export function useListApiV1StripeProducts<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? listApiV1StripeProductsQueryKey();
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey =
+    resolvedOptions?.queryKey ?? listApiV1StripeProductsQueryKey();
 
   const query = useQuery(
     {
       ...listApiV1StripeProductsQueryOptions(config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

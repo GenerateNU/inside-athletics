@@ -3,11 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  GetApiV1CommentLikeByIdQueryResponse,
-  GetApiV1CommentLikeByIdPathParams,
-} from "../models/GetApiV1CommentLikeById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +14,12 @@ import type {
   UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1CommentLikeById } from "../clients/getApiV1CommentLikeById.ts";
+import type {
+  GetApiV1CommentLikeByIdQueryResponse,
+  GetApiV1CommentLikeByIdPathParams,
+} from "../models/GetApiV1CommentLikeById.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getApiV1CommentLikeById } from "../clients/getApiV1CommentLikeById.ts";
 
 export const getApiV1CommentLikeByIdSuspenseQueryKey = (
   id: GetApiV1CommentLikeByIdPathParams["id"],
@@ -44,8 +43,10 @@ export function getApiV1CommentLikeByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1CommentLikeById(id, config);
+      return getApiV1CommentLikeById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useGetApiV1CommentLikeByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1CommentLikeByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1CommentLikeByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1CommentLikeByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

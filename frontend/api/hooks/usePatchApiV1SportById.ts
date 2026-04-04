@@ -3,12 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type {
-  PatchApiV1SportByIdMutationRequest,
-  PatchApiV1SportByIdMutationResponse,
-  PatchApiV1SportByIdPathParams,
-} from "../models/PatchApiV1SportById.ts";
 import type {
   Client,
   RequestConfig,
@@ -19,8 +13,13 @@ import type {
   UseMutationResult,
   QueryClient,
 } from "@tanstack/react-query";
-import { patchApiV1SportById } from "../clients/patchApiV1SportById.ts";
+import type {
+  PatchApiV1SportByIdMutationRequest,
+  PatchApiV1SportByIdMutationResponse,
+  PatchApiV1SportByIdPathParams,
+} from "../models/PatchApiV1SportById.ts";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
+import { patchApiV1SportById } from "../clients/patchApiV1SportById.ts";
 
 export const patchApiV1SportByIdMutationKey = () =>
   [{ url: "/api/v1/sport/:id" }] as const;
