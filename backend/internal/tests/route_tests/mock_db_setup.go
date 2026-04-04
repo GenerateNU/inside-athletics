@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"inside-athletics/internal/models"
 
-	"fmt"
 	"inside-athletics/internal/handlers/content"
-	"inside-athletics/internal/server"
 	"inside-athletics/internal/s3"
+	"inside-athletics/internal/server"
 	unitTests "inside-athletics/internal/tests/unit_tests"
 	"log"
 	"net/http/httptest"
@@ -121,8 +120,8 @@ func (td *TestDatabase) RunMigrations(t *testing.T) {
 
 	// Run Atlas migrations using exec
 	cmd := exec.Command("atlas", "migrate", "apply",
-		"--dir", fmt.Sprintf("file://%s", migrationDir),
-		//"--dir", "file://"+filepath.ToSlash(migrationDir),
+		//"--dir", fmt.Sprintf("file://%s", migrationDir),
+		"--dir", "file://"+filepath.ToSlash(migrationDir),
 		"--url", connStr,
 	)
 
