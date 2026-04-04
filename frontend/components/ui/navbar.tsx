@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  BookOpen,
-  Briefcase,
-  Home,
-  Plus,
-  Search,
-} from "lucide-react";
+import { BookOpen, Briefcase, Home, Plus, Search } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -25,42 +19,12 @@ import {
   useGetApiV1UserSportFollows,
   useGetApiV1UserTagFollows,
 } from "@/api/hooks";
-import type { GetCollegeFollowsByUserResponse } from "@/api/models/GetCollegeFollowsByUserResponse";
-import type { GetCollegeResponse } from "@/api/models/GetCollegeResponse";
-import type { GetSportFollowsByUserResponse } from "@/api/models/GetSportFollowsByUserResponse";
-import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
-import type { GetTagResponse } from "@/api/models/GetTagResponse";
-import type { SportResponse } from "@/api/models/SportResponse";
 
 const navItems = [
   { label: "Home", icon: Home },
   { label: "Explore", icon: Search },
   { label: "Post", icon: Plus },
 ];
-
-function unwrapBody<T>(value: unknown): T | undefined {
-  let current = value;
-
-  for (let depth = 0; depth < 5; depth += 1) {
-    if (!current || typeof current !== "object") {
-      return current as T | undefined;
-    }
-
-    if ("body" in current && current.body !== undefined) {
-      current = current.body;
-      continue;
-    }
-
-    if ("Body" in current && current.Body !== undefined) {
-      current = current.Body;
-      continue;
-    }
-
-    return current as T | undefined;
-  }
-
-  return current as T | undefined;
-}
 
 type NavbarProps = React.ComponentProps<"aside">;
 
@@ -99,13 +63,9 @@ export function Navbar({ className, ...props }: NavbarProps) {
     client: { headers: authHeaders },
   });
 
-  const tagIds =
-    unwrapBody<GetTagFollowsByUserResponse>(tagFollows)?.tag_ids ?? [];
-  const sportIds =
-    unwrapBody<GetSportFollowsByUserResponse>(sportFollows)?.sport_ids ?? [];
-  const collegeIds =
-    unwrapBody<GetCollegeFollowsByUserResponse>(collegeFollows)?.college_ids ??
-    [];
+  const tagIds = tagFollows?.tag_ids ?? [];
+  const sportIds = sportFollows?.sport_ids ?? [];
+  const collegeIds = collegeFollows?.college_ids ?? [];
 
   // Fetch each individual item using useQueries (parallel, no waterfalls)
   const tagResults = useQueries({
@@ -133,21 +93,18 @@ export function Navbar({ className, ...props }: NavbarProps) {
     collegeResults.some((r) => r.isLoading);
 
   const followingItems = [
-    ...sportResults.flatMap((r) =>
-      unwrapBody<SportResponse>(r.data)
-        ? [{ label: unwrapBody<SportResponse>(r.data)!.name, type: "sport" as const }]
-        : []
-    ),
-    ...tagResults.flatMap((r) =>
-      unwrapBody<GetTagResponse>(r.data)
-        ? [{ label: unwrapBody<GetTagResponse>(r.data)!.name, type: "tag" as const }]
-        : []
-    ),
-    ...collegeResults.flatMap((r) =>
-      unwrapBody<GetCollegeResponse>(r.data)
-        ? [{ label: unwrapBody<GetCollegeResponse>(r.data)!.name, type: "school" as const }]
-        : []
-    ),
+    ...sportResults.flatMap((r) => {
+      const sport = r.data;
+      return sport ? [{ label: sport.name, type: "sport" as const }] : [];
+    }),
+    ...tagResults.flatMap((r) => {
+      const tag = r.data;
+      return tag ? [{ label: tag.name, type: "tag" as const }] : [];
+    }),
+    ...collegeResults.flatMap((r) => {
+      const college = r.data;
+      return college ? [{ label: college.name, type: "school" as const }] : [];
+    }),
   ];
 
   return (
@@ -175,7 +132,10 @@ export function Navbar({ className, ...props }: NavbarProps) {
             isCollapsed && "justify-center",
           )}
         >
-          <div aria-hidden="true" className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300" />
+          <div
+            aria-hidden="true"
+            className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300"
+          />
           {!isCollapsed && (
             <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
               Inside Athletics
@@ -199,7 +159,13 @@ export function Navbar({ className, ...props }: NavbarProps) {
       <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
 
       {/* Nav items — unchanged */}
-      <nav aria-label="Primary" className={cn("flex flex-col gap-1", isCollapsed && "w-full items-center")}>
+      <nav
+        aria-label="Primary"
+        className={cn(
+          "flex flex-col gap-1",
+          isCollapsed && "w-full items-center",
+        )}
+      >
         {navItems.map(({ label, icon: Icon }) => (
           <Button
             key={label}
@@ -221,7 +187,12 @@ export function Navbar({ className, ...props }: NavbarProps) {
       </nav>
 
       {/* Following section — same JSX, driven by new data */}
-      <div className={cn("mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]", isCollapsed && "w-full")}>
+      <div
+        className={cn(
+          "mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]",
+          isCollapsed && "w-full",
+        )}
+      >
         <div
           className={cn(
             "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
@@ -265,7 +236,10 @@ export function Navbar({ className, ...props }: NavbarProps) {
               ) : type === "sport" ? (
                 <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
               ) : (
-                <span aria-hidden="true" className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black" />
+                <span
+                  aria-hidden="true"
+                  className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black"
+                />
               )}
               {!isCollapsed && <span className="truncate">{label}</span>}
             </button>
