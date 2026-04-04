@@ -4,12 +4,12 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetApiV1UserCurrentQueryResponse } from "../models/GetApiV1UserCurrent.ts";
 import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type { GetApiV1UserCurrentQueryResponse } from "../models/GetApiV1UserCurrent.ts";
 
 function getGetApiV1UserCurrentUrl() {
   const res = { method: "GET", url: `/api/v1/user/current` as const };

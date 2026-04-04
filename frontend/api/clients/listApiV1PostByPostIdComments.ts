@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  ListApiV1PostByPostIdCommentsQueryResponse,
-  ListApiV1PostByPostIdCommentsPathParams,
-} from "../models/ListApiV1PostByPostIdComments.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  ListApiV1PostByPostIdCommentsQueryResponse,
+  ListApiV1PostByPostIdCommentsPathParams,
+} from "../models/ListApiV1PostByPostIdComments.ts";
 
 function getListApiV1PostByPostIdCommentsUrl(
   post_id: ListApiV1PostByPostIdCommentsPathParams["post_id"],

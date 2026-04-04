@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1CommentByIdQueryResponse,
-  GetApiV1CommentByIdPathParams,
-} from "../models/GetApiV1CommentById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1CommentByIdQueryResponse,
+  GetApiV1CommentByIdPathParams,
+} from "../models/GetApiV1CommentById.ts";
 
 function getGetApiV1CommentByIdUrl(id: GetApiV1CommentByIdPathParams["id"]) {
   const res = { method: "GET", url: `/api/v1/comment/${id}` as const };

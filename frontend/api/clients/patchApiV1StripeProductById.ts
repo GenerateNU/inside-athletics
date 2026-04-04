@@ -5,15 +5,15 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1StripeProductByIdMutationRequest,
-  PatchApiV1StripeProductByIdMutationResponse,
-  PatchApiV1StripeProductByIdPathParams,
-} from "../models/PatchApiV1StripeProductById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1StripeProductByIdMutationRequest,
+  PatchApiV1StripeProductByIdMutationResponse,
+  PatchApiV1StripeProductByIdPathParams,
+} from "../models/PatchApiV1StripeProductById.ts";
 
 function getPatchApiV1StripeProductByIdUrl(
   id: PatchApiV1StripeProductByIdPathParams["id"],

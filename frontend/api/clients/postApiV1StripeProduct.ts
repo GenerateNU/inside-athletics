@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PostApiV1StripeProductMutationRequest,
-  PostApiV1StripeProductMutationResponse,
-} from "../models/PostApiV1StripeProduct.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PostApiV1StripeProductMutationRequest,
+  PostApiV1StripeProductMutationResponse,
+} from "../models/PostApiV1StripeProduct.ts";
 
 function getPostApiV1StripeProductUrl() {
   const res = { method: "POST", url: `/api/v1/stripe_product/` as const };

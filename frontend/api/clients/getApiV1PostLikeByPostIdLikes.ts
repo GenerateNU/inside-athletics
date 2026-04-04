@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1PostLikeByPostIdLikesQueryResponse,
-  GetApiV1PostLikeByPostIdLikesPathParams,
-} from "../models/GetApiV1PostLikeByPostIdLikes.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1PostLikeByPostIdLikesQueryResponse,
+  GetApiV1PostLikeByPostIdLikesPathParams,
+} from "../models/GetApiV1PostLikeByPostIdLikes.ts";
 
 function getGetApiV1PostLikeByPostIdLikesUrl(
   post_id: GetApiV1PostLikeByPostIdLikesPathParams["post_id"],

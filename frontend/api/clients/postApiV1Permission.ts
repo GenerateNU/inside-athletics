@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PostApiV1PermissionMutationRequest,
-  PostApiV1PermissionMutationResponse,
-} from "../models/PostApiV1Permission.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PostApiV1PermissionMutationRequest,
+  PostApiV1PermissionMutationResponse,
+} from "../models/PostApiV1Permission.ts";
 
 function getPostApiV1PermissionUrl() {
   const res = { method: "POST", url: `/api/v1/permission/` as const };

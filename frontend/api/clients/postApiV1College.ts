@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PostApiV1CollegeMutationRequest,
-  PostApiV1CollegeMutationResponse,
-} from "../models/PostApiV1College.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PostApiV1CollegeMutationRequest,
+  PostApiV1CollegeMutationResponse,
+} from "../models/PostApiV1College.ts";
 
 function getPostApiV1CollegeUrl() {
   const res = { method: "POST", url: `/api/v1/college` as const };

@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1PermissionByIdQueryResponse,
-  GetApiV1PermissionByIdPathParams,
-} from "../models/GetApiV1PermissionById.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1PermissionByIdQueryResponse,
+  GetApiV1PermissionByIdPathParams,
+} from "../models/GetApiV1PermissionById.ts";
 
 function getGetApiV1PermissionByIdUrl(
   id: GetApiV1PermissionByIdPathParams["id"],

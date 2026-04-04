@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1StripeCustomersEmailByEmailQueryResponse,
-  GetApiV1StripeCustomersEmailByEmailPathParams,
-} from "../models/GetApiV1StripeCustomersEmailByEmail.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  GetApiV1StripeCustomersEmailByEmailQueryResponse,
+  GetApiV1StripeCustomersEmailByEmailPathParams,
+} from "../models/GetApiV1StripeCustomersEmailByEmail.ts";
 
 function getGetApiV1StripeCustomersEmailByEmailUrl(
   email: GetApiV1StripeCustomersEmailByEmailPathParams["email"],

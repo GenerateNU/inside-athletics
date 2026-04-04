@@ -5,14 +5,14 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  PatchApiV1UserMutationRequest,
-  PatchApiV1UserMutationResponse,
-} from "../models/PatchApiV1User.ts";
-import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
+import type {
+  PatchApiV1UserMutationRequest,
+  PatchApiV1UserMutationResponse,
+} from "../models/PatchApiV1User.ts";
 
 function getPatchApiV1UserUrl() {
   const res = { method: "PATCH", url: `/api/v1/user` as const };
