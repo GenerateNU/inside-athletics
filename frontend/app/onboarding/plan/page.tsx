@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -20,6 +20,8 @@ const planOptions = [
 
 export default function OnboardingPlanPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") ?? "";
   const [selectedPlan, setSelectedPlan] = useState("");
 
   const canContinue = Boolean(selectedPlan);
@@ -159,7 +161,11 @@ export default function OnboardingPlanPage() {
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
             router.push(
-              selectedPlan === "free" ? "/onboarding/topic-tags" : "/",
+              selectedPlan === "free"
+                ? role
+                  ? `/onboarding/topic-tags?role=${encodeURIComponent(role)}`
+                  : "/onboarding/topic-tags"
+                : "/",
             );
           }}
           disabled={!canContinue}

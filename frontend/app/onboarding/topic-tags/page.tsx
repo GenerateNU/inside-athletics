@@ -113,7 +113,7 @@ export default function OnboardingTopicTagsPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
-            router.push("/");
+            router.push("/onboarding/athletic-program-survey");
           }}
           disabled={!canContinue}
         >

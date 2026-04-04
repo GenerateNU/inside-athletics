@@ -1,0 +1,112 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+
+const surveyQuestions = [
+  "To what extent does your program prioritize long-term player development (athletic, personal, and leadership growth over your college career)?",
+  "When conflicts arise, how often are academics prioritized over athletics within your program?",
+  "How would you rate the quality and accessibility of academic and career support resources available to athletes at your school (e.g., advisors, career guidance, networking)?",
+  "How seriously does your program treat athlete mental health, including coach awareness, available resources, and overall support?",
+  "How would you describe the overall competitiveness of your program (e.g., performance standards, emphasis on winning, playing time)?",
+  "How would you rate the overall team culture within your program (including trust, accountability, support and camaraderie among teammates, and alignment with team values)?",
+  "How clear and transparent are coaches about expectations, roles, and feedback?",
+] as const;
+
+const ratingOptions = ["1", "2", "3", "4", "5"] as const;
+
+export default function OnboardingAthleticProgramSurveyPage() {
+  const router = useRouter();
+  const [responses, setResponses] = useState<Record<number, string>>({});
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
+      <div className="w-full max-w-3xl space-y-6 rounded-md bg-white p-8 shadow-sm">
+        <div className="space-y-3 text-center">
+          <h1 className="text-4xl font-bold text-black">
+            Athletic Program Survey
+          </h1>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <p className="text-sm text-gray-600">
+              You can skip this survey and return later via your profile page
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl px-4 text-sm font-semibold"
+              style={{
+                borderColor: "#2C649A",
+                color: "#2C649A",
+              }}
+              onClick={() => {
+                router.push("/");
+              }}
+            >
+              Skip for now
+            </Button>
+          </div>
+          <p className="text-sm text-gray-600">
+            Your responses to these questions will live and be visible to others
+            on your profile page. Please rank the following qualities from 1 -
+            5 regarding your sports team.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {surveyQuestions.map((question, index) => (
+            <div
+              key={question}
+              className="space-y-4 rounded-xl border border-gray-200 px-5 py-5"
+            >
+              <p className="text-sm font-medium text-black">
+                {index + 1}. {question}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {ratingOptions.map((option) => {
+                  const isSelected = responses[index] === option;
+
+                  return (
+                    <Button
+                      key={option}
+                      type="button"
+                      variant="outline"
+                      className="h-11 min-w-16 rounded-xl px-6 text-sm font-semibold"
+                      style={{
+                        borderColor: isSelected ? "transparent" : "#00804D",
+                        background: isSelected
+                          ? "linear-gradient(180deg, #00804D 0%, #043D26 100%)"
+                          : "#FFFFFF",
+                        color: isSelected ? "#FFFFFF" : "#000000",
+                      }}
+                      onClick={() => {
+                        setResponses((current) => ({
+                          ...current,
+                          [index]: option,
+                        }));
+                      }}
+                    >
+                      {option}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Button
+          type="button"
+          className="h-10 w-full rounded-xl text-sm font-semibold"
+          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+          onClick={() => {
+            router.push("/");
+          }}
+        >
+          Continue
+        </Button>
+      </div>
+    </div>
+  );
+}
