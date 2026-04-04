@@ -1,0 +1,1 @@
+SELECT word_similarity('erm', name) as similarity FROM  WHERE word_similarity('erm', name) >= show_limit() ORDER BY similarity DESC LIMIT 20

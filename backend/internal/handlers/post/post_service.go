@@ -212,7 +212,7 @@ func (s *PostService) FuzzySearchForPost(ctx context.Context, input *GetSearchPa
 		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
 	}
 	searchStr := input.SearchStr
-	posts, total, err := s.postDB.FuzzySearchForPost(userID, searchStr)
+	posts, total, err := s.postDB.FuzzySearchForPost(userID, searchStr, input.Limit)
 	if err != nil {
 		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
 	}

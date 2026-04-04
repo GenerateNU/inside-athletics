@@ -320,11 +320,11 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 	return utils.HandleDBError(&updatedPost, dbResponse.Error)
 }
 
-func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string) ([]models.Post, int64, error) {
+func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit int) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
-	selectQuery, whereQuery, orderQuery := utils.FuzzySearchBy("title", searchStr)
+	selectQuery, whereQuery, orderQuery := utils.FuzzySearchByQueries("title", searchStr)
 	selectQuery = POST_SELECT_QUERY + "," + selectQuery
 	if err := p.db.
 		Model(&models.Post{}).
@@ -338,7 +338,9 @@ func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string) ([]model
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		Order(orderQuery).
-		Scan(&posts).Count(&total).Error; err != nil {
+		Count(&total).
+		Limit(limit).
+		Scan(&posts).Error; err != nil {
 		return posts, 0, err
 	}
 

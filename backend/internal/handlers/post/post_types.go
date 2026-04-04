@@ -179,6 +179,7 @@ type DeletePostResponse struct {
 
 type GetSearchParam struct {
 	SearchStr string `query:"search_str" binding:"required" example:"Northeastern University" doc:"String to fuzzy search posts/tags/colleges/sports on"`
+	Limit     int    `query:"limit" default:"20" example:"10" doc:"Cap on the number of posts to return"`
 }
 
 type GetSearchResponse struct {

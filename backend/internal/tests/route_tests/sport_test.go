@@ -3,6 +3,7 @@ package routeTests
 import (
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/models"
+	"inside-athletics/internal/utils"
 	"net/http"
 	"testing"
 )
@@ -244,4 +245,42 @@ func TestDeleteSport(t *testing.T) {
 	if getResp.Code != http.StatusNotFound {
 		t.Errorf("expected 404 after delete, got %d", getResp.Code)
 	}
+}
+
+func TestSportSearch(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	})
+
+	sportDB := sport.NewSportDB(testDB.DB)
+	popularity := int32(1)
+	ermSport, err := sportDB.CreateSport("Erm Sport", &popularity)
+	if err != nil {
+		t.Fatal("Unable to create sport erm sport")
+	}
+	_, err1 := sportDB.CreateSport("Rifling", &popularity)
+	if err1 != nil {
+		t.Fatal("Unable to create rifling")
+	}
+
+	resp := api.Get("/api/v1/sports/search?search_str=Erm", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("Expected 200 response but got %d, %s", resp.Code, resp.Body.String())
+	}
+
+	var searchResults utils.SearchResults[*sport.SportResponse]
+	DecodeTo(&searchResults, resp)
+
+	if len(searchResults.Results) != 1 {
+		t.Fatalf("Expected 1 returned sport but got %d", len(searchResults.Results))
+	}
+
+	if searchResults.Results[0].Name != ermSport.Name {
+		t.Fatalf("Expected the top search result to be Erm Sport but got %s", searchResults.Results[0].Name)
+	}
+
 }

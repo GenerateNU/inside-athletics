@@ -710,7 +710,7 @@ func TestTypoStillReturns(t *testing.T) {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
-	resp := api.Get("/api/v1/posts/search?search_str=northeustern", authHeader)
+	resp := api.Get("/api/v1/posts/search?search_str=northeusternTest", authHeader)
 	if resp.Code != http.StatusOK {
 		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
 	}
@@ -722,6 +722,51 @@ func TestTypoStillReturns(t *testing.T) {
 	}
 	if searchResp.Posts[0].Title != post1.Title {
 		t.Error("Expected to retrieve post 1")
+	}
+}
+
+func TestSearchLimit(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	_, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted north", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/search?search_str=northTest&limit=1", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
+	}
+	var searchResp post.GetSearchResponse
+	DecodeTo(&searchResp, resp)
+
+	if searchResp.Count != 2 {
+		t.Errorf("Expected 2 total entries but got %d", searchResp.Count)
+	}
+	if len(searchResp.Posts) != 1 {
+		t.Errorf("Expected only 1 entry to be returned")
 	}
 }
 
