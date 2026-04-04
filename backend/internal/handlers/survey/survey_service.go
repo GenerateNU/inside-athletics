@@ -5,7 +5,6 @@ import (
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +24,11 @@ func (s *SurveyService) CreateSurvey(ctx context.Context, input *struct{ Body Cr
 		return nil, err
 	}
 
-	survey, err := utils.HandleDBError(s.surveyDB.CreateSurvey(b))
+	created, err := s.surveyDB.CreateSurvey(b)
+	if err != nil {
+		return nil, err
+	}
+	survey, err := utils.HandleDBError(created, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,8 @@ func (s *SurveyService) CreateSurvey(ctx context.Context, input *struct{ Body Cr
 }
 
 func (s *SurveyService) DeleteSurvey(ctx context.Context, input *DeleteSurveyRequest) (*utils.ResponseBody[SurveyResponse], error) {
-	survey, err := utils.HandleDBError(s.surveyDB.GetSurveyByID(input.ID))
+	fetched, ferr := s.surveyDB.GetSurveyByID(input.ID)
+	survey, err := utils.HandleDBError(fetched, ferr)
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +104,3 @@ func validateRatings(vals ...int32) error {
 	}
 	return nil
 }
-
-// ensure uuid import is used (used in types/db, kept here for clarity)
-var _ = uuid.UUID{}

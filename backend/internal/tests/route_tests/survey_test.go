@@ -11,7 +11,7 @@ import (
 )
 
 // helpers to seed a survey into the DB
-func seedSurvey(t *testing.T, testDB *TestDB, userID, collegeID, sportID uuid.UUID) *models.Survey {
+func seedSurvey(t *testing.T, testDB *TestDatabase, userID, collegeID, sportID uuid.UUID) *models.Survey {
 	t.Helper()
 	survey := models.Survey{
 		ID:                         uuid.New(),
