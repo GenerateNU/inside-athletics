@@ -2,18 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Plus, X, Search, ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { Plus, X, Search } from "lucide-react";
 
-//Component for an individual tag
 function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClick: () => void }) {
   return (
-    <div className={`p-[0.5px] rounded-md ${active ? "bg-gradient-to-b from-[#377DC0] to-[#DBE64C]" : "bg-gray-300"}`}>
+    <div className={`p-[0.5px] rounded-md bg-[#00804D]`}>
       <Button
         variant="ghost"
         onClick={onClick}
-        className={`rounded-md bg-white flex items-center gap-2 w-full h-full px-1 py-1 text-[#001225] ${active ? "text-[#001225] hover:text-[#001225]" : "text-gray-500 hover:text-gray-500"}`}
+        className={`rounded-md bg-white flex items-center gap-2 w-full h-full px-1 py-1 text-[#001225] ${active ? "text-[#F4F8FA] hover:text-[#F4F8FA] bg-gradient-to-b from-[#00804D] to-[#043D26]" : "text-[#001225] hover:text-[#001225]"}`}
       >
         {active ? <X size={16} /> : <Plus size={16} />}
         {tag.Name}
@@ -22,8 +19,6 @@ function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClic
   );
 }
 
-
-//component for a header and list of corresponding tags
 function TagSection({ header, tags, activeTags, onToggle }: {
   header: string;
   tags: Tag[];
@@ -47,27 +42,20 @@ type Tag = {
   IsSchool: boolean;
 };
 
+type SearchPopupProps = {
+  activeTags: Tag[];
+  setActiveTagsAction: React.Dispatch<React.SetStateAction<Tag[]>>;
+  onBackAction: () => void;
+};
 
-export default function SearchPopup() {
-  const searchParams = useSearchParams();
-  const initialTagNames = searchParams.getAll("tag_name");
-  const initialTagIsSchools = searchParams.getAll("tag_is_school").map((val) => val === "true");
-  const initialActiveTags: Tag[] = initialTagNames.map((name, i) => ({
-    Name: name,
-    IsSchool: initialTagIsSchools[i] ?? false,
-  }));
-
-  const [activeTags, setActiveTags] = useState<Tag[]>(initialActiveTags);
+export default function SearchPopup({ activeTags, setActiveTagsAction, onBackAction }: SearchPopupProps) {
   const [search, setSearch] = useState("");
-  const router = useRouter();
 
-  //filter logic for searchbar (matches based on whether tag label contains string input)
   const filter = (tags: Tag[]) =>
     tags.filter((tag) => tag.Name.toLowerCase().includes(search.toLowerCase()));
 
-  //handler function that takes tags on and off the section beneath the search bar when clicking on header tags
   const toggleTag = (tag: Tag) => {
-    setActiveTags((prev) => {
+    setActiveTagsAction((prev) => {
       const exists = prev.find((t) => t.Name === tag.Name);
       if (exists) {
         return prev.filter((t) => t.Name !== tag.Name);
@@ -77,18 +65,9 @@ export default function SearchPopup() {
     });
   };
 
-  //handler function that takes tags off the section beneath the search bar when clicking on search bar tags
   const removeTag = (tag: Tag) => {
-    setActiveTags((prev) => prev.filter((name) => name.Name !== tag.Name));
+    setActiveTagsAction((prev) => prev.filter((t) => t.Name !== tag.Name));
   };
-
-  //mock data
-  const schools = [
-    { Name: "Northeastern University", IsSchool: true },
-    { Name: "Northwestern University", IsSchool: true },
-    { Name: "Southwestern University", IsSchool: true },
-    { Name: "Southeastern University", IsSchool: true },
-  ];
 
   const sports = [
     { Name: "Swim", IsSchool: false },
@@ -113,7 +92,6 @@ export default function SearchPopup() {
     { Name: "D2 Recruiting", IsSchool: false },
     { Name: "D3 Recruiting", IsSchool: false },
     { Name: "Highlight Film Review", IsSchool: false },
-    { Name: "NCAA Compliance", IsSchool: false },
   ];
 
   const academics = [
@@ -131,26 +109,11 @@ export default function SearchPopup() {
   ];
 
   return (
-    <div className="flex p-4">
-      <div className="max-w-lg w-full space-y-4">
+    <div className="flex w-[600px]">
+      <div className="max-w-lg w-full space-y-3 justify-between">
         <div className="flex gap-4">
-          {/* onclick function left undefined for later popup logic */}
-          <Button
-            variant="ghost"
-            onClick={() => {
-              const params = new URLSearchParams();
-              activeTags.forEach((tag) => {
-                params.append("tag_name", tag.Name);
-                params.append("tag_is_school", String(tag.IsSchool));
-              });
-              router.push(`/create_post_popup?${params.toString()}`);
-            }}
-          >
-            <ArrowLeft className="!w-8 !h-8" />
-          </Button>
-          <label className="block text-3xl text-black font-bold">Add Tag</label>
+          <label className="block text-1xl text-black font-bold">Add Tag</label>
         </div>
-        {/* Searchbar */}
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <Input
@@ -163,31 +126,26 @@ export default function SearchPopup() {
             className="pl-9"
           />
         </div>
-
-        {/* Searchbar tags */}
         {activeTags.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {[...activeTags].map((tag) => (
+            {activeTags.map((tag) => (
               <TagButton key={tag.Name} tag={tag} active={true} onClick={() => removeTag(tag)} />
             ))}
           </div>
         )}
-
-        {[...schools.keys()].length > 0 && (
-          <TagSection header="Schools" tags={filter(schools)} activeTags={activeTags} onToggle={toggleTag} />
-        )}
-        {[...sports.keys()].length > 0 && (
-          <TagSection header="Sports" tags={filter(sports)} activeTags={activeTags} onToggle={toggleTag} />
-        )}
-        {[...recruitments.keys()].length > 0 && (
-          <TagSection header="Recruitment" tags={filter(recruitments)} activeTags={activeTags} onToggle={toggleTag} />
-        )}
-        {[...academics.keys()].length > 0 && (
-          <TagSection header="Academics" tags={filter(academics)} activeTags={activeTags} onToggle={toggleTag} />
-        )}
-        {[...advice.keys()].length > 0 && (
-          <TagSection header="Advice" tags={filter(advice)} activeTags={activeTags} onToggle={toggleTag} />
-        )}
+        <TagSection header="Sports" tags={filter(sports)} activeTags={activeTags} onToggle={toggleTag} />
+        <TagSection header="Recruitment" tags={filter(recruitments)} activeTags={activeTags} onToggle={toggleTag} />
+        <TagSection header="Academics" tags={filter(academics)} activeTags={activeTags} onToggle={toggleTag} />
+        <TagSection header="Advice" tags={filter(advice)} activeTags={activeTags} onToggle={toggleTag} />
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            className="rounded-full bg-[#2C649A] hover:bg-[#245580] hover:text-[#F4F8FA] text-[#F4F8FA] flex items-center gap-2 h-full px-4 py-1"
+            onClick={onBackAction}
+          >
+            Done
+          </Button>
+        </div>
       </div>
     </div>
   );
