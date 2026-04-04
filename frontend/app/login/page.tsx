@@ -6,8 +6,6 @@ import { redirect } from "next/navigation";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
-import CreatePostPopup from "@/components/ui/create-post-popup"
-
 type loginInitialState = {
   success: boolean;
   message: string;
@@ -24,8 +22,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone">
-      <CreatePostPopup></CreatePostPopup>
-      {/* <div className="max-w-lg w-full space-y-8">
+      <div className="max-w-lg w-full space-y-8">
         <div className="flex justify-center">
           <label className="block text-4xl text-black font-bold">
             {" "}
@@ -73,7 +70,7 @@ export default function LoginPage() {
             <p> Forgot Password?</p>
           </div>
         </form>
-      </div> */}
+      </div>
     </div>
   );
 }
