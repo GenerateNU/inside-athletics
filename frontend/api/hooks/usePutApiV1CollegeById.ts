@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PutApiV1CollegeByIdMutationRequest,
   PutApiV1CollegeByIdMutationResponse,
