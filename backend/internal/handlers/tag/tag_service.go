@@ -25,6 +25,7 @@ func (u *TagService) GetTagByName(ctx context.Context, input *GetTagByNameParams
 	response := &GetTagResponse{
 		ID:   tag.ID,
 		Name: tag.Name,
+		Type: tag.Type,
 	}
 
 	return &utils.ResponseBody[GetTagResponse]{
@@ -44,6 +45,27 @@ func (u *TagService) GetTagById(ctx context.Context, input *GetTagByIDParams) (*
 	response := &GetTagResponse{
 		ID:   tag.ID,
 		Name: tag.Name,
+		Type: tag.Type,
+	}
+
+	return &utils.ResponseBody[GetTagResponse]{
+		Body: response,
+	}, err
+}
+
+func (u *TagService) GetTagByType(ctx context.Context, input *GetTagByTypeParams) (*utils.ResponseBody[GetTagResponse], error) {
+	tagType := input.Type
+	tag, err := u.tagDB.GetTagByType(tagType)
+	respBody := &utils.ResponseBody[GetTagResponse]{}
+
+	if err != nil {
+		return respBody, err
+	}
+
+	response := &GetTagResponse{
+		ID:   tag.ID,
+		Name: tag.Name,
+		Type: tag.Type,
 	}
 
 	return &utils.ResponseBody[GetTagResponse]{
@@ -83,6 +105,7 @@ func (u *TagService) CreateTag(ctx context.Context, input *CreateTagInput) (*uti
 
 	tag := &models.Tag{
 		Name: input.Body.Name,
+		Type: input.Body.Type,
 	}
 
 	createdTag, err := u.tagDB.CreateTag(tag)
@@ -94,6 +117,7 @@ func (u *TagService) CreateTag(ctx context.Context, input *CreateTagInput) (*uti
 	response := &CreateTagResponse{
 		ID:   createdTag.ID,
 		Name: createdTag.Name,
+		Type: createdTag.Type,
 	}
 
 	return &utils.ResponseBody[CreateTagResponse]{
@@ -112,6 +136,7 @@ func (u *TagService) UpdateTag(cts context.Context, input *UpdateTagInput) (*uti
 	respBody.Body = &UpdateTagResponse{
 		ID:   updatedTag.ID,
 		Name: updatedTag.Name,
+		Type: updatedTag.Type,
 	}
 
 	return respBody, nil

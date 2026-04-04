@@ -14,6 +14,7 @@ func Route(api huma.API, db *gorm.DB) {
 		grp := huma.NewGroup(api, "/api/v1/tag")
 		huma.Post(grp, "/", tagService.CreateTag)
 		huma.Get(grp, "/name/{name}", tagService.GetTagByName)
+		huma.Get(grp, "/type/{type}", tagService.GetTagByType)
 		huma.Get(grp, "/{id}", tagService.GetTagById)
 		huma.Get(grp, "/{tag_id}/posts", tagService.GetPostsByTag)
 		huma.Patch(grp, "/{id}", tagService.UpdateTag)

@@ -48,6 +48,12 @@ func (u *TagDB) GetTagByID(id uuid.UUID) (*models.Tag, error) {
 	return utils.HandleDBError(&tag, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 
+func (u *TagDB) GetTagByType(tagType models.TagType) (*models.Tag, error) {
+	var tag models.Tag
+	dbResponse := u.db.Where("type = ?", tagType).First(&tag)
+	return utils.HandleDBError(&tag, dbResponse.Error) // helper function that maps GORM errors to Huma errors
+}
+
 func (u *TagDB) CreateTag(tag *models.Tag) (*models.Tag, error) {
 	dbResponse := u.db.Create(tag)
 	return utils.HandleDBError(tag, dbResponse.Error)

@@ -18,22 +18,24 @@ func TestGetTagByName(t *testing.T) {
 	tag := models.Tag{
 		ID:   uuid.New(),
 		Name: "Hockey",
+		Type: models.TagTypeSports,
 	}
 	tagResp := testDB.DB.Create(&tag)
 	_, err := utils.HandleDBError(&tag, tagResp.Error)
-
 	if err != nil {
-		t.Fatalf("Unable to add tag to table: %s", err.Error())
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tag/name/Hockey", "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/tag/name/Hockey", "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.GetTagResponse
-
 	DecodeTo(&response, resp)
 
 	if response.Name != "Hockey" {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+		t.Fatalf("unexpected response: %s", resp.Body.String())
+	}
+	if response.Type != models.TagTypeSports {
+		t.Fatalf("unexpected type: %s", response.Type)
 	}
 }
 
@@ -46,22 +48,24 @@ func TestGetTagByID(t *testing.T) {
 	tag := models.Tag{
 		ID:   newID,
 		Name: "Women's Basketball",
+		Type: models.TagTypeSports,
 	}
 	tagResp := testDB.DB.Create(&tag)
 	_, err := utils.HandleDBError(&tag, tagResp.Error)
-
 	if err != nil {
-		t.Fatalf("Unable to add tag to table: %s", err.Error())
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tag/"+newID.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/tag/"+newID.String(), "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.GetTagResponse
-
 	DecodeTo(&response, resp)
 
 	if response.Name != "Women's Basketball" {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+		t.Fatalf("unexpected response: %s", resp.Body.String())
+	}
+	if response.Type != models.TagTypeSports {
+		t.Fatalf("unexpected type: %s", response.Type)
 	}
 }
 
@@ -72,9 +76,10 @@ func TestCreateTag(t *testing.T) {
 
 	payload := tagPackage.CreateTagBody{
 		Name: "Basketball",
+		Type: models.TagTypeSports,
 	}
 
-	resp := api.Post("/api/v1/tag/", "Authorization: Bearer " + mockUUID, payload)
+	resp := api.Post("/api/v1/tag/", "Authorization: Bearer "+mockUUID, payload)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -83,7 +88,10 @@ func TestCreateTag(t *testing.T) {
 	DecodeTo(&response, resp)
 
 	if response.Name != "Basketball" {
-		t.Fatalf("Unexpected response: %+v", response)
+		t.Fatalf("unexpected response: %+v", response)
+	}
+	if response.Type != models.TagTypeSports {
+		t.Fatalf("unexpected type: %s", response.Type)
 	}
 }
 
@@ -95,23 +103,29 @@ func TestUpdateTag(t *testing.T) {
 	tag := models.Tag{
 		ID:   uuid.New(),
 		Name: "Hockey",
+		Type: models.TagTypeSports,
 	}
 	tagResp := testDB.DB.Create(&tag)
 	_, err := utils.HandleDBError(&tag, tagResp.Error)
 	if err != nil {
-		t.Fatalf("Unable to add tag to table: %s", err.Error())
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
 	update := tagPackage.UpdateTagBody{
 		Name: "Updated",
+		Type: models.TagTypeDivisions,
 	}
 
-	resp := api.Patch("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer " + mockUUID, update)
+	resp := api.Patch("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer "+mockUUID, update)
 
 	var response tagPackage.UpdateTagResponse
 	DecodeTo(&response, resp)
+
 	if response.Name != "Updated" {
-		t.Fatalf("Unexpected response: %+v", response)
+		t.Fatalf("unexpected response: %+v", response)
+	}
+	if response.Type != models.TagTypeDivisions {
+		t.Fatalf("unexpected type: %s", response.Type)
 	}
 }
 
@@ -123,19 +137,20 @@ func TestDeleteTag(t *testing.T) {
 	tag := models.Tag{
 		ID:   uuid.New(),
 		Name: "Suli",
+		Type: models.TagTypeSports,
 	}
 	tagResp := testDB.DB.Create(&tag)
 	_, err := utils.HandleDBError(&tag, tagResp.Error)
 	if err != nil {
-		t.Fatalf("Unable to add tag to table: %s", err.Error())
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Delete("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Delete("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.DeleteTagResponse
 	DecodeTo(&response, resp)
 
 	if response.ID != tag.ID {
-		t.Fatalf("Unexpected response: %s", resp.Body.String())
+		t.Fatalf("unexpected response: %s", resp.Body.String())
 	}
 }
