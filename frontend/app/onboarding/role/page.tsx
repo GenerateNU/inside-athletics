@@ -81,9 +81,7 @@ export default function OnboardingRolePage() {
               <SelectItem value="prospective-athlete">
                 Prospective Athlete
               </SelectItem>
-              <SelectItem value="coach">Coach</SelectItem>
               <SelectItem value="parent">Parent</SelectItem>
-              <SelectItem value="recruiter">Recruiter</SelectItem>
             </SelectContent>
           </Select>
         </div>
