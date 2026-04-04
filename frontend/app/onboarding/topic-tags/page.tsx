@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { XIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useOnboarding } from "@/utils/onboarding";
 
 const topicCategories = [
   {
@@ -27,7 +28,16 @@ const topicCategories = [
 
 export default function OnboardingTopicTagsPage() {
   const router = useRouter();
+  const { data, hydrated, updateSection } = useOnboarding();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setSelectedTags(data.topicTags.selectedTags);
+  }, [data.topicTags.selectedTags, hydrated]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((current) =>
@@ -113,6 +123,9 @@ export default function OnboardingTopicTagsPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("topicTags", {
+              selectedTags,
+            });
             router.push("/onboarding/athletic-program-survey");
           }}
           disabled={!canContinue}

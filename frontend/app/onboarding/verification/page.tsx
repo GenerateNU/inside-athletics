@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useOnboarding } from "@/utils/onboarding";
 
 export default function OnboardingVerificationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
 
   const [name, setName] = useState("");
@@ -16,6 +18,18 @@ export default function OnboardingVerificationPage() {
   const [fullName, setFullName] = useState("");
   const [institutionEmail, setInstitutionEmail] = useState("");
   const [school, setSchool] = useState("");
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setName(data.verification.name);
+    setEmail(data.verification.email);
+    setFullName(data.verification.fullName);
+    setInstitutionEmail(data.verification.institutionEmail);
+    setSchool(data.verification.school);
+  }, [data.verification, hydrated]);
 
   const isAthlete = role === "athlete";
 
@@ -141,6 +155,13 @@ export default function OnboardingVerificationPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("verification", {
+              name,
+              email,
+              fullName,
+              institutionEmail,
+              school,
+            });
             router.push(
               `/onboarding/verification/code?role=${encodeURIComponent(role)}`,
             );

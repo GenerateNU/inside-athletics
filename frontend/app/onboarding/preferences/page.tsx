@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { XIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useOnboarding } from "@/utils/onboarding";
 import {
   Select,
   SelectContent,
@@ -75,6 +76,7 @@ const universityOptions = [
 export default function OnboardingPreferencesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const isAthlete = role === "athlete" || role === "prospective-athlete";
   const [division, setDivision] = useState("");
@@ -86,6 +88,19 @@ export default function OnboardingPreferencesPage() {
   const [primarySport, setPrimarySport] = useState("");
   const [program, setProgram] = useState("");
   const [university, setUniversity] = useState("");
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setDivision(data.preferences.division);
+    setAssociation(data.preferences.association);
+    setSelectedUniversities(data.preferences.selectedUniversities);
+    setPrimarySport(data.preferences.primarySport);
+    setProgram(data.preferences.program);
+    setUniversity(data.preferences.university);
+  }, [data.preferences, hydrated]);
 
   const filteredUniversities = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -336,6 +351,14 @@ export default function OnboardingPreferencesPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("preferences", {
+              division,
+              association,
+              selectedUniversities,
+              primarySport,
+              program,
+              university,
+            });
             router.push(
               `/onboarding/verification?role=${encodeURIComponent(role)}`,
             );

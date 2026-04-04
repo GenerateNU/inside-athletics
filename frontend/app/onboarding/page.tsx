@@ -2,14 +2,25 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useOnboarding } from "@/utils/onboarding";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { data, hydrated, updateSection } = useOnboarding();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setName(data.account.name);
+    setUsername(data.account.username);
+  }, [data.account.name, data.account.username, hydrated]);
 
   const canContinue = Boolean(name.trim() && username.trim() && password);
 
@@ -68,6 +79,10 @@ export default function SignUpPage() {
               className="h-10 w-full rounded-xl text-sm font-semibold"
               style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
               onClick={() => {
+                updateSection("account", {
+                  name,
+                  username,
+                });
                 router.push("/onboarding/role");
               }}
               disabled={!canContinue}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { useOnboarding } from "@/utils/onboarding";
 
 const planOptions = [
   {
@@ -21,8 +22,17 @@ const planOptions = [
 export default function OnboardingPlanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const [selectedPlan, setSelectedPlan] = useState("");
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setSelectedPlan(data.plan.selectedPlan);
+  }, [data.plan.selectedPlan, hydrated]);
 
   const canContinue = Boolean(selectedPlan);
 
@@ -160,6 +170,9 @@ export default function OnboardingPlanPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("plan", {
+              selectedPlan,
+            });
             router.push(
               selectedPlan === "free"
                 ? role

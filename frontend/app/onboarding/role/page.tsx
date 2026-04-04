@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useOnboarding } from "@/utils/onboarding";
 import {
   Select,
   SelectContent,
@@ -15,8 +16,18 @@ import {
 
 export default function OnboardingRolePage() {
   const router = useRouter();
+  const { data, hydrated, updateSection } = useOnboarding();
   const [role, setRole] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setRole(data.role.role);
+    setProfileImage(data.role.profileImage);
+  }, [data.role.profileImage, data.role.role, hydrated]);
 
   const canContinue = Boolean(role);
 
@@ -91,6 +102,10 @@ export default function OnboardingRolePage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("role", {
+              role,
+              profileImage,
+            });
             router.push(
               `/onboarding/preferences?role=${encodeURIComponent(role)}`,
             );

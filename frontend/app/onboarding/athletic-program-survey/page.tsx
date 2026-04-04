@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { useOnboarding } from "@/utils/onboarding";
 
 const surveyQuestions = [
   "To what extent does your program prioritize long-term player development (athletic, personal, and leadership growth over your college career)?",
@@ -19,7 +20,16 @@ const ratingOptions = ["1", "2", "3", "4", "5"] as const;
 
 export default function OnboardingAthleticProgramSurveyPage() {
   const router = useRouter();
+  const { data, hydrated, updateSection } = useOnboarding();
   const [responses, setResponses] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setResponses(data.survey.responses);
+  }, [data.survey.responses, hydrated]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
@@ -41,6 +51,9 @@ export default function OnboardingAthleticProgramSurveyPage() {
                 color: "#2C649A",
               }}
               onClick={() => {
+                updateSection("survey", {
+                  responses,
+                });
                 router.push("/");
               }}
             >
@@ -101,6 +114,9 @@ export default function OnboardingAthleticProgramSurveyPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("survey", {
+              responses,
+            });
             router.push("/");
           }}
         >

@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useOnboarding } from "@/utils/onboarding";
 
 export default function OnboardingVerificationCodePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const [code, setCode] = useState("");
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setCode(data.verification.code);
+  }, [data.verification.code, hydrated]);
 
   const canContinue = Boolean(code.trim());
 
@@ -45,6 +55,9 @@ export default function OnboardingVerificationCodePage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("verification", {
+              code,
+            });
             router.push(
               role === "athlete"
                 ? `/onboarding/teams-of-interest?role=${encodeURIComponent(role)}`

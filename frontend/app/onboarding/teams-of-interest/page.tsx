@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { useOnboarding } from "@/utils/onboarding";
 
 const divisions = [
   { label: "Division I", value: "division-i" },
@@ -19,9 +20,19 @@ const associations = [
 export default function OnboardingTeamsOfInterestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const [division, setDivision] = useState("");
   const [association, setAssociation] = useState("");
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    setDivision(data.preferences.division);
+    setAssociation(data.preferences.association);
+  }, [data.preferences.association, data.preferences.division, hydrated]);
 
   const canContinue = Boolean(division && association);
 
@@ -96,6 +107,10 @@ export default function OnboardingTeamsOfInterestPage() {
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
           onClick={() => {
+            updateSection("preferences", {
+              division,
+              association,
+            });
             router.push(
               role ? `/onboarding/plan?role=${encodeURIComponent(role)}` : "/onboarding/plan",
             );
