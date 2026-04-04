@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
 export default function OnboardingRolePage() {
   const router = useRouter();
   const [role, setRole] = useState("");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const canContinue = Boolean(role);
 
@@ -28,6 +30,42 @@ export default function OnboardingRolePage() {
         <div className="space-y-2 text-center">
           <h1 className="text-4xl font-bold text-black">About you</h1>
           <p className="text-sm text-gray-600">Tell us about yourself!</p>
+        </div>
+
+        <div className="flex flex-col items-center gap-3">
+          <label
+            htmlFor="profile-image"
+            className="flex cursor-pointer flex-col items-center gap-3"
+          >
+            <div className="relative flex size-28 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile preview"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-gray-200" />
+              )}
+              <div className="absolute bottom-1 right-1 flex size-8 items-center justify-center rounded-full border border-white bg-white text-gray-700 shadow-sm">
+                <PlusIcon className="size-4" />
+              </div>
+            </div>
+          </label>
+          <input
+            id="profile-image"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (!file) {
+                setProfileImage(null);
+                return;
+              }
+              setProfileImage(URL.createObjectURL(file));
+            }}
+          />
         </div>
 
         <div className="space-y-3">

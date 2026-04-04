@@ -76,7 +76,7 @@ export default function OnboardingPreferencesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get("role") ?? "";
-  const isAthlete = role === "athlete";
+  const isAthlete = role === "athlete" || role === "prospective-athlete";
   const [division, setDivision] = useState("");
   const [association, setAssociation] = useState("");
   const [search, setSearch] = useState("");
