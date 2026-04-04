@@ -8,9 +8,10 @@ import (
 	"log"
 	"os"
 
+	sqs "inside-athletics/internal/sqs"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	sqs "inside-athletics/internal/sqs"
 )
 
 var sesService *SESEmailService
@@ -51,7 +52,7 @@ func handler(ctx context.Context, event events.SQSEvent) (events.SQSEventRespons
 }
 
 func processRecord(ctx context.Context, record events.SQSMessage) error {
-	var message sqs.DisasterEmailMessage
+	var message sqs.ReplyEmailMessage
 	if err := json.Unmarshal([]byte(record.Body), &message); err != nil {
 		return fmt.Errorf("failed to parse message body: %w", err)
 	}
@@ -60,7 +61,7 @@ func processRecord(ctx context.Context, record events.SQSMessage) error {
 		return errors.New("missing required fields in message")
 	}
 
-	return sesService.SendDisasterEmail(ctx, message)
+	return sesService.SendReplyEmail(ctx, message)
 }
 
 func getEnv(key, fallback string) string {

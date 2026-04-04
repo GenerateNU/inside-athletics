@@ -1,13 +1,17 @@
 package comment
 
 import (
+	"inside-athletics/internal/handlers/post"
+	"inside-athletics/internal/sqs"
+
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
 
 func Route(api huma.API, db *gorm.DB) {
 	commentDB := &CommentDB{db}
-	commentService := &CommentService{commentDB}
+	postDB := post.NewPostDB(db)
+	commentService := &CommentService{commentDB, postDB, &sqs.SQSService{}}
 	{
 		grp := huma.NewGroup(api, "/api/v1/comment")
 		huma.Post(grp, "/", commentService.CreateComment)         // Create comment

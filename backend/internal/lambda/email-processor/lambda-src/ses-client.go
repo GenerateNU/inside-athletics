@@ -50,10 +50,10 @@ func NewSESEmailService(ctx context.Context, region string, fromEmail string) (*
 	}, nil
 }
 
-func (s *SESEmailService) SendDisasterEmail(ctx context.Context, message sqs.DisasterEmailMessage) error {
+func (s *SESEmailService) SendReplyEmail(ctx context.Context, message sqs.ReplyEmailMessage) error {
 	// Render the email component to HTML and plain text
-	htmlBody := lambda.RenderDisasterEmailHTML(message)
-	textBody := lambda.RenderDisasterEmailText(message)
+	htmlBody := lambda.RenderReplyEmailHTML(message)
+	textBody := lambda.RenderReplyEmailText(message)
 
 	destination := &types.Destination{
 		ToAddresses: []string{message.To},

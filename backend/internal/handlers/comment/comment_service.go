@@ -2,14 +2,19 @@ package comment
 
 import (
 	"context"
+	"fmt"
+	post "inside-athletics/internal/handlers/post"
 	models "inside-athletics/internal/models"
+	sqsservice "inside-athletics/internal/sqs"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
 )
 
 type CommentService struct {
-	commentDB *CommentDB
+	commentDB  *CommentDB
+	postDB     *post.PostDB
+	sqsService *sqsservice.SQSService
 }
 
 // Creates a new comment.
@@ -43,6 +48,37 @@ func (s *CommentService) CreateComment(ctx context.Context, input *CreateComment
 	if err != nil {
 		return nil, err
 	}
+
+	// Send SQS notification to whoever is being replied to
+	go func() {
+		var recipientEmail string
+		var message string
+
+		post, err := s.postDB.GetPostByID(input.Body.PostID, userID)
+		if err != nil {
+			return
+		}
+
+		if input.Body.ParentCommentID != nil {
+			// Reply to a comment — notify the parent comment author
+			parent, err := s.commentDB.GetCommentByID(*input.Body.ParentCommentID, userID)
+			if err != nil {
+				return
+			}
+			recipientEmail = parent.User.Email
+			message = fmt.Sprintf("Someone replied to your comment! Go check it out\n\nPost: %s", post.Title)
+		} else {
+			// Top-level comment on a post — notify the post author
+			recipientEmail = post.Author.Email
+			message = fmt.Sprintf("Someone replied to your post! Go check it out\n\nPost: %s", post.Title)
+		}
+
+		_ = s.sqsService.SendMessage(ctx, sqsservice.ReplyEmailMessage{
+			To:      recipientEmail,
+			From:    "insideathletics@gmail.com",
+			Message: message,
+		})
+	}()
 
 	// Convert the comment to a response
 	return &utils.ResponseBody[CreateCommentResponse]{

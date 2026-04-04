@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var disasterEmailHTMLTemplate = template.Must(template.New("disasterEmail").Parse(`
+var replyEmailHTMLTemplate = template.Must(template.New("disasterEmail").Parse(`
 <!DOCTYPE html>
 <html>
 <body style="display:flex; flex-direction:column; background-color:#f3f4f6; margin:0; padding:0; font-family:'PT Sans', Arial, sans-serif; justify-content:center; align-items:center;">
@@ -42,22 +42,22 @@ var disasterEmailHTMLTemplate = template.Must(template.New("disasterEmail").Pars
 </html>
 `))
 
-type disasterEmailTemplateData struct {
+type replyEmailTemplateData struct {
 	Message string
 }
 
-func RenderDisasterEmailHTML(message sqs.DisasterEmailMessage) string {
-	data := disasterEmailTemplateData{
+func RenderReplyEmailHTML(message sqs.ReplyEmailMessage) string {
+	data := replyEmailTemplateData{
 		Message: message.Message,
 	}
 	var buf bytes.Buffer
-	if err := disasterEmailHTMLTemplate.Execute(&buf, data); err != nil {
+	if err := replyEmailHTMLTemplate.Execute(&buf, data); err != nil {
 		return fmt.Sprintf("error rendering email: %v", err)
 	}
 	return buf.String()
 }
 
-func RenderDisasterEmailText(message sqs.DisasterEmailMessage) string {
+func RenderReplyEmailText(message sqs.ReplyEmailMessage) string {
 	return strings.TrimSpace(fmt.Sprintf(`New Reply in Inside Athletics:
 
 %s`, message.Message))

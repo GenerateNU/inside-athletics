@@ -4,19 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	sqstypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
 
 type ISQSService interface {
-	SendMessage(ctx context.Context, message DisasterEmailMessage) error
-	SendBatchMessages(ctx context.Context, messages []DisasterEmailMessage) error
+	SendMessage(ctx context.Context, message ReplyEmailMessage) error
+	SendBatchMessages(ctx context.Context, messages []ReplyEmailMessage) error
 }
 
 type SQSService struct {
@@ -52,7 +50,7 @@ func NewSQSService(ctx context.Context) (*SQSService, error) {
 	}, nil
 }
 
-func (s *SQSService) SendMessage(ctx context.Context, message DisasterEmailMessage) error {
+func (s *SQSService) SendMessage(ctx context.Context, message ReplyEmailMessage) error {
 	body, err := json.Marshal(message)
 	if err != nil {
 		return fmt.Errorf("failed to marshal message: %w", err)
@@ -63,64 +61,4 @@ func (s *SQSService) SendMessage(ctx context.Context, message DisasterEmailMessa
 		MessageBody: aws.String(string(body)),
 	})
 	return err
-}
-
-func (s *SQSService) SendBatchMessages(ctx context.Context, messages []DisasterEmailMessage) error {
-	if len(messages) == 0 {
-		return nil
-	}
-
-	log.Printf("Got %d messages to SQS Batch send", len(messages))
-
-	for i := 0; i < len(messages); i += BATCH_SIZE {
-		end := i + BATCH_SIZE
-		if end > len(messages) {
-			end = len(messages)
-		}
-		batch := messages[i:end]
-
-		entries := make([]sqstypes.SendMessageBatchRequestEntry, len(batch))
-		for index, message := range batch {
-			body, err := json.Marshal(message)
-			if err != nil {
-				return fmt.Errorf("failed to marshal message: %w", err)
-			}
-			id := fmt.Sprintf("%d", i+index)
-			entries[index] = sqstypes.SendMessageBatchRequestEntry{
-				Id:          &id,
-				MessageBody: aws.String(string(body)),
-			}
-		}
-
-		log.Printf("Entries: \n%v", entries)
-
-		command := &sqs.SendMessageBatchInput{
-			QueueUrl: &s.sqsQueueURL,
-			Entries:  entries,
-		}
-
-		prettyMessages, _ := json.MarshalIndent(messages, "", "  ")
-		log.Printf("COMMAND: \n\n\n%s\n\n\n", prettyMessages)
-
-		response, err := s.client.SendMessageBatch(ctx, command)
-		if err != nil {
-			log.Printf("Error sending batch messages: %v", err)
-			return err
-		}
-
-		prettyResponse, _ := json.MarshalIndent(response, "", "  ")
-		log.Printf("Sending batch messages response: %s", prettyResponse)
-		log.Printf("Response failed: %v", response.Failed)
-		log.Printf("Response successful: %v", response.Successful)
-
-		// Log successful and failed messages
-		if len(response.Successful) > 0 {
-			log.Printf("Successfully sent %d messages", len(response.Successful))
-		}
-		if len(response.Failed) > 0 {
-			log.Printf("Failed to send %d messages: %v", len(response.Failed), response.Failed)
-		}
-	}
-
-	return nil
 }
