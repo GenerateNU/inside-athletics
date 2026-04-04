@@ -1,0 +1,20 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/CreateTagBody.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "name": {
+      "description": "The name of the tag to create",
+      "examples": ["Hockey"],
+      "type": "string"
+    }
+  },
+  "required": ["name"],
+  "type": "object",
+  "x-readme-ref-name": "CreateTagBody"
+}

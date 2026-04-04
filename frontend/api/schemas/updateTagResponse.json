@@ -1,0 +1,25 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/UpdateTagResponse.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "id": {
+      "description": "ID of the tag updated",
+      "examples": ["1"],
+      "type": "string"
+    },
+    "name": {
+      "description": "The updated name of the tag",
+      "examples": ["Northeastern Hockey"],
+      "type": "string"
+    }
+  },
+  "required": ["id", "name"],
+  "type": "object",
+  "x-readme-ref-name": "UpdateTagResponse"
+}

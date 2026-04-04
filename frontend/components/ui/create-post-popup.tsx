@@ -4,9 +4,11 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import Select from 'react-select';
+import Select from "react-select";
 import SearchPopup from "./search-popup";
 import { useSession } from "@/utils/SessionContext";
+
+// Generated hooks from Kubb
 import { useGetApiV1Colleges } from "@/api/hooks";
 
 type Tag = {
@@ -17,7 +19,7 @@ type Tag = {
 
 function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClick: () => void }) {
   return (
-    <div className={`p-[0.5px] rounded-md`}>
+    <div className="p-[0.5px] rounded-md">
       <Button
         variant="ghost"
         onClick={onClick}
@@ -39,10 +41,10 @@ export default function CreatePostPopup() {
   const [showSearchPopup, setShowSearchPopup] = useState(false);
 
   const session = useSession();
+  const enabled = !!session?.access_token;
   const authHeaders = session?.access_token
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
-  const enabled = !!session?.access_token;
 
   const { data: collegesData } = useGetApiV1Colleges({
     query: { enabled },
@@ -115,10 +117,10 @@ export default function CreatePostPopup() {
           isSearchable={true}
           placeholder="Select a school..."
           styles={{
-            control: (base, state) => ({ ...base, fontFamily: 'inherit', fontSize: '0.875rem', borderColor: state.isFocused ? '#2C649A' : base.borderColor, boxShadow: state.isFocused ? '0 0 0 1px #2C649A' : base.boxShadow, '&:hover': { borderColor: state.isFocused ? '#2C649A' : base.borderColor } }),
-            menu: (base) => ({ ...base, fontFamily: 'inherit', fontSize: '0.875rem' }),
-            option: (base) => ({ ...base, fontFamily: 'inherit', fontSize: '0.875rem' }),
-            placeholder: (base) => ({ ...base, fontSize: '0.875rem' }),
+            control: (base, state) => ({ ...base, fontFamily: "inherit", fontSize: "0.875rem", borderColor: state.isFocused ? "#2C649A" : base.borderColor, boxShadow: state.isFocused ? "0 0 0 1px #2C649A" : base.boxShadow, "&:hover": { borderColor: state.isFocused ? "#2C649A" : base.borderColor } }),
+            menu: (base) => ({ ...base, fontFamily: "inherit", fontSize: "0.875rem" }),
+            option: (base) => ({ ...base, fontFamily: "inherit", fontSize: "0.875rem" }),
+            placeholder: (base) => ({ ...base, fontSize: "0.875rem" }),
           }}
         />
         {activeTags.filter((t) => t.type === "schools").length > 0 && (

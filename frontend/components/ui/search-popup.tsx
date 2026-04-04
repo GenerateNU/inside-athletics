@@ -1,12 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus, X, Search } from "lucide-react";
+
+// Generated hooks from Kubb
+import { useGetApiV1TagByType } from "@/api/hooks";
 
 function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClick: () => void }) {
   return (
-    <div className={`p-[0.5px] rounded-md bg-[#00804D]`}>
+    <div className="p-[0.5px] rounded-md bg-[#00804D]">
       <Button
         variant="ghost"
         onClick={onClick}
@@ -67,27 +70,33 @@ const TAG_SECTIONS: { header: string; type: TagType; max: number; group?: string
   { header: "Recruiting Logistics", type: "recruiting_logistics", max: 5 },
 ];
 
-async function fetchTagsByType(type: TagType): Promise<Tag[]> {
-  const res = await fetch(`/api/v1/tag/type/${type}`);
-  if (!res.ok) return [];
-  return res.json();
+// One hook call per tag type — all run in parallel
+function useAllTagSections() {
+  const sports             = useGetApiV1TagByType("sports");
+  const divisions          = useGetApiV1TagByType("divisions");
+  const athleticsPerf      = useGetApiV1TagByType("athletics_performance");
+  const healthWellness     = useGetApiV1TagByType("health_wellness");
+  const studentAthleteLife = useGetApiV1TagByType("student_athlete_life");
+  const recruitingLogistic = useGetApiV1TagByType("recruiting_logistics");
+
+  const results: Record<TagType, Tag[]> = {
+    sports:               sports.data             ?? [],
+    divisions:            divisions.data           ?? [],
+    athletics_performance: athleticsPerf.data      ?? [],
+    health_wellness:      healthWellness.data      ?? [],
+    student_athlete_life: studentAthleteLife.data  ?? [],
+    recruiting_logistics: recruitingLogistic.data  ?? [],
+  };
+
+  const loading = [sports, divisions, athleticsPerf, healthWellness, studentAthleteLife, recruitingLogistic]
+    .some((r) => r.isLoading);
+
+  return { tagsByType: results, loading };
 }
 
 export default function SearchPopup({ activeTags, setActiveTagsAction, onBackAction }: SearchPopupProps) {
   const [search, setSearch] = useState("");
-  const [tagsByType, setTagsByType] = useState<Record<string, Tag[]>>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadAll() {
-      const entries = await Promise.all(
-        TAG_SECTIONS.map(async ({ type }) => [type, await fetchTagsByType(type)])
-      );
-      setTagsByType(Object.fromEntries(entries));
-      setLoading(false);
-    }
-    loadAll();
-  }, []);
+  const { tagsByType, loading } = useAllTagSections();
 
   const filter = (tags: Tag[]) =>
     tags.filter((tag) => tag.name.toLowerCase().includes(search.toLowerCase()));
@@ -149,7 +158,7 @@ export default function SearchPopup({ activeTags, setActiveTagsAction, onBackAct
               )}
               <TagSection
                 header={header}
-                tags={filter(tagsByType[type] ?? [])}
+                tags={filter(tagsByType[type])}
                 activeTags={activeTags}
                 maxTagNum={max}
                 onToggle={(tag) => toggleTag(tag, max)}

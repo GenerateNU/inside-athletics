@@ -1,0 +1,27 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/StripeProductResponse.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "active": { "examples": [true], "type": "boolean" },
+    "created": {
+      "examples": [1700000000],
+      "format": "int64",
+      "type": "integer"
+    },
+    "description": {
+      "examples": ["Get premium content with this subscription"],
+      "type": "string"
+    },
+    "id": { "examples": ["prod_12345"], "type": "string" },
+    "name": { "examples": ["Premium Plan"], "type": "string" }
+  },
+  "required": ["id", "name", "description", "active", "created"],
+  "type": "object",
+  "x-readme-ref-name": "StripeProductResponse"
+}
