@@ -9,7 +9,7 @@ Use `useSession()` to get the token and pass it via the `client` option:
 ```tsx
 "use client";
 
-import { useSession } from "@/components/session-provider";
+import { useSession } from "@/utils/SessionContext";
 import { useDeleteApiV1CollegeById } from "@/gen/hooks/useDeleteApiV1CollegeById";
 
 export function DeleteCollegeButton({ id }: { id: string }) {
