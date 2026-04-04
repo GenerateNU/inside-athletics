@@ -7,6 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type RoleDB struct {
@@ -21,16 +22,10 @@ func (r *RoleDB) CreateRoleWithPermissionsStrict(spec RoleSpec) (*models.Role, e
 	var created *models.Role
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
-		var existing models.Role
-		if err := tx.Where("name = ?", spec.Name).First(&existing).Error; err == nil {
-			return huma.Error400BadRequest("Role already exists")
-		} else if err != gorm.ErrRecordNotFound {
-			return huma.Error500InternalServerError("Database error", err)
-		}
-
 		role := &models.Role{Name: spec.Name}
 		if err := tx.Create(role).Error; err != nil {
-			return huma.Error500InternalServerError("Failed to create role", err)
+			_, handleErr := utils.HandleDBError(&models.Role{}, err)
+			return handleErr
 		}
 
 		for _, p := range spec.Permissions {
@@ -130,7 +125,7 @@ func (r *RoleDB) UpdateRoleWithPermissionsStrict(id uuid.UUID, updates UpdateRol
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		var role models.Role
-		if err := tx.First(&role, "id = ?", id).Error; err != nil {
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&role, "id = ?", id).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return huma.Error404NotFound("Resource not found")
 			}

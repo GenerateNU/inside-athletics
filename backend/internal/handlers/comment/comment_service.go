@@ -6,10 +6,38 @@ import (
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/google/uuid"
 )
 
 type CommentService struct {
 	commentDB *CommentDB
+}
+
+const (
+	// Free users can only view comments for their first 3 viewed posts.
+	freeUserMaxCommentVisiblePosts = 3
+	freeCommentLimitMessage        = "You have used up your free comment access. Upgrade to view comments on more posts."
+)
+
+// enforceCommentVisibility applies free-tier comment visibility limits.
+// Premium users are unrestricted.
+func (s *CommentService) enforceCommentVisibility(userID, postID uuid.UUID) error {
+	isPremium, err := s.commentDB.IsUserPremium(userID)
+	if err != nil {
+		return err
+	}
+	if isPremium {
+		return nil
+	}
+
+	allowed, err := s.commentDB.IsPostWithinFirstViewedPosts(userID, postID, freeUserMaxCommentVisiblePosts)
+	if err != nil {
+		return err
+	}
+	if !allowed {
+		return huma.Error403Forbidden(freeCommentLimitMessage)
+	}
+	return nil
 }
 
 // Creates a new comment.
@@ -61,6 +89,9 @@ func (s *CommentService) GetComment(ctx context.Context, input *GetCommentParams
 	if err != nil {
 		return nil, err
 	}
+	if err := s.enforceCommentVisibility(userID, comment.PostID); err != nil {
+		return nil, err
+	}
 
 	// Convert the comment to a response
 	return &utils.ResponseBody[CommentResponse]{
@@ -74,6 +105,10 @@ func (s *CommentService) GetCommentsByPost(ctx context.Context, input *GetCommen
 	if err != nil {
 		return nil, err
 	}
+	if err := s.enforceCommentVisibility(userID, input.PostID); err != nil {
+		return nil, err
+	}
+
 	// Get the comments from the database
 	comments, err := s.commentDB.GetCommentsByPost(input.PostID, userID)
 	if err != nil {
@@ -96,6 +131,15 @@ func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) 
 	if err != nil {
 		return nil, err
 	}
+	parentComment, err := s.commentDB.GetCommentByID(input.ID, userID)
+	if err != nil {
+		return nil, err
+	}
+	// Replies inherit visibility from the parent comment's post.
+	if err := s.enforceCommentVisibility(userID, parentComment.PostID); err != nil {
+		return nil, err
+	}
+
 	// Get the replies from the database
 	comments, err := s.commentDB.GetReplies(input.ID, userID)
 	if err != nil {

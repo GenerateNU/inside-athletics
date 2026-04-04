@@ -1,6 +1,7 @@
 package post
 
 import (
+	"errors"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 	"math"
@@ -15,6 +16,11 @@ type PostDB struct {
 	db *gorm.DB
 }
 
+var (
+	ErrFreePostCreationLimitReached = errors.New("free-tier post creation limit reached")
+	ErrFreePostViewLimitReached     = errors.New("free-tier post view limit reached")
+)
+
 // NewPostDB creates a new PostDB instance
 func NewPostDB(db *gorm.DB) *PostDB {
 	return &PostDB{db: db}
@@ -23,20 +29,125 @@ func NewPostDB(db *gorm.DB) *PostDB {
 // CreatePost creates a new sport in the database
 func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post, error) {
 	dbError := s.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&post).Error; err != nil {
-			return err
-		}
-		var tagModels []models.Tag
-		for _, t := range tags {
-			tagModels = append(tagModels, models.Tag{ID: t.ID})
-		}
-		if err := tx.Model(&post).Association("Tags").Append(&tagModels); err != nil {
+		return s.createPostTx(tx, post, tags)
+	})
+	return utils.HandleDBError(post, dbError)
+}
+
+// CreatePostWithAuthorLimit creates a post while enforcing the author's post cap atomically.
+func (s *PostDB) CreatePostWithAuthorLimit(post *models.Post, tags []TagRequest, maxPosts int64) (*models.Post, error) {
+	dbError := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := s.lockUserForUpdate(tx, post.AuthorID); err != nil {
 			return err
 		}
 
-		return nil
+		var count int64
+		if err := tx.Model(&models.Post{}).Where("author_id = ?", post.AuthorID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count >= maxPosts {
+			return ErrFreePostCreationLimitReached
+		}
+
+		return s.createPostTx(tx, post, tags)
 	})
-	return utils.HandleDBError(post, dbError)
+	if dbError != nil {
+		if errors.Is(dbError, ErrFreePostCreationLimitReached) {
+			return nil, dbError
+		}
+		return utils.HandleDBError(post, dbError)
+	}
+	return post, nil
+}
+
+// CountViewedPostsByUser returns the number of distinct posts the user has viewed (for free-tier limit).
+func (s *PostDB) CountViewedPostsByUser(userID uuid.UUID) (int64, error) {
+	var count int64
+	err := s.db.Model(&models.ViewedPost{}).Where("user_id = ?", userID).Count(&count).Error
+	return count, err
+}
+
+// HasUserViewedPost returns true if the user has already viewed this post.
+func (s *PostDB) HasUserViewedPost(userID, postID uuid.UUID) (bool, error) {
+	var count int64
+	err := s.db.Model(&models.ViewedPost{}).Where("user_id = ? AND post_id = ?", userID, postID).Count(&count).Error
+	return count > 0, err
+}
+
+// RecordPostView records that the user viewed the post (idempotent: safe to call if already viewed).
+func (s *PostDB) RecordPostView(userID, postID uuid.UUID) error {
+	v := &models.ViewedPost{UserID: userID, PostID: postID}
+	return s.db.Where("user_id = ? AND post_id = ?", userID, postID).FirstOrCreate(v).Error
+}
+
+// RecordPostViewIfAllowed records a new post view while enforcing the user's distinct-view cap atomically.
+func (s *PostDB) RecordPostViewIfAllowed(userID, postID uuid.UUID, maxViews int64) error {
+	dbError := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := s.lockUserForUpdate(tx, userID); err != nil {
+			return err
+		}
+
+		var existing models.ViewedPost
+		err := tx.Where("user_id = ? AND post_id = ?", userID, postID).Take(&existing).Error
+		switch {
+		case err == nil:
+			return nil
+		case !errors.Is(err, gorm.ErrRecordNotFound):
+			return err
+		}
+
+		var count int64
+		if err := tx.Model(&models.ViewedPost{}).Where("user_id = ?", userID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count >= maxViews {
+			return ErrFreePostViewLimitReached
+		}
+
+		return tx.Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "user_id"}, {Name: "post_id"}},
+			DoNothing: true,
+		}).Create(&models.ViewedPost{UserID: userID, PostID: postID}).Error
+	})
+	if dbError != nil {
+		if errors.Is(dbError, ErrFreePostViewLimitReached) {
+			return dbError
+		}
+		_, err := utils.HandleDBError((*models.ViewedPost)(nil), dbError)
+		return err
+	}
+	return nil
+}
+
+// CountPostsByAuthor returns how many posts the user has created (for free-tier create limit).
+func (s *PostDB) CountPostsByAuthor(authorID uuid.UUID) (int64, error) {
+	var count int64
+	err := s.db.Model(&models.Post{}).Where("author_id = ?", authorID).Count(&count).Error
+	return count, err
+}
+
+func (s *PostDB) createPostTx(tx *gorm.DB, post *models.Post, tags []TagRequest) error {
+	if err := tx.Create(post).Error; err != nil {
+		return err
+	}
+	var tagModels []models.Tag
+	for _, t := range tags {
+		tagModels = append(tagModels, models.Tag{ID: t.ID})
+	}
+	if err := tx.Model(post).Association("Tags").Append(&tagModels); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PostDB) lockUserForUpdate(tx *gorm.DB, userID uuid.UUID) error {
+	return tx.
+		Model(&models.User{}).
+		Select("id").
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("id = ?", userID).
+		Take(&models.User{}).Error
 }
 
 // GetPostByID retrieves a post by its ID
