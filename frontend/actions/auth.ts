@@ -53,9 +53,6 @@ export async function signup(
     };
   }
 
-  return {
-    success: true,
-    message: "Form submitted successfully!",
-    email: payload.email,
-  };
+  revalidatePath("/", "layout");
+  redirect("/onboarding");
 }

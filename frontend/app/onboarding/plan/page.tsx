@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { submitOnboardingUser } from "@/utils/onboarding-submit";
 import { useOnboarding } from "@/utils/onboarding";
+import { useSession } from "@/utils/SessionContext";
 
 const planOptions = [
   {
@@ -22,9 +24,12 @@ const planOptions = [
 export default function OnboardingPlanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const session = useSession();
   const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const [selectedPlan, setSelectedPlan] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!hydrated) {
@@ -169,22 +174,59 @@ export default function OnboardingPlanPage() {
           type="button"
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
-          onClick={() => {
+          onClick={async () => {
             updateSection("plan", {
               selectedPlan,
             });
-            router.push(
-              selectedPlan === "free"
-                ? role
+
+            if (selectedPlan === "free") {
+              router.push(
+                role
                   ? `/onboarding/topic-tags?role=${encodeURIComponent(role)}`
-                  : "/onboarding/topic-tags"
-                : "/",
-            );
+                  : "/onboarding/topic-tags",
+              );
+              return;
+            }
+
+            if (!session?.access_token) {
+              setError("You need an active session before finishing onboarding.");
+              return;
+            }
+
+            setIsSubmitting(true);
+            setError("");
+
+            try {
+              await submitOnboardingUser(
+                {
+                  ...data,
+                  plan: {
+                    selectedPlan,
+                  },
+                },
+                session.access_token,
+                session.user.email,
+              );
+              router.push("/");
+            } catch (submissionError) {
+              setError(
+                submissionError instanceof Error
+                  ? submissionError.message
+                  : "Unable to finish onboarding.",
+              );
+            } finally {
+              setIsSubmitting(false);
+            }
           }}
-          disabled={!canContinue}
+          disabled={!canContinue || isSubmitting}
         >
           Continue
         </Button>
+        {error ? (
+          <p className="text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
     </div>
   );

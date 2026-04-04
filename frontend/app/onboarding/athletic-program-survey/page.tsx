@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { submitOnboardingUser } from "@/utils/onboarding-submit";
 import { useOnboarding } from "@/utils/onboarding";
+import { useSession } from "@/utils/SessionContext";
 
 const surveyQuestions = [
   "To what extent does your program prioritize long-term player development (athletic, personal, and leadership growth over your college career)?",
@@ -20,8 +22,11 @@ const ratingOptions = ["1", "2", "3", "4", "5"] as const;
 
 export default function OnboardingAthleticProgramSurveyPage() {
   const router = useRouter();
-  const { data, hydrated, updateSection } = useOnboarding();
+  const session = useSession();
+  const { data, hydrated } = useOnboarding();
   const [responses, setResponses] = useState<Record<number, string>>({});
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!hydrated) {
@@ -30,6 +35,38 @@ export default function OnboardingAthleticProgramSurveyPage() {
 
     setResponses(data.survey.responses);
   }, [data.survey.responses, hydrated]);
+
+  const finishOnboarding = async () => {
+    if (!session?.access_token) {
+      setError("You need an active session before finishing onboarding.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      await submitOnboardingUser(
+        {
+          ...data,
+          survey: {
+            responses,
+          },
+        },
+        session.access_token,
+        session.user.email,
+      );
+      router.push("/");
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Unable to finish onboarding.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
@@ -50,12 +87,8 @@ export default function OnboardingAthleticProgramSurveyPage() {
                 borderColor: "#2C649A",
                 color: "#2C649A",
               }}
-              onClick={() => {
-                updateSection("survey", {
-                  responses,
-                });
-                router.push("/");
-              }}
+              onClick={finishOnboarding}
+              disabled={isSubmitting}
             >
               Skip for now
             </Button>
@@ -65,6 +98,11 @@ export default function OnboardingAthleticProgramSurveyPage() {
             on your profile page. Please rank the following qualities from 1 -
             5 regarding your sports team.
           </p>
+          {error ? (
+            <p className="text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          ) : null}
         </div>
 
         <div className="space-y-6">
@@ -113,12 +151,8 @@ export default function OnboardingAthleticProgramSurveyPage() {
           type="button"
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
-          onClick={() => {
-            updateSection("survey", {
-              responses,
-            });
-            router.push("/");
-          }}
+          onClick={finishOnboarding}
+          disabled={isSubmitting}
         >
           Continue
         </Button>
