@@ -164,7 +164,7 @@ func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, erro
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		First(&post, "posts.id = ?", id)
 
@@ -195,7 +195,7 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID 
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Where("sport_id = ?", sportID).
 		Limit(limit).
@@ -231,7 +231,7 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userI
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Where("author_id = ?", authorID).
 		Limit(limit).
@@ -278,7 +278,7 @@ func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Limit(limit).
 		Offset(offset).
@@ -327,7 +327,7 @@ func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID 
 						SELECT 1
 						FROM tag_follows tf
 						JOIN tag_posts tp_sub ON tp_sub.tag_id = tf.tag_id
-						WHERE tf.user_id = ? AND tp_sub.post_id = posts.id
+						WHERE tf.user_id = ? AND tp_sub.postable_id = posts.id AND tp_sub.postable_type = 'post'
 					) THEN 12.0
 					ELSE 0.0
 				END +
@@ -387,7 +387,7 @@ func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID 
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Order("popularity_score DESC").
 		Order("comment_count DESC").
@@ -428,7 +428,7 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Where("id = ?", id).
 		Updates(updates).

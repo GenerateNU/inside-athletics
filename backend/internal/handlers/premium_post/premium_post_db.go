@@ -41,7 +41,9 @@ func (s *PremiumPostDB) GetAllPremiumPosts(limit, offset int) ([]models.PremiumP
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
-		Preload("Tags").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
 		Limit(limit).
 		Offset(offset).
 		Find(&posts).Error; err != nil {
@@ -68,7 +70,9 @@ func (s *PremiumPostDB) GetPremiumPostsByAuthorID(limit, offset int, authorID uu
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
-		Preload("Tags").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
 		Where("author_id = ?", authorID).
 		Limit(limit).
 		Offset(offset).
@@ -95,7 +99,9 @@ func (s *PremiumPostDB) GetPremiumPostsBySportID(limit, offset int, sportID uuid
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
-		Preload("Tags").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
 		Where("sport_id = ?", sportID).
 		Limit(limit).
 		Offset(offset).
@@ -122,7 +128,9 @@ func (s *PremiumPostDB) GetPremiumPostsByCollegeID(limit, offset int, collegeID 
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
-		Preload("Tags").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
 		Where("college_id = ?", collegeID).
 		Limit(limit).
 		Offset(offset).
@@ -139,7 +147,7 @@ func (s *PremiumPostDB) GetPremiumPostsByTagID(limit, offset int, tagID uuid.UUI
 	var total int64
 
 	base := s.db.Model(&models.PremiumPost{}).
-		Joins("JOIN tag_posts tp ON tp.premium_post_id = premium_posts.id").
+		Joins("JOIN tag_posts tp ON tp.postable_id = premium_posts.id AND tp.postable_type = 'premium_post'").
 		Where("tp.tag_id = ?", tagID)
 
 	// if this jointable count is 0, there are no premium posts with the given tag
@@ -149,12 +157,14 @@ func (s *PremiumPostDB) GetPremiumPostsByTagID(limit, offset int, tagID uuid.UUI
 
 	if err := s.db.
 		Model(&models.PremiumPost{}).
-		Joins("JOIN tag_posts tp ON tp.premium_post_id = premium_posts.id").
+		Joins("JOIN tag_posts tp ON tp.postable_id = premium_posts.id AND tp.postable_type = 'premium_post'").
 		Where("tp.tag_id = ?", tagID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
-		Preload("Tags").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
 		Limit(limit).
 		Offset(offset).
 		Find(&posts).Error; err != nil {
@@ -169,16 +179,11 @@ func (s *PremiumPostDB) UpdatePremiumPost(id uuid.UUID, updates UpdatePremiumPos
 	var updatedPost models.PremiumPost
 	dbResponse := s.db.Model(&models.PremiumPost{}).
 		Clauses(clause.Returning{}).
-		Select(`premium_posts.*,
-			(SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = premium_posts.id) AS like_count,
-			(SELECT COUNT(*) FROM comments WHERE comments.post_id = premium_posts.id) AS comment_count,
-			(SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = premium_posts.id AND post_likes.user_id = ?) AS is_liked`,
-			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
 		Where("id = ?", id).
 		Updates(updates).
