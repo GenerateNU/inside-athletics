@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1TagByTagIdPostsQueryResponse,
   GetApiV1TagByTagIdPostsPathParams,
@@ -24,7 +25,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1TagByTagIdPostsQueryKey = (
   tag_id: GetApiV1TagByTagIdPostsPathParams["tag_id"],
-  params?: GetApiV1TagByTagIdPostsQueryParams,
+  params: GetApiV1TagByTagIdPostsQueryParams = {},
 ) =>
   [
     { url: "/api/v1/tag/:tag_id/posts", params: { tag_id: tag_id } },
@@ -50,10 +51,8 @@ export function getApiV1TagByTagIdPostsQueryOptions(
     enabled: !!tag_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1TagByTagIdPosts(tag_id, params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1TagByTagIdPosts(tag_id, params, config);
     },
   });
 }
@@ -83,16 +82,15 @@ export function useGetApiV1TagByTagIdPosts<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
-    getApiV1TagByTagIdPostsQueryKey(tag_id, params);
+    queryOptions?.queryKey ?? getApiV1TagByTagIdPostsQueryKey(tag_id, params);
 
   const query = useQuery(
     {
       ...getApiV1TagByTagIdPostsQueryOptions(tag_id, params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   ListApiV1StripePricesByIdQueryResponse,
   ListApiV1StripePricesByIdPathParams,
@@ -43,10 +44,8 @@ export function listApiV1StripePricesByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return listApiV1StripePricesById(id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return listApiV1StripePricesById(id, config);
     },
   });
 }
@@ -73,15 +72,15 @@ export function useListApiV1StripePricesByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? listApiV1StripePricesByIdSuspenseQueryKey(id);
+    queryOptions?.queryKey ?? listApiV1StripePricesByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...listApiV1StripePricesByIdSuspenseQueryOptions(id, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

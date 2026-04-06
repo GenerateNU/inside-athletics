@@ -1,0 +1,19 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/GetUploadURLResponse.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "document_id": { "type": "string" },
+    "expires_in": { "format": "int64", "type": "integer" },
+    "key": { "type": "string" },
+    "upload_url": { "type": "string" }
+  },
+  "required": ["upload_url", "key", "document_id", "expires_in"],
+  "type": "object",
+  "x-readme-ref-name": "GetUploadURLResponse"
+}

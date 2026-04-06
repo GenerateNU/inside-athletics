@@ -14,4 +14,9 @@ export type CreateTagBody = {
    * @type string
    */
   name: string;
+  /**
+   * @description The type of the tag
+   * @type string
+   */
+  type: string;
 };

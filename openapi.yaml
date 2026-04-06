@@ -174,6 +174,48 @@ components:
         - is_liked
         - is_verified_athlete
       type: object
+    ConfirmUploadRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ConfirmUploadRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        key:
+          description: S3 object key from upload-url response
+          type: string
+      required:
+        - key
+      type: object
+    ConfirmUploadResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ConfirmUploadResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        download_url:
+          type: string
+        key:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        size:
+          format: int64
+          type: integer
+      required:
+        - key
+        - download_url
+        - size
+      type: object
     CreateCollegeRequest:
       additionalProperties: false
       properties:
@@ -756,8 +798,14 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - name
+        - type
       type: object
     CreateTagPostBody:
       additionalProperties: false
@@ -833,9 +881,15 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     CreateUserBody:
       additionalProperties: false
@@ -993,6 +1047,22 @@ components:
         - message
         - total
         - liked
+      type: object
+    DeleteContentResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteContentResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Success message
+          type: string
+      required:
+        - message
       type: object
     DeletePostLikeResponse:
       additionalProperties: false
@@ -1203,6 +1273,25 @@ components:
             - https://example.com/errors/example
           format: uri
           type: string
+      type: object
+    GetAllCollegesResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllCollegesResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        colleges:
+          items:
+            $ref: "#/components/schemas/GetCollegeResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - colleges
       type: object
     GetAllPermissionsResponse:
       additionalProperties: false
@@ -1427,6 +1516,25 @@ components:
       required:
         - user_id
         - comment_id
+      type: object
+    GetDownloadURLResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetDownloadURLResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        download_url:
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+      required:
+        - download_url
+        - expires_in
       type: object
     GetPostLikeInfoResponse:
       additionalProperties: false
@@ -1768,9 +1876,64 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
+      type: object
+    GetUploadURLRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUploadURLRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        fileName:
+          description: Optional; used as documentId in response (defaults to last segment of key)
+          type: string
+        fileType:
+          description: MIME type, e.g. image/jpeg, application/pdf
+          type: string
+        key:
+          description: Full S3 object key, e.g. premium/image/content-123/photo.jpg
+          type: string
+      required:
+        - key
+        - fileType
+        - fileName
+      type: object
+    GetUploadURLResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUploadURLResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        document_id:
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+        key:
+          type: string
+        upload_url:
+          type: string
+      required:
+        - upload_url
+        - key
+        - document_id
+        - expires_in
       type: object
     GetUserResponse:
       additionalProperties: false
@@ -2311,6 +2474,11 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
         updated_at:
           format: date-time
           type: string
@@ -2320,6 +2488,7 @@ components:
         - updated_at
         - deleted_at
         - name
+        - type
       type: object
     TagRequest:
       additionalProperties: false
@@ -2729,8 +2898,14 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - name
+        - type
       type: object
     UpdateTagPostBody:
       additionalProperties: false
@@ -2806,9 +2981,15 @@ components:
           examples:
             - Northeastern Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     UpdateUserBody:
       additionalProperties: false
@@ -3223,6 +3404,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Put API v1 college by ID
+  /api/v1/colleges/:
+    get:
+      operationId: get-api-v1-colleges
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllCollegesResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 colleges
   /api/v1/comment/:
     post:
       operationId: post-api-v1-comment
@@ -3473,6 +3671,104 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: List API v1 comment by ID replies
+  /api/v1/content:
+    delete:
+      operationId: delete-api-v1-content
+      parameters:
+        - description: S3 object key to delete
+          explode: false
+          in: query
+          name: key
+          required: true
+          schema:
+            description: S3 object key to delete
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteContentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 content
+  /api/v1/content/confirm-upload:
+    post:
+      operationId: post-api-v1-content-confirm-upload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmUploadRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmUploadResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 content confirm upload
+  /api/v1/content/download-url:
+    get:
+      operationId: get-api-v1-content-download-url
+      parameters:
+        - description: S3 object key
+          explode: false
+          in: query
+          name: key
+          required: true
+          schema:
+            description: S3 object key
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDownloadURLResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 content download URL
+  /api/v1/content/upload-url:
+    post:
+      operationId: post-api-v1-content-upload-url
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUploadURLRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUploadURLResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 content upload URL
   /api/v1/health/:
     get:
       operationId: get-api-v1-health
@@ -4925,6 +5221,38 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 tag name by name
+  /api/v1/tag/type/{type}:
+    get:
+      operationId: list-api-v1-tag-type-by-type
+      parameters:
+        - description: The type of the tag
+          example: sports
+          in: path
+          name: type
+          required: true
+          schema:
+            description: The type of the tag
+            examples:
+              - sports
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/GetTagResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 tag type by type
   /api/v1/tag/{id}:
     delete:
       operationId: delete-api-v1-tag-by-id

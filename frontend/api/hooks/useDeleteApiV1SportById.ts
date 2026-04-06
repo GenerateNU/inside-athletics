@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   DeleteApiV1SportByIdMutationResponse,
   DeleteApiV1SportByIdPathParams,

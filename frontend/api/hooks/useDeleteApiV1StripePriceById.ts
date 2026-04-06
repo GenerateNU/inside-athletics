@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type { DeleteApiV1StripePriceByIdMutationResponse } from "../models/DeleteApiV1StripePriceById.ts";
 import type {
   Client,
