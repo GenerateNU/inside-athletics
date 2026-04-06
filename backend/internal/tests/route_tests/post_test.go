@@ -153,7 +153,7 @@ func TestCreatePostWithTags(t *testing.T) {
 		},
 	}
 
-	resp := api.Post("/api/v1/post/", body, authHeader)
+	resp := api.Post("/api/v1/post/", authHeader, body)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}

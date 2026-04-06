@@ -29,9 +29,33 @@ func NewPostDB(db *gorm.DB) *PostDB {
 // CreatePost creates a new sport in the database
 func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post, error) {
 	dbError := s.db.Transaction(func(tx *gorm.DB) error {
-		return s.createPostTx(tx, post, tags)
+		if err := tx.Create(&post).Error; err != nil {
+			return err
+		}
+		for _, t := range tags {
+			tagPost := models.TagPost{
+				PostableID:   post.ID,
+				PostableType: "post",
+				TagID:        t.ID,
+			}
+			if err := tx.Create(&tagPost).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	})
-	return utils.HandleDBError(post, dbError)
+	if dbError != nil {
+		return utils.HandleDBError(post, dbError)
+	}
+
+	// reload post with tags
+	if err := s.db.Preload("Tags", func(db *gorm.DB) *gorm.DB {
+		return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+	}).First(post, "id = ?", post.ID).Error; err != nil {
+		return utils.HandleDBError(post, err)
+	}
+
+	return post, nil
 }
 
 // CreatePostWithAuthorLimit creates a post while enforcing the author's post cap atomically.
@@ -40,7 +64,6 @@ func (s *PostDB) CreatePostWithAuthorLimit(post *models.Post, tags []TagRequest,
 		if err := s.lockUserForUpdate(tx, post.AuthorID); err != nil {
 			return err
 		}
-
 		var count int64
 		if err := tx.Model(&models.Post{}).Where("author_id = ?", post.AuthorID).Count(&count).Error; err != nil {
 			return err
@@ -48,7 +71,6 @@ func (s *PostDB) CreatePostWithAuthorLimit(post *models.Post, tags []TagRequest,
 		if count >= maxPosts {
 			return ErrFreePostCreationLimitReached
 		}
-
 		return s.createPostTx(tx, post, tags)
 	})
 	if dbError != nil {
@@ -57,6 +79,14 @@ func (s *PostDB) CreatePostWithAuthorLimit(post *models.Post, tags []TagRequest,
 		}
 		return utils.HandleDBError(post, dbError)
 	}
+
+	// reload post with tags
+	if err := s.db.Preload("Tags", func(db *gorm.DB) *gorm.DB {
+		return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+	}).First(post, "id = ?", post.ID).Error; err != nil {
+		return utils.HandleDBError(post, err)
+	}
+
 	return post, nil
 }
 
@@ -130,14 +160,16 @@ func (s *PostDB) createPostTx(tx *gorm.DB, post *models.Post, tags []TagRequest)
 	if err := tx.Create(post).Error; err != nil {
 		return err
 	}
-	var tagModels []models.Tag
 	for _, t := range tags {
-		tagModels = append(tagModels, models.Tag{ID: t.ID})
+		tagPost := models.TagPost{
+			PostableID:   post.ID,
+			PostableType: "post",
+			TagID:        t.ID,
+		}
+		if err := tx.Create(&tagPost).Error; err != nil {
+			return err
+		}
 	}
-	if err := tx.Model(post).Association("Tags").Append(&tagModels); err != nil {
-		return err
-	}
-
 	return nil
 }
 
