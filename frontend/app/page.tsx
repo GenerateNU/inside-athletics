@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/ui/navbar";
-import { RatingPanel } from "@/components/rating-panel";
+import { RatingPanel } from "@/components/ui/rating-panel";
 import { CiUser } from "react-icons/ci";
 
 export default function Page() {
