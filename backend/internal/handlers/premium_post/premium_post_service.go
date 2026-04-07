@@ -37,13 +37,12 @@ func (s *PremiumPostService) CreatePremiumPost(ctx context.Context, input *struc
 	}
 
 	premiumPost := &models.PremiumPost{
-		AuthorID:       id,
-		SportID:        input.Body.SportID,
-		CollegeID:      input.Body.CollegeID,
-		Title:          input.Body.Title,
-		Content:        input.Body.Content,
-		AttachmentKey:  input.Body.AttachmentKey,
-		AttachmentType: input.Body.AttachmentType,
+		AuthorID:  id,
+		SportID:   input.Body.SportID,
+		CollegeID: input.Body.CollegeID,
+		Title:     input.Body.Title,
+		Content:   input.Body.Content,
+		MediaID:   input.Body.MediaID,
 	}
 
 	createdPost, err := utils.HandleDBError(

@@ -22,7 +22,14 @@ func NewPremiumPostDB(db *gorm.DB) *PremiumPostDB {
 // CreatePremiumPost creates a new premium post in the database
 func (s *PremiumPostDB) CreatePremiumPost(premiumPost *models.PremiumPost) (*models.PremiumPost, error) {
 	dbResponse := s.db.Create(premiumPost)
-	return utils.HandleDBError(premiumPost, dbResponse.Error)
+	result, err := utils.HandleDBError(premiumPost, dbResponse.Error)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.db.Preload("Media").First(result, result.ID).Error; err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // GetAllPremiumPosts returns all premium posts in the database
@@ -41,6 +48,7 @@ func (s *PremiumPostDB) GetAllPremiumPosts(limit, offset int) ([]models.PremiumP
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Media").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
@@ -70,6 +78,7 @@ func (s *PremiumPostDB) GetPremiumPostsByAuthorID(limit, offset int, authorID uu
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Media").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
@@ -99,6 +108,7 @@ func (s *PremiumPostDB) GetPremiumPostsBySportID(limit, offset int, sportID uuid
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Media").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
@@ -128,6 +138,7 @@ func (s *PremiumPostDB) GetPremiumPostsByCollegeID(limit, offset int, collegeID 
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Media").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
@@ -162,6 +173,7 @@ func (s *PremiumPostDB) GetPremiumPostsByTagID(limit, offset int, tagID uuid.UUI
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Media").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
@@ -182,6 +194,7 @@ func (s *PremiumPostDB) UpdatePremiumPost(id uuid.UUID, updates UpdatePremiumPos
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Media").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).

@@ -8,7 +8,7 @@ import (
 
 // get all posts - limit int for how many posts they want
 // create
-// update - only update s3 key, title, and content
+// update - title, content, and optional media_id
 // delete
 // get all posts by sport - limit int for how many posts they want
 // get all posts by college - limit int for how many posts they want
@@ -56,8 +56,8 @@ type PremiumPostResponse struct {
 	Tags           []models.Tag           `json:"tags" type:"tag"`
 	Title          string                 `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content        string                 `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
-	AttachmentKey  *string                `json:"attachment_key,omitempty" example:"abc123.pdf" gorm:"type:text;default:null"`
-	AttachmentType *models.AttachmentType `json:"attachment_type,omitempty" example:"video" gorm:"type:varchar(10);default:null" validate:"omitempty,oneof=pdf image video"`
+	MediaID        *uuid.UUID             `json:"media_id,omitempty" example:"123e4567-e89b-12d3-a456-426614174000"`
+	Media          *models.Media          `json:"media,omitempty"`
 }
 
 type GetAllPremiumPostsResponse struct {
@@ -91,8 +91,7 @@ type CreatePremiumPostParams struct {
 	Tags           []uuid.UUID            `json:"tag" type:"tag"`
 	Title          string                 `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content        string                 `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
-	AttachmentKey  *string                `json:"attachment_key,omitempty" example:"abc123.pdf" gorm:"type:text;default:null"`
-	AttachmentType *models.AttachmentType `json:"attachment_type,omitempty" example:"video" gorm:"type:varchar(10);default:null" validate:"omitempty,oneof=pdf image video"`
+	MediaID        *uuid.UUID             `json:"media_id,omitempty" example:"123e4567-e89b-12d3-a456-426614174000"`
 }
 
 type CreatePremiumPostResponse struct {
@@ -103,8 +102,8 @@ type CreatePremiumPostResponse struct {
 	Tags           []models.Tag           `json:"tag" type:"tag"`
 	Title          string                 `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content        string                 `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
-	AttachmentKey  *string                `json:"attachment_key,omitempty" example:"abc123.pdf" gorm:"type:text;default:null"`
-	AttachmentType *models.AttachmentType `json:"attachment_type,omitempty" example:"video" gorm:"type:varchar(10);default:null" validate:"omitempty,oneof=pdf image video"`
+	MediaID        *uuid.UUID             `json:"media_id,omitempty" example:"123e4567-e89b-12d3-a456-426614174000"`
+	Media          *models.Media          `json:"media,omitempty"`
 }
 
 // ToPremiumPostResponse converts a PremiumPost model to a premiumPostResponse
@@ -115,37 +114,36 @@ func ToCreatePremiumPostResponse(post *models.PremiumPost, id uuid.UUID) *Create
 		userId = &uid
 	}
 	return &CreatePremiumPostResponse{
-		ID:             post.ID,
-		AuthorID:       userId,
-		SportID:        post.SportID,
-		CollegeID:      post.CollegeID,
-		Tags:           post.Tags,
-		Title:          post.Title,
-		Content:        post.Content,
-		AttachmentKey:  post.AttachmentKey,
-		AttachmentType: post.AttachmentType,
+		ID:        post.ID,
+		AuthorID:  userId,
+		SportID:   post.SportID,
+		CollegeID: post.CollegeID,
+		Tags:      post.Tags,
+		Title:     post.Title,
+		Content:   post.Content,
+		MediaID:   post.MediaID,
+		Media:     post.Media,
 	}
 }
 
 func ToPremiumPostResponse(post *models.PremiumPost) *PremiumPostResponse {
 	return &PremiumPostResponse{
-		ID:             post.ID,
-		Author:         &post.Author,
-		Sport:          post.Sport,
-		College:        post.College,
-		Tags:           post.Tags,
-		Title:          post.Title,
-		Content:        post.Content,
-		AttachmentKey:  post.AttachmentKey,
-		AttachmentType: post.AttachmentType,
+		ID:      post.ID,
+		Author:  &post.Author,
+		Sport:   post.Sport,
+		College: post.College,
+		Tags:    post.Tags,
+		Title:   post.Title,
+		Content: post.Content,
+		MediaID: post.MediaID,
+		Media:   post.Media,
 	}
 }
 
 type UpdatePremiumPostRequest struct {
-	Title          *string                `json:"title,omitempty" minLength:"1" maxLength:"100"`
-	Content        *string                `json:"content,omitempty" minLength:"1" maxLength:"5000"`
-	AttachmentKey  *string                `json:"attachment_key,omitempty"`
-	AttachmentType *models.AttachmentType `json:"attachment_type,omitempty" validate:"omitempty,oneof=pdf image video"`
+	Title   *string     `json:"title,omitempty" minLength:"1" maxLength:"100"`
+	Content *string     `json:"content,omitempty" minLength:"1" maxLength:"5000"`
+	MediaID *uuid.UUID  `json:"media_id,omitempty"`
 }
 
 type DeletePremiumPostRequest struct {

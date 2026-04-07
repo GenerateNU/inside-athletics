@@ -7,16 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// an attachmenttype is a
-type AttachmentType string
-
-// for optional pdf, image or video
-const (
-	AttachmentTypePDF   AttachmentType = "pdf"
-	AttachmentTypeImage AttachmentType = "image"
-	AttachmentTypeVideo AttachmentType = "video"
-)
-
 // PremiumPost represents a post that is only available to paid users & moderators/admins in the system
 type PremiumPost struct {
 	ID        uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
@@ -31,13 +21,11 @@ type PremiumPost struct {
 	CollegeID *uuid.UUID `json:"college_id" gorm:"type:uuid;default:null"`
 	College   *College   `json:"-" gorm:"foreignKey:CollegeID;references:ID;constraint:OnDelete:SET NULL;"`
 
-	//need to fix this bc tag_posts use post not premium post
 	Tags []Tag `json:"tags" gorm:"many2many:tag_posts;foreignKey:ID;joinForeignKey:PostableID;joinReferences:TagID"`
 
 	Title   string `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content string `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
 
-	// s3 key for video pdf or image but it's optional!!
-	AttachmentKey  *string         `json:"attachment_key,omitempty" example:"abc123.pdf" gorm:"type:text;default:null"`
-	AttachmentType *AttachmentType `json:"attachment_type,omitempty" example:"video" gorm:"type:varchar(10);default:null" validate:"omitempty,oneof=pdf image video"`
+	MediaID *uuid.UUID `json:"media_id,omitempty" gorm:"type:uuid;default:null"`
+	Media   *Media     `json:"media,omitempty" gorm:"foreignKey:MediaID;references:ID;constraint:OnDelete:SET NULL"`
 }
