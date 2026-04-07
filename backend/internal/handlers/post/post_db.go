@@ -1,6 +1,7 @@
 package post
 
 import (
+	"errors"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 	"math"
@@ -15,6 +16,11 @@ type PostDB struct {
 	db *gorm.DB
 }
 
+var (
+	ErrFreePostCreationLimitReached = errors.New("free-tier post creation limit reached")
+	ErrFreePostViewLimitReached     = errors.New("free-tier post view limit reached")
+)
+
 // NewPostDB creates a new PostDB instance
 func NewPostDB(db *gorm.DB) *PostDB {
 	return &PostDB{db: db}
@@ -26,17 +32,154 @@ func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post,
 		if err := tx.Create(&post).Error; err != nil {
 			return err
 		}
-		var tagModels []models.Tag
 		for _, t := range tags {
-			tagModels = append(tagModels, models.Tag{ID: t.ID})
+			tagPost := models.TagPost{
+				PostableID:   post.ID,
+				PostableType: "post",
+				TagID:        t.ID,
+			}
+			if err := tx.Create(&tagPost).Error; err != nil {
+				return err
+			}
 		}
-		if err := tx.Model(&post).Association("Tags").Append(&tagModels); err != nil {
+		return nil
+	})
+	if dbError != nil {
+		return utils.HandleDBError(post, dbError)
+	}
+
+	// reload post with tags
+	if err := s.db.Preload("Tags", func(db *gorm.DB) *gorm.DB {
+		return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+	}).First(post, "id = ?", post.ID).Error; err != nil {
+		return utils.HandleDBError(post, err)
+	}
+
+	return post, nil
+}
+
+// CreatePostWithAuthorLimit creates a post while enforcing the author's post cap atomically.
+func (s *PostDB) CreatePostWithAuthorLimit(post *models.Post, tags []TagRequest, maxPosts int64) (*models.Post, error) {
+	dbError := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := s.lockUserForUpdate(tx, post.AuthorID); err != nil {
+			return err
+		}
+		var count int64
+		if err := tx.Model(&models.Post{}).Where("author_id = ?", post.AuthorID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count >= maxPosts {
+			return ErrFreePostCreationLimitReached
+		}
+		return s.createPostTx(tx, post, tags)
+	})
+	if dbError != nil {
+		if errors.Is(dbError, ErrFreePostCreationLimitReached) {
+			return nil, dbError
+		}
+		return utils.HandleDBError(post, dbError)
+	}
+
+	// reload post with tags
+	if err := s.db.Preload("Tags", func(db *gorm.DB) *gorm.DB {
+		return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+	}).First(post, "id = ?", post.ID).Error; err != nil {
+		return utils.HandleDBError(post, err)
+	}
+
+	return post, nil
+}
+
+// CountViewedPostsByUser returns the number of distinct posts the user has viewed (for free-tier limit).
+func (s *PostDB) CountViewedPostsByUser(userID uuid.UUID) (int64, error) {
+	var count int64
+	err := s.db.Model(&models.ViewedPost{}).Where("user_id = ?", userID).Count(&count).Error
+	return count, err
+}
+
+// HasUserViewedPost returns true if the user has already viewed this post.
+func (s *PostDB) HasUserViewedPost(userID, postID uuid.UUID) (bool, error) {
+	var count int64
+	err := s.db.Model(&models.ViewedPost{}).Where("user_id = ? AND post_id = ?", userID, postID).Count(&count).Error
+	return count > 0, err
+}
+
+// RecordPostView records that the user viewed the post (idempotent: safe to call if already viewed).
+func (s *PostDB) RecordPostView(userID, postID uuid.UUID) error {
+	v := &models.ViewedPost{UserID: userID, PostID: postID}
+	return s.db.Where("user_id = ? AND post_id = ?", userID, postID).FirstOrCreate(v).Error
+}
+
+// RecordPostViewIfAllowed records a new post view while enforcing the user's distinct-view cap atomically.
+func (s *PostDB) RecordPostViewIfAllowed(userID, postID uuid.UUID, maxViews int64) error {
+	dbError := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := s.lockUserForUpdate(tx, userID); err != nil {
 			return err
 		}
 
-		return nil
+		var existing models.ViewedPost
+		err := tx.Where("user_id = ? AND post_id = ?", userID, postID).Take(&existing).Error
+		switch {
+		case err == nil:
+			return nil
+		case !errors.Is(err, gorm.ErrRecordNotFound):
+			return err
+		}
+
+		var count int64
+		if err := tx.Model(&models.ViewedPost{}).Where("user_id = ?", userID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count >= maxViews {
+			return ErrFreePostViewLimitReached
+		}
+
+		return tx.Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "user_id"}, {Name: "post_id"}},
+			DoNothing: true,
+		}).Create(&models.ViewedPost{UserID: userID, PostID: postID}).Error
 	})
-	return utils.HandleDBError(post, dbError)
+	if dbError != nil {
+		if errors.Is(dbError, ErrFreePostViewLimitReached) {
+			return dbError
+		}
+		_, err := utils.HandleDBError((*models.ViewedPost)(nil), dbError)
+		return err
+	}
+	return nil
+}
+
+// CountPostsByAuthor returns how many posts the user has created (for free-tier create limit).
+func (s *PostDB) CountPostsByAuthor(authorID uuid.UUID) (int64, error) {
+	var count int64
+	err := s.db.Model(&models.Post{}).Where("author_id = ?", authorID).Count(&count).Error
+	return count, err
+}
+
+func (s *PostDB) createPostTx(tx *gorm.DB, post *models.Post, tags []TagRequest) error {
+	if err := tx.Create(post).Error; err != nil {
+		return err
+	}
+	for _, t := range tags {
+		tagPost := models.TagPost{
+			PostableID:   post.ID,
+			PostableType: "post",
+			TagID:        t.ID,
+		}
+		if err := tx.Create(&tagPost).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *PostDB) lockUserForUpdate(tx *gorm.DB, userID uuid.UUID) error {
+	return tx.
+		Model(&models.User{}).
+		Select("id").
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("id = ?", userID).
+		Take(&models.User{}).Error
 }
 
 // GetPostByID retrieves a post by its ID
@@ -53,7 +196,7 @@ func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, erro
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		First(&post, "posts.id = ?", id)
 
@@ -84,7 +227,7 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID 
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Where("sport_id = ?", sportID).
 		Limit(limit).
@@ -120,7 +263,7 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userI
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Where("author_id = ?", authorID).
 		Limit(limit).
@@ -167,7 +310,7 @@ func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Limit(limit).
 		Offset(offset).
@@ -216,7 +359,7 @@ func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID 
 						SELECT 1
 						FROM tag_follows tf
 						JOIN tag_posts tp_sub ON tp_sub.tag_id = tf.tag_id
-						WHERE tf.user_id = ? AND tp_sub.post_id = posts.id
+						WHERE tf.user_id = ? AND tp_sub.postable_id = posts.id AND tp_sub.postable_type = 'post'
 					) THEN 12.0
 					ELSE 0.0
 				END +
@@ -276,7 +419,7 @@ func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID 
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Order("popularity_score DESC").
 		Order("comment_count DESC").
@@ -317,7 +460,7 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Where("id = ?", id).
 		Updates(updates).

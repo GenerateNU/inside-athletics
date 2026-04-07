@@ -193,6 +193,11 @@
             "format": "int64",
             "type": "integer"
           },
+          "popularity_score": {
+            "examples": [42.5],
+            "format": "double",
+            "type": "number"
+          },
           "sport": {
             "additionalProperties": false,
             "properties": {

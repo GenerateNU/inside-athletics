@@ -10,5 +10,4 @@ export const createSportFollowBodySchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   sport_id: z.string().describe("ID of the Sport"),
-  user_id: z.string().describe("ID of the user"),
 });

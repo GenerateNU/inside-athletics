@@ -32,7 +32,7 @@ type PremiumPost struct {
 	College   *College   `json:"-" gorm:"foreignKey:CollegeID;references:ID;constraint:OnDelete:SET NULL;"`
 
 	//need to fix this bc tag_posts use post not premium post
-	Tags []Tag `json:"tags" gorm:"many2many:tag_posts;"`
+	Tags []Tag `json:"tags" gorm:"many2many:tag_posts;foreignKey:ID;joinForeignKey:PostableID;joinReferences:TagID"`
 
 	Title   string `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content string `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`

@@ -9,6 +9,7 @@ import (
 	"inside-athletics/internal/handlers/comment_like"
 	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/handlers/health"
+	"inside-athletics/internal/handlers/media"
 	"inside-athletics/internal/handlers/permission"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/post_like"
