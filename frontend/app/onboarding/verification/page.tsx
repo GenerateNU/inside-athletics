@@ -24,12 +24,17 @@ export default function OnboardingVerificationPage() {
       return;
     }
 
+    if (!data.legal.accepted) {
+      router.replace(`/onboarding/legal?role=${encodeURIComponent(role)}`);
+      return;
+    }
+
     setName(data.verification.name);
     setEmail(data.verification.email);
     setFullName(data.verification.fullName);
     setInstitutionEmail(data.verification.institutionEmail);
     setSchool(data.verification.school);
-  }, [data.verification, hydrated]);
+  }, [data.legal.accepted, data.verification, hydrated, role, router]);
 
   const isAthlete = role === "athlete";
 

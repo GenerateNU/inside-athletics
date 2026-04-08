@@ -36,6 +36,9 @@ export type OnboardingData = {
     school: string;
     code: string;
   };
+  legal: {
+    accepted: boolean;
+  };
   plan: {
     selectedPlan: string;
   };
@@ -71,6 +74,9 @@ const defaultOnboardingData: OnboardingData = {
     institutionEmail: "",
     school: "",
     code: "",
+  },
+  legal: {
+    accepted: false,
   },
   plan: {
     selectedPlan: "",
@@ -122,6 +128,10 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           verification: {
             ...defaultOnboardingData.verification,
             ...parsed.verification,
+          },
+          legal: {
+            ...defaultOnboardingData.legal,
+            ...parsed.legal,
           },
           plan: {
             ...defaultOnboardingData.plan,

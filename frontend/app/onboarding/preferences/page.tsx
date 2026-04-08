@@ -359,9 +359,7 @@ export default function OnboardingPreferencesPage() {
               program,
               university,
             });
-            router.push(
-              `/onboarding/verification?role=${encodeURIComponent(role)}`,
-            );
+            router.push(`/onboarding/legal?role=${encodeURIComponent(role)}`);
           }}
           disabled={!canContinue}
         >
