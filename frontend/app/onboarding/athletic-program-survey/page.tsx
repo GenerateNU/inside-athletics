@@ -23,7 +23,7 @@ const ratingOptions = ["1", "2", "3", "4", "5"] as const;
 export default function OnboardingAthleticProgramSurveyPage() {
   const router = useRouter();
   const session = useSession();
-  const { data, hydrated } = useOnboarding();
+  const { data, hydrated, reset } = useOnboarding();
   const [responses, setResponses] = useState<Record<number, string>>({});
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,6 +56,7 @@ export default function OnboardingAthleticProgramSurveyPage() {
         session.access_token,
         session.user.email,
       );
+      reset();
       router.push("/");
     } catch (submissionError) {
       setError(
@@ -95,8 +96,8 @@ export default function OnboardingAthleticProgramSurveyPage() {
           </div>
           <p className="text-sm text-gray-600">
             Your responses to these questions will live and be visible to others
-            on your profile page. Please rank the following qualities from 1 -
-            5 regarding your sports team.
+            on your profile page. Please rank the following qualities from 1 - 5
+            regarding your sports team.
           </p>
           {error ? (
             <p className="text-sm text-red-600" role="alert">

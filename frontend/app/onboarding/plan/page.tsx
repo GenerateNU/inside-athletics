@@ -25,7 +25,7 @@ export default function OnboardingPlanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const session = useSession();
-  const { data, hydrated, updateSection } = useOnboarding();
+  const { data, hydrated, reset, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const [selectedPlan, setSelectedPlan] = useState("");
   const [error, setError] = useState("");
@@ -189,7 +189,9 @@ export default function OnboardingPlanPage() {
             }
 
             if (!session?.access_token) {
-              setError("You need an active session before finishing onboarding.");
+              setError(
+                "You need an active session before finishing onboarding.",
+              );
               return;
             }
 
@@ -207,6 +209,7 @@ export default function OnboardingPlanPage() {
                 session.access_token,
                 session.user.email,
               );
+              reset();
               router.push("/");
             } catch (submissionError) {
               setError(
