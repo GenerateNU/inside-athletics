@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useOnboarding } from "@/utils/onboarding";
+import { useSession } from "@/utils/SessionContext";
 import {
   Select,
   SelectContent,
@@ -19,11 +20,53 @@ const roleOptions = [
   { label: "Prospective Athlete", value: "prospective-athlete" },
 ] as const;
 
+type UploadUrlPayload = {
+  upload_url: string;
+  key: string;
+};
+
+type ConfirmUploadPayload = {
+  key: string;
+  download_url: string;
+};
+
+function unwrapBody<T>(value: unknown): T | undefined {
+  let current = value;
+
+  for (let depth = 0; depth < 5; depth += 1) {
+    if (!current || typeof current !== "object") {
+      return current as T | undefined;
+    }
+
+    if ("body" in current && current.body !== undefined) {
+      current = current.body;
+      continue;
+    }
+
+    if ("Body" in current && current.Body !== undefined) {
+      current = current.Body;
+      continue;
+    }
+
+    return current as T | undefined;
+  }
+
+  return current as T | undefined;
+}
+
+function sanitizeFileName(fileName: string) {
+  return fileName.toLowerCase().replace(/[^a-z0-9._-]+/g, "-");
+}
+
 export default function OnboardingRolePage() {
   const router = useRouter();
+  const session = useSession();
   const { data, hydrated, updateSection } = useOnboarding();
   const [role, setRole] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageKey, setProfileImageKey] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
 
   useEffect(() => {
     if (!hydrated) {
@@ -32,7 +75,13 @@ export default function OnboardingRolePage() {
 
     setRole(data.role.role);
     setProfileImage(data.role.profileImage);
-  }, [data.role.profileImage, data.role.role, hydrated]);
+    setProfileImageKey(data.role.profileImageKey);
+  }, [
+    data.role.profileImage,
+    data.role.profileImageKey,
+    data.role.role,
+    hydrated,
+  ]);
 
   const canContinue = Boolean(role);
 
@@ -42,6 +91,116 @@ export default function OnboardingRolePage() {
 
   const selectedRoleLabel =
     roleOptions.find((option) => option.value === role)?.label ?? "";
+
+  const handleProfileImageChange = async (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      setProfileImage(null);
+      setProfileImageKey(null);
+      setUploadError("");
+      return;
+    }
+
+    if (!session?.access_token) {
+      setUploadError("You need an active session to upload a profile image.");
+      event.target.value = "";
+      return;
+    }
+
+    setIsUploadingProfileImage(true);
+    setUploadError("");
+
+    try {
+      const extension = file.name.includes(".")
+        ? file.name.slice(file.name.lastIndexOf("."))
+        : "";
+      const key = `profiles/onboarding/${Date.now()}-${sanitizeFileName(
+        `${crypto.randomUUID()}${extension}`,
+      )}`;
+
+      const uploadUrlResponse = await fetch("/api/v1/content/upload-url", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key,
+          fileName: file.name,
+          fileType: file.type || "application/octet-stream",
+        }),
+      });
+
+      if (!uploadUrlResponse.ok) {
+        throw new Error("Unable to prepare profile image upload.");
+      }
+
+      const uploadUrlPayload = unwrapBody<UploadUrlPayload>(
+        await uploadUrlResponse.json(),
+      );
+
+      if (!uploadUrlPayload?.upload_url || !uploadUrlPayload.key) {
+        throw new Error("Upload URL response was incomplete.");
+      }
+
+      const directUploadResponse = await fetch(uploadUrlPayload.upload_url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+        },
+        body: file,
+      });
+
+      if (!directUploadResponse.ok) {
+        throw new Error("Unable to upload profile image.");
+      }
+
+      const confirmUploadResponse = await fetch(
+        "/api/v1/content/confirm-upload",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            key: uploadUrlPayload.key,
+          }),
+        },
+      );
+
+      if (!confirmUploadResponse.ok) {
+        throw new Error("Unable to confirm profile image upload.");
+      }
+
+      const confirmUploadPayload = unwrapBody<ConfirmUploadPayload>(
+        await confirmUploadResponse.json(),
+      );
+
+      if (!confirmUploadPayload?.download_url || !confirmUploadPayload.key) {
+        throw new Error("Confirmed upload response was incomplete.");
+      }
+
+      setProfileImage(confirmUploadPayload.download_url);
+      setProfileImageKey(confirmUploadPayload.key);
+      updateSection("role", {
+        profileImage: confirmUploadPayload.download_url,
+        profileImageKey: confirmUploadPayload.key,
+      });
+    } catch (error) {
+      setUploadError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload profile image.",
+      );
+      event.target.value = "";
+    } finally {
+      setIsUploadingProfileImage(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
@@ -73,19 +232,20 @@ export default function OnboardingRolePage() {
               </div>
             </div>
           </label>
+          {isUploadingProfileImage ? (
+            <p className="text-sm text-gray-600">Uploading profile image...</p>
+          ) : null}
+          {uploadError ? (
+            <p className="text-sm text-red-600" role="alert">
+              {uploadError}
+            </p>
+          ) : null}
           <input
             id="profile-image"
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (!file) {
-                setProfileImage(null);
-                return;
-              }
-              setProfileImage(URL.createObjectURL(file));
-            }}
+            onChange={handleProfileImageChange}
           />
         </div>
 
@@ -120,12 +280,13 @@ export default function OnboardingRolePage() {
             updateSection("role", {
               role,
               profileImage,
+              profileImageKey,
             });
             router.push(
               `/onboarding/preferences?role=${encodeURIComponent(role)}`,
             );
           }}
-          disabled={!canContinue}
+          disabled={!canContinue || isUploadingProfileImage}
         >
           Continue
         </Button>

@@ -19,6 +19,7 @@ export type OnboardingData = {
   role: {
     role: string;
     profileImage: string | null;
+    profileImageKey: string | null;
   };
   preferences: {
     division: string;
@@ -58,6 +59,7 @@ const defaultOnboardingData: OnboardingData = {
   role: {
     role: "",
     profileImage: null,
+    profileImageKey: null,
   },
   preferences: {
     division: "",
