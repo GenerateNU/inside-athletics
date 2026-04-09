@@ -34,8 +34,8 @@ type GetSurveysByUserParams struct {
 
 // GetAverageRatingsParams defines optional query filters for the averages endpoint
 type GetAverageRatingsParams struct {
-	SportID   *uuid.UUID `query:"sport_id" doc:"Filter by sport ID"`
-	CollegeID *uuid.UUID `query:"college_id" doc:"Filter by college ID"`
+	SportID   uuid.UUID `query:"sport_id" doc:"Filter by sport ID" required:"false"`
+	CollegeID uuid.UUID `query:"college_id" doc:"Filter by college ID" required:"false"`
 }
 
 // SurveyResponse defines the response structure for a single survey

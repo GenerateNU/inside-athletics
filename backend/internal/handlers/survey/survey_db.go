@@ -74,7 +74,7 @@ func (s *SurveyDB) DeleteSurvey(id uuid.UUID) error {
 
 // GetAverageRatings returns average scores for each rating field,
 // optionally filtered by sportID and/or collegeID, grouped by both.
-func (s *SurveyDB) GetAverageRatings(sportID, collegeID *uuid.UUID) ([]AverageRatingsRow, error) {
+func (s *SurveyDB) GetAverageRatings(sportID, collegeID uuid.UUID) ([]AverageRatingsRow, error) {
 	q := s.db.Model(&models.Survey{}).
 		Select(`
 			sport_id,
@@ -90,11 +90,11 @@ func (s *SurveyDB) GetAverageRatings(sportID, collegeID *uuid.UUID) ([]AverageRa
 		`).
 		Group("sport_id, college_id")
 
-	if sportID != nil {
-		q = q.Where("sport_id = ?", *sportID)
+	if sportID != uuid.Nil {
+		q = q.Where("sport_id = ?", sportID)
 	}
-	if collegeID != nil {
-		q = q.Where("college_id = ?", *collegeID)
+	if collegeID != uuid.Nil {
+		q = q.Where("college_id = ?", collegeID)
 	}
 
 	var rows []AverageRatingsRow
