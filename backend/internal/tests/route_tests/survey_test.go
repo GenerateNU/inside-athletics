@@ -10,6 +10,24 @@ import (
 	"github.com/google/uuid"
 )
 
+// seedUser inserts a User row so surveys can satisfy fk_surveys_user.
+func seedUser(t *testing.T, testDB *TestDatabase) *models.User {
+	t.Helper()
+	user := models.User{
+		ID:                      uuid.New(),
+		FirstName:               "Test",
+		LastName:                "User",
+		Email:                   uuid.NewString() + "@example.com",
+		Username:                "testuser-" + uuid.NewString(),
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&user).Error; err != nil {
+		t.Fatalf("failed to create user: %v", err)
+	}
+	return &user
+}
+
 // seedCollege inserts a College row so surveys can satisfy fk_surveys_college.
 func seedCollege(t *testing.T, testDB *TestDatabase) *models.College {
 	t.Helper()
@@ -40,7 +58,7 @@ func seedSport(t *testing.T, testDB *TestDatabase) *models.Sport {
 	return &sport
 }
 
-// seedSurvey inserts a Survey row. collegeID and sportID must already exist in the DB.
+// seedSurvey inserts a Survey row. userID, collegeID and sportID must already exist in the DB.
 func seedSurvey(t *testing.T, testDB *TestDatabase, userID, collegeID, sportID uuid.UUID) *models.Survey {
 	t.Helper()
 	survey := models.Survey{
@@ -68,6 +86,20 @@ func TestCreateSurvey(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
+
+	// mockUUID user must exist for the FK
+	user := models.User{
+		ID:                      uuid.MustParse(mockUUID),
+		FirstName:               "Test",
+		LastName:                "User",
+		Email:                   "test@example.com",
+		Username:                "testuser-mock",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&user).Error; err != nil {
+		t.Fatalf("failed to create user: %v", err)
+	}
 
 	college := seedCollege(t, testDB)
 	sport := seedSport(t, testDB)
@@ -133,9 +165,10 @@ func TestDeleteSurvey(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	user := seedUser(t, testDB)
 	college := seedCollege(t, testDB)
 	sport := seedSport(t, testDB)
-	survey := seedSurvey(t, testDB, uuid.MustParse(mockUUID), college.ID, sport.ID)
+	survey := seedSurvey(t, testDB, user.ID, college.ID, sport.ID)
 
 	resp := api.Delete("/api/v1/survey/"+survey.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -166,17 +199,17 @@ func TestGetSurveysByUser(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	userID := uuid.MustParse(mockUUID)
+	user := seedUser(t, testDB)
 
 	college1 := seedCollege(t, testDB)
 	sport1 := seedSport(t, testDB)
 	college2 := seedCollege(t, testDB)
 	sport2 := seedSport(t, testDB)
 
-	seedSurvey(t, testDB, userID, college1.ID, sport1.ID)
-	seedSurvey(t, testDB, userID, college2.ID, sport2.ID)
+	seedSurvey(t, testDB, user.ID, college1.ID, sport1.ID)
+	seedSurvey(t, testDB, user.ID, college2.ID, sport2.ID)
 
-	resp := api.Get("/api/v1/survey/user/"+userID.String(), "Authorization: Bearer "+mockUUID)
+	resp := api.Get("/api/v1/survey/user/"+user.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -217,9 +250,11 @@ func TestGetAverageRatingsNoFilter(t *testing.T) {
 
 	college := seedCollege(t, testDB)
 	sport := seedSport(t, testDB)
+	user1 := seedUser(t, testDB)
+	user2 := seedUser(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
-	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
+	seedSurvey(t, testDB, user1.ID, college.ID, sport.ID)
+	seedSurvey(t, testDB, user2.ID, college.ID, sport.ID)
 
 	resp := api.Get("/api/v1/survey/averages", "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -242,9 +277,11 @@ func TestGetAverageRatingsFilterBySport(t *testing.T) {
 	college := seedCollege(t, testDB)
 	sport := seedSport(t, testDB)
 	otherSport := seedSport(t, testDB)
+	user1 := seedUser(t, testDB)
+	user2 := seedUser(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
-	seedSurvey(t, testDB, uuid.New(), college.ID, otherSport.ID) // should not appear
+	seedSurvey(t, testDB, user1.ID, college.ID, sport.ID)
+	seedSurvey(t, testDB, user2.ID, college.ID, otherSport.ID) // should not appear
 
 	resp := api.Get("/api/v1/survey/averages?sport_id="+sport.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -270,9 +307,11 @@ func TestGetAverageRatingsFilterByCollege(t *testing.T) {
 	college := seedCollege(t, testDB)
 	otherCollege := seedCollege(t, testDB)
 	sport := seedSport(t, testDB)
+	user1 := seedUser(t, testDB)
+	user2 := seedUser(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
-	seedSurvey(t, testDB, uuid.New(), otherCollege.ID, sport.ID) // should not appear
+	seedSurvey(t, testDB, user1.ID, college.ID, sport.ID)
+	seedSurvey(t, testDB, user2.ID, otherCollege.ID, sport.ID) // should not appear
 
 	resp := api.Get("/api/v1/survey/averages?college_id="+college.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -297,13 +336,14 @@ func TestGetAverageRatingsFilterBySportAndCollege(t *testing.T) {
 
 	college := seedCollege(t, testDB)
 	sport := seedSport(t, testDB)
+	user1 := seedUser(t, testDB)
+	user2 := seedUser(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
-
+	seedSurvey(t, testDB, user1.ID, college.ID, sport.ID)
 
 	noiseCollege := seedCollege(t, testDB)
 	noiseSport := seedSport(t, testDB)
-	seedSurvey(t, testDB, uuid.New(), noiseCollege.ID, noiseSport.ID)
+	seedSurvey(t, testDB, user2.ID, noiseCollege.ID, noiseSport.ID)
 
 	url := "/api/v1/survey/averages?sport_id=" + sport.ID.String() + "&college_id=" + college.ID.String()
 	resp := api.Get(url, "Authorization: Bearer "+mockUUID)
