@@ -17,7 +17,6 @@ export default function OnboardingVerificationPage() {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [institutionEmail, setInstitutionEmail] = useState("");
-  const [school, setSchool] = useState("");
 
   useEffect(() => {
     if (!hydrated) {
@@ -33,13 +32,12 @@ export default function OnboardingVerificationPage() {
     setEmail(data.verification.email);
     setFullName(data.verification.fullName);
     setInstitutionEmail(data.verification.institutionEmail);
-    setSchool(data.verification.school);
   }, [data.legal.accepted, data.verification, hydrated, role, router]);
 
   const isAthlete = role === "athlete";
 
   const canContinue = isAthlete
-    ? Boolean(fullName.trim() && institutionEmail.trim() && school.trim())
+    ? Boolean(fullName.trim() && institutionEmail.trim())
     : Boolean(name.trim() && email.trim());
 
   return (
@@ -90,25 +88,6 @@ export default function OnboardingVerificationPage() {
                 className="h-10 rounded-xl px-3 text-sm"
                 onChange={(event) => {
                   setInstitutionEmail(event.target.value);
-                }}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <label
-                htmlFor="school"
-                className="block text-sm font-medium text-black"
-              >
-                School
-              </label>
-              <Input
-                id="school"
-                type="text"
-                value={school}
-                placeholder="Enter your school"
-                className="h-10 rounded-xl px-3 text-sm"
-                onChange={(event) => {
-                  setSchool(event.target.value);
                 }}
               />
             </div>
@@ -165,7 +144,6 @@ export default function OnboardingVerificationPage() {
               email,
               fullName,
               institutionEmail,
-              school,
             });
             router.push(
               `/onboarding/verification/code?role=${encodeURIComponent(role)}`,
