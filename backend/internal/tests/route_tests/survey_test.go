@@ -10,7 +10,37 @@ import (
 	"github.com/google/uuid"
 )
 
-// helpers to seed a survey into the DB
+// seedCollege inserts a College row so surveys can satisfy fk_surveys_college.
+func seedCollege(t *testing.T, testDB *TestDatabase) *models.College {
+	t.Helper()
+	college := models.College{
+		ID:           uuid.New(),
+		Name:         "Test College",
+		State:        "Massachusetts",
+		City:         "Boston",
+		Website:      "https://www.testcollege.edu",
+		DivisionRank: 1,
+	}
+	if err := testDB.DB.Create(&college).Error; err != nil {
+		t.Fatalf("Unable to seed college: %s", err.Error())
+	}
+	return &college
+}
+
+// seedSport inserts a Sport row so surveys can satisfy fk_surveys_sport.
+func seedSport(t *testing.T, testDB *TestDatabase) *models.Sport {
+	t.Helper()
+	sport := models.Sport{
+		ID:   uuid.New(),
+		Name: "Test Sport",
+	}
+	if err := testDB.DB.Create(&sport).Error; err != nil {
+		t.Fatalf("Unable to seed sport: %s", err.Error())
+	}
+	return &sport
+}
+
+// seedSurvey inserts a Survey row. collegeID and sportID must already exist in the DB.
 func seedSurvey(t *testing.T, testDB *TestDatabase, userID, collegeID, sportID uuid.UUID) *models.Survey {
 	t.Helper()
 	survey := models.Survey{
@@ -39,10 +69,13 @@ func TestCreateSurvey(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
+
 	payload := surveyPackage.CreateSurveyRequest{
 		UserID:                     uuid.MustParse(mockUUID),
-		CollegeID:                  uuid.New(),
-		SportID:                    uuid.New(),
+		CollegeID:                  college.ID,
+		SportID:                    sport.ID,
 		PlayerDev:                  4,
 		AcademicsAthleticsPriority: 3,
 		AcademicCareerResources:    4,
@@ -73,10 +106,13 @@ func TestCreateSurveyInvalidRating(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
+
 	payload := surveyPackage.CreateSurveyRequest{
 		UserID:                     uuid.MustParse(mockUUID),
-		CollegeID:                  uuid.New(),
-		SportID:                    uuid.New(),
+		CollegeID:                  college.ID,
+		SportID:                    sport.ID,
 		PlayerDev:                  6, // out of range
 		AcademicsAthleticsPriority: 3,
 		AcademicCareerResources:    4,
@@ -97,7 +133,9 @@ func TestDeleteSurvey(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	survey := seedSurvey(t, testDB, uuid.MustParse(mockUUID), uuid.New(), uuid.New())
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
+	survey := seedSurvey(t, testDB, uuid.MustParse(mockUUID), college.ID, sport.ID)
 
 	resp := api.Delete("/api/v1/survey/"+survey.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -129,8 +167,14 @@ func TestGetSurveysByUser(t *testing.T) {
 	api := testDB.API
 
 	userID := uuid.MustParse(mockUUID)
-	seedSurvey(t, testDB, userID, uuid.New(), uuid.New())
-	seedSurvey(t, testDB, userID, uuid.New(), uuid.New())
+
+	college1 := seedCollege(t, testDB)
+	sport1 := seedSport(t, testDB)
+	college2 := seedCollege(t, testDB)
+	sport2 := seedSport(t, testDB)
+
+	seedSurvey(t, testDB, userID, college1.ID, sport1.ID)
+	seedSurvey(t, testDB, userID, college2.ID, sport2.ID)
 
 	resp := api.Get("/api/v1/survey/user/"+userID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -171,10 +215,11 @@ func TestGetAverageRatingsNoFilter(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	collegeID := uuid.New()
-	sportID := uuid.New()
-	seedSurvey(t, testDB, uuid.New(), collegeID, sportID)
-	seedSurvey(t, testDB, uuid.New(), collegeID, sportID)
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
+
+	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
+	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
 
 	resp := api.Get("/api/v1/survey/averages", "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
@@ -194,14 +239,14 @@ func TestGetAverageRatingsFilterBySport(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	sportID := uuid.New()
-	otherSportID := uuid.New()
-	collegeID := uuid.New()
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
+	otherSport := seedSport(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), collegeID, sportID)
-	seedSurvey(t, testDB, uuid.New(), collegeID, otherSportID) // should not appear
+	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
+	seedSurvey(t, testDB, uuid.New(), college.ID, otherSport.ID) // should not appear
 
-	resp := api.Get("/api/v1/survey/averages?sport_id="+sportID.String(), "Authorization: Bearer "+mockUUID)
+	resp := api.Get("/api/v1/survey/averages?sport_id="+sport.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -212,8 +257,8 @@ func TestGetAverageRatingsFilterBySport(t *testing.T) {
 	if len(response.Averages) != 1 {
 		t.Fatalf("expected 1 averages row for sport filter, got %d", len(response.Averages))
 	}
-	if response.Averages[0].SportID != sportID {
-		t.Fatalf("unexpected sport_id in averages: got %s, want %s", response.Averages[0].SportID, sportID)
+	if response.Averages[0].SportID != sport.ID {
+		t.Fatalf("unexpected sport_id in averages: got %s, want %s", response.Averages[0].SportID, sport.ID)
 	}
 }
 
@@ -222,14 +267,14 @@ func TestGetAverageRatingsFilterByCollege(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	collegeID := uuid.New()
-	otherCollegeID := uuid.New()
-	sportID := uuid.New()
+	college := seedCollege(t, testDB)
+	otherCollege := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), collegeID, sportID)
-	seedSurvey(t, testDB, uuid.New(), otherCollegeID, sportID) // should not appear
+	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
+	seedSurvey(t, testDB, uuid.New(), otherCollege.ID, sport.ID) // should not appear
 
-	resp := api.Get("/api/v1/survey/averages?college_id="+collegeID.String(), "Authorization: Bearer "+mockUUID)
+	resp := api.Get("/api/v1/survey/averages?college_id="+college.ID.String(), "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -240,8 +285,8 @@ func TestGetAverageRatingsFilterByCollege(t *testing.T) {
 	if len(response.Averages) != 1 {
 		t.Fatalf("expected 1 averages row for college filter, got %d", len(response.Averages))
 	}
-	if response.Averages[0].CollegeID != collegeID {
-		t.Fatalf("unexpected college_id in averages: got %s, want %s", response.Averages[0].CollegeID, collegeID)
+	if response.Averages[0].CollegeID != college.ID {
+		t.Fatalf("unexpected college_id in averages: got %s, want %s", response.Averages[0].CollegeID, college.ID)
 	}
 }
 
@@ -250,13 +295,17 @@ func TestGetAverageRatingsFilterBySportAndCollege(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	collegeID := uuid.New()
-	sportID := uuid.New()
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
 
-	seedSurvey(t, testDB, uuid.New(), collegeID, sportID)
-	seedSurvey(t, testDB, uuid.New(), uuid.New(), uuid.New()) // noise — different college+sport
+	seedSurvey(t, testDB, uuid.New(), college.ID, sport.ID)
 
-	url := "/api/v1/survey/averages?sport_id=" + sportID.String() + "&college_id=" + collegeID.String()
+
+	noiseCollege := seedCollege(t, testDB)
+	noiseSport := seedSport(t, testDB)
+	seedSurvey(t, testDB, uuid.New(), noiseCollege.ID, noiseSport.ID)
+
+	url := "/api/v1/survey/averages?sport_id=" + sport.ID.String() + "&college_id=" + college.ID.String()
 	resp := api.Get(url, "Authorization: Bearer "+mockUUID)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
@@ -269,7 +318,7 @@ func TestGetAverageRatingsFilterBySportAndCollege(t *testing.T) {
 		t.Fatalf("expected 1 averages row for sport+college filter, got %d", len(response.Averages))
 	}
 	row := response.Averages[0]
-	if row.SportID != sportID || row.CollegeID != collegeID {
+	if row.SportID != sport.ID || row.CollegeID != college.ID {
 		t.Fatalf("unexpected row: got sport=%s college=%s", row.SportID, row.CollegeID)
 	}
 	if row.ResponseCount != 1 {
