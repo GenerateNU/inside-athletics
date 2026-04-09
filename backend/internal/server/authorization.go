@@ -20,9 +20,11 @@ var (
 )
 
 var resourceByPathPrefix = map[string]string{
-	"user/tag":     "tagfollow",
-	"user/sport":   "sportfollow",
-	"user/college": "collegefollow",
+	"user/tag":      "tagfollow",
+	"user/sport":    "sportfollow",
+	"user/college":  "collegefollow",
+	"post/premium":  "premiumpost",
+	"posts/premium": "premiumpost",
 }
 
 func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func(huma.Context)) {
