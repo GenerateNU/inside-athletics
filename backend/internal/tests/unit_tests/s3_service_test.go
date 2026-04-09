@@ -16,12 +16,14 @@ var errHeadNotFound = errors.New("head object: not found")
 
 // Tests GetUploadURL key format, response shape, validation, and contentID/userID behavior.
 func TestS3Service_GetUploadURL(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	mock := NewMockS3Client()
 	cfg := s3.Config{Bucket: "test", Region: "us-east-1", PresignedURLExpiry: time.Hour}
 	svc := s3.NewService(mock, cfg)
 
 	t.Run("returns upload URL and correct key format for contentID", func(t *testing.T) {
+		t.Parallel()
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
 			Key:      "premium/image/content-123/photo.jpg",
 			FileType: "image/jpeg",
@@ -55,6 +57,7 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 	})
 
 	t.Run("uses userID when contentID empty", func(t *testing.T) {
+		t.Parallel()
 		mock := NewMockS3Client()
 		svc := s3.NewService(mock, cfg)
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
@@ -72,6 +75,7 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 	})
 
 	t.Run("prefers contentID over userID", func(t *testing.T) {
+		t.Parallel()
 		mock := NewMockS3Client()
 		svc := s3.NewService(mock, cfg)
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
@@ -90,6 +94,7 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 	})
 
 	t.Run("missing fileName defaults documentId to path base", func(t *testing.T) {
+		t.Parallel()
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
 			Key:      "premium/image/c1/photo.jpg",
 			FileType: "image/jpeg",
@@ -103,6 +108,7 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 	})
 
 	t.Run("missing key returns error", func(t *testing.T) {
+		t.Parallel()
 		_, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
 			Key:      "",
 			FileType: "image/jpeg",
@@ -117,6 +123,7 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 	})
 
 	t.Run("missing fileType returns error", func(t *testing.T) {
+		t.Parallel()
 		_, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
 			Key:      "premium/image/c1/x.jpg",
 			FileType: "",
@@ -132,12 +139,14 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 
 // Tests GetDownloadURL URL and expiry, and empty key error.
 func TestS3Service_GetDownloadURL(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	mock := NewMockS3Client()
 	cfg := s3.Config{Bucket: "test", Region: "us-east-1", PresignedURLExpiry: time.Hour}
 	svc := s3.NewService(mock, cfg)
 
 	t.Run("returns download URL and expires_in", func(t *testing.T) {
+		t.Parallel()
 		key := "premium/image/user-1/photo.jpg"
 		resp, err := svc.GetDownloadURL(ctx, key)
 		if err != nil {
@@ -161,6 +170,7 @@ func TestS3Service_GetDownloadURL(t *testing.T) {
 	})
 
 	t.Run("empty key returns error", func(t *testing.T) {
+		t.Parallel()
 		_, err := svc.GetDownloadURL(ctx, "")
 		if err == nil {
 			t.Fatal("expected error for empty key")
@@ -173,6 +183,7 @@ func TestS3Service_GetDownloadURL(t *testing.T) {
 
 // Tests that zero config expiry falls back to default 1 hour.
 func TestS3Service_GetUploadURL_defaultExpiry(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	mock := NewMockS3Client()
 	cfg := s3.Config{Bucket: "test", Region: "us-east-1"} // PresignedURLExpiry zero
@@ -191,6 +202,7 @@ func TestS3Service_GetUploadURL_defaultExpiry(t *testing.T) {
 
 // Tests ConfirmUpload: HeadObject then PresignedDownloadURL, response shape, and empty key / HeadObject error.
 func TestS3Service_ConfirmUpload(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	mock := NewMockS3Client()
 	mock.HeadObjectResponse.Size = 1024
@@ -199,6 +211,7 @@ func TestS3Service_ConfirmUpload(t *testing.T) {
 	svc := s3.NewService(mock, cfg)
 
 	t.Run("returns key, download URL, size, and metadata", func(t *testing.T) {
+		t.Parallel()
 		key := "premium/image/user-1/photo.jpg"
 		resp, err := svc.ConfirmUpload(ctx, key)
 		if err != nil {
@@ -225,6 +238,7 @@ func TestS3Service_ConfirmUpload(t *testing.T) {
 	})
 
 	t.Run("empty key returns error", func(t *testing.T) {
+		t.Parallel()
 		_, err := svc.ConfirmUpload(ctx, "")
 		if err == nil {
 			t.Fatal("expected error for empty key")
@@ -235,6 +249,7 @@ func TestS3Service_ConfirmUpload(t *testing.T) {
 	})
 
 	t.Run("HeadObject error is returned", func(t *testing.T) {
+		t.Parallel()
 		mock2 := NewMockS3Client()
 		mock2.HeadObjectResponse.Err = errHeadNotFound
 		svc2 := s3.NewService(mock2, cfg)
@@ -250,12 +265,14 @@ func TestS3Service_ConfirmUpload(t *testing.T) {
 
 // Tests DeleteObject calls client and validates key.
 func TestS3Service_DeleteObject(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	mock := NewMockS3Client()
 	cfg := s3.Config{Bucket: "test", Region: "us-east-1"}
 	svc := s3.NewService(mock, cfg)
 
 	t.Run("deletes and records key", func(t *testing.T) {
+		t.Parallel()
 		key := "premium/image/user-1/photo.jpg"
 		err := svc.DeleteObject(ctx, key)
 		if err != nil {
@@ -267,6 +284,7 @@ func TestS3Service_DeleteObject(t *testing.T) {
 	})
 
 	t.Run("empty key returns error", func(t *testing.T) {
+		t.Parallel()
 		err := svc.DeleteObject(ctx, "")
 		if err == nil {
 			t.Fatal("expected error for empty key")
@@ -280,6 +298,7 @@ func TestS3Service_DeleteObject(t *testing.T) {
 // --- CompressBytes tests (different media types) ---
 
 func TestCompressBytes_EmptyInput(t *testing.T) {
+	t.Parallel()
 	out, err := s3.CompressBytes(nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -304,6 +323,7 @@ func TestCompressBytes_EmptyInput(t *testing.T) {
 }
 
 func TestCompressBytes_PlainText(t *testing.T) {
+	t.Parallel()
 	src := []byte("Hello world. This is plain text that compresses well. " + "Repeated repeated repeated repeated repeated.")
 	out, err := s3.CompressBytes(src)
 	if err != nil {
@@ -314,6 +334,7 @@ func TestCompressBytes_PlainText(t *testing.T) {
 }
 
 func TestCompressBytes_JSON(t *testing.T) {
+	t.Parallel()
 	src := []byte(`{"name":"test","kind":"image","items":[1,2,3],"nested":{"a":true}}`)
 	out, err := s3.CompressBytes(src)
 	if err != nil {
@@ -323,6 +344,7 @@ func TestCompressBytes_JSON(t *testing.T) {
 }
 
 func TestCompressBytes_HTML(t *testing.T) {
+	t.Parallel()
 	src := []byte(`<!DOCTYPE html><html><head><title>Test</title></head><body><p>Content</p></body></html>`)
 	out, err := s3.CompressBytes(src)
 	if err != nil {
@@ -332,6 +354,7 @@ func TestCompressBytes_HTML(t *testing.T) {
 }
 
 func TestCompressBytes_ImageLike(t *testing.T) {
+	t.Parallel()
 	src := make([]byte, 256)
 	src[0], src[1] = 0xFF, 0xD8 // JPEG magic
 	for i := 2; i < len(src); i++ {
@@ -345,6 +368,7 @@ func TestCompressBytes_ImageLike(t *testing.T) {
 }
 
 func TestCompressBytes_PDFLike(t *testing.T) {
+	t.Parallel()
 	src := []byte("%PDF-1.4\n%\xe2\xe3\xcf\xd3\n1 0 obj\n/Type /Catalog\nendobj\n" +
 		"stream\nstream stream stream stream stream\nendstream\n")
 	out, err := s3.CompressBytes(src)
@@ -355,6 +379,7 @@ func TestCompressBytes_PDFLike(t *testing.T) {
 }
 
 func TestCompressBytes_VideoLike(t *testing.T) {
+	t.Parallel()
 	src := make([]byte, 1024)
 	for i := range src {
 		src[i] = byte(i*i + 1)

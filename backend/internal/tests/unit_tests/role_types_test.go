@@ -8,6 +8,7 @@ import (
 )
 
 func TestHasPermission(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		perms    []models.Permission
@@ -85,6 +86,7 @@ func TestHasPermission(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := role.HasPermission(tt.perms, tt.action, tt.resource); got != tt.want {
 				t.Fatalf("HasPermission() = %v, want %v", got, tt.want)
 			}

@@ -7,6 +7,7 @@ import (
 )
 
 func TestGetGreeting(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

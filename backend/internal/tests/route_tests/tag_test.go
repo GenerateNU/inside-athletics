@@ -11,6 +11,7 @@ import (
 )
 
 func TestGetTagByName(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -26,7 +27,7 @@ func TestGetTagByName(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tag/name/Hockey", "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/tag/name/Hockey", "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.GetTagResponse
 
@@ -38,6 +39,7 @@ func TestGetTagByName(t *testing.T) {
 }
 
 func TestGetTagByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -54,7 +56,7 @@ func TestGetTagByID(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tag/"+newID.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/tag/"+newID.String(), "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.GetTagResponse
 
@@ -66,6 +68,7 @@ func TestGetTagByID(t *testing.T) {
 }
 
 func TestCreateTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -74,7 +77,7 @@ func TestCreateTag(t *testing.T) {
 		Name: "Basketball",
 	}
 
-	resp := api.Post("/api/v1/tag/", "Authorization: Bearer " + mockUUID, payload)
+	resp := api.Post("/api/v1/tag/", "Authorization: Bearer "+mockUUID, payload)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -88,6 +91,7 @@ func TestCreateTag(t *testing.T) {
 }
 
 func TestUpdateTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -106,7 +110,7 @@ func TestUpdateTag(t *testing.T) {
 		Name: "Updated",
 	}
 
-	resp := api.Patch("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer " + mockUUID, update)
+	resp := api.Patch("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer "+mockUUID, update)
 
 	var response tagPackage.UpdateTagResponse
 	DecodeTo(&response, resp)
@@ -116,6 +120,7 @@ func TestUpdateTag(t *testing.T) {
 }
 
 func TestDeleteTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -130,7 +135,7 @@ func TestDeleteTag(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Delete("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Delete("/api/v1/tag/"+tag.ID.String(), "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.DeleteTagResponse
 	DecodeTo(&response, resp)
