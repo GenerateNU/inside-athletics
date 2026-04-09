@@ -39,7 +39,7 @@ export default function CreatePostPopup() {
   const [showSearchPopup, setShowSearchPopup] = useState(false);
 
   const session = useSession();
-  const enabled = !!session?.access_token;
+  const enabled = true;
   const authHeaders = session?.access_token
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
@@ -48,6 +48,8 @@ export default function CreatePostPopup() {
     query: { enabled },
     client: { headers: authHeaders },
   });
+
+  console.log({ enabled, authHeaders, collegesData });
 
   const schools = (collegesData?.colleges ?? []).map((c) => ({
     value: c.id,
@@ -109,6 +111,7 @@ export default function CreatePostPopup() {
         <label className="block text-1xl text-[#001225] font-bold">Add School</label>
         <label className="block text-xs text-[#001225]">Select Max 3</label>
         <Select
+          instanceId="school-select"
           options={schools}
           value={selectedSchool}
           onChange={toggleSchoolTag}

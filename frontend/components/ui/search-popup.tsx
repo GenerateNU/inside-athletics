@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Plus, X, Search } from "lucide-react";
-import { useGetApiV1TagByType } from "@/api/hooks";
+import { useListApiV1TagTypeByType } from "@/api/hooks";
 
 function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClick: () => void }) {
   return (
@@ -70,12 +70,12 @@ const TAG_SECTIONS: { header: string; type: TagType; max: number; group?: string
 
 // One hook call per tag type — all run in parallel
 function useAllTagSections() {
-  const sports             = useGetApiV1TagByType("sports");
-  const divisions          = useGetApiV1TagByType("divisions");
-  const athleticsPerf      = useGetApiV1TagByType("athletics_performance");
-  const healthWellness     = useGetApiV1TagByType("health_wellness");
-  const studentAthleteLife = useGetApiV1TagByType("student_athlete_life");
-  const recruitingLogistic = useGetApiV1TagByType("recruiting_logistics");
+  const sports             = useListApiV1TagTypeByType("sports");
+  const divisions          = useListApiV1TagTypeByType("divisions");
+  const athleticsPerf      = useListApiV1TagTypeByType("athletics_performance");
+  const healthWellness     = useListApiV1TagTypeByType("health_wellness");
+  const studentAthleteLife = useListApiV1TagTypeByType("student_athlete_life");
+  const recruitingLogistic = useListApiV1TagTypeByType("recruiting_logistics");
 
   const results: Record<TagType, Tag[]> = {
     sports:               sports.data             ?? [],
@@ -87,7 +87,7 @@ function useAllTagSections() {
   };
 
   const loading = [sports, divisions, athleticsPerf, healthWellness, studentAthleteLife, recruitingLogistic]
-    .some((r) => r.isLoading);
+    .some((r) => r.isLoading || r.data === undefined);
 
   return { tagsByType: results, loading };
 }
@@ -97,7 +97,9 @@ export default function SearchPopup({ activeTags, setActiveTagsAction, onBackAct
   const { tagsByType, loading } = useAllTagSections();
 
   const filter = (tags: Tag[]) =>
-    tags.filter((tag) => tag.name.toLowerCase().includes(search.toLowerCase()));
+    Array.isArray(tags)
+      ? tags.filter((tag) => tag.name.toLowerCase().includes(search.toLowerCase()))
+      : [];
 
   const toggleTag = (tag: Tag, max: number) => {
     setActiveTagsAction((prev) => {
