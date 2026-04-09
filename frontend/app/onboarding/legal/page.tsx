@@ -22,7 +22,7 @@ export default function OnboardingLegalPage() {
   }, [data.legal.accepted, hydrated]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-2xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-4xl font-bold text-black">
@@ -39,9 +39,9 @@ export default function OnboardingLegalPage() {
             <p className="text-sm leading-6 text-gray-700">
               Privacy note: Content shared on Inside Athletics may be used in
               aggregated and anonymized form to generate insights, reports, and
-              educational or social media content about college athletics. We
-              do not publicly share individual posts in a way that can identify
-              a user.
+              educational or social media content about college athletics. We do
+              not publicly share individual posts in a way that can identify a
+              user.
             </p>
           </section>
 
@@ -66,8 +66,8 @@ export default function OnboardingLegalPage() {
             }}
           />
           <span>
-            I have read the privacy policy and terms and conditions, and I
-            agree to continue.
+            I have read the privacy policy and terms and conditions, and I agree
+            to continue.
           </span>
         </label>
 

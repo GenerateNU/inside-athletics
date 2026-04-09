@@ -25,7 +25,7 @@ export default function OnboardingVerificationCodePage() {
   const canContinue = Boolean(code.trim());
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-4xl font-bold text-black">Verification Code</h1>
@@ -35,7 +35,10 @@ export default function OnboardingVerificationCodePage() {
         </div>
 
         <div className="space-y-3">
-          <label htmlFor="verification-code" className="block text-sm font-medium text-black">
+          <label
+            htmlFor="verification-code"
+            className="block text-sm font-medium text-black"
+          >
             Code
           </label>
           <Input

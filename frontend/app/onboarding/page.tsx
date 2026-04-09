@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOnboarding } from "@/utils/onboarding";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -10,85 +11,100 @@ export default function SignUpPage() {
   const router = useRouter();
   const { data, hydrated, updateSection } = useOnboarding();
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (!hydrated) {
-      return;
-    }
+    if (!hydrated) return;
 
     setName(data.account.name);
+    setEmail(data.verification.email);
     setUsername(data.account.username);
-  }, [data.account.name, data.account.username, hydrated]);
+  }, [data.account.name, data.account.username, data.verification.email, hydrated]);
 
-  const canContinue = Boolean(name.trim() && username.trim() && password);
+  const canContinue = Boolean(
+    name.trim() && email.trim() && username.trim() && password,
+  );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
-      <div className="w-full max-w-lg space-y-6">
-        <div className="space-y-4 text-center">
-          <h1 className="text-4xl font-bold text-black">
-            Join Inside Athletics
-          </h1>
-          <div className="flex h-56 w-full items-center justify-center rounded-md bg-gray-200 text-sm font-medium text-gray-500">
-            Placeholder Image
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
+      <div className="w-full max-w-lg rounded-[1rem] bg-white px-8 py-10 shadow-[0_18px_45px_rgba(44,100,154,0.16)]">
+        <div className="space-y-6">
+          <div className="space-y-4 text-center">
+            <h1 className="text-4xl font-bold text-black">
+              Join Inside Athletics
+            </h1>
+            <div className="flex w-full items-center justify-center rounded-md px-6 py-8">
+              <Image
+                src="/next-images/inside-athletics-logo.svg"
+                alt="Inside Athletics"
+                width={240}
+                height={240}
+                priority
+                className="h-auto w-full max-w-[14rem]"
+              />
+            </div>
           </div>
-        </div>
-        <div className="space-y-6 rounded-md bg-white p-8 shadow-sm">
-          <div className="flex w-full flex-col space-y-4">
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              value={name}
-              placeholder="Name"
-              required
-              onChange={(event) => {
-                setName(event.target.value);
-              }}
-            />
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              value={username}
-              placeholder="Username"
-              required
-              onChange={(event) => {
-                setUsername(event.target.value);
-              }}
-            />
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              value={password}
-              placeholder="Password"
-              required
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-            />
-          </div>
+          <div className="space-y-6 rounded-md">
+            <div className="flex w-full flex-col space-y-4">
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                className="bg-[#F0F4F8]"
+                value={name}
+                placeholder="Name"
+                required
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                className="bg-[#F0F4F8]"
+                value={email}
+                placeholder="Email"
+                required
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                className="bg-[#F0F4F8]"
+                value={username}
+                placeholder="Username"
+                required
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                className="bg-[#F0F4F8]"
+                value={password}
+                placeholder="Password"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-          <div className="flex w-full flex-col items-center gap-2">
-            <Button
-              type="button"
-              variant="default"
-              className="h-10 w-full rounded-xl text-sm font-semibold"
-              style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
-              onClick={() => {
-                updateSection("account", {
-                  name,
-                  username,
-                });
-                router.push("/onboarding/role");
-              }}
-              disabled={!canContinue}
-            >
-              Continue
-            </Button>
+            <div className="flex w-full flex-col items-center gap-2">
+              <Button
+                type="button"
+                variant="default"
+                className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
+                onClick={() => {
+                  updateSection("account", { name, username });
+                  updateSection("verification", { name, email });
+                  router.push("/onboarding/role");
+                }}
+                disabled={!canContinue}
+              >
+                Continue
+              </Button>
+            </div>
           </div>
         </div>
       </div>

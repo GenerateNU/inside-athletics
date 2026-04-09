@@ -50,7 +50,7 @@ export default function OnboardingTopicTagsPage() {
   const canContinue = selectedTags.length > 0;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-3xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-3 text-center">
           <h1 className="text-4xl font-bold text-black">Choose Topic Tags</h1>
@@ -77,7 +77,9 @@ export default function OnboardingTopicTagsPage() {
                 </button>
               ))
             ) : (
-              <span className="text-sm text-gray-500">No tags selected yet</span>
+              <span className="text-sm text-gray-500">
+                No tags selected yet
+              </span>
             )}
           </div>
         </div>
