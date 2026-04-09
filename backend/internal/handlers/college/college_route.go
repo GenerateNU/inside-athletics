@@ -18,6 +18,7 @@ func Route(api huma.API, db *gorm.DB) {
 	var collegeService = &CollegeService{collegeDB} // create object with college functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/college")
+		huma.Get(grp, "/", collegeService.ListColleges)
 		huma.Get(grp, "/{id}", collegeService.GetCollege)
 		huma.Post(grp, "", collegeService.CreateCollege)
 		huma.Put(grp, "/{id}", collegeService.UpdateCollege)

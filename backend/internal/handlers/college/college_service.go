@@ -47,6 +47,36 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	}, err
 }
 
+func (u *CollegeService) ListColleges(ctx context.Context, input *ListCollegesParams) (*utils.ResponseBody[ListCollegesResponse], error) {
+	colleges, err := u.collegeDB.ListColleges(input.Limit, input.Offset)
+
+	respBody := &utils.ResponseBody[ListCollegesResponse]{}
+	if err != nil {
+		return respBody, err
+	}
+
+	responseColleges := make([]GetCollegeResponse, 0, len(*colleges))
+	for _, college := range *colleges {
+		responseColleges = append(responseColleges, GetCollegeResponse{
+			ID:           college.ID,
+			Name:         college.Name,
+			State:        college.State,
+			City:         college.City,
+			Website:      college.Website,
+			AcademicRank: college.AcademicRank,
+			DivisionRank: college.DivisionRank,
+			Logo:         StringPtrOrNil(college.Logo),
+		})
+	}
+
+	return &utils.ResponseBody[ListCollegesResponse]{
+		Body: &ListCollegesResponse{
+			Colleges: responseColleges,
+			Total:    len(responseColleges),
+		},
+	}, nil
+}
+
 // Creates a single college
 func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollegeInput) (*utils.ResponseBody[CreateCollegeResponse], error) {
 	college := &models.College{
@@ -94,7 +124,7 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	if err != nil {
 		return respBody, err
 	}
-	
+
 	response := &UpdateCollegeResponse{
 		ID:           college.ID,
 		Name:         college.Name,

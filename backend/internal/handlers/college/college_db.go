@@ -24,6 +24,17 @@ func (c *CollegeDB) GetCollege(id uuid.UUID) (*models.College, error) {
 	return utils.HandleDBError(&college, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 
+func (c *CollegeDB) ListColleges(limit, offset int) (*[]models.College, error) {
+	var colleges []models.College
+	dbResponse := c.db.
+		Order("name ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&colleges)
+
+	return utils.HandleDBError(&colleges, dbResponse.Error)
+}
+
 // Creates a new college in the database
 func (c *CollegeDB) CreateCollege(college *models.College) (*models.College, error) {
 	dbResponse := c.db.Create(college)
