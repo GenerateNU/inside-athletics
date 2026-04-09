@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -48,57 +48,55 @@ export function RatingPanel() {
   };
 
   return (
-    <Card className="w-full max-w-3xl border border-black/10 bg-[#E8F1FA] py-0 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
-      <CardHeader className="border-b border-black/8 px-6 py-5">
-        <CardTitle className="text-left text-2xl font-semibold text-black">
-          Rating
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-8 px-6 py-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          <Select value={programGender} onValueChange={handleProgramGenderChange}>
-            <SelectTrigger className="h-12 w-full rounded-md border-black/10 bg-zinc-50 px-4 text-sm text-black">
-              <SelectValue placeholder="Select Program Gender" />
-            </SelectTrigger>
-            <SelectContent>
-              {genderOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className="w-full max-w-3xl space-y-4">
+      <h2 className="text-left text-2xl font-semibold text-black">Rating</h2>
+      <Card className="border border-black/10 bg-[#E8F1FA] py-0 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
+        <CardContent className="space-y-8 px-6 py-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Select value={programGender} onValueChange={handleProgramGenderChange}>
+              <SelectTrigger className="h-12 w-full rounded-md border-black/10 bg-zinc-50 px-4 text-sm text-black">
+                <SelectValue placeholder="Select Program Gender" />
+              </SelectTrigger>
+              <SelectContent>
+                {genderOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select value={sportProgram} onValueChange={handleSportProgramChange}>
-            <SelectTrigger className="h-12 w-full rounded-md border-black/10 bg-zinc-50 px-4 text-sm text-black">
-              <SelectValue placeholder="Select Sport Program" />
-            </SelectTrigger>
-            <SelectContent>
-              {sportOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <Select value={sportProgram} onValueChange={handleSportProgramChange}>
+              <SelectTrigger className="h-12 w-full rounded-md border-black/10 bg-zinc-50 px-4 text-sm text-black">
+                <SelectValue placeholder="Select Sport Program" />
+              </SelectTrigger>
+              <SelectContent>
+                {sportOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {ratingRows.map((row) => (
-            <div
-              key={row.label}
-              className="flex items-center gap-4 rounded-xl bg-[#E8F1FA] p-4"
-            >
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#3E7DBB] text-base font-semibold text-white">
-                {row.value}/5
+          <div className="grid gap-4 md:grid-cols-2">
+            {ratingRows.map((row) => (
+              <div
+                key={row.label}
+                className="flex items-center gap-4 rounded-xl bg-[#E8F1FA] p-4"
+              >
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#3E7DBB] text-base font-semibold text-white">
+                  {row.value}/5
+                </div>
+                <div className="text-sm font-medium leading-6 text-black">
+                  {row.label}
+                </div>
               </div>
-              <div className="text-sm font-medium leading-6 text-black">
-                {row.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
