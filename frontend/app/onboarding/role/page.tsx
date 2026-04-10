@@ -114,7 +114,9 @@ export default function OnboardingRolePage() {
   }, [data.preferences, data.role, hydrated]);
 
   useEffect(() => {
-    if (role !== "athlete" || !session?.access_token) {
+    const accessToken = session?.access_token;
+
+    if (role !== "athlete" || !accessToken) {
       setIsLoadingColleges(false);
       setCollegeError("");
       if (role !== "athlete") {
@@ -132,7 +134,7 @@ export default function OnboardingRolePage() {
 
         const response = await fetch("/api/v1/college/?limit=500", {
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -199,7 +201,9 @@ export default function OnboardingRolePage() {
       return;
     }
 
-    if (!session?.access_token) {
+    const accessToken = session?.access_token;
+
+    if (!accessToken) {
       setUploadError("You need an active session to upload a profile image.");
       event.target.value = "";
       return;
@@ -219,7 +223,7 @@ export default function OnboardingRolePage() {
       const uploadUrlResponse = await fetch("/api/v1/content/upload-url", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -258,7 +262,7 @@ export default function OnboardingRolePage() {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
