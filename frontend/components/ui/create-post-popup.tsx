@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
 import SearchPopup from "./search-popup.tsx";
 import { useSession } from "@/utils/SessionContext";
-import { useGetApiV1Colleges } from "@/api/hooks";
+import { useGetApiV1Colleges, usePostApiV1Post } from "@/api/hooks";
+import { useRouter } from "next/navigation";
 
 type Tag = {
   id: string;
@@ -37,6 +38,7 @@ export default function CreatePostPopup() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<{ value: string; label: string } | null>(null);
   const [showSearchPopup, setShowSearchPopup] = useState(false);
+  const router = useRouter();
 
   const session = useSession();
   const enabled = true;
@@ -50,6 +52,32 @@ export default function CreatePostPopup() {
   });
 
   console.log({ enabled, authHeaders, collegesData });
+
+  const { mutateAsync: createPost, isPending } = usePostApiV1Post({
+    client: { headers: authHeaders },
+  });
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) return;
+
+    const schoolTag = activeTags.find((t) => t.type === "schools");
+    const sportTag = activeTags.find((t) => t.type === "sports");
+    const otherTags = activeTags.filter((t) => t.type !== "schools" && t.type !== "sport");
+
+    await createPost({
+      data: {
+        title,
+        content,
+        is_anonymous: isAnonymous,
+        college_id: schoolTag?.id,
+        sport_id: sportTag?.id,
+        tags: otherTags.length > 0 ? otherTags.map((t) => ({ id: t.id, name: t.name })) : null,
+      },
+    });
+
+
+    router.push("/");
+  };
 
   const schools = (collegesData?.colleges ?? []).map((c) => ({
     value: c.id,
@@ -86,7 +114,7 @@ export default function CreatePostPopup() {
       <div className="max-w-lg w-full flex flex-col justify-between space-y-3 overflow-y-auto max-h-[90vh]">
         <div className="flex justify-between">
           <label className="block text-3xl text-[#001225] font-bold">Create Post</label>
-          <Button variant="ghost" onClick={() => {}}>
+          <Button variant="ghost" onClick={() => router.push("/?createPost=false")}>
             <X className="!w-8 !h-8" />
           </Button>
         </div>
@@ -161,7 +189,7 @@ export default function CreatePostPopup() {
           <Button
             variant="ghost"
             className="rounded-full bg-[#2C649A] text-[#F4F8FA] hover:text-[#F4F8FA] hover:bg-[#245580] flex items-center gap-2 h-full px-4 py-1"
-            onClick={() => {}}
+            onClick={handleSubmit}
           >
             Post
           </Button>
