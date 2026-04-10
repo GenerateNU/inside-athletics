@@ -4,6 +4,8 @@ import { Navbar } from "@/components/ui/navbar";
 import { RatingPanel } from "@/components/ui/rating-panel";
 import { CiUser } from "react-icons/ci";
 
+const demoCollegeId = "014d2c09-4023-445d-9779-66aff4824245";
+
 export default function Page() {
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -30,8 +32,7 @@ export default function Page() {
                 <Button variant="outline"> Click here</Button>
               </div>
             </div>
-
-            <RatingPanel />
+            <RatingPanel collegeId={demoCollegeId} />
           </div>
         </main>
       </div>

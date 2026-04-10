@@ -96,12 +96,17 @@ function formatRating(value: number) {
 
 async function getAverageRatings({
   accessToken,
+  collegeId,
   sportId,
 }: {
   accessToken: string;
+  collegeId: string;
   sportId: string;
 }) {
-  const searchParams = new URLSearchParams({ sport_id: sportId });
+  const searchParams = new URLSearchParams({
+    college_id: collegeId,
+    sport_id: sportId,
+  });
   const response = await fetch(
     `/api/v1/survey/averages?${searchParams.toString()}`,
     {
@@ -174,7 +179,7 @@ function aggregateRatings(rows: AverageRatingsRow[]): AggregatedRatings | null {
   };
 }
 
-export function RatingPanel() {
+export function RatingPanel({ collegeId }: { collegeId: string }) {
   const [programGender, setProgramGender] = useState<string>("");
   const [sportProgram, setSportProgram] = useState<string>("");
   const session = useSession();
@@ -203,13 +208,14 @@ export function RatingPanel() {
     isLoading: isLoadingRatings,
     isError,
   } = useQuery({
-    queryKey: ["survey-averages", sportProgram],
+    queryKey: ["survey-averages", collegeId, sportProgram],
     queryFn: () =>
       getAverageRatings({
         accessToken: session!.access_token,
+        collegeId,
         sportId: sportProgram,
       }),
-    enabled: !!session?.access_token && !!sportProgram,
+    enabled: !!session?.access_token && !!collegeId && !!sportProgram,
   });
 
   const aggregatedRatings = aggregateRatings(surveyRows);
