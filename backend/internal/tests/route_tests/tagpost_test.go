@@ -63,6 +63,7 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 }
 
 func TestGetPostsByTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -81,7 +82,7 @@ func TestGetPostsByTag(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tag/"+HealthAndWellnessID.String()+"/posts", "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/tag/"+HealthAndWellnessID.String()+"/posts", "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.GetPostsByTagResponse
 
@@ -93,6 +94,7 @@ func TestGetPostsByTag(t *testing.T) {
 }
 
 func TestGetTagpostByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -111,7 +113,7 @@ func TestGetTagpostByID(t *testing.T) {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/post/tag/"+newId.String(), "Authorization: Bearer " + mockUUID)
+	resp := api.Get("/api/v1/post/tag/"+newId.String(), "Authorization: Bearer "+mockUUID)
 
 	var response tagpostPackage.GetTagPostByIDResponse
 
@@ -123,6 +125,7 @@ func TestGetTagpostByID(t *testing.T) {
 }
 
 func TestCreateTagPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -150,6 +153,7 @@ func TestCreateTagPost(t *testing.T) {
 }
 
 func TestUpdateTagPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -184,6 +188,7 @@ func TestUpdateTagPost(t *testing.T) {
 }
 
 func TestDeleteTagPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

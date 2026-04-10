@@ -83,6 +83,7 @@ func seedSurvey(t *testing.T, testDB *TestDatabase, userID, collegeID, sportID u
 }
 
 func TestCreateSurvey(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -134,6 +135,7 @@ func TestCreateSurvey(t *testing.T) {
 }
 
 func TestCreateSurveyInvalidRating(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -161,6 +163,7 @@ func TestCreateSurveyInvalidRating(t *testing.T) {
 }
 
 func TestDeleteSurvey(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -184,6 +187,7 @@ func TestDeleteSurvey(t *testing.T) {
 }
 
 func TestDeleteSurveyNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -195,6 +199,7 @@ func TestDeleteSurveyNotFound(t *testing.T) {
 }
 
 func TestGetSurveysByUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -226,6 +231,7 @@ func TestGetSurveysByUser(t *testing.T) {
 }
 
 func TestGetSurveysByUserEmpty(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -244,6 +250,7 @@ func TestGetSurveysByUserEmpty(t *testing.T) {
 }
 
 func TestGetAverageRatingsNoFilter(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -270,6 +277,7 @@ func TestGetAverageRatingsNoFilter(t *testing.T) {
 }
 
 func TestGetAverageRatingsFilterBySport(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -300,6 +308,7 @@ func TestGetAverageRatingsFilterBySport(t *testing.T) {
 }
 
 func TestGetAverageRatingsFilterByCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -330,6 +339,7 @@ func TestGetAverageRatingsFilterByCollege(t *testing.T) {
 }
 
 func TestGetAverageRatingsFilterBySportAndCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
