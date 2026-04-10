@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
-import SearchPopup from "./search-popup";
+import SearchPopup from "./search-popup.tsx";
 import { useSession } from "@/utils/SessionContext";
 import { useGetApiV1Colleges } from "@/api/hooks";
 

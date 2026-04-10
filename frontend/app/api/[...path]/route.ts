@@ -3,10 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const BACKEND_ORIGIN =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8080";
 
-function buildBackendUrl(
-  path: string[],
-  search: string,
-) {
+function buildBackendUrl(path: string[], search: string) {
   const normalizedPath = path.map((segment) => decodeURIComponent(segment));
   return `${BACKEND_ORIGIN}/api/${normalizedPath.join("/")}${search}`;
 }
@@ -24,7 +21,10 @@ function copyAllowedHeaders(request: NextRequest) {
   return headers;
 }
 
-async function handle(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
+async function handle(
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
   const { path } = await context.params;
   const url = buildBackendUrl(path, request.nextUrl.search);
   const headers = copyAllowedHeaders(request);
