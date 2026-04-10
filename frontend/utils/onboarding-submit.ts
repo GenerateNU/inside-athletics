@@ -7,6 +7,9 @@ type TagPayload = {
   name: string;
 };
 
+const CURRENT_USER_SYNC_RETRIES = 8;
+const CURRENT_USER_SYNC_DELAY_MS = 250;
+
 function splitName(fullName: string) {
   const trimmed = fullName.trim();
 
@@ -67,6 +70,34 @@ function unwrapBody<T>(value: unknown): T | undefined {
   }
 
   return current as T | undefined;
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+async function waitForCurrentUser(headers: Record<string, string>) {
+  for (let attempt = 0; attempt < CURRENT_USER_SYNC_RETRIES; attempt += 1) {
+    const currentUserResponse = await fetch("/api/v1/user/current", {
+      headers,
+    });
+
+    if (currentUserResponse.ok) {
+      return;
+    }
+
+    if (currentUserResponse.status !== 404) {
+      throw new Error("Unable to verify current user.");
+    }
+
+    if (attempt < CURRENT_USER_SYNC_RETRIES - 1) {
+      await delay(CURRENT_USER_SYNC_DELAY_MS);
+    }
+  }
+
+  throw new Error("User creation did not finish syncing. Please try again.");
 }
 
 async function getOrCreateTagId(
@@ -181,6 +212,8 @@ export async function submitOnboardingUser(
     if (!createUserResponse.ok) {
       throw new Error("Unable to create user.");
     }
+
+    await waitForCurrentUser(headers);
   }
 
   await syncSelectedTagFollows(data, headers);
