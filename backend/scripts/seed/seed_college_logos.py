@@ -29,16 +29,12 @@ import boto3
 import requests
 from thefuzz import process as fuzz_process
 
-# ── Constants ────────────────────────────────────────────────────────────────
-
 NCAA_API_BASE = "https://ncaa-api.henrygd.me"
 NCAA_CDN_BASE = "https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgd"
 RATE_LIMIT_DELAY = 0.25  # 4 req/s, safely under the 5 req/s cap
 FUZZY_MATCH_THRESHOLD = 80  # minimum score to accept a name match
 S3_KEY_PREFIX = "colleges/logos"
 CONTENT_TYPE = "image/png"
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
 
 
 def normalize(name: str) -> str:
@@ -146,7 +142,6 @@ def main():
     )
     args = parser.parse_args()
 
-    # ── Env / AWS setup ──────────────────────────────────────────────────────
     bucket = os.environ.get("S3_BUCKET")
     region = os.environ.get("AWS_REGION")
 
@@ -162,7 +157,6 @@ def main():
         s3_client = None
         print(f"[DRY RUN] Would upload to bucket={bucket}, region={region}")
 
-    # ── Load data ────────────────────────────────────────────────────────────
     colleges = load_colleges(args.colleges)
     if args.limit:
         colleges = colleges[: args.limit]
@@ -171,7 +165,6 @@ def main():
     schools = fetch_schools_index()
     lookup = build_lookup(schools)
 
-    # ── Process each college ─────────────────────────────────────────────────
     results = {"uploaded": [], "not_matched": [], "no_logo": [], "failed": []}
 
     for i, college in enumerate(colleges, 1):
@@ -215,11 +208,11 @@ def main():
             s3_url = upload_to_s3(s3_client, bucket, key, logo_bytes, ext)
             print(f"  ✓ Uploaded → {s3_url}")
             results["uploaded"].append({"name": name, "key": key, "url": s3_url})
+            college["logo"] = key
         except Exception as e:
             print(f"  ✗ S3 upload failed: {e}")
             results["failed"].append({"name": name, "error": str(e)})
 
-    # ── Summary ──────────────────────────────────────────────────────────────
     print("\n" + "=" * 60)
     print("SUMMARY")
     print("=" * 60)
@@ -238,7 +231,11 @@ def main():
         for n in results["no_logo"]:
             print(f"  - {n}")
 
-    # Write results to JSON for review
+    with open(args.colleges, "w") as f:
+        json.dump(colleges, f, indent=2)
+    print(f"✓ colleges.json updated with logo keys")
+
+    # Write results to JSON for reviewa
     output_path = Path(args.colleges).parent / "logo_results.json"
     with open(output_path, "w") as f:
         json.dump(results, f, indent=2)
