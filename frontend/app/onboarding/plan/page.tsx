@@ -62,12 +62,12 @@ export default function OnboardingPlanPage() {
                 className="rounded-xl p-[2px] transition-all"
                 style={{
                   background: isPremium
-                    ? "linear-gradient(180deg, #2C649A 0%, #5F95C7 100%)"
-                    : "linear-gradient(180deg, #2C649A 0%, #16A34A 100%)",
+                    ? "#7F8C2D"
+                    : "#D4E94B",
                   boxShadow: isSelected
                     ? isPremium
-                      ? "0 0 0 3px rgba(44, 100, 154, 0.28), 0 14px 30px rgba(44, 100, 154, 0.22)"
-                      : "0 0 0 3px rgba(22, 163, 74, 0.22), 0 14px 30px rgba(44, 100, 154, 0.12)"
+                      ? "4px 6px 14px rgba(127, 140, 45, 0.24)"
+                      : "4px 6px 14px rgba(44, 100, 154, 0.18)"
                     : "none",
                   transform: isSelected ? "translateY(-2px)" : "none",
                 }}
@@ -79,33 +79,51 @@ export default function OnboardingPlanPage() {
                   style={{
                     borderColor: "transparent",
                     background: isPremium
-                      ? "linear-gradient(180deg, #2C649A 0%, #76A7D4 100%)"
-                      : "#FFFFFF",
-                    color: isPremium ? "#FFFFFF" : "#000000",
+                      ? "#E9F4A5"
+                      : "#FCFDF1",
+                    color: "#000000",
                   }}
                   onClick={() => {
                     setSelectedPlan(plan.value);
                   }}
                 >
                   <div className="w-full px-4 py-4">
-                    <span className="block w-full text-sm font-semibold break-words">
-                      {plan.label}
-                    </span>
+                    {isPremium ? (
+                      <div
+                        className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border-[1.5px] px-3 py-3 text-sm font-semibold"
+                        style={{
+                          backgroundColor: "#FCFDF1",
+                          borderColor: "#7F8C2D",
+                        }}
+                      >
+                        {plan.label}
+                      </div>
+                    ) : (
+                      <div
+                        className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border px-3 py-3 text-sm font-semibold"
+                        style={{
+                          backgroundColor: "#FFFFFF",
+                          borderColor: "#D4E94B",
+                        }}
+                      >
+                        {plan.label}
+                      </div>
+                    )}
                   </div>
                   <div className="w-full px-4">
                     <div
                       className="mx-3 border-t"
                       style={{
                         borderColor: isPremium
-                          ? "rgba(234, 244, 255, 0.35)"
-                          : "rgba(44, 100, 154, 0.2)",
+                          ? "#7F8C2D"
+                          : "#D4E94B",
                       }}
                     />
                   </div>
                   <div
                     className="w-full px-4 py-4 text-sm"
                     style={{
-                      color: isPremium ? "#EAF4FF" : "#4B5563",
+                      color: isPremium ? "#000000" : "#4B5563",
                     }}
                   >
                     {plan.price}
@@ -115,15 +133,15 @@ export default function OnboardingPlanPage() {
                       className="mx-3 border-t"
                       style={{
                         borderColor: isPremium
-                          ? "rgba(234, 244, 255, 0.35)"
-                          : "rgba(44, 100, 154, 0.2)",
+                          ? "#7F8C2D"
+                          : "#D4E94B",
                       }}
                     />
                   </div>
                   <div
                     className="w-full px-4 py-4 text-sm"
                     style={{
-                      color: isPremium ? "#EAF4FF" : "#4B5563",
+                      color: isPremium ? "#000000" : "#4B5563",
                     }}
                   >
                     Feature 1
@@ -133,15 +151,15 @@ export default function OnboardingPlanPage() {
                       className="mx-3 border-t"
                       style={{
                         borderColor: isPremium
-                          ? "rgba(234, 244, 255, 0.35)"
-                          : "rgba(44, 100, 154, 0.2)",
+                          ? "#7F8C2D"
+                          : "#D4E94B",
                       }}
                     />
                   </div>
                   <div
                     className="w-full px-4 py-4 text-sm"
                     style={{
-                      color: isPremium ? "#EAF4FF" : "#4B5563",
+                      color: isPremium ? "#000000" : "#4B5563",
                     }}
                   >
                     Feature 2
@@ -151,15 +169,15 @@ export default function OnboardingPlanPage() {
                       className="mx-3 border-t"
                       style={{
                         borderColor: isPremium
-                          ? "rgba(234, 244, 255, 0.35)"
-                          : "rgba(44, 100, 154, 0.2)",
+                          ? "#7F8C2D"
+                          : "#D4E94B",
                       }}
                     />
                   </div>
                   <div
                     className="w-full px-4 py-4 text-sm"
                     style={{
-                      color: isPremium ? "#EAF4FF" : "#4B5563",
+                      color: isPremium ? "#000000" : "#4B5563",
                     }}
                   >
                     Feature 3

@@ -63,10 +63,10 @@ export default function OnboardingTopicTagsPage() {
                 <button
                   key={tag}
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium text-white"
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium text-black"
                   style={{
-                    background:
-                      "linear-gradient(180deg, #00804D 0%, #043D26 100%)",
+                    backgroundColor: "#D4E94B80",
+                    borderColor: "#7F8C2D",
                   }}
                   onClick={() => {
                     toggleTag(tag);
@@ -101,11 +101,9 @@ export default function OnboardingTopicTagsPage() {
                       variant="outline"
                       className="h-12 rounded-xl px-4 text-sm font-semibold"
                       style={{
-                        borderColor: isSelected ? "transparent" : "#00804D",
-                        background: isSelected
-                          ? "linear-gradient(180deg, #00804D 0%, #043D26 100%)"
-                          : "#FFFFFF",
-                        color: isSelected ? "#FFFFFF" : "#000000",
+                        borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
+                        backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
+                        color: "#000000",
                       }}
                       onClick={() => {
                         toggleTag(tag);

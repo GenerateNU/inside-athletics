@@ -21,7 +21,12 @@ export default function SignUpPage() {
     setName(data.account.name);
     setEmail(data.verification.email);
     setUsername(data.account.username);
-  }, [data.account.name, data.account.username, data.verification.email, hydrated]);
+  }, [
+    data.account.name,
+    data.account.username,
+    data.verification.email,
+    hydrated,
+  ]);
 
   const canContinue = Boolean(
     name.trim() && email.trim() && username.trim() && password,
@@ -37,7 +42,7 @@ export default function SignUpPage() {
             </h1>
             <div className="flex w-full items-center justify-center rounded-md px-6 py-8">
               <Image
-                src="/next-images/inside-athletics-logo.svg"
+                src="/ia mark.svg"
                 alt="Inside Athletics"
                 width={240}
                 height={240}

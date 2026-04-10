@@ -1,28 +1,114 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOnboarding } from "@/utils/onboarding";
 
+const CODE_LENGTH = 6;
+
+function normalizeDigits(value: string) {
+  return value.replace(/\D/g, "").slice(0, CODE_LENGTH);
+}
+
 export default function OnboardingVerificationCodePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
-  const [code, setCode] = useState("");
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const [digits, setDigits] = useState<string[]>(() =>
+    Array.from({ length: CODE_LENGTH }, () => ""),
+  );
 
   useEffect(() => {
     if (!hydrated) {
       return;
     }
 
-    setCode(data.verification.code);
+    const normalizedCode = normalizeDigits(data.verification.code);
+    const nextDigits = Array.from({ length: CODE_LENGTH }, (_, index) => {
+      return normalizedCode[index] ?? "";
+    });
+
+    setDigits(nextDigits);
   }, [data.verification.code, hydrated]);
 
-  const canContinue = Boolean(code.trim());
+  const code = useMemo(() => digits.join(""), [digits]);
+  const canContinue = code.length === CODE_LENGTH;
+
+  const focusInput = (index: number) => {
+    inputRefs.current[index]?.focus();
+    inputRefs.current[index]?.select();
+  };
+
+  const handleDigitChange = (index: number, value: string) => {
+    const normalizedValue = normalizeDigits(value);
+
+    if (!normalizedValue) {
+      setDigits((current) => {
+        const next = [...current];
+        next[index] = "";
+        return next;
+      });
+      return;
+    }
+
+    setDigits((current) => {
+      const next = [...current];
+
+      if (normalizedValue.length > 1) {
+        normalizedValue.split("").forEach((digit, offset) => {
+          const targetIndex = index + offset;
+          if (targetIndex < CODE_LENGTH) {
+            next[targetIndex] = digit;
+          }
+        });
+      } else {
+        next[index] = normalizedValue;
+      }
+
+      return next;
+    });
+
+    const nextIndex = Math.min(index + normalizedValue.length, CODE_LENGTH - 1);
+    focusInput(nextIndex);
+  };
+
+  const handleKeyDown = (
+    index: number,
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === "Backspace" && !digits[index] && index > 0) {
+      event.preventDefault();
+      setDigits((current) => {
+        const next = [...current];
+        next[index - 1] = "";
+        return next;
+      });
+      focusInput(index - 1);
+    }
+
+    if (event.key === "ArrowLeft" && index > 0) {
+      event.preventDefault();
+      focusInput(index - 1);
+    }
+
+    if (event.key === "ArrowRight" && index < CODE_LENGTH - 1) {
+      event.preventDefault();
+      focusInput(index + 1);
+    }
+  };
+
+  const handlePaste = (
+    index: number,
+    event: React.ClipboardEvent<HTMLInputElement>,
+  ) => {
+    event.preventDefault();
+    handleDigitChange(index, event.clipboardData.getData("text"));
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
@@ -36,21 +122,42 @@ export default function OnboardingVerificationCodePage() {
 
         <div className="space-y-3">
           <label
-            htmlFor="verification-code"
+            htmlFor="verification-code-0"
             className="block text-sm font-medium text-black"
           >
             Code
           </label>
-          <Input
-            id="verification-code"
-            type="text"
-            value={code}
-            placeholder="Enter your code"
-            className="h-10 rounded-xl px-3 text-sm"
-            onChange={(event) => {
-              setCode(event.target.value);
-            }}
-          />
+          <div className="flex justify-center gap-3">
+            {digits.map((digit, index) => (
+              <Input
+                key={index}
+                id={`verification-code-${index}`}
+                ref={(element) => {
+                  inputRefs.current[index] = element;
+                }}
+                type="text"
+                inputMode="numeric"
+                autoComplete={index === 0 ? "one-time-code" : "off"}
+                maxLength={CODE_LENGTH}
+                value={digit}
+                className="h-12 w-12 rounded-xl px-0 text-center text-lg font-semibold"
+                style={{
+                  backgroundColor: digit ? "#D4E94B80" : "#FCFDF1",
+                  borderColor: digit ? "#7F8C2D" : "#D4E94B",
+                  borderWidth: "1px",
+                }}
+                onChange={(event) => {
+                  handleDigitChange(index, event.target.value);
+                }}
+                onKeyDown={(event) => {
+                  handleKeyDown(index, event);
+                }}
+                onPaste={(event) => {
+                  handlePaste(index, event);
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         <Button
@@ -62,7 +169,7 @@ export default function OnboardingVerificationCodePage() {
               code,
             });
             router.push(
-              role === "athlete"
+              role === "prospective-athlete"
                 ? `/onboarding/teams-of-interest?role=${encodeURIComponent(role)}`
                 : "/onboarding/plan",
             );

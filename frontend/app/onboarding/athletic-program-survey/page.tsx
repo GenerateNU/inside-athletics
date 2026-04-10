@@ -126,11 +126,9 @@ export default function OnboardingAthleticProgramSurveyPage() {
                       variant="outline"
                       className="h-11 min-w-16 rounded-xl px-6 text-sm font-semibold"
                       style={{
-                        borderColor: isSelected ? "transparent" : "#00804D",
-                        background: isSelected
-                          ? "linear-gradient(180deg, #00804D 0%, #043D26 100%)"
-                          : "#FFFFFF",
-                        color: isSelected ? "#FFFFFF" : "#000000",
+                        borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
+                        backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
+                        color: "#000000",
                       }}
                       onClick={() => {
                         setResponses((current) => ({
