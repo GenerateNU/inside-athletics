@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOnboarding } from "@/utils/onboarding";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 const CODE_LENGTH = 6;
 
@@ -18,10 +19,14 @@ export default function OnboardingVerificationCodePage() {
   const searchParams = useSearchParams();
   const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
+  const source = searchParams.get("source") ?? "";
+  const signupEmail = searchParams.get("email") ?? "";
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [digits, setDigits] = useState<string[]>(() =>
     Array.from({ length: CODE_LENGTH }, () => ""),
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!hydrated) {
@@ -38,6 +43,7 @@ export default function OnboardingVerificationCodePage() {
 
   const code = useMemo(() => digits.join(""), [digits]);
   const canContinue = code.length === CODE_LENGTH;
+  const isSignupVerification = source === "signup" && Boolean(signupEmail);
 
   const focusInput = (index: number) => {
     inputRefs.current[index]?.focus();
@@ -110,6 +116,46 @@ export default function OnboardingVerificationCodePage() {
     handleDigitChange(index, event.clipboardData.getData("text"));
   };
 
+  const handleContinue = async () => {
+    if (!canContinue) {
+      return;
+    }
+
+    updateSection("verification", {
+      code,
+    });
+
+    if (!isSignupVerification) {
+      router.push(
+        role === "prospective-athlete"
+          ? `/onboarding/teams-of-interest?role=${encodeURIComponent(role)}`
+          : "/onboarding/plan",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: signupEmail,
+        token: code,
+        type: "email",
+      });
+
+      if (verifyError) {
+        setError(verifyError.message || "Unable to verify your code.");
+        return;
+      }
+
+      router.push("/onboarding");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
@@ -164,20 +210,16 @@ export default function OnboardingVerificationCodePage() {
           type="button"
           className="h-10 w-full rounded-xl text-sm font-semibold"
           style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
-          onClick={() => {
-            updateSection("verification", {
-              code,
-            });
-            router.push(
-              role === "prospective-athlete"
-                ? `/onboarding/teams-of-interest?role=${encodeURIComponent(role)}`
-                : "/onboarding/plan",
-            );
-          }}
-          disabled={!canContinue}
+          onClick={handleContinue}
+          disabled={!canContinue || isSubmitting}
         >
           Continue
         </Button>
+        {error ? (
+          <p className="text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
     </div>
   );

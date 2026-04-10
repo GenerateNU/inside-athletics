@@ -67,8 +67,14 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getSession();
   const pathname = request.nextUrl.pathname;
   const isOnboardingRoute = pathname.startsWith(ONBOARDING_PATH_PREFIX);
+  const isSignupVerificationRoute =
+    pathname.startsWith("/onboarding/verification/code") &&
+    request.nextUrl.searchParams.get("source") === "signup";
   const isAuthRoute =
-    pathname.startsWith("/login") || pathname.startsWith("/signup");
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    isSignupVerificationRoute ||
+    pathname.startsWith("/auth/confirm");
 
   if (
     !user &&

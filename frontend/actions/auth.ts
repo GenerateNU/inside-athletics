@@ -38,8 +38,9 @@ export async function signup(
   formData: FormData,
 ) {
   const supabase = await createSupabaseServerClient();
+  const email = formData.get("email") as string;
   const payload = {
-    email: formData.get("email") as string,
+    email,
     password: formData.get("password") as string,
     options: {
       data: {},
@@ -54,5 +55,7 @@ export async function signup(
   }
 
   revalidatePath("/", "layout");
-  redirect("/onboarding");
+  redirect(
+    `/onboarding/verification/code?source=signup&email=${encodeURIComponent(email)}`,
+  );
 }
