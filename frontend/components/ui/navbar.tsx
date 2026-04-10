@@ -31,11 +31,24 @@ import type { GetSportFollowsByUserResponse } from "@/api/models/GetSportFollows
 import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
 import type { GetTagResponse } from "@/api/models/GetTagResponse";
 import type { SportResponse } from "@/api/models/SportResponse";
+import CreatePostPopup from "@/components/ui/create-post-popup";
 
 const navItems = [
-  { label: "Home", icon: Home },
-  { label: "Explore", icon: Search },
-  { label: "Post", icon: Plus },
+  {
+    label: "Home",
+    icon: Home,
+    render: () => <CreatePostPopup />,
+  },
+  {
+    label: "Explore",
+    icon: Search,
+    render: () => <CreatePostPopup />,
+  },
+  {
+    label: "Post",
+    icon: Plus,
+    render: () => <CreatePostPopup />,
+  },
 ];
 
 function unwrapBody<T>(value: unknown): T | undefined {
@@ -200,10 +213,11 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
       {/* Nav items — unchanged */}
       <nav aria-label="Primary" className={cn("flex flex-col gap-1", isCollapsed && "w-full items-center")}>
-        {navItems.map(({ label, icon: Icon }) => (
+        {navItems.map(({ label, icon: Icon, render }) => (
           <Button
             key={label}
             variant="ghost"
+            onClick={render}
             size="lg"
             className={cn(
               "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900",

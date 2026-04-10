@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/ui/navbar";
 import { CiUser } from "react-icons/ci";
+import CreatePostPopup from "@/components/ui/create-post-popup"
 
 export default function Page() {
   return (
@@ -11,6 +12,7 @@ export default function Page() {
         <main className="flex min-w-0 flex-1 items-center justify-center p-6">
           <div className="flex flex-col items-center gap-4 text-center">
             <p className="text-6xl">🐸</p>
+            <CreatePostPopup></CreatePostPopup>
             <h1 className="text-4xl font-bold">Welcome to Inside Athletics</h1>
             <p className="text-muted-foreground">
               Under Construction! but here are some components:
