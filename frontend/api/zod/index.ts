@@ -1,5 +1,7 @@
 export { assignRoleRequestSchema } from "./assignRoleRequestSchema.ts";
 export { assignRoleResponseSchema } from "./assignRoleResponseSchema.ts";
+export { averageRatingsResponseSchema } from "./averageRatingsResponseSchema.ts";
+export { averageRatingsRowSchema } from "./averageRatingsRowSchema.ts";
 export { collegeSchema } from "./collegeSchema.ts";
 export { commentResponseSchema } from "./commentResponseSchema.ts";
 export { confirmUploadRequestSchema } from "./confirmUploadRequestSchema.ts";
@@ -12,6 +14,7 @@ export { createCommentBodySchema } from "./createCommentBodySchema.ts";
 export { createCommentLikeBodySchema } from "./createCommentLikeBodySchema.ts";
 export { createCommentLikeResponseSchema } from "./createCommentLikeResponseSchema.ts";
 export { createCommentResponseSchema } from "./createCommentResponseSchema.ts";
+export { createMediaRequestSchema } from "./createMediaRequestSchema.ts";
 export { createPermissionRequestSchema } from "./createPermissionRequestSchema.ts";
 export { createPostLikeBodySchema } from "./createPostLikeBodySchema.ts";
 export { createPostLikeResponseSchema } from "./createPostLikeResponseSchema.ts";
@@ -24,6 +27,7 @@ export { createSportRequestSchema } from "./createSportRequestSchema.ts";
 export { createStripeCheckoutSessionRequestSchema } from "./createStripeCheckoutSessionRequestSchema.ts";
 export { createStripePriceRequestSchema } from "./createStripePriceRequestSchema.ts";
 export { createStripeProductRequestSchema } from "./createStripeProductRequestSchema.ts";
+export { createSurveyRequestSchema } from "./createSurveyRequestSchema.ts";
 export { createTagBodySchema } from "./createTagBodySchema.ts";
 export { createTagFollowBodySchema } from "./createTagFollowBodySchema.ts";
 export { createTagFollowResponseSchema } from "./createTagFollowResponseSchema.ts";
@@ -62,6 +66,12 @@ export {
   deleteApiV1ContentErrorSchema,
   deleteApiV1ContentMutationResponseSchema,
 } from "./deleteApiV1ContentSchema.ts";
+export {
+  deleteApiV1MediaByIdPathParamsSchema,
+  deleteApiV1MediaById200Schema,
+  deleteApiV1MediaByIdErrorSchema,
+  deleteApiV1MediaByIdMutationResponseSchema,
+} from "./deleteApiV1MediaByIdSchema.ts";
 export {
   deleteApiV1PermissionByIdPathParamsSchema,
   deleteApiV1PermissionById200Schema,
@@ -114,6 +124,12 @@ export {
   deleteApiV1StripeProductByIdMutationResponseSchema,
 } from "./deleteApiV1StripeProductByIdSchema.ts";
 export {
+  deleteApiV1SurveyByIdPathParamsSchema,
+  deleteApiV1SurveyById200Schema,
+  deleteApiV1SurveyByIdErrorSchema,
+  deleteApiV1SurveyByIdMutationResponseSchema,
+} from "./deleteApiV1SurveyByIdSchema.ts";
+export {
   deleteApiV1TagByIdPathParamsSchema,
   deleteApiV1TagById200Schema,
   deleteApiV1TagByIdErrorSchema,
@@ -158,6 +174,7 @@ export { deleteTagResponseSchema } from "./deleteTagResponseSchema.ts";
 export { deleteUserResponseSchema } from "./deleteUserResponseSchema.ts";
 export { errorDetailSchema } from "./errorDetailSchema.ts";
 export { errorModelSchema } from "./errorModelSchema.ts";
+export { getAllCollegesResponseSchema } from "./getAllCollegesResponseSchema.ts";
 export { getAllPermissionsResponseSchema } from "./getAllPermissionsResponseSchema.ts";
 export { getAllPostsResponseSchema } from "./getAllPostsResponseSchema.ts";
 export { getAllRolesResponseSchema } from "./getAllRolesResponseSchema.ts";
@@ -174,6 +191,11 @@ export {
   getApiV1CollegeByIdErrorSchema,
   getApiV1CollegeByIdQueryResponseSchema,
 } from "./getApiV1CollegeByIdSchema.ts";
+export {
+  getApiV1Colleges200Schema,
+  getApiV1CollegesErrorSchema,
+  getApiV1CollegesQueryResponseSchema,
+} from "./getApiV1CollegesSchema.ts";
 export {
   getApiV1CommentByIdPathParamsSchema,
   getApiV1CommentById200Schema,
@@ -208,6 +230,12 @@ export {
   getApiV1HealthErrorSchema,
   getApiV1HealthQueryResponseSchema,
 } from "./getApiV1HealthSchema.ts";
+export {
+  getApiV1MediaByIdPathParamsSchema,
+  getApiV1MediaById200Schema,
+  getApiV1MediaByIdErrorSchema,
+  getApiV1MediaByIdQueryResponseSchema,
+} from "./getApiV1MediaByIdSchema.ts";
 export {
   getApiV1PermissionByIdPathParamsSchema,
   getApiV1PermissionById200Schema,
@@ -325,6 +353,19 @@ export {
   getApiV1StripeProductByIdQueryResponseSchema,
 } from "./getApiV1StripeProductByIdSchema.ts";
 export {
+  getApiV1SurveyAveragesQueryParamsSchema,
+  getApiV1SurveyAverages200Schema,
+  getApiV1SurveyAveragesErrorSchema,
+  getApiV1SurveyAveragesQueryResponseSchema,
+} from "./getApiV1SurveyAveragesSchema.ts";
+export {
+  getApiV1SurveyUserByUserIdPathParamsSchema,
+  getApiV1SurveyUserByUserIdQueryParamsSchema,
+  getApiV1SurveyUserByUserId200Schema,
+  getApiV1SurveyUserByUserIdErrorSchema,
+  getApiV1SurveyUserByUserIdQueryResponseSchema,
+} from "./getApiV1SurveyUserByUserIdSchema.ts";
+export {
   getApiV1TagByIdPathParamsSchema,
   getApiV1TagById200Schema,
   getApiV1TagByIdErrorSchema,
@@ -404,6 +445,7 @@ export { getPostsByTagResponseSchema } from "./getPostsByTagResponseSchema.ts";
 export { getSportFollowsByUserResponseSchema } from "./getSportFollowsByUserResponseSchema.ts";
 export { getStripeCustomerByEmailResponseSchema } from "./getStripeCustomerByEmailResponseSchema.ts";
 export { getStripeCustomerResponseSchema } from "./getStripeCustomerResponseSchema.ts";
+export { getSurveysByUserResponseSchema } from "./getSurveysByUserResponseSchema.ts";
 export { getTagFollowsByUserResponseSchema } from "./getTagFollowsByUserResponseSchema.ts";
 export { getTagPostByIDResponseSchema } from "./getTagPostByIDResponseSchema.ts";
 export { getTagResponseSchema } from "./getTagResponseSchema.ts";
@@ -441,6 +483,13 @@ export {
   listApiV1StripeProductsErrorSchema,
   listApiV1StripeProductsQueryResponseSchema,
 } from "./listApiV1StripeProductsSchema.ts";
+export {
+  listApiV1TagTypeByTypePathParamsSchema,
+  listApiV1TagTypeByType200Schema,
+  listApiV1TagTypeByTypeErrorSchema,
+  listApiV1TagTypeByTypeQueryResponseSchema,
+} from "./listApiV1TagTypeByTypeSchema.ts";
+export { mediaResponseSchema } from "./mediaResponseSchema.ts";
 export {
   patchApiV1CommentByIdPathParamsSchema,
   patchApiV1CommentById200Schema,
@@ -556,6 +605,12 @@ export {
   postApiV1ContentUploadUrlMutationResponseSchema,
 } from "./postApiV1ContentUploadUrlSchema.ts";
 export {
+  postApiV1Media200Schema,
+  postApiV1MediaErrorSchema,
+  postApiV1MediaMutationRequestSchema,
+  postApiV1MediaMutationResponseSchema,
+} from "./postApiV1MediaSchema.ts";
+export {
   postApiV1Permission200Schema,
   postApiV1PermissionErrorSchema,
   postApiV1PermissionMutationRequestSchema,
@@ -616,6 +671,12 @@ export {
   postApiV1StripeProductMutationResponseSchema,
 } from "./postApiV1StripeProductSchema.ts";
 export {
+  postApiV1Survey200Schema,
+  postApiV1SurveyErrorSchema,
+  postApiV1SurveyMutationRequestSchema,
+  postApiV1SurveyMutationResponseSchema,
+} from "./postApiV1SurveySchema.ts";
+export {
   postApiV1Tag200Schema,
   postApiV1TagErrorSchema,
   postApiV1TagMutationRequestSchema,
@@ -668,6 +729,7 @@ export { sportSchema } from "./sportSchema.ts";
 export { stripeCheckoutSessionResponseSchema } from "./stripeCheckoutSessionResponseSchema.ts";
 export { stripePriceResponseSchema } from "./stripePriceResponseSchema.ts";
 export { stripeProductResponseSchema } from "./stripeProductResponseSchema.ts";
+export { surveyResponseSchema } from "./surveyResponseSchema.ts";
 export { tagRequestSchema } from "./tagRequestSchema.ts";
 export { tagSchema } from "./tagSchema.ts";
 export { updateCollegeRequestSchema } from "./updateCollegeRequestSchema.ts";

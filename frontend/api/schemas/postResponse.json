@@ -208,9 +208,21 @@
             "examples": ["Hockey"],
             "type": "string"
           },
+          "type": {
+            "description": "The type of the tag",
+            "examples": ["sports"],
+            "type": "string"
+          },
           "updated_at": { "format": "date-time", "type": "string" }
         },
-        "required": ["id", "created_at", "updated_at", "deleted_at", "name"],
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "deleted_at",
+          "name",
+          "type"
+        ],
         "type": "object",
         "x-readme-ref-name": "Tag"
       },

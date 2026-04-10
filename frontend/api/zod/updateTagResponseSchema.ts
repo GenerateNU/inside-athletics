@@ -11,4 +11,5 @@ export const updateTagResponseSchema = z.object({
   ),
   id: z.string().describe("ID of the tag updated"),
   name: z.string().describe("The updated name of the tag"),
+  type: z.string().describe("The type of the tag"),
 });

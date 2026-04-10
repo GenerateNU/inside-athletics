@@ -19,4 +19,9 @@ export type UpdateTagResponse = {
    * @type string
    */
   name: string;
+  /**
+   * @description The type of the tag
+   * @type string
+   */
+  type: string;
 };

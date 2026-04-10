@@ -3,6 +3,7 @@ export type { DeleteApiV1CollegeByIdMutationKey } from "./hooks/useDeleteApiV1Co
 export type { DeleteApiV1CommentByIdMutationKey } from "./hooks/useDeleteApiV1CommentById.ts";
 export type { DeleteApiV1CommentLikeByIdMutationKey } from "./hooks/useDeleteApiV1CommentLikeById.ts";
 export type { DeleteApiV1ContentMutationKey } from "./hooks/useDeleteApiV1Content.ts";
+export type { DeleteApiV1MediaByIdMutationKey } from "./hooks/useDeleteApiV1MediaById.ts";
 export type { DeleteApiV1PermissionByIdMutationKey } from "./hooks/useDeleteApiV1PermissionById.ts";
 export type { DeleteApiV1PostByIdMutationKey } from "./hooks/useDeleteApiV1PostById.ts";
 export type { DeleteApiV1PostLikeByIdMutationKey } from "./hooks/useDeleteApiV1PostLikeById.ts";
@@ -12,6 +13,7 @@ export type { DeleteApiV1SportByIdMutationKey } from "./hooks/useDeleteApiV1Spor
 export type { DeleteApiV1StripeCustomersByIdMutationKey } from "./hooks/useDeleteApiV1StripeCustomersById.ts";
 export type { DeleteApiV1StripePriceByIdMutationKey } from "./hooks/useDeleteApiV1StripePriceById.ts";
 export type { DeleteApiV1StripeProductByIdMutationKey } from "./hooks/useDeleteApiV1StripeProductById.ts";
+export type { DeleteApiV1SurveyByIdMutationKey } from "./hooks/useDeleteApiV1SurveyById.ts";
 export type { DeleteApiV1TagByIdMutationKey } from "./hooks/useDeleteApiV1TagById.ts";
 export type { DeleteApiV1UserByIdMutationKey } from "./hooks/useDeleteApiV1UserById.ts";
 export type { DeleteApiV1UserCollegeByIdMutationKey } from "./hooks/useDeleteApiV1UserCollegeById.ts";
@@ -21,6 +23,8 @@ export type { GetApiV1CheckoutSessionsByIdQueryKey } from "./hooks/useGetApiV1Ch
 export type { GetApiV1CheckoutSessionsByIdSuspenseQueryKey } from "./hooks/useGetApiV1CheckoutSessionsByIdSuspense.ts";
 export type { GetApiV1CollegeByIdQueryKey } from "./hooks/useGetApiV1CollegeById.ts";
 export type { GetApiV1CollegeByIdSuspenseQueryKey } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
+export type { GetApiV1CollegesQueryKey } from "./hooks/useGetApiV1Colleges.ts";
+export type { GetApiV1CollegesSuspenseQueryKey } from "./hooks/useGetApiV1CollegesSuspense.ts";
 export type { GetApiV1CommentByIdQueryKey } from "./hooks/useGetApiV1CommentById.ts";
 export type { GetApiV1CommentByIdSuspenseQueryKey } from "./hooks/useGetApiV1CommentByIdSuspense.ts";
 export type { GetApiV1CommentLikeByCommentIdLikesQueryKey } from "./hooks/useGetApiV1CommentLikeByCommentIdLikes.ts";
@@ -33,6 +37,8 @@ export type { GetApiV1HealthQueryKey } from "./hooks/useGetApiV1Health.ts";
 export type { GetApiV1HealthHealthcheckQueryKey } from "./hooks/useGetApiV1HealthHealthcheck.ts";
 export type { GetApiV1HealthHealthcheckSuspenseQueryKey } from "./hooks/useGetApiV1HealthHealthcheckSuspense.ts";
 export type { GetApiV1HealthSuspenseQueryKey } from "./hooks/useGetApiV1HealthSuspense.ts";
+export type { GetApiV1MediaByIdQueryKey } from "./hooks/useGetApiV1MediaById.ts";
+export type { GetApiV1MediaByIdSuspenseQueryKey } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
 export type { GetApiV1PermissionByIdQueryKey } from "./hooks/useGetApiV1PermissionById.ts";
 export type { GetApiV1PermissionByIdSuspenseQueryKey } from "./hooks/useGetApiV1PermissionByIdSuspense.ts";
 export type { GetApiV1PermissionsQueryKey } from "./hooks/useGetApiV1Permissions.ts";
@@ -71,6 +77,10 @@ export type { GetApiV1StripePriceByIdQueryKey } from "./hooks/useGetApiV1StripeP
 export type { GetApiV1StripePriceByIdSuspenseQueryKey } from "./hooks/useGetApiV1StripePriceByIdSuspense.ts";
 export type { GetApiV1StripeProductByIdQueryKey } from "./hooks/useGetApiV1StripeProductById.ts";
 export type { GetApiV1StripeProductByIdSuspenseQueryKey } from "./hooks/useGetApiV1StripeProductByIdSuspense.ts";
+export type { GetApiV1SurveyAveragesQueryKey } from "./hooks/useGetApiV1SurveyAverages.ts";
+export type { GetApiV1SurveyAveragesSuspenseQueryKey } from "./hooks/useGetApiV1SurveyAveragesSuspense.ts";
+export type { GetApiV1SurveyUserByUserIdQueryKey } from "./hooks/useGetApiV1SurveyUserByUserId.ts";
+export type { GetApiV1SurveyUserByUserIdSuspenseQueryKey } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
 export type { GetApiV1TagByIdQueryKey } from "./hooks/useGetApiV1TagById.ts";
 export type { GetApiV1TagByIdSuspenseQueryKey } from "./hooks/useGetApiV1TagByIdSuspense.ts";
 export type { GetApiV1TagByTagIdPostsQueryKey } from "./hooks/useGetApiV1TagByTagIdPosts.ts";
@@ -103,6 +113,8 @@ export type { ListApiV1StripePricesByIdQueryKey } from "./hooks/useListApiV1Stri
 export type { ListApiV1StripePricesByIdSuspenseQueryKey } from "./hooks/useListApiV1StripePricesByIdSuspense.ts";
 export type { ListApiV1StripeProductsQueryKey } from "./hooks/useListApiV1StripeProducts.ts";
 export type { ListApiV1StripeProductsSuspenseQueryKey } from "./hooks/useListApiV1StripeProductsSuspense.ts";
+export type { ListApiV1TagTypeByTypeQueryKey } from "./hooks/useListApiV1TagTypeByType.ts";
+export type { ListApiV1TagTypeByTypeSuspenseQueryKey } from "./hooks/useListApiV1TagTypeByTypeSuspense.ts";
 export type { PatchApiV1CommentByIdMutationKey } from "./hooks/usePatchApiV1CommentById.ts";
 export type { PatchApiV1PermissionByIdMutationKey } from "./hooks/usePatchApiV1PermissionById.ts";
 export type { PatchApiV1PostByIdMutationKey } from "./hooks/usePatchApiV1PostById.ts";
@@ -120,6 +132,7 @@ export type { PostApiV1CommentMutationKey } from "./hooks/usePostApiV1Comment.ts
 export type { PostApiV1CommentLikeMutationKey } from "./hooks/usePostApiV1CommentLike.ts";
 export type { PostApiV1ContentConfirmUploadMutationKey } from "./hooks/usePostApiV1ContentConfirmUpload.ts";
 export type { PostApiV1ContentUploadUrlMutationKey } from "./hooks/usePostApiV1ContentUploadUrl.ts";
+export type { PostApiV1MediaMutationKey } from "./hooks/usePostApiV1Media.ts";
 export type { PostApiV1PermissionMutationKey } from "./hooks/usePostApiV1Permission.ts";
 export type { PostApiV1PostMutationKey } from "./hooks/usePostApiV1Post.ts";
 export type { PostApiV1PostLikeMutationKey } from "./hooks/usePostApiV1PostLike.ts";
@@ -130,6 +143,7 @@ export type { PostApiV1SportMutationKey } from "./hooks/usePostApiV1Sport.ts";
 export type { PostApiV1StripeCustomersMutationKey } from "./hooks/usePostApiV1StripeCustomers.ts";
 export type { PostApiV1StripePriceMutationKey } from "./hooks/usePostApiV1StripePrice.ts";
 export type { PostApiV1StripeProductMutationKey } from "./hooks/usePostApiV1StripeProduct.ts";
+export type { PostApiV1SurveyMutationKey } from "./hooks/usePostApiV1Survey.ts";
 export type { PostApiV1TagMutationKey } from "./hooks/usePostApiV1Tag.ts";
 export type { PostApiV1UserMutationKey } from "./hooks/usePostApiV1User.ts";
 export type { PostApiV1UserByIdRolesMutationKey } from "./hooks/usePostApiV1UserByIdRoles.ts";
@@ -139,6 +153,8 @@ export type { PostApiV1UserTagMutationKey } from "./hooks/usePostApiV1UserTag.ts
 export type { PutApiV1CollegeByIdMutationKey } from "./hooks/usePutApiV1CollegeById.ts";
 export type { AssignRoleRequest } from "./models/AssignRoleRequest.ts";
 export type { AssignRoleResponse } from "./models/AssignRoleResponse.ts";
+export type { AverageRatingsResponse } from "./models/AverageRatingsResponse.ts";
+export type { AverageRatingsRow } from "./models/AverageRatingsRow.ts";
 export type { CollegeDivisionRankEnumKey, College } from "./models/College.ts";
 export type { CommentResponse } from "./models/CommentResponse.ts";
 export type { ConfirmUploadRequest } from "./models/ConfirmUploadRequest.ts";
@@ -157,6 +173,7 @@ export type { CreateCommentBody } from "./models/CreateCommentBody.ts";
 export type { CreateCommentLikeBody } from "./models/CreateCommentLikeBody.ts";
 export type { CreateCommentLikeResponse } from "./models/CreateCommentLikeResponse.ts";
 export type { CreateCommentResponse } from "./models/CreateCommentResponse.ts";
+export type { CreateMediaRequest } from "./models/CreateMediaRequest.ts";
 export type { CreatePermissionRequest } from "./models/CreatePermissionRequest.ts";
 export type { CreatePostLikeBody } from "./models/CreatePostLikeBody.ts";
 export type { CreatePostLikeResponse } from "./models/CreatePostLikeResponse.ts";
@@ -169,6 +186,7 @@ export type { CreateSportRequest } from "./models/CreateSportRequest.ts";
 export type { CreateStripeCheckoutSessionRequest } from "./models/CreateStripeCheckoutSessionRequest.ts";
 export type { CreateStripePriceRequest } from "./models/CreateStripePriceRequest.ts";
 export type { CreateStripeProductRequest } from "./models/CreateStripeProductRequest.ts";
+export type { CreateSurveyRequest } from "./models/CreateSurveyRequest.ts";
 export type { CreateTagBody } from "./models/CreateTagBody.ts";
 export type { CreateTagFollowBody } from "./models/CreateTagFollowBody.ts";
 export type { CreateTagFollowResponse } from "./models/CreateTagFollowResponse.ts";
@@ -212,6 +230,13 @@ export type {
   DeleteApiV1ContentMutationResponse,
   DeleteApiV1ContentMutation,
 } from "./models/DeleteApiV1Content.ts";
+export type {
+  DeleteApiV1MediaByIdPathParams,
+  DeleteApiV1MediaById200,
+  DeleteApiV1MediaByIdError,
+  DeleteApiV1MediaByIdMutationResponse,
+  DeleteApiV1MediaByIdMutation,
+} from "./models/DeleteApiV1MediaById.ts";
 export type {
   DeleteApiV1PermissionByIdPathParams,
   DeleteApiV1PermissionById200,
@@ -273,6 +298,13 @@ export type {
   DeleteApiV1StripeProductByIdMutation,
 } from "./models/DeleteApiV1StripeProductById.ts";
 export type {
+  DeleteApiV1SurveyByIdPathParams,
+  DeleteApiV1SurveyById200,
+  DeleteApiV1SurveyByIdError,
+  DeleteApiV1SurveyByIdMutationResponse,
+  DeleteApiV1SurveyByIdMutation,
+} from "./models/DeleteApiV1SurveyById.ts";
+export type {
   DeleteApiV1TagByIdPathParams,
   DeleteApiV1TagById200,
   DeleteApiV1TagByIdError,
@@ -322,6 +354,7 @@ export type { DeleteTagResponse } from "./models/DeleteTagResponse.ts";
 export type { DeleteUserResponse } from "./models/DeleteUserResponse.ts";
 export type { ErrorDetail } from "./models/ErrorDetail.ts";
 export type { ErrorModel } from "./models/ErrorModel.ts";
+export type { GetAllCollegesResponse } from "./models/GetAllCollegesResponse.ts";
 export type { GetAllPermissionsResponse } from "./models/GetAllPermissionsResponse.ts";
 export type { GetAllPostsResponse } from "./models/GetAllPostsResponse.ts";
 export type { GetAllRolesResponse } from "./models/GetAllRolesResponse.ts";
@@ -340,6 +373,12 @@ export type {
   GetApiV1CollegeByIdQueryResponse,
   GetApiV1CollegeByIdQuery,
 } from "./models/GetApiV1CollegeById.ts";
+export type {
+  GetApiV1Colleges200,
+  GetApiV1CollegesError,
+  GetApiV1CollegesQueryResponse,
+  GetApiV1CollegesQuery,
+} from "./models/GetApiV1Colleges.ts";
 export type {
   GetApiV1CommentByIdPathParams,
   GetApiV1CommentById200,
@@ -380,6 +419,13 @@ export type {
   GetApiV1HealthHealthcheckQueryResponse,
   GetApiV1HealthHealthcheckQuery,
 } from "./models/GetApiV1HealthHealthcheck.ts";
+export type {
+  GetApiV1MediaByIdPathParams,
+  GetApiV1MediaById200,
+  GetApiV1MediaByIdError,
+  GetApiV1MediaByIdQueryResponse,
+  GetApiV1MediaByIdQuery,
+} from "./models/GetApiV1MediaById.ts";
 export type {
   GetApiV1PermissionByIdPathParams,
   GetApiV1PermissionById200,
@@ -516,6 +562,21 @@ export type {
   GetApiV1StripeProductByIdQuery,
 } from "./models/GetApiV1StripeProductById.ts";
 export type {
+  GetApiV1SurveyAveragesQueryParams,
+  GetApiV1SurveyAverages200,
+  GetApiV1SurveyAveragesError,
+  GetApiV1SurveyAveragesQueryResponse,
+  GetApiV1SurveyAveragesQuery,
+} from "./models/GetApiV1SurveyAverages.ts";
+export type {
+  GetApiV1SurveyUserByUserIdPathParams,
+  GetApiV1SurveyUserByUserIdQueryParams,
+  GetApiV1SurveyUserByUserId200,
+  GetApiV1SurveyUserByUserIdError,
+  GetApiV1SurveyUserByUserIdQueryResponse,
+  GetApiV1SurveyUserByUserIdQuery,
+} from "./models/GetApiV1SurveyUserByUserId.ts";
+export type {
   GetApiV1TagByIdPathParams,
   GetApiV1TagById200,
   GetApiV1TagByIdError,
@@ -609,6 +670,7 @@ export type { GetPostsByTagResponse } from "./models/GetPostsByTagResponse.ts";
 export type { GetSportFollowsByUserResponse } from "./models/GetSportFollowsByUserResponse.ts";
 export type { GetStripeCustomerByEmailResponse } from "./models/GetStripeCustomerByEmailResponse.ts";
 export type { GetStripeCustomerResponse } from "./models/GetStripeCustomerResponse.ts";
+export type { GetSurveysByUserResponse } from "./models/GetSurveysByUserResponse.ts";
 export type { GetTagFollowsByUserResponse } from "./models/GetTagFollowsByUserResponse.ts";
 export type { GetTagPostByIDResponse } from "./models/GetTagPostByIDResponse.ts";
 export type { GetTagResponse } from "./models/GetTagResponse.ts";
@@ -651,6 +713,14 @@ export type {
   ListApiV1StripeProductsQueryResponse,
   ListApiV1StripeProductsQuery,
 } from "./models/ListApiV1StripeProducts.ts";
+export type {
+  ListApiV1TagTypeByTypePathParams,
+  ListApiV1TagTypeByType200,
+  ListApiV1TagTypeByTypeError,
+  ListApiV1TagTypeByTypeQueryResponse,
+  ListApiV1TagTypeByTypeQuery,
+} from "./models/ListApiV1TagTypeByType.ts";
+export type { MediaResponse } from "./models/MediaResponse.ts";
 export type {
   PatchApiV1CommentByIdPathParams,
   PatchApiV1CommentById200,
@@ -783,6 +853,13 @@ export type {
   PostApiV1ContentUploadUrlMutation,
 } from "./models/PostApiV1ContentUploadUrl.ts";
 export type {
+  PostApiV1Media200,
+  PostApiV1MediaError,
+  PostApiV1MediaMutationRequest,
+  PostApiV1MediaMutationResponse,
+  PostApiV1MediaMutation,
+} from "./models/PostApiV1Media.ts";
+export type {
   PostApiV1Permission200,
   PostApiV1PermissionError,
   PostApiV1PermissionMutationRequest,
@@ -853,6 +930,13 @@ export type {
   PostApiV1StripeProductMutation,
 } from "./models/PostApiV1StripeProduct.ts";
 export type {
+  PostApiV1Survey200,
+  PostApiV1SurveyError,
+  PostApiV1SurveyMutationRequest,
+  PostApiV1SurveyMutationResponse,
+  PostApiV1SurveyMutation,
+} from "./models/PostApiV1Survey.ts";
+export type {
   PostApiV1Tag200,
   PostApiV1TagError,
   PostApiV1TagMutationRequest,
@@ -912,6 +996,7 @@ export type { SportResponse } from "./models/SportResponse.ts";
 export type { StripeCheckoutSessionResponse } from "./models/StripeCheckoutSessionResponse.ts";
 export type { StripePriceResponse } from "./models/StripePriceResponse.ts";
 export type { StripeProductResponse } from "./models/StripeProductResponse.ts";
+export type { SurveyResponse } from "./models/SurveyResponse.ts";
 export type { Tag } from "./models/Tag.ts";
 export type { TagRequest } from "./models/TagRequest.ts";
 export type {
@@ -942,6 +1027,7 @@ export { deleteApiV1CollegeById } from "./clients/deleteApiV1CollegeById.ts";
 export { deleteApiV1CommentById } from "./clients/deleteApiV1CommentById.ts";
 export { deleteApiV1CommentLikeById } from "./clients/deleteApiV1CommentLikeById.ts";
 export { deleteApiV1Content } from "./clients/deleteApiV1Content.ts";
+export { deleteApiV1MediaById } from "./clients/deleteApiV1MediaById.ts";
 export { deleteApiV1PermissionById } from "./clients/deleteApiV1PermissionById.ts";
 export { deleteApiV1PostById } from "./clients/deleteApiV1PostById.ts";
 export { deleteApiV1PostLikeById } from "./clients/deleteApiV1PostLikeById.ts";
@@ -951,6 +1037,7 @@ export { deleteApiV1SportById } from "./clients/deleteApiV1SportById.ts";
 export { deleteApiV1StripeCustomersById } from "./clients/deleteApiV1StripeCustomersById.ts";
 export { deleteApiV1StripePriceById } from "./clients/deleteApiV1StripePriceById.ts";
 export { deleteApiV1StripeProductById } from "./clients/deleteApiV1StripeProductById.ts";
+export { deleteApiV1SurveyById } from "./clients/deleteApiV1SurveyById.ts";
 export { deleteApiV1TagById } from "./clients/deleteApiV1TagById.ts";
 export { deleteApiV1UserById } from "./clients/deleteApiV1UserById.ts";
 export { deleteApiV1UserCollegeById } from "./clients/deleteApiV1UserCollegeById.ts";
@@ -958,12 +1045,14 @@ export { deleteApiV1UserSportById } from "./clients/deleteApiV1UserSportById.ts"
 export { deleteApiV1UserTagById } from "./clients/deleteApiV1UserTagById.ts";
 export { getApiV1CheckoutSessionsById } from "./clients/getApiV1CheckoutSessionsById.ts";
 export { getApiV1CollegeById } from "./clients/getApiV1CollegeById.ts";
+export { getApiV1Colleges } from "./clients/getApiV1Colleges.ts";
 export { getApiV1CommentById } from "./clients/getApiV1CommentById.ts";
 export { getApiV1CommentLikeByCommentIdLikes } from "./clients/getApiV1CommentLikeByCommentIdLikes.ts";
 export { getApiV1CommentLikeById } from "./clients/getApiV1CommentLikeById.ts";
 export { getApiV1ContentDownloadUrl } from "./clients/getApiV1ContentDownloadUrl.ts";
 export { getApiV1Health } from "./clients/getApiV1Health.ts";
 export { getApiV1HealthHealthcheck } from "./clients/getApiV1HealthHealthcheck.ts";
+export { getApiV1MediaById } from "./clients/getApiV1MediaById.ts";
 export { getApiV1PermissionById } from "./clients/getApiV1PermissionById.ts";
 export { getApiV1Permissions } from "./clients/getApiV1Permissions.ts";
 export { getApiV1PostById } from "./clients/getApiV1PostById.ts";
@@ -983,6 +1072,8 @@ export { getApiV1StripeCustomersById } from "./clients/getApiV1StripeCustomersBy
 export { getApiV1StripeCustomersEmailByEmail } from "./clients/getApiV1StripeCustomersEmailByEmail.ts";
 export { getApiV1StripePriceById } from "./clients/getApiV1StripePriceById.ts";
 export { getApiV1StripeProductById } from "./clients/getApiV1StripeProductById.ts";
+export { getApiV1SurveyAverages } from "./clients/getApiV1SurveyAverages.ts";
+export { getApiV1SurveyUserByUserId } from "./clients/getApiV1SurveyUserByUserId.ts";
 export { getApiV1TagById } from "./clients/getApiV1TagById.ts";
 export { getApiV1TagByTagIdPosts } from "./clients/getApiV1TagByTagIdPosts.ts";
 export { getApiV1TagNameByName } from "./clients/getApiV1TagNameByName.ts";
@@ -999,6 +1090,7 @@ export { listApiV1CommentByIdReplies } from "./clients/listApiV1CommentByIdRepli
 export { listApiV1PostByPostIdComments } from "./clients/listApiV1PostByPostIdComments.ts";
 export { listApiV1StripePricesById } from "./clients/listApiV1StripePricesById.ts";
 export { listApiV1StripeProducts } from "./clients/listApiV1StripeProducts.ts";
+export { listApiV1TagTypeByType } from "./clients/listApiV1TagTypeByType.ts";
 export { patchApiV1CommentById } from "./clients/patchApiV1CommentById.ts";
 export { patchApiV1PermissionById } from "./clients/patchApiV1PermissionById.ts";
 export { patchApiV1PostById } from "./clients/patchApiV1PostById.ts";
@@ -1016,6 +1108,7 @@ export { postApiV1Comment } from "./clients/postApiV1Comment.ts";
 export { postApiV1CommentLike } from "./clients/postApiV1CommentLike.ts";
 export { postApiV1ContentConfirmUpload } from "./clients/postApiV1ContentConfirmUpload.ts";
 export { postApiV1ContentUploadUrl } from "./clients/postApiV1ContentUploadUrl.ts";
+export { postApiV1Media } from "./clients/postApiV1Media.ts";
 export { postApiV1Permission } from "./clients/postApiV1Permission.ts";
 export { postApiV1Post } from "./clients/postApiV1Post.ts";
 export { postApiV1PostLike } from "./clients/postApiV1PostLike.ts";
@@ -1026,6 +1119,7 @@ export { postApiV1Sport } from "./clients/postApiV1Sport.ts";
 export { postApiV1StripeCustomers } from "./clients/postApiV1StripeCustomers.ts";
 export { postApiV1StripePrice } from "./clients/postApiV1StripePrice.ts";
 export { postApiV1StripeProduct } from "./clients/postApiV1StripeProduct.ts";
+export { postApiV1Survey } from "./clients/postApiV1Survey.ts";
 export { postApiV1Tag } from "./clients/postApiV1Tag.ts";
 export { postApiV1User } from "./clients/postApiV1User.ts";
 export { postApiV1UserByIdRoles } from "./clients/postApiV1UserByIdRoles.ts";
@@ -1048,6 +1142,9 @@ export { useDeleteApiV1CommentLikeById } from "./hooks/useDeleteApiV1CommentLike
 export { deleteApiV1ContentMutationKey } from "./hooks/useDeleteApiV1Content.ts";
 export { deleteApiV1ContentMutationOptions } from "./hooks/useDeleteApiV1Content.ts";
 export { useDeleteApiV1Content } from "./hooks/useDeleteApiV1Content.ts";
+export { deleteApiV1MediaByIdMutationKey } from "./hooks/useDeleteApiV1MediaById.ts";
+export { deleteApiV1MediaByIdMutationOptions } from "./hooks/useDeleteApiV1MediaById.ts";
+export { useDeleteApiV1MediaById } from "./hooks/useDeleteApiV1MediaById.ts";
 export { deleteApiV1PermissionByIdMutationKey } from "./hooks/useDeleteApiV1PermissionById.ts";
 export { deleteApiV1PermissionByIdMutationOptions } from "./hooks/useDeleteApiV1PermissionById.ts";
 export { useDeleteApiV1PermissionById } from "./hooks/useDeleteApiV1PermissionById.ts";
@@ -1075,6 +1172,9 @@ export { useDeleteApiV1StripePriceById } from "./hooks/useDeleteApiV1StripePrice
 export { deleteApiV1StripeProductByIdMutationKey } from "./hooks/useDeleteApiV1StripeProductById.ts";
 export { deleteApiV1StripeProductByIdMutationOptions } from "./hooks/useDeleteApiV1StripeProductById.ts";
 export { useDeleteApiV1StripeProductById } from "./hooks/useDeleteApiV1StripeProductById.ts";
+export { deleteApiV1SurveyByIdMutationKey } from "./hooks/useDeleteApiV1SurveyById.ts";
+export { deleteApiV1SurveyByIdMutationOptions } from "./hooks/useDeleteApiV1SurveyById.ts";
+export { useDeleteApiV1SurveyById } from "./hooks/useDeleteApiV1SurveyById.ts";
 export { deleteApiV1TagByIdMutationKey } from "./hooks/useDeleteApiV1TagById.ts";
 export { deleteApiV1TagByIdMutationOptions } from "./hooks/useDeleteApiV1TagById.ts";
 export { useDeleteApiV1TagById } from "./hooks/useDeleteApiV1TagById.ts";
@@ -1102,6 +1202,12 @@ export { useGetApiV1CollegeById } from "./hooks/useGetApiV1CollegeById.ts";
 export { getApiV1CollegeByIdSuspenseQueryKey } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
 export { getApiV1CollegeByIdSuspenseQueryOptions } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
 export { useGetApiV1CollegeByIdSuspense } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
+export { getApiV1CollegesQueryKey } from "./hooks/useGetApiV1Colleges.ts";
+export { getApiV1CollegesQueryOptions } from "./hooks/useGetApiV1Colleges.ts";
+export { useGetApiV1Colleges } from "./hooks/useGetApiV1Colleges.ts";
+export { getApiV1CollegesSuspenseQueryKey } from "./hooks/useGetApiV1CollegesSuspense.ts";
+export { getApiV1CollegesSuspenseQueryOptions } from "./hooks/useGetApiV1CollegesSuspense.ts";
+export { useGetApiV1CollegesSuspense } from "./hooks/useGetApiV1CollegesSuspense.ts";
 export { getApiV1CommentByIdQueryKey } from "./hooks/useGetApiV1CommentById.ts";
 export { getApiV1CommentByIdQueryOptions } from "./hooks/useGetApiV1CommentById.ts";
 export { useGetApiV1CommentById } from "./hooks/useGetApiV1CommentById.ts";
@@ -1138,6 +1244,12 @@ export { useGetApiV1HealthHealthcheckSuspense } from "./hooks/useGetApiV1HealthH
 export { getApiV1HealthSuspenseQueryKey } from "./hooks/useGetApiV1HealthSuspense.ts";
 export { getApiV1HealthSuspenseQueryOptions } from "./hooks/useGetApiV1HealthSuspense.ts";
 export { useGetApiV1HealthSuspense } from "./hooks/useGetApiV1HealthSuspense.ts";
+export { getApiV1MediaByIdQueryKey } from "./hooks/useGetApiV1MediaById.ts";
+export { getApiV1MediaByIdQueryOptions } from "./hooks/useGetApiV1MediaById.ts";
+export { useGetApiV1MediaById } from "./hooks/useGetApiV1MediaById.ts";
+export { getApiV1MediaByIdSuspenseQueryKey } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
+export { getApiV1MediaByIdSuspenseQueryOptions } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
+export { useGetApiV1MediaByIdSuspense } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
 export { getApiV1PermissionByIdQueryKey } from "./hooks/useGetApiV1PermissionById.ts";
 export { getApiV1PermissionByIdQueryOptions } from "./hooks/useGetApiV1PermissionById.ts";
 export { useGetApiV1PermissionById } from "./hooks/useGetApiV1PermissionById.ts";
@@ -1252,6 +1364,18 @@ export { useGetApiV1StripeProductById } from "./hooks/useGetApiV1StripeProductBy
 export { getApiV1StripeProductByIdSuspenseQueryKey } from "./hooks/useGetApiV1StripeProductByIdSuspense.ts";
 export { getApiV1StripeProductByIdSuspenseQueryOptions } from "./hooks/useGetApiV1StripeProductByIdSuspense.ts";
 export { useGetApiV1StripeProductByIdSuspense } from "./hooks/useGetApiV1StripeProductByIdSuspense.ts";
+export { getApiV1SurveyAveragesQueryKey } from "./hooks/useGetApiV1SurveyAverages.ts";
+export { getApiV1SurveyAveragesQueryOptions } from "./hooks/useGetApiV1SurveyAverages.ts";
+export { useGetApiV1SurveyAverages } from "./hooks/useGetApiV1SurveyAverages.ts";
+export { getApiV1SurveyAveragesSuspenseQueryKey } from "./hooks/useGetApiV1SurveyAveragesSuspense.ts";
+export { getApiV1SurveyAveragesSuspenseQueryOptions } from "./hooks/useGetApiV1SurveyAveragesSuspense.ts";
+export { useGetApiV1SurveyAveragesSuspense } from "./hooks/useGetApiV1SurveyAveragesSuspense.ts";
+export { getApiV1SurveyUserByUserIdQueryKey } from "./hooks/useGetApiV1SurveyUserByUserId.ts";
+export { getApiV1SurveyUserByUserIdQueryOptions } from "./hooks/useGetApiV1SurveyUserByUserId.ts";
+export { useGetApiV1SurveyUserByUserId } from "./hooks/useGetApiV1SurveyUserByUserId.ts";
+export { getApiV1SurveyUserByUserIdSuspenseQueryKey } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
+export { getApiV1SurveyUserByUserIdSuspenseQueryOptions } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
+export { useGetApiV1SurveyUserByUserIdSuspense } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
 export { getApiV1TagByIdQueryKey } from "./hooks/useGetApiV1TagById.ts";
 export { getApiV1TagByIdQueryOptions } from "./hooks/useGetApiV1TagById.ts";
 export { useGetApiV1TagById } from "./hooks/useGetApiV1TagById.ts";
@@ -1348,6 +1472,12 @@ export { useListApiV1StripeProducts } from "./hooks/useListApiV1StripeProducts.t
 export { listApiV1StripeProductsSuspenseQueryKey } from "./hooks/useListApiV1StripeProductsSuspense.ts";
 export { listApiV1StripeProductsSuspenseQueryOptions } from "./hooks/useListApiV1StripeProductsSuspense.ts";
 export { useListApiV1StripeProductsSuspense } from "./hooks/useListApiV1StripeProductsSuspense.ts";
+export { listApiV1TagTypeByTypeQueryKey } from "./hooks/useListApiV1TagTypeByType.ts";
+export { listApiV1TagTypeByTypeQueryOptions } from "./hooks/useListApiV1TagTypeByType.ts";
+export { useListApiV1TagTypeByType } from "./hooks/useListApiV1TagTypeByType.ts";
+export { listApiV1TagTypeByTypeSuspenseQueryKey } from "./hooks/useListApiV1TagTypeByTypeSuspense.ts";
+export { listApiV1TagTypeByTypeSuspenseQueryOptions } from "./hooks/useListApiV1TagTypeByTypeSuspense.ts";
+export { useListApiV1TagTypeByTypeSuspense } from "./hooks/useListApiV1TagTypeByTypeSuspense.ts";
 export { patchApiV1CommentByIdMutationKey } from "./hooks/usePatchApiV1CommentById.ts";
 export { patchApiV1CommentByIdMutationOptions } from "./hooks/usePatchApiV1CommentById.ts";
 export { usePatchApiV1CommentById } from "./hooks/usePatchApiV1CommentById.ts";
@@ -1399,6 +1529,9 @@ export { usePostApiV1ContentConfirmUpload } from "./hooks/usePostApiV1ContentCon
 export { postApiV1ContentUploadUrlMutationKey } from "./hooks/usePostApiV1ContentUploadUrl.ts";
 export { postApiV1ContentUploadUrlMutationOptions } from "./hooks/usePostApiV1ContentUploadUrl.ts";
 export { usePostApiV1ContentUploadUrl } from "./hooks/usePostApiV1ContentUploadUrl.ts";
+export { postApiV1MediaMutationKey } from "./hooks/usePostApiV1Media.ts";
+export { postApiV1MediaMutationOptions } from "./hooks/usePostApiV1Media.ts";
+export { usePostApiV1Media } from "./hooks/usePostApiV1Media.ts";
 export { postApiV1PermissionMutationKey } from "./hooks/usePostApiV1Permission.ts";
 export { postApiV1PermissionMutationOptions } from "./hooks/usePostApiV1Permission.ts";
 export { usePostApiV1Permission } from "./hooks/usePostApiV1Permission.ts";
@@ -1429,6 +1562,9 @@ export { usePostApiV1StripePrice } from "./hooks/usePostApiV1StripePrice.ts";
 export { postApiV1StripeProductMutationKey } from "./hooks/usePostApiV1StripeProduct.ts";
 export { postApiV1StripeProductMutationOptions } from "./hooks/usePostApiV1StripeProduct.ts";
 export { usePostApiV1StripeProduct } from "./hooks/usePostApiV1StripeProduct.ts";
+export { postApiV1SurveyMutationKey } from "./hooks/usePostApiV1Survey.ts";
+export { postApiV1SurveyMutationOptions } from "./hooks/usePostApiV1Survey.ts";
+export { usePostApiV1Survey } from "./hooks/usePostApiV1Survey.ts";
 export { postApiV1TagMutationKey } from "./hooks/usePostApiV1Tag.ts";
 export { postApiV1TagMutationOptions } from "./hooks/usePostApiV1Tag.ts";
 export { usePostApiV1Tag } from "./hooks/usePostApiV1Tag.ts";
@@ -1458,6 +1594,8 @@ export { updateCollegeRequestDivisionRankEnum } from "./models/UpdateCollegeRequ
 export { updateCollegeResponseDivisionRankEnum } from "./models/UpdateCollegeResponse.ts";
 export { assignRoleRequestSchema } from "./zod/assignRoleRequestSchema.ts";
 export { assignRoleResponseSchema } from "./zod/assignRoleResponseSchema.ts";
+export { averageRatingsResponseSchema } from "./zod/averageRatingsResponseSchema.ts";
+export { averageRatingsRowSchema } from "./zod/averageRatingsRowSchema.ts";
 export { collegeSchema } from "./zod/collegeSchema.ts";
 export { commentResponseSchema } from "./zod/commentResponseSchema.ts";
 export { confirmUploadRequestSchema } from "./zod/confirmUploadRequestSchema.ts";
@@ -1470,6 +1608,7 @@ export { createCommentBodySchema } from "./zod/createCommentBodySchema.ts";
 export { createCommentLikeBodySchema } from "./zod/createCommentLikeBodySchema.ts";
 export { createCommentLikeResponseSchema } from "./zod/createCommentLikeResponseSchema.ts";
 export { createCommentResponseSchema } from "./zod/createCommentResponseSchema.ts";
+export { createMediaRequestSchema } from "./zod/createMediaRequestSchema.ts";
 export { createPermissionRequestSchema } from "./zod/createPermissionRequestSchema.ts";
 export { createPostLikeBodySchema } from "./zod/createPostLikeBodySchema.ts";
 export { createPostLikeResponseSchema } from "./zod/createPostLikeResponseSchema.ts";
@@ -1482,6 +1621,7 @@ export { createSportRequestSchema } from "./zod/createSportRequestSchema.ts";
 export { createStripeCheckoutSessionRequestSchema } from "./zod/createStripeCheckoutSessionRequestSchema.ts";
 export { createStripePriceRequestSchema } from "./zod/createStripePriceRequestSchema.ts";
 export { createStripeProductRequestSchema } from "./zod/createStripeProductRequestSchema.ts";
+export { createSurveyRequestSchema } from "./zod/createSurveyRequestSchema.ts";
 export { createTagBodySchema } from "./zod/createTagBodySchema.ts";
 export { createTagFollowBodySchema } from "./zod/createTagFollowBodySchema.ts";
 export { createTagFollowResponseSchema } from "./zod/createTagFollowResponseSchema.ts";
@@ -1520,6 +1660,12 @@ export {
   deleteApiV1ContentErrorSchema,
   deleteApiV1ContentMutationResponseSchema,
 } from "./zod/deleteApiV1ContentSchema.ts";
+export {
+  deleteApiV1MediaByIdPathParamsSchema,
+  deleteApiV1MediaById200Schema,
+  deleteApiV1MediaByIdErrorSchema,
+  deleteApiV1MediaByIdMutationResponseSchema,
+} from "./zod/deleteApiV1MediaByIdSchema.ts";
 export {
   deleteApiV1PermissionByIdPathParamsSchema,
   deleteApiV1PermissionById200Schema,
@@ -1572,6 +1718,12 @@ export {
   deleteApiV1StripeProductByIdMutationResponseSchema,
 } from "./zod/deleteApiV1StripeProductByIdSchema.ts";
 export {
+  deleteApiV1SurveyByIdPathParamsSchema,
+  deleteApiV1SurveyById200Schema,
+  deleteApiV1SurveyByIdErrorSchema,
+  deleteApiV1SurveyByIdMutationResponseSchema,
+} from "./zod/deleteApiV1SurveyByIdSchema.ts";
+export {
   deleteApiV1TagByIdPathParamsSchema,
   deleteApiV1TagById200Schema,
   deleteApiV1TagByIdErrorSchema,
@@ -1616,6 +1768,7 @@ export { deleteTagResponseSchema } from "./zod/deleteTagResponseSchema.ts";
 export { deleteUserResponseSchema } from "./zod/deleteUserResponseSchema.ts";
 export { errorDetailSchema } from "./zod/errorDetailSchema.ts";
 export { errorModelSchema } from "./zod/errorModelSchema.ts";
+export { getAllCollegesResponseSchema } from "./zod/getAllCollegesResponseSchema.ts";
 export { getAllPermissionsResponseSchema } from "./zod/getAllPermissionsResponseSchema.ts";
 export { getAllPostsResponseSchema } from "./zod/getAllPostsResponseSchema.ts";
 export { getAllRolesResponseSchema } from "./zod/getAllRolesResponseSchema.ts";
@@ -1632,6 +1785,11 @@ export {
   getApiV1CollegeByIdErrorSchema,
   getApiV1CollegeByIdQueryResponseSchema,
 } from "./zod/getApiV1CollegeByIdSchema.ts";
+export {
+  getApiV1Colleges200Schema,
+  getApiV1CollegesErrorSchema,
+  getApiV1CollegesQueryResponseSchema,
+} from "./zod/getApiV1CollegesSchema.ts";
 export {
   getApiV1CommentByIdPathParamsSchema,
   getApiV1CommentById200Schema,
@@ -1666,6 +1824,12 @@ export {
   getApiV1HealthErrorSchema,
   getApiV1HealthQueryResponseSchema,
 } from "./zod/getApiV1HealthSchema.ts";
+export {
+  getApiV1MediaByIdPathParamsSchema,
+  getApiV1MediaById200Schema,
+  getApiV1MediaByIdErrorSchema,
+  getApiV1MediaByIdQueryResponseSchema,
+} from "./zod/getApiV1MediaByIdSchema.ts";
 export {
   getApiV1PermissionByIdPathParamsSchema,
   getApiV1PermissionById200Schema,
@@ -1783,6 +1947,19 @@ export {
   getApiV1StripeProductByIdQueryResponseSchema,
 } from "./zod/getApiV1StripeProductByIdSchema.ts";
 export {
+  getApiV1SurveyAveragesQueryParamsSchema,
+  getApiV1SurveyAverages200Schema,
+  getApiV1SurveyAveragesErrorSchema,
+  getApiV1SurveyAveragesQueryResponseSchema,
+} from "./zod/getApiV1SurveyAveragesSchema.ts";
+export {
+  getApiV1SurveyUserByUserIdPathParamsSchema,
+  getApiV1SurveyUserByUserIdQueryParamsSchema,
+  getApiV1SurveyUserByUserId200Schema,
+  getApiV1SurveyUserByUserIdErrorSchema,
+  getApiV1SurveyUserByUserIdQueryResponseSchema,
+} from "./zod/getApiV1SurveyUserByUserIdSchema.ts";
+export {
   getApiV1TagByIdPathParamsSchema,
   getApiV1TagById200Schema,
   getApiV1TagByIdErrorSchema,
@@ -1862,6 +2039,7 @@ export { getPostsByTagResponseSchema } from "./zod/getPostsByTagResponseSchema.t
 export { getSportFollowsByUserResponseSchema } from "./zod/getSportFollowsByUserResponseSchema.ts";
 export { getStripeCustomerByEmailResponseSchema } from "./zod/getStripeCustomerByEmailResponseSchema.ts";
 export { getStripeCustomerResponseSchema } from "./zod/getStripeCustomerResponseSchema.ts";
+export { getSurveysByUserResponseSchema } from "./zod/getSurveysByUserResponseSchema.ts";
 export { getTagFollowsByUserResponseSchema } from "./zod/getTagFollowsByUserResponseSchema.ts";
 export { getTagPostByIDResponseSchema } from "./zod/getTagPostByIDResponseSchema.ts";
 export { getTagResponseSchema } from "./zod/getTagResponseSchema.ts";
@@ -1899,6 +2077,13 @@ export {
   listApiV1StripeProductsErrorSchema,
   listApiV1StripeProductsQueryResponseSchema,
 } from "./zod/listApiV1StripeProductsSchema.ts";
+export {
+  listApiV1TagTypeByTypePathParamsSchema,
+  listApiV1TagTypeByType200Schema,
+  listApiV1TagTypeByTypeErrorSchema,
+  listApiV1TagTypeByTypeQueryResponseSchema,
+} from "./zod/listApiV1TagTypeByTypeSchema.ts";
+export { mediaResponseSchema } from "./zod/mediaResponseSchema.ts";
 export {
   patchApiV1CommentByIdPathParamsSchema,
   patchApiV1CommentById200Schema,
@@ -2014,6 +2199,12 @@ export {
   postApiV1ContentUploadUrlMutationResponseSchema,
 } from "./zod/postApiV1ContentUploadUrlSchema.ts";
 export {
+  postApiV1Media200Schema,
+  postApiV1MediaErrorSchema,
+  postApiV1MediaMutationRequestSchema,
+  postApiV1MediaMutationResponseSchema,
+} from "./zod/postApiV1MediaSchema.ts";
+export {
   postApiV1Permission200Schema,
   postApiV1PermissionErrorSchema,
   postApiV1PermissionMutationRequestSchema,
@@ -2074,6 +2265,12 @@ export {
   postApiV1StripeProductMutationResponseSchema,
 } from "./zod/postApiV1StripeProductSchema.ts";
 export {
+  postApiV1Survey200Schema,
+  postApiV1SurveyErrorSchema,
+  postApiV1SurveyMutationRequestSchema,
+  postApiV1SurveyMutationResponseSchema,
+} from "./zod/postApiV1SurveySchema.ts";
+export {
   postApiV1Tag200Schema,
   postApiV1TagErrorSchema,
   postApiV1TagMutationRequestSchema,
@@ -2126,6 +2323,7 @@ export { sportSchema } from "./zod/sportSchema.ts";
 export { stripeCheckoutSessionResponseSchema } from "./zod/stripeCheckoutSessionResponseSchema.ts";
 export { stripePriceResponseSchema } from "./zod/stripePriceResponseSchema.ts";
 export { stripeProductResponseSchema } from "./zod/stripeProductResponseSchema.ts";
+export { surveyResponseSchema } from "./zod/surveyResponseSchema.ts";
 export { tagRequestSchema } from "./zod/tagRequestSchema.ts";
 export { tagSchema } from "./zod/tagSchema.ts";
 export { updateCollegeRequestSchema } from "./zod/updateCollegeRequestSchema.ts";
