@@ -6,6 +6,8 @@ import (
 	"inside-athletics/internal/handlers/tagpost"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"regexp"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -212,7 +214,7 @@ func (s *PostService) FuzzySearchForPost(ctx context.Context, input *GetSearchPa
 		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
 	}
 	searchStr := input.SearchStr
-	posts, total, err := s.postDB.FuzzySearchForPost(userID, searchStr, input.Limit)
+	posts, total, err := s.postDB.FuzzySearchForPost(userID, searchStr, input.Limit, input.Offset)
 	if err != nil {
 		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
 	}
@@ -225,6 +227,58 @@ func (s *PostService) FuzzySearchForPost(ctx context.Context, input *GetSearchPa
 		Body: &GetSearchResponse{
 			Posts: postResponses,
 			Count: total,
+		},
+	}, nil
+}
+
+func (s *PostService) FilterPosts(ctx context.Context, input *GetFilterPostsParams) (*utils.ResponseBody[GetAllPostsResponse], error) {
+	userID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	uuidPattern := `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`
+	fullPattern := fmt.Sprintf(`^%s(?:,%s)*$`, uuidPattern, uuidPattern)
+	re := regexp.MustCompile(fullPattern)
+
+	// input validation
+	if input.CollegeIds != "" && !re.MatchString(input.CollegeIds) {
+		return nil, huma.Error400BadRequest("Expected comma seperated list of uuids with no spaces for college input uuid,uuid")
+	}
+	if input.SportIds != "" && !re.MatchString(input.SportIds) {
+		return nil, huma.Error400BadRequest("Expected comma seperated list of uuids with no spaces for sport input uuid,uuid")
+	}
+	if input.TagIds != "" && !re.MatchString(input.TagIds) {
+		return nil, huma.Error400BadRequest("Expected comma seperated list of uuids with no spaces for tag input uuid,uuid")
+	}
+	mapUUID := func(id string) uuid.UUID {
+		parsedId, _ := uuid.Parse(id)
+		return parsedId
+	}
+
+	collegeIds := []uuid.UUID{}
+	sportIds := []uuid.UUID{}
+	tagIds := []uuid.UUID{}
+	if input.CollegeIds != "" {
+		collegeIds = utils.MapList(strings.Split(input.CollegeIds, ","), mapUUID)
+	}
+	if input.SportIds != "" {
+		sportIds = utils.MapList(strings.Split(input.SportIds, ","), mapUUID)
+	}
+	if input.TagIds != "" {
+		tagIds = utils.MapList(strings.Split(input.TagIds, ","), mapUUID)
+	}
+
+	posts, total, err := s.postDB.FilterPosts(userID, collegeIds, sportIds, tagIds, input.Limit, input.Offset)
+	if err != nil {
+		return nil, err
+	}
+	postResponses := utils.MapList(posts, func(p models.Post) PostResponse {
+		return *ToPostResponse(&p, p.ID)
+	})
+	return &utils.ResponseBody[GetAllPostsResponse]{
+		Body: &GetAllPostsResponse{
+			Posts: postResponses,
+			Total: int(total),
 		},
 	}, nil
 }

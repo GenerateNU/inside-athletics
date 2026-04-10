@@ -1,9 +1,11 @@
 package post
 
 import (
+	"fmt"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 	"math"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -27,7 +29,7 @@ func NewPostDB(db *gorm.DB) *PostDB {
 	return &PostDB{db: db}
 }
 
-// CreatePost creates a new sport in the database
+// CreatePost creates a new post in the database
 func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post, error) {
 	dbError := s.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&post).Error; err != nil {
@@ -320,7 +322,7 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 	return utils.HandleDBError(&updatedPost, dbResponse.Error)
 }
 
-func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit int) ([]models.Post, int64, error) {
+func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit int, offset int) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
@@ -340,12 +342,61 @@ func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit in
 		Order(orderQuery).
 		Count(&total).
 		Limit(limit).
+		Offset(offset).
 		Scan(&posts).Error; err != nil {
 		return posts, 0, err
 	}
 
 	if total == 0 {
 		return []models.Post{}, 0, nil
+	}
+
+	return posts, total, nil
+}
+
+func (p *PostDB) FilterPosts(userId uuid.UUID, colleges []uuid.UUID, sports []uuid.UUID, tags []uuid.UUID, limit int, offset int) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+
+	filters := make([]string, 0)
+	if len(colleges) > 0 {
+		mappedColleges := utils.MapList(colleges, func(c uuid.UUID) string { return fmt.Sprintf("posts.college_id = '%s'", c.String()) })
+		collegeQuery := strings.Join(mappedColleges, " OR ")
+		filters = append(filters, collegeQuery)
+	}
+
+	if len(sports) > 0 {
+		mappedSports := utils.MapList(sports, func(c uuid.UUID) string { return fmt.Sprintf("posts.sport_id = '%s'", c.String()) })
+		sportQuery := strings.Join(mappedSports, " OR ")
+		filters = append(filters, sportQuery)
+	}
+
+	if len(tags) > 0 {
+		mappedTags := utils.MapList(tags, func(c uuid.UUID) string { return fmt.Sprintf("tag_posts.tag_id = '%s'", c.String()) })
+		tagQuery := strings.Join(mappedTags, " OR ")
+		filters = append(filters, tagQuery)
+	}
+
+	whereQuery := strings.Join(filters, " OR ")
+
+	if err := p.db.
+		Model(&models.Post{}).
+		Select(POST_SELECT_QUERY, userId).
+		Joins("JOIN tag_posts ON posts.id = tag_posts.post_id").
+		Where(whereQuery).
+		Group("posts.id").
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+		}).
+		Count(&total).
+		Limit(limit).
+		Offset(offset).
+		Order("posts.created_at DESC").
+		Scan(&posts).Error; err != nil {
+		return posts, 0, err
 	}
 
 	return posts, total, nil
