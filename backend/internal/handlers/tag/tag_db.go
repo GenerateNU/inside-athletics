@@ -53,6 +53,15 @@ func (u *TagDB) CreateTag(tag *models.Tag) (*models.Tag, error) {
 	return utils.HandleDBError(tag, dbResponse.Error)
 }
 
+func (u *TagDB) GetTagsByType(tagType models.TagType) ([]*models.Tag, error) {
+	var tags []*models.Tag
+	dbResponse := u.db.Where("type = ?", tagType).Find(&tags)
+	if dbResponse.Error != nil {
+		return nil, dbResponse.Error
+	}
+	return tags, nil
+}
+
 func (u *TagDB) UpdateTag(id uuid.UUID, updates *UpdateTagBody) (*models.Tag, error) {
 	dbResponse := u.db.Model(&models.Tag{}).
 		Where("id = ?", id).
