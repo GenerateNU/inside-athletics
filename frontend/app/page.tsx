@@ -1,5 +1,7 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import CreatePostPopup from "@/components/ui/create-post-popup";
 import { Navbar } from "@/components/ui/navbar";
 import { CiUser } from "react-icons/ci";
 import CreatePostPopup from "@/components/ui/create-post-popup"
@@ -28,6 +30,7 @@ export default function Page() {
             </div>
             <div className="flex flex-row gap-5">
               <Button variant="outline"> Click here</Button>
+              <CreatePostPopup/>
             </div>
           </div>
         </main>
