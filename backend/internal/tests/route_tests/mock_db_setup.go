@@ -17,6 +17,7 @@ import (
 	"runtime"
 	"testing"
 	"time"
+	"fmt"
 
 	"github.com/danielgtaylor/huma/v2/humatest"
 	"github.com/stripe/stripe-go/v81"
