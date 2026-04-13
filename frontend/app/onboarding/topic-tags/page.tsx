@@ -53,7 +53,7 @@ export default function OnboardingTopicTagsPage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-3xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-3 text-center">
-          <h1 className="text-4xl font-bold text-black">Choose Topic Tags</h1>
+          <h1 className="text-4xl font-bold text-[#001F3E]">Choose Topic Tags</h1>
           <p className="text-sm text-gray-600">
             Select what you&apos;d like to see on your home feed
           </p>
@@ -83,7 +83,7 @@ export default function OnboardingTopicTagsPage() {
         <div className="space-y-6">
           {topicCategories.map((category) => (
             <div key={category.name} className="space-y-3">
-              <h2 className="text-center text-sm font-semibold text-black">
+              <h2 className="text-center text-sm font-semibold text-[#001F3E]">
                 {category.name}
               </h2>
               <div className="flex flex-wrap gap-3">

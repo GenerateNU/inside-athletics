@@ -314,7 +314,7 @@ export default function OnboardingRolePage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-black">About you</h1>
+          <h1 className="text-4xl font-bold text-[#001F3E]">About you</h1>
           <p className="text-sm text-gray-600">Tell us about yourself!</p>
         </div>
 
@@ -364,7 +364,10 @@ export default function OnboardingRolePage() {
             Role
           </label>
           <Select value={role} onValueChange={handleRoleChange}>
-            <SelectTrigger id="role" className="h-10 w-full text-sm">
+            <SelectTrigger
+              id="role"
+              className="h-10 w-full border-[#3E7DBB] text-sm"
+            >
               <SelectValue placeholder="Select a role">
                 {selectedRoleLabel}
               </SelectValue>
@@ -393,7 +396,10 @@ export default function OnboardingRolePage() {
                 setPrimarySport(value ?? "");
               }}
             >
-              <SelectTrigger id="primary-sport" className="h-10 w-full text-sm">
+              <SelectTrigger
+                id="primary-sport"
+                className="h-10 w-full border-[#3E7DBB] text-sm"
+              >
                 <SelectValue placeholder="Select a primary sport">
                   {selectedPrimarySportLabel}
                 </SelectValue>
@@ -456,7 +462,10 @@ export default function OnboardingRolePage() {
                 setUniversity(value ?? "");
               }}
             >
-              <SelectTrigger id="university" className="h-10 w-full text-sm">
+              <SelectTrigger
+                id="university"
+                className="h-10 w-full border-[#3E7DBB] text-sm"
+              >
                 <SelectValue
                   placeholder={
                     isLoadingColleges

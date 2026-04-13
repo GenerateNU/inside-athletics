@@ -37,7 +37,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-lg rounded-[1rem] bg-white px-8 py-10 shadow-[0_18px_45px_rgba(44,100,154,0.16)]">
         <div className="space-y-6">
           <div className="space-y-4 text-center">
-            <h1 className="text-4xl font-bold text-black">
+            <h1 className="text-4xl font-bold text-[#001F3E]">
               Join Inside Athletics
             </h1>
             <div className="flex w-full items-center justify-center rounded-md px-6 py-8">
@@ -57,7 +57,7 @@ export default function SignUpPage() {
                 id="name"
                 name="name"
                 type="text"
-                className="bg-[#F0F4F8]"
+                className="border-[#3E7DBB] bg-[#F0F4F8]"
                 value={name}
                 placeholder="Name"
                 required
@@ -67,7 +67,7 @@ export default function SignUpPage() {
                 id="email"
                 name="email"
                 type="email"
-                className="bg-[#F0F4F8]"
+                className="border-[#3E7DBB] bg-[#F0F4F8]"
                 value={email}
                 placeholder="Email"
                 required
@@ -77,7 +77,7 @@ export default function SignUpPage() {
                 id="username"
                 name="username"
                 type="text"
-                className="bg-[#F0F4F8]"
+                className="border-[#3E7DBB] bg-[#F0F4F8]"
                 value={username}
                 placeholder="Username"
                 required
@@ -87,7 +87,7 @@ export default function SignUpPage() {
                 id="password"
                 name="password"
                 type="password"
-                className="bg-[#F0F4F8]"
+                className="border-[#3E7DBB] bg-[#F0F4F8]"
                 value={password}
                 placeholder="Password"
                 required

@@ -79,19 +79,19 @@ export default function OnboardingBillingPage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-3xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-black">Payment Info</h1>
+          <h1 className="text-4xl font-bold text-[#001F3E]">Payment Info</h1>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-4 rounded-xl border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-black">Payment</h2>
+            <h2 className="text-sm font-semibold text-[#001F3E]">Payment</h2>
             <div className="grid gap-4">
               <label className="space-y-2">
                 <span className="text-sm font-medium text-black">
                   Cardholder name
                 </span>
                 <Input
-                  className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                  className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                   value={form.cardholderName}
                   onChange={(event) => {
                     updateField("cardholderName", event.target.value);
@@ -104,7 +104,7 @@ export default function OnboardingBillingPage() {
                   Card number
                 </span>
                 <Input
-                  className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                  className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                   value={form.cardNumber}
                   onChange={(event) => {
                     updateField("cardNumber", event.target.value);
@@ -119,7 +119,7 @@ export default function OnboardingBillingPage() {
                     Expiry date
                   </span>
                   <Input
-                    className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                    className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                     value={form.expiryDate}
                     onChange={(event) => {
                       updateField("expiryDate", event.target.value);
@@ -130,7 +130,7 @@ export default function OnboardingBillingPage() {
                 <label className="space-y-2">
                   <span className="text-sm font-medium text-black">CVC</span>
                   <Input
-                    className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                    className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                     value={form.cvc}
                     onChange={(event) => {
                       updateField("cvc", event.target.value);
@@ -144,14 +144,14 @@ export default function OnboardingBillingPage() {
           </div>
 
           <div className="space-y-4 rounded-xl border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-black">Billing</h2>
+            <h2 className="text-sm font-semibold text-[#001F3E]">Billing</h2>
             <div className="grid gap-4">
               <label className="space-y-2">
                 <span className="text-sm font-medium text-black">
                   Address line 1
                 </span>
                 <Input
-                  className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                  className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                   value={form.addressLine1}
                   onChange={(event) => {
                     updateField("addressLine1", event.target.value);
@@ -164,7 +164,7 @@ export default function OnboardingBillingPage() {
                   Address line 2
                 </span>
                 <Input
-                  className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                  className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                   value={form.addressLine2}
                   onChange={(event) => {
                     updateField("addressLine2", event.target.value);
@@ -176,7 +176,7 @@ export default function OnboardingBillingPage() {
                 <label className="space-y-2">
                   <span className="text-sm font-medium text-black">City</span>
                   <Input
-                    className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                    className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                     value={form.city}
                     onChange={(event) => {
                       updateField("city", event.target.value);
@@ -187,7 +187,7 @@ export default function OnboardingBillingPage() {
                 <label className="space-y-2">
                   <span className="text-sm font-medium text-black">State</span>
                   <Input
-                    className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                    className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                     value={form.state}
                     onChange={(event) => {
                       updateField("state", event.target.value);
@@ -202,7 +202,7 @@ export default function OnboardingBillingPage() {
                     Postal code
                   </span>
                   <Input
-                    className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                    className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                     value={form.postalCode}
                     onChange={(event) => {
                       updateField("postalCode", event.target.value);
@@ -215,7 +215,7 @@ export default function OnboardingBillingPage() {
                     Country
                   </span>
                   <Input
-                    className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                    className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                     value={form.country}
                     onChange={(event) => {
                       updateField("country", event.target.value);
@@ -228,7 +228,7 @@ export default function OnboardingBillingPage() {
           </div>
 
           <div className="space-y-4 rounded-xl border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-black">
+            <h2 className="text-sm font-semibold text-[#001F3E]">
               Contact information
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -237,7 +237,7 @@ export default function OnboardingBillingPage() {
                   Contact email
                 </span>
                 <Input
-                  className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                  className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                   value={form.contactEmail}
                   onChange={(event) => {
                     updateField("contactEmail", event.target.value);
@@ -251,7 +251,7 @@ export default function OnboardingBillingPage() {
                   Contact phone
                 </span>
                 <Input
-                  className="h-11 rounded-xl border-gray-300 px-4 text-sm md:text-sm"
+                  className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
                   value={form.contactPhone}
                   onChange={(event) => {
                     updateField("contactPhone", event.target.value);

@@ -40,7 +40,7 @@ export default function OnboardingPlanPage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-3xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-black">Choose Your Plan</h1>
+          <h1 className="text-4xl font-bold text-[#001F3E]">Choose Your Plan</h1>
           <p className="text-sm text-gray-600">
             Pick the plan you want to start with.
           </p>

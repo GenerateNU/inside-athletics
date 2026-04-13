@@ -44,7 +44,7 @@ export default function OnboardingVerificationPage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-black">Verification</h1>
+          <h1 className="text-4xl font-bold text-[#001F3E]">Verification</h1>
           <p className="text-sm text-gray-600">
             {isAthlete
               ? "Confirm your athlete details so we can verify your profile."
@@ -66,7 +66,7 @@ export default function OnboardingVerificationPage() {
                 type="text"
                 value={fullName}
                 placeholder="As it appears on your team roster"
-                className="h-10 rounded-xl px-3 text-sm"
+                className="h-10 rounded-md border-[#3E7DBB] px-3 text-sm"
                 onChange={(event) => {
                   setFullName(event.target.value);
                 }}
@@ -85,7 +85,7 @@ export default function OnboardingVerificationPage() {
                 type="email"
                 value={institutionEmail}
                 placeholder="name@school.edu"
-                className="h-10 rounded-xl px-3 text-sm"
+                className="h-10 rounded-md border-[#3E7DBB] px-3 text-sm"
                 onChange={(event) => {
                   setInstitutionEmail(event.target.value);
                 }}
@@ -106,7 +106,7 @@ export default function OnboardingVerificationPage() {
                 type="text"
                 value={name}
                 placeholder="Enter your full name"
-                className="h-10 rounded-xl px-3 text-sm"
+                className="h-10 rounded-md border-[#3E7DBB] px-3 text-sm"
                 onChange={(event) => {
                   setName(event.target.value);
                 }}
@@ -125,7 +125,7 @@ export default function OnboardingVerificationPage() {
                 type="email"
                 value={email}
                 placeholder="name@email.com"
-                className="h-10 rounded-xl px-3 text-sm"
+                className="h-10 rounded-md border-[#3E7DBB] px-3 text-sm"
                 onChange={(event) => {
                   setEmail(event.target.value);
                 }}

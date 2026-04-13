@@ -73,7 +73,7 @@ export default function OnboardingAthleticProgramSurveyPage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-3xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-3 text-center">
-          <h1 className="text-4xl font-bold text-black">
+          <h1 className="text-4xl font-bold text-[#001F3E]">
             Athletic Program Survey
           </h1>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">

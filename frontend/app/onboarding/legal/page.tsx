@@ -25,7 +25,7 @@ export default function OnboardingLegalPage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-2xl space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-black">
+          <h1 className="text-4xl font-bold text-[#001F3E]">
             Privacy Policy & Terms
           </h1>
           <p className="text-sm text-gray-600">
@@ -35,7 +35,7 @@ export default function OnboardingLegalPage() {
 
         <div className="space-y-6 rounded-xl border border-gray-200 bg-gray-50 p-6">
           <section className="space-y-2">
-            <h2 className="text-lg font-semibold text-black">Privacy Policy</h2>
+            <h2 className="text-lg font-semibold text-[#001F3E]">Privacy Policy</h2>
             <p className="text-sm leading-6 text-gray-700">
               Privacy note: Content shared on Inside Athletics may be used in
               aggregated and anonymized form to generate insights, reports, and
@@ -46,7 +46,7 @@ export default function OnboardingLegalPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-semibold text-black">
+            <h2 className="text-lg font-semibold text-[#001F3E]">
               Terms & Conditions
             </h2>
             <p className="text-sm leading-6 text-gray-700">

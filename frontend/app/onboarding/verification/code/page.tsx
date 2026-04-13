@@ -236,7 +236,7 @@ export default function OnboardingVerificationCodePage() {
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-bold text-black">Verification Code</h1>
+          <h1 className="text-4xl font-bold text-[#001F3E]">Verification Code</h1>
           <p className="text-sm text-gray-600">
             Enter the verification code sent to your email.
           </p>
@@ -262,10 +262,10 @@ export default function OnboardingVerificationCodePage() {
                 autoComplete={index === 0 ? "one-time-code" : "off"}
                 maxLength={CODE_LENGTH}
                 value={digit}
-                className={`h-12 w-12 rounded-xl border px-0 text-center text-lg font-semibold ${
+                className={`h-12 w-12 rounded-md border px-0 text-center text-lg font-semibold ${
                   digit
                     ? "border-[#7F8C2D] bg-[#D4E94B80]"
-                    : "border-[#D4E94B] bg-[#FCFDF1]"
+                    : "border-[#3E7DBB] bg-[#FCFDF1]"
                 }`}
                 onChange={(event) => {
                   handleDigitChange(index, event.target.value);
