@@ -60,7 +60,7 @@ type SearchPopupProps = {
 };
 
 const TAG_SECTIONS: { header: string; type: TagType; max: number; group?: string }[] = [
-  { header: "Sports", type: "sports", max: 2 },
+  { header: "Sports", type: "sports", max: 1 },
   { header: "Divisions", type: "divisions", max: 3 },
   { header: "Athletics & Performance", type: "athletics_performance", max: 5, group: "Other Tags" },
   { header: "Health & Wellness", type: "health_wellness", max: 5 },
