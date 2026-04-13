@@ -2,7 +2,7 @@
 import { login } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -17,6 +17,7 @@ const initialState: loginInitialState = {
 };
 
 export default function LoginPage() {
+  const router = useRouter();
   const [state, loginAction] = useActionState(login, initialState);
   const status = useFormStatus();
 
@@ -24,25 +25,18 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-stone">
       <div className="max-w-lg w-full space-y-8">
         <div className="flex justify-center">
-          <label className="block text-4xl text-black font-bold">
-            {" "}
-            Log In{" "}
-          </label>
+          <label className="block text-4xl text-black font-bold">Log In</label>
         </div>
         <form className="mt-8 space-y-6 bg-white p-8">
           <div className="w-full flex flex-col items-center space-y-4">
+            <p className="text-center text-sm text-gray-600">
+              Enter your email and we&apos;ll send you a 6-digit login code.
+            </p>
             <Input
               id="email"
               name="email"
               type="email"
               placeholder="Email"
-              required
-            />
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Password"
               required
             />
             {!state?.success && (
@@ -57,12 +51,12 @@ export default function LoginPage() {
               disabled={status.pending}
               type="submit"
             >
-              LOG IN
+              SEND CODE
             </Button>
             <Button
               type="button"
               variant="default"
-              onClick={() => redirect("/signup")}
+              onClick={() => router.push("/signup")}
               disabled={status.pending}
             >
               Sign Up

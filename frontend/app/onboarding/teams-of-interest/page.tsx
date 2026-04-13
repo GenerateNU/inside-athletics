@@ -102,7 +102,9 @@ export default function OnboardingTeamsOfInterestPage() {
   }, [data.preferences, hydrated]);
 
   useEffect(() => {
-    if (!session?.access_token) {
+    const accessToken = session?.access_token;
+
+    if (!accessToken) {
       setIsLoadingColleges(false);
       setCollegeError("You need an active session to load schools.");
       return;
@@ -117,7 +119,7 @@ export default function OnboardingTeamsOfInterestPage() {
 
         const response = await fetch("/api/v1/college/?limit=500", {
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 

@@ -1,12 +1,11 @@
 import { Suspense } from "react";
-import OnboardingBillingPage from "./OnboardingBillingPage";
 
 export const dynamic = "force-dynamic";
 
-export default function BillingPage() {
+export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <OnboardingBillingPage />
+      {children}
     </Suspense>
   );
 }
