@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"inside-athletics/internal/models"
-
+	"fmt"
 	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/s3"
 	"inside-athletics/internal/server"
@@ -17,7 +17,6 @@ import (
 	"runtime"
 	"testing"
 	"time"
-	"fmt"
 
 	"github.com/danielgtaylor/huma/v2/humatest"
 	"github.com/stripe/stripe-go/v81"
