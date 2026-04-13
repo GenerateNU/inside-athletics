@@ -40,6 +40,7 @@ func seedUserAndSport(t *testing.T, testDB *TestDatabase, unique string) (models
 }
 
 func TestGetSportFollowsByUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -76,6 +77,7 @@ func TestGetSportFollowsByUser(t *testing.T) {
 }
 
 func TestGetFollowingUsersBySport(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -108,6 +110,7 @@ func TestGetFollowingUsersBySport(t *testing.T) {
 }
 
 func TestCreateSportFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -144,6 +147,7 @@ func TestCreateSportFollow(t *testing.T) {
 }
 
 func TestDeleteSportFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -180,6 +184,7 @@ func TestDeleteSportFollow(t *testing.T) {
 }
 
 func TestDeleteSportFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -211,6 +216,7 @@ func TestDeleteSportFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
 }
 
 func TestDeleteSportFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -241,6 +247,7 @@ func TestDeleteSportFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T)
 }
 
 func TestDeleteSportFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -271,6 +278,7 @@ func TestDeleteSportFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
 }
 
 func TestGetSportFollowsByUser_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -290,6 +298,7 @@ func TestGetSportFollowsByUser_InvalidUUID(t *testing.T) {
 }
 
 func TestGetFollowingUsersBySport_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -309,6 +318,7 @@ func TestGetFollowingUsersBySport_InvalidUUID(t *testing.T) {
 }
 
 func TestCreateSportFollow_DuplicateReturns409(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -338,6 +348,7 @@ func TestCreateSportFollow_DuplicateReturns409(t *testing.T) {
 }
 
 func TestCreateSportFollow_NonExistentSportReturnsError(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -363,6 +374,7 @@ func TestCreateSportFollow_NonExistentSportReturnsError(t *testing.T) {
 }
 
 func TestDeleteSportFollow_NonExistentReturns404(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -380,6 +392,7 @@ func TestDeleteSportFollow_NonExistentReturns404(t *testing.T) {
 }
 
 func TestDeleteSportFollow_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

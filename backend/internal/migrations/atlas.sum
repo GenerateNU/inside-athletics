@@ -1,4 +1,5 @@
 h1:iFdE8mwg+unNq4X4qoT4Q7BMvv6zGXuSsOdugUCMgEw=
+h1:QmACusuFiZo58JfLYmIxUVZ2meozpSJhEFxpk1+COmM=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
@@ -26,3 +27,6 @@ h1:iFdE8mwg+unNq4X4qoT4Q7BMvv6zGXuSsOdugUCMgEw=
 20260330225810_MediaAddedMediaType.sql h1:nIsevTXSgwgb4oAmmp/sGzMOy+4W6YSYeRRNQS5onqU=
 20260409023619_AthleteSurveyTable.sql h1:n8Bc4XsS3juO7YytEMcatpBM3NAC+wFApbRDqA+voDc=
 20260410120000_SeedCollegeRatingSurveyData.sql h1:EaSrqWmqudloK+0KYZqTy1ucYbHxKXwpRx5dWWDxXlg=
+20260325181724_FuzzySearch.sql h1:1z4s6GDSsX745a+HkaqiEc7Ri0I8iaIpRVkYHP68A+0=
+20260330225810_MediaAddedMediaType.sql h1:W7o1vz5ibx9iRZ0C8EvrdQ1Gy++B4cUau01lSzK1OF8=
+20260409023619_AthleteSurveyTable.sql h1:WrTBTZDhZzdwss8PRMPpHxqEHeXAsX5GEoo/o2E2v/c=

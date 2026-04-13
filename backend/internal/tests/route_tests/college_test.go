@@ -6,10 +6,12 @@ import (
 	h "inside-athletics/internal/handlers/college"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"net/http"
 	"testing"
 )
 
 func TestGetCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -46,6 +48,7 @@ func TestGetCollege(t *testing.T) {
 }
 
 func TestCreateCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -82,6 +85,7 @@ func TestCreateCollege(t *testing.T) {
 }
 
 func TestUpdateCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -146,6 +150,7 @@ func TestUpdateCollege(t *testing.T) {
 }
 
 func TestDeleteCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -184,6 +189,7 @@ func TestDeleteCollege(t *testing.T) {
 }
 
 func TestCreateCollegeMissingName(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -215,6 +221,7 @@ func TestCreateCollegeMissingName(t *testing.T) {
 }
 
 func TestCreateCollegeMissingState(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -246,6 +253,7 @@ func TestCreateCollegeMissingState(t *testing.T) {
 }
 
 func TestCreateCollegeMissingCity(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -277,6 +285,7 @@ func TestCreateCollegeMissingCity(t *testing.T) {
 }
 
 func TestCreateCollegeMissingDivisionRank(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -308,6 +317,7 @@ func TestCreateCollegeMissingDivisionRank(t *testing.T) {
 }
 
 func TestCreateCollegeMissingWebsite(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -335,5 +345,58 @@ func TestCreateCollegeMissingWebsite(t *testing.T) {
 
 	if resp.Code < 400 {
 		t.Fatalf("Expected error response for missing website, got status %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestCollegeSearch(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+	})
+
+	neu := models.College{
+		Name:         "Northeastern University",
+		State:        "Massachusetts",
+		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
+		DivisionRank: models.DivisionI,
+	}
+	collegeResp := testDB.DB.Create(&neu)
+	_, err := utils.HandleDBError(&neu, collegeResp.Error)
+
+	if err != nil {
+		t.Fatalf("Unable to add college to table: %s", err.Error())
+	}
+
+	erm := models.College{
+		Name:         "Erm University",
+		State:        "Ur moms house",
+		City:         "ur moms house",
+		Website:      "urmom.com",
+		DivisionRank: models.DivisionI,
+	}
+	ermResp := testDB.DB.Create(&erm)
+	_, err1 := utils.HandleDBError(&erm, ermResp.Error)
+
+	// make sure college was added to db
+	if err1 != nil {
+		t.Fatalf("Unable to add college to table: %s", err1.Error())
+	}
+
+	resp := api.Get("/api/v1/colleges/search?search_str=erm", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("Expected status ok got %d, Error Details: %s", resp.Code, resp.Body.String())
+	}
+	var searchResult utils.SearchResults[*h.GetCollegeResponse]
+	DecodeTo(&searchResult, resp)
+
+	if len(searchResult.Results) != 1 {
+		t.Fatalf("Expected to only return 1 college for search, got %d", len(searchResult.Results))
+	}
+	if searchResult.Results[0].Name != erm.Name {
+		t.Fatalf("Expected highest ranking college to be Erm University got %s", searchResult.Results[0].Name)
 	}
 }

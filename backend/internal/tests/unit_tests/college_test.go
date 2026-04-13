@@ -6,6 +6,7 @@ import (
 )
 
 func TestStringPtrOrNil(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		input string
@@ -30,6 +31,7 @@ func TestStringPtrOrNil(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := h.StringPtrOrNil(tt.input)
 
 			if tt.input == "" {

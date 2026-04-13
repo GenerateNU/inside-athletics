@@ -17,6 +17,7 @@ import (
 )
 
 func TestIsOwnerOfPostOrComment(t *testing.T) {
+	t.Parallel()
 	testDB := setupAuthTestDB(t)
 	defer testDB.Teardown(t)
 

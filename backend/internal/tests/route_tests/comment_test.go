@@ -54,6 +54,7 @@ func seedUserAndPost(t *testing.T, testDB *TestDatabase, unique string) (models.
 }
 
 func TestCreateComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -82,6 +83,7 @@ func TestCreateComment(t *testing.T) {
 
 // Asserts anonymous comments hide user_id when caller is not the user who made the comment.
 func TestCreateCommentAnonymous(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -108,6 +110,7 @@ func TestCreateCommentAnonymous(t *testing.T) {
 // testing get anonymous comment, when user is not user who made comment, will not return user id
 // also testing when user who made comment gets it, userId is shown
 func TestGetComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -151,6 +154,7 @@ func TestGetComment(t *testing.T) {
 }
 
 func TestGetCommentWithLikes(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -205,6 +209,7 @@ func TestGetCommentWithLikes(t *testing.T) {
 }
 
 func TestGetCommentsByPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -231,6 +236,7 @@ func TestGetCommentsByPost(t *testing.T) {
 }
 
 func TestGetReplies(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -262,6 +268,7 @@ func TestGetReplies(t *testing.T) {
 }
 
 func TestUpdateComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -287,6 +294,7 @@ func TestUpdateComment(t *testing.T) {
 }
 
 func TestDeleteComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -310,6 +318,7 @@ func TestDeleteComment(t *testing.T) {
 }
 
 func TestCreateReplyToReplyReturns400(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -339,6 +348,7 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 }
 
 func TestFreeUserGetCommentsByPostLimitedToFirstThreeViewedPosts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -402,6 +412,7 @@ func TestFreeUserGetCommentsByPostLimitedToFirstThreeViewedPosts(t *testing.T) {
 }
 
 func TestFreeUserGetCommentBlockedOutsideFirstThreeViewedPosts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -465,6 +476,7 @@ func TestFreeUserGetCommentBlockedOutsideFirstThreeViewedPosts(t *testing.T) {
 }
 
 func TestPremiumUserCanViewCommentsOutsideFirstThreeViewedPosts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
