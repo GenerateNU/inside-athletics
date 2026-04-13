@@ -8,12 +8,10 @@ from pathlib import Path
 
 class ScrapeAthletes:
 
-    base_url: str
     info_pattern: str
     sports: List[str]
 
-    def __init__(self, base_url: str, info_pattern: str):
-        self.base_url = base_url
+    def __init__(self, info_pattern: str):
         self.info_pattern = info_pattern
         self.sports = self.read_sports_from_file()
         
@@ -41,6 +39,44 @@ class ScrapeAthletes:
                 sports_list.append(sport_str) # add sport by itself
                 sports_list = sports_list + [g + "s-" + sport_str for g in genders]
             return sports_list
+        
+    def clean_url(self, url: str) -> str:
+        """
+            Given a url, put it in https:// format 
+        """
+        if url.startswith(("http://", "https://")):
+            return url
+        elif url.startswith("www."):
+            return url.replace("www.", "https://")
+        else:
+            return "https://" + url  
+    
+    def get_all_athletes(self, sample_size: int | None = None):
+        college_info_path = Path(__file__).parent / "college_info.json" 
+        missed_colleges = []
+        college_athletes = {}
+        total_schools_looped = 0
+        with open(college_info_path, "r") as file:
+            college_info = json.load(file)
+            for college in college_info:
+                sport_url = self.clean_url(college["athletics_website"])
+                name = college["name"]
+                athletes, found = self.get_athletes(sport_url)
+                if not found:
+                    missed_colleges.append(name)
+                else:
+                    college_athletes[name] = athletes
+                
+                total_schools_looped += 1
+                if sample_size and total_schools_looped >= sample_size:
+                    break
+
+            with open(Path(__file__).parent / "athletes.json", "w", encoding="utf-8") as athlete_file:
+                json.dump(college_athletes, athlete_file, indent=2)
+            with open(Path(__file__).parent / "missed_schools.txt", "w") as missed_college_file:
+                for school in missed_colleges:
+                    missed_college_file.write(school + "\n")
+            print(f"Number of schools with found athletes {len(college_athletes)} number of missed colleges {len(missed_colleges)}")
     
     def get_athletes(self, base_url: str) -> Tuple[Dict[str, List[str]], bool]:
         """
@@ -49,22 +85,24 @@ class ScrapeAthletes:
         params:
             base_url: str: Represents the sport website for a given college 
         
-        Returns: Dictionary of found sports for the given college sports url and the athlete names for each found sport
+        Returns: Dictionary of found sports for the given college sports url and the athlete names for each found sport along with if any sports were found for the given college
         """
-        sports_url = f"{base_url}sports/"
+        sports_url = f"{base_url}/sports/"
         # create links to respective sports rosters
         sports_rosters = {}
         for sport in self.sports:
             roster_url = f"{sports_url}{sport}/roster"
             try:
-                print(f"Checking sport {roster_url}")
                 roster: List[str] = self.filter_for_sublinks(self.create_soup_from_request(roster_url), self.info_pattern)
-            except:
-                print(f"Unable to load sport {roster_url}")
+            except Exception as e:
+                print(f"{sport} ERROR {roster_url} {e}")
                 continue
             roster = self.get_athlete_names(roster)
             if len(roster) > 0:
                 sports_rosters[sport] = roster
+                print(f"{sport} FOUND {roster_url}")
+            else:
+                print(f"{sport} NOT FOUND {roster_url}")
         return sports_rosters, len(sports_rosters) > 0
     
     def get_college_info(self, save: bool) -> Dict[str, str]:
@@ -147,7 +185,7 @@ class ScrapeAthletes:
             return city, state
         return None, None
 
-    def get_athlete_names(self, roster_links: List[str]) -> Set[str]:
+    def get_athlete_names(self, roster_links: List[str]) -> List[str]:
         """
         Parse athlete names from roster links and return them as a set
         """
@@ -158,7 +196,7 @@ class ScrapeAthletes:
                 found_pattern = match.group()
                 name = found_pattern.split("/")[1]
                 athlete_names.add(name)
-        return athlete_names
+        return list(athlete_names)
     
     def create_soup_from_request(self, url: str) -> BeautifulSoup:
         """
@@ -166,7 +204,7 @@ class ScrapeAthletes:
         """
         page = requests.get(url)
         if page.status_code != 200:
-            raise Exception("Page not found")
+            raise Exception(f"Unable to reach page, returned code: {page.status_code}")
         return BeautifulSoup(page.content, "html.parser")
     
     def filter_for_sublinks(self, soup: BeautifulSoup, pattern: str, filter: str | None = None):
@@ -181,6 +219,5 @@ class ScrapeAthletes:
         return l
     
 
-c = ScrapeAthletes("https://acusports.com/", r".*/roster/[a-z]+-[a-z]+/[0-9]+")
-#athlete_dict = c.get_athletes("https://acusports.com/")
-c.get_college_info(save = True)
+c = ScrapeAthletes(".*/roster/[a-z]+-[a-z]+/[0-9]+")
+athlete_dict = c.get_all_athletes(sample_size=50)
