@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image'
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -178,7 +178,12 @@ export function Navbar({ className, ...props }: NavbarProps) {
             isCollapsed && "justify-center",
           )}
         >
-          <div aria-hidden="true" className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300" />
+            <Image
+            src={"/logo_image.svg"}
+            width={45}
+            height={45}
+            alt="Picture of the author"
+          />
           {!isCollapsed && (
             <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
               Inside Athletics
@@ -220,7 +225,6 @@ export function Navbar({ className, ...props }: NavbarProps) {
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
               title={label}
-              nativeButton={false}
               render={<Link href={href} />}
             >
               <Icon className={cn("size-[clamp(0.9rem,1.2vw,1rem)] shrink-0", isActive ? "text-zinc-900" : "text-zinc-700")} />
