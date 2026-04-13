@@ -3,7 +3,6 @@ package routeTests
 import (
 	"bytes"
 	"encoding/json"
-	"inside-athletics/internal/handlers/college"
 	h "inside-athletics/internal/handlers/college"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -391,7 +390,7 @@ func TestCollegeSearch(t *testing.T) {
 	if resp.Code != http.StatusOK {
 		t.Fatalf("Expected status ok got %d, Error Details: %s", resp.Code, resp.Body.String())
 	}
-	var searchResult utils.SearchResults[*college.GetCollegeResponse]
+	var searchResult utils.SearchResults[*h.GetCollegeResponse]
 	DecodeTo(&searchResult, resp)
 
 	if len(searchResult.Results) != 1 {

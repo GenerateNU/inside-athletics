@@ -1,7 +1,6 @@
 package routeTests
 
 import (
-	"inside-athletics/internal/handlers/tag"
 	tagPackage "inside-athletics/internal/handlers/tag"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
@@ -176,7 +175,7 @@ func TestTagSearch(t *testing.T) {
 		t.Fatalf("Expected code 200 but got %d", resp.Code)
 	}
 
-	var searchResults utils.SearchResults[*tag.GetTagResponse]
+	var searchResults utils.SearchResults[*tagPackage.GetTagResponse]
 	DecodeTo(&searchResults, resp)
 
 	n := len(searchResults.Results)
