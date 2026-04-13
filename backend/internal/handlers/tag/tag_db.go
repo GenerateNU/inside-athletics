@@ -87,3 +87,7 @@ func (u *TagDB) DeleteTag(id uuid.UUID) error {
 	}
 	return nil
 }
+
+func (u *TagDB) FuzzySearchFor(searchStr string, limit int) ([]models.Tag, error) {
+	return utils.FuzzySearchForDB(searchStr, limit, u.db, "name", models.Tag{})
+}

@@ -10,9 +10,9 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-// SeedCollege represents the JSON structure for college data
 type SeedCollege struct {
 	Name         string `json:"name"`
 	State        string `json:"state"`
@@ -23,68 +23,78 @@ type SeedCollege struct {
 	Logo         string `json:"logo,omitempty"`
 }
 
-// SeedSport represents the JSON structure for sport data
 type SeedSport struct {
 	Name       string `json:"name"`
 	Popularity *int32 `json:"popularity,omitempty"`
 }
 
 func main() {
-	// Parse command line flags
 	collegesFile := flag.String("colleges", "scripts/seed/data/colleges.json", "Path to colleges JSON file")
 	sportsFile := flag.String("sports", "scripts/seed/data/sports.json", "Path to sports JSON file")
-	dbURL := flag.String("db", os.Getenv("DEV_DB_CONNECTION_STRING"), "Database connection string")
+	dbURL := flag.String("db", os.Getenv("DEV_DB_CONNECTION_STRING"), "Database connection string (defaults to DEV_DB_CONNECTION_STRING)")
 	flag.Parse()
 
 	if *dbURL == "" {
-		log.Fatal("Database connection string is required. Set DEV_DB_CONNECTION_STRING or use -db flag")
+		log.Fatal("ERROR: Database connection string is required. Set DEV_DB_CONNECTION_STRING or use -db flag")
 	}
 
-	// Connect to database
-	db, err := gorm.Open(postgres.Open(*dbURL), &gorm.Config{})
+	log.Printf("Connecting to database: %s", maskPassword(*dbURL))
+
+	db, err := gorm.Open(postgres.Open(*dbURL), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("ERROR: Failed to connect to database: %v", err)
 	}
 
-	log.Println("Connected to database successfully")
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalf("ERROR: Failed to get underlying DB: %v", err)
+	}
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatalf("ERROR: Failed to ping database: %v", err)
+	}
 
-	// Seed colleges
+	var currentDB, currentSchema string
+	db.Raw("SELECT current_database()").Scan(&currentDB)
+	db.Raw("SELECT current_schema()").Scan(&currentSchema)
+	log.Printf("✓ Connected — database: %s, schema: %s", currentDB, currentSchema)
+
 	if _, err := os.Stat(*collegesFile); err == nil {
 		if err := seedColleges(db, *collegesFile); err != nil {
-			log.Fatalf("Failed to seed colleges: %v", err)
+			log.Fatalf("ERROR: Failed to seed colleges: %v", err)
 		}
 		log.Println("✓ Colleges seeded successfully")
 	} else {
-		log.Printf("Skipping colleges - file not found: %s", *collegesFile)
+		log.Printf("SKIP: Colleges file not found: %s", *collegesFile)
 	}
 
-	// Seed sports
 	if _, err := os.Stat(*sportsFile); err == nil {
 		if err := seedSports(db, *sportsFile); err != nil {
-			log.Fatalf("Failed to seed sports: %v", err)
+			log.Fatalf("ERROR: Failed to seed sports: %v", err)
 		}
 		log.Println("✓ Sports seeded successfully")
 	} else {
-		log.Printf("Skipping sports - file not found: %s", *sportsFile)
+		log.Printf("SKIP: Sports file not found: %s", *sportsFile)
 	}
 
-	log.Println("Seeding completed successfully!")
+	log.Println("✓ Seeding completed successfully!")
 }
 
 func seedColleges(db *gorm.DB, filename string) error {
-	// Read the JSON file
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return fmt.Errorf("failed to read colleges file: %w", err)
 	}
 
-	// Parse JSON
 	var seedColleges []SeedCollege
 	if err := json.Unmarshal(data, &seedColleges); err != nil {
 		return fmt.Errorf("failed to parse colleges JSON: %w", err)
 	}
 
-	// Insert into database
+	log.Printf("Processing %d colleges from %s", len(seedColleges), filename)
+	created, updated, failed := 0, 0, 0
+
 	for _, sc := range seedColleges {
 		college := models.College{
 			Name:         sc.Name,
@@ -96,44 +106,80 @@ func seedColleges(db *gorm.DB, filename string) error {
 			Logo:         sc.Logo,
 		}
 
-		// Use FirstOrCreate to avoid duplicates
 		result := db.Where("name = ? AND state = ?", college.Name, college.State).FirstOrCreate(&college)
 		if result.Error != nil {
-			return fmt.Errorf("failed to create college %s: %w", college.Name, result.Error)
+			log.Printf("  ERROR: FirstOrCreate failed for %s: %v", sc.Name, result.Error)
+			failed++
+			continue
+		}
+
+		if result.RowsAffected == 1 {
+			log.Printf("  ✓ Created: %s (id=%s)", sc.Name, college.ID)
+			created++
+		} else {
+			updateResult := db.Model(&college).Updates(map[string]interface{}{
+				"logo":    sc.Logo,
+				"city":    sc.City,
+				"website": sc.Website,
+			})
+			if updateResult.Error != nil {
+				log.Printf("  ERROR: Update failed for %s: %v", sc.Name, updateResult.Error)
+				failed++
+				continue
+			}
+			log.Printf("  → Updated: %s (id=%s)", sc.Name, college.ID)
+			updated++
 		}
 	}
 
-	log.Printf("Processed %d colleges", len(seedColleges))
+	log.Printf("Summary — created: %d, updated: %d, failed: %d", created, updated, failed)
 	return nil
 }
 
 func seedSports(db *gorm.DB, filename string) error {
-	// Read the JSON file
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return fmt.Errorf("failed to read sports file: %w", err)
 	}
 
-	// Parse JSON
 	var seedSports []SeedSport
 	if err := json.Unmarshal(data, &seedSports); err != nil {
 		return fmt.Errorf("failed to parse sports JSON: %w", err)
 	}
 
-	// Insert into database
+	log.Printf("Processing %d sports from %s", len(seedSports), filename)
+
 	for _, ss := range seedSports {
 		sport := models.Sport{
 			Name:       ss.Name,
 			Popularity: ss.Popularity,
 		}
-
-		// Use FirstOrCreate to avoid duplicates
 		result := db.Where("name = ?", sport.Name).FirstOrCreate(&sport)
 		if result.Error != nil {
-			return fmt.Errorf("failed to create sport %s: %w", sport.Name, result.Error)
+			log.Printf("  ERROR: Failed to seed sport %s: %v", ss.Name, result.Error)
 		}
 	}
 
-	log.Printf("Processed %d sports", len(seedSports))
 	return nil
+}
+
+func maskPassword(url string) string {
+	result := []rune(url)
+	inPassword := false
+	colonCount := 0
+	for i, c := range result {
+		if c == ':' {
+			colonCount++
+			if colonCount == 2 {
+				inPassword = true
+			}
+		}
+		if c == '@' {
+			inPassword = false
+		}
+		if inPassword && c != ':' {
+			result[i] = '*'
+		}
+	}
+	return string(result)
 }

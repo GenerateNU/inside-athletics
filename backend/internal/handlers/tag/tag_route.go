@@ -1,9 +1,10 @@
 package tag
 
 import (
+	"inside-athletics/internal/handlers/tagpost"
+
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
-	"inside-athletics/internal/handlers/tagpost"
 )
 
 func Route(api huma.API, db *gorm.DB) {
@@ -19,5 +20,9 @@ func Route(api huma.API, db *gorm.DB) {
 		huma.Get(grp, "/type/{type}", tagService.GetTagsByType)
 		huma.Patch(grp, "/{id}", tagService.UpdateTag)
 		huma.Delete(grp, "/{id}", tagService.DeleteTag)
+	}
+	{
+		grp := huma.NewGroup(api, "/api/v1/tags")
+		huma.Get(grp, "/search", tagService.FuzzySearchFor)
 	}
 }
