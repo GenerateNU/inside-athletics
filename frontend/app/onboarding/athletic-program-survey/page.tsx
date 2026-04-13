@@ -83,11 +83,7 @@ export default function OnboardingAthleticProgramSurveyPage() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl px-4 text-sm font-semibold"
-              style={{
-                borderColor: "#2C649A",
-                color: "#2C649A",
-              }}
+              className="rounded-xl border-[#2C649A] px-4 text-sm font-semibold text-[#2C649A]"
               onClick={finishOnboarding}
               disabled={isSubmitting}
             >
@@ -124,12 +120,11 @@ export default function OnboardingAthleticProgramSurveyPage() {
                       key={option}
                       type="button"
                       variant="outline"
-                      className="h-11 min-w-16 rounded-xl px-6 text-sm font-semibold"
-                      style={{
-                        borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
-                        backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
-                        color: "#000000",
-                      }}
+                      className={`h-11 min-w-16 rounded-xl px-6 text-sm font-semibold text-black ${
+                        isSelected
+                          ? "border-[#7F8C2D] bg-[#D4E94B80]"
+                          : "border-[#D4E94B] bg-[#FCFDF1]"
+                      }`}
                       onClick={() => {
                         setResponses((current) => ({
                           ...current,
@@ -148,8 +143,7 @@ export default function OnboardingAthleticProgramSurveyPage() {
 
         <Button
           type="button"
-          className="h-10 w-full rounded-xl text-sm font-semibold"
-          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+          className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
           onClick={finishOnboarding}
           disabled={isSubmitting}
         >

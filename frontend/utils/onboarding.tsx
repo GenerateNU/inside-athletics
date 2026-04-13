@@ -43,6 +43,20 @@ export type OnboardingData = {
   plan: {
     selectedPlan: string;
   };
+  billing: {
+    cardholderName: string;
+    cardNumber: string;
+    expiryDate: string;
+    cvc: string;
+    contactEmail: string;
+    contactPhone: string;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
   topicTags: {
     selectedTags: string[];
   };
@@ -82,6 +96,20 @@ const defaultOnboardingData: OnboardingData = {
   },
   plan: {
     selectedPlan: "",
+  },
+  billing: {
+    cardholderName: "",
+    cardNumber: "",
+    expiryDate: "",
+    cvc: "",
+    contactEmail: "",
+    contactPhone: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "",
   },
   topicTags: {
     selectedTags: [],
@@ -138,6 +166,10 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           plan: {
             ...defaultOnboardingData.plan,
             ...parsed.plan,
+          },
+          billing: {
+            ...defaultOnboardingData.billing,
+            ...parsed.billing,
           },
           topicTags: {
             ...defaultOnboardingData.topicTags,

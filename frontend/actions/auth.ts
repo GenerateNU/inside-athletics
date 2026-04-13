@@ -55,7 +55,5 @@ export async function signup(
   }
 
   revalidatePath("/", "layout");
-  redirect(
-    `/onboarding/verification/code?source=signup&email=${encodeURIComponent(email)}`,
-  );
+  redirect("/onboarding");
 }

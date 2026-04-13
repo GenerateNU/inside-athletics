@@ -84,8 +84,7 @@ export default function OnboardingLegalPage() {
           </Button>
           <Button
             type="button"
-            className="h-10 flex-1 rounded-xl text-sm font-semibold"
-            style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+            className="h-10 flex-1 rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
             onClick={() => {
               updateSection("legal", {
                 accepted,

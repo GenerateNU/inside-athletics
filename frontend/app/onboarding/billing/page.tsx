@@ -266,8 +266,7 @@ export default function OnboardingBillingPage() {
 
         <Button
           type="button"
-          className="h-10 w-full rounded-xl text-sm font-semibold"
-          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+          className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
           onClick={() => {
             updateSection("billing", form);
             router.push(

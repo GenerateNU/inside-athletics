@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { submitOnboardingUser } from "@/utils/onboarding-submit";
 import { useOnboarding } from "@/utils/onboarding";
-import { useSession } from "@/utils/SessionContext";
 
 const planOptions = [
   {
@@ -24,12 +22,9 @@ const planOptions = [
 export default function OnboardingPlanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const session = useSession();
-  const { data, hydrated, reset, updateSection } = useOnboarding();
+  const { data, hydrated, updateSection } = useOnboarding();
   const role = searchParams.get("role") ?? "";
   const [selectedPlan, setSelectedPlan] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!hydrated) {
@@ -59,30 +54,22 @@ export default function OnboardingPlanPage() {
             return (
               <div
                 key={plan.value}
-                className="rounded-xl p-[2px] transition-all"
-                style={{
-                  background: isPremium
-                    ? "#7F8C2D"
-                    : "#D4E94B",
-                  boxShadow: isSelected
+                className={`rounded-xl p-[2px] transition-all ${
+                  isPremium ? "bg-[#7F8C2D]" : "bg-[#D4E94B]"
+                } ${
+                  isSelected
                     ? isPremium
-                      ? "4px 6px 14px rgba(127, 140, 45, 0.24)"
-                      : "4px 6px 14px rgba(44, 100, 154, 0.18)"
-                    : "none",
-                  transform: isSelected ? "translateY(-2px)" : "none",
-                }}
+                      ? "-translate-y-0.5 shadow-[4px_6px_14px_rgba(127,140,45,0.24)]"
+                      : "-translate-y-0.5 shadow-[4px_6px_14px_rgba(44,100,154,0.18)]"
+                    : ""
+                }`}
               >
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex h-full min-h-72 w-full min-w-0 flex-col items-start rounded-[calc(0.75rem-2px)] px-0 py-0 text-left whitespace-normal"
-                  style={{
-                    borderColor: "transparent",
-                    background: isPremium
-                      ? "#E9F4A5"
-                      : "#FCFDF1",
-                    color: "#000000",
-                  }}
+                  className={`flex h-full min-h-72 w-full min-w-0 flex-col items-start rounded-[calc(0.75rem-2px)] border-transparent px-0 py-0 text-left text-black whitespace-normal ${
+                    isPremium ? "bg-[#E9F4A5]" : "bg-[#FCFDF1]"
+                  }`}
                   onClick={() => {
                     setSelectedPlan(plan.value);
                   }}
@@ -90,21 +77,13 @@ export default function OnboardingPlanPage() {
                   <div className="w-full px-4 py-4">
                     {isPremium ? (
                       <div
-                        className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border-[1.5px] px-3 py-3 text-sm font-semibold"
-                        style={{
-                          backgroundColor: "#FCFDF1",
-                          borderColor: "#7F8C2D",
-                        }}
+                        className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border-[1.5px] border-[#7F8C2D] bg-[#FCFDF1] px-3 py-3 text-sm font-semibold"
                       >
                         {plan.label}
                       </div>
                     ) : (
                       <div
-                        className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border px-3 py-3 text-sm font-semibold"
-                        style={{
-                          backgroundColor: "#FFFFFF",
-                          borderColor: "#D4E94B",
-                        }}
+                        className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border border-[#D4E94B] bg-white px-3 py-3 text-sm font-semibold"
                       >
                         {plan.label}
                       </div>
@@ -112,73 +91,57 @@ export default function OnboardingPlanPage() {
                   </div>
                   <div className="w-full px-4">
                     <div
-                      className="mx-3 border-t"
-                      style={{
-                        borderColor: isPremium
-                          ? "#7F8C2D"
-                          : "#D4E94B",
-                      }}
+                      className={`mx-3 border-t ${
+                        isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"
+                      }`}
                     />
                   </div>
                   <div
-                    className="w-full px-4 py-4 text-sm"
-                    style={{
-                      color: isPremium ? "#000000" : "#4B5563",
-                    }}
+                    className={`w-full px-4 py-4 text-sm ${
+                      isPremium ? "text-black" : "text-gray-600"
+                    }`}
                   >
                     {plan.price}
                   </div>
                   <div className="w-full px-4">
                     <div
-                      className="mx-3 border-t"
-                      style={{
-                        borderColor: isPremium
-                          ? "#7F8C2D"
-                          : "#D4E94B",
-                      }}
+                      className={`mx-3 border-t ${
+                        isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"
+                      }`}
                     />
                   </div>
                   <div
-                    className="w-full px-4 py-4 text-sm"
-                    style={{
-                      color: isPremium ? "#000000" : "#4B5563",
-                    }}
+                    className={`w-full px-4 py-4 text-sm ${
+                      isPremium ? "text-black" : "text-gray-600"
+                    }`}
                   >
                     Feature 1
                   </div>
                   <div className="w-full px-4">
                     <div
-                      className="mx-3 border-t"
-                      style={{
-                        borderColor: isPremium
-                          ? "#7F8C2D"
-                          : "#D4E94B",
-                      }}
+                      className={`mx-3 border-t ${
+                        isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"
+                      }`}
                     />
                   </div>
                   <div
-                    className="w-full px-4 py-4 text-sm"
-                    style={{
-                      color: isPremium ? "#000000" : "#4B5563",
-                    }}
+                    className={`w-full px-4 py-4 text-sm ${
+                      isPremium ? "text-black" : "text-gray-600"
+                    }`}
                   >
                     Feature 2
                   </div>
                   <div className="w-full px-4">
                     <div
-                      className="mx-3 border-t"
-                      style={{
-                        borderColor: isPremium
-                          ? "#7F8C2D"
-                          : "#D4E94B",
-                      }}
+                      className={`mx-3 border-t ${
+                        isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"
+                      }`}
                     />
                   </div>
                   <div
-                    className="w-full px-4 py-4 text-sm"
-                    style={{
-                      color: isPremium ? "#000000" : "#4B5563",
-                    }}
+                    className={`w-full px-4 py-4 text-sm ${
+                      isPremium ? "text-black" : "text-gray-600"
+                    }`}
                   >
                     Feature 3
                   </div>
@@ -190,9 +153,8 @@ export default function OnboardingPlanPage() {
 
         <Button
           type="button"
-          className="h-10 w-full rounded-xl text-sm font-semibold"
-          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
-          onClick={async () => {
+          className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
+          onClick={() => {
             updateSection("plan", {
               selectedPlan,
             });
@@ -206,48 +168,16 @@ export default function OnboardingPlanPage() {
               return;
             }
 
-            if (!session?.access_token) {
-              setError(
-                "You need an active session before finishing onboarding.",
-              );
-              return;
-            }
-
-            setIsSubmitting(true);
-            setError("");
-
-            try {
-              await submitOnboardingUser(
-                {
-                  ...data,
-                  plan: {
-                    selectedPlan,
-                  },
-                },
-                session.access_token,
-                session.user.email,
-              );
-              reset();
-              router.push("/");
-            } catch (submissionError) {
-              setError(
-                submissionError instanceof Error
-                  ? submissionError.message
-                  : "Unable to finish onboarding.",
-              );
-            } finally {
-              setIsSubmitting(false);
-            }
+            router.push(
+              role
+                ? `/onboarding/billing?role=${encodeURIComponent(role)}`
+                : "/onboarding/billing",
+            );
           }}
-          disabled={!canContinue || isSubmitting}
+          disabled={!canContinue}
         >
           Continue
         </Button>
-        {error ? (
-          <p className="text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        ) : null}
       </div>
     </div>
   );

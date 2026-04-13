@@ -63,11 +63,7 @@ export default function OnboardingTopicTagsPage() {
                 <button
                   key={tag}
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium text-black"
-                  style={{
-                    backgroundColor: "#D4E94B80",
-                    borderColor: "#7F8C2D",
-                  }}
+                  className="inline-flex items-center gap-2 rounded-full border border-[#7F8C2D] bg-[#D4E94B80] px-3 py-1 text-sm font-medium text-black"
                   onClick={() => {
                     toggleTag(tag);
                   }}
@@ -99,12 +95,11 @@ export default function OnboardingTopicTagsPage() {
                       key={tag}
                       type="button"
                       variant="outline"
-                      className="h-12 rounded-xl px-4 text-sm font-semibold"
-                      style={{
-                        borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
-                        backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
-                        color: "#000000",
-                      }}
+                      className={`h-12 rounded-xl px-4 text-sm font-semibold text-black ${
+                        isSelected
+                          ? "border-[#7F8C2D] bg-[#D4E94B80]"
+                          : "border-[#D4E94B] bg-[#FCFDF1]"
+                      }`}
                       onClick={() => {
                         toggleTag(tag);
                       }}
@@ -120,8 +115,7 @@ export default function OnboardingTopicTagsPage() {
 
         <Button
           type="button"
-          className="h-10 w-full rounded-xl text-sm font-semibold"
-          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+          className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
           onClick={() => {
             updateSection("topicTags", {
               selectedTags,

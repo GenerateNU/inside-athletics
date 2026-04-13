@@ -219,12 +219,11 @@ export default function OnboardingTeamsOfInterestPage() {
                   key={item.value}
                   type="button"
                   variant="outline"
-                  className="h-12 rounded-xl text-sm font-semibold"
-                  style={{
-                    borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
-                    backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
-                    color: "#000000",
-                  }}
+                  className={`h-12 rounded-xl text-sm font-semibold text-black ${
+                    isSelected
+                      ? "border-[#7F8C2D] bg-[#D4E94B80]"
+                      : "border-[#D4E94B] bg-[#FCFDF1]"
+                  }`}
                   onClick={() => {
                     setDivision(item.value);
                   }}
@@ -341,12 +340,11 @@ export default function OnboardingTeamsOfInterestPage() {
                   key={item.value}
                   type="button"
                   variant="outline"
-                  className="h-12 rounded-xl text-sm font-semibold"
-                  style={{
-                    borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
-                    backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
-                    color: "#000000",
-                  }}
+                  className={`h-12 rounded-xl text-sm font-semibold text-black ${
+                    isSelected
+                      ? "border-[#7F8C2D] bg-[#D4E94B80]"
+                      : "border-[#D4E94B] bg-[#FCFDF1]"
+                  }`}
                   onClick={() => {
                     setAssociation(item.value);
                   }}
@@ -360,8 +358,7 @@ export default function OnboardingTeamsOfInterestPage() {
 
         <Button
           type="button"
-          className="h-10 w-full rounded-xl text-sm font-semibold"
-          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+          className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
           onClick={() => {
             updateSection("preferences", {
               division,

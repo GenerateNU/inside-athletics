@@ -333,8 +333,7 @@ export default function OnboardingRolePage() {
                 )}
               </div>
               <div
-                className="absolute bottom-0 right-0 flex size-6 items-center justify-center rounded-full shadow-sm"
-                style={{ backgroundColor: "#3E7DBB", color: "#FFFFFF" }}
+                className="absolute bottom-0 right-0 flex size-6 items-center justify-center rounded-full bg-[#3E7DBB] text-white shadow-sm"
               >
                 <PlusIcon className="size-3" />
               </div>
@@ -426,13 +425,11 @@ export default function OnboardingRolePage() {
                     key={option.value}
                     type="button"
                     variant="outline"
-                    className="h-12 rounded-xl text-sm font-semibold"
-                    style={{
-                      borderColor: isSelected ? "#7F8C2D" : "#D4E94B",
-                      borderWidth: "1px",
-                      backgroundColor: isSelected ? "#D4E94B80" : "#FCFDF1",
-                      color: "#000000",
-                    }}
+                    className={`h-12 rounded-xl border text-sm font-semibold text-black ${
+                      isSelected
+                        ? "border-[#7F8C2D] bg-[#D4E94B80]"
+                        : "border-[#D4E94B] bg-[#FCFDF1]"
+                    }`}
                     onClick={() => {
                       setProgram(option.value);
                     }}
@@ -486,8 +483,7 @@ export default function OnboardingRolePage() {
 
         <Button
           type="button"
-          className="h-10 w-full rounded-xl text-sm font-semibold"
-          style={{ backgroundColor: "#2C649A", color: "#FFFFFF" }}
+          className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
           onClick={() => {
             updateSection("role", {
               role,
@@ -499,6 +495,17 @@ export default function OnboardingRolePage() {
               program,
               university: role === "athlete" ? university : "",
             });
+            if (
+              role === "athlete" &&
+              data.verification.email.trim() &&
+              !session?.user.email_confirmed_at
+            ) {
+              router.push(
+                `/onboarding/verification/code?source=signup&role=${encodeURIComponent(role)}&email=${encodeURIComponent(data.verification.email)}`,
+              );
+              return;
+            }
+
             router.push(`/onboarding/legal?role=${encodeURIComponent(role)}`);
           }}
           disabled={!canContinue || isUploadingProfileImage}
