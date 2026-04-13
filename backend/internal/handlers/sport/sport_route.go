@@ -19,5 +19,6 @@ func Route(api huma.API, db *gorm.DB) {
 	{
 		grp := huma.NewGroup(api, "/api/v1/sports")
 		huma.Get(grp, "/", sportService.GetAllSports) // Read sports
+		huma.Get(grp, "/search", sportService.FuzzySearchFor)
 	}
 }
