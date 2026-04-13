@@ -556,3 +556,165 @@ func TestGetAllPremiumPostsPagination(t *testing.T) {
 		t.Errorf("expected 1 post with offset=2, got %d", len(page2.Posts))
 	}
 }
+
+// test updating a premium post
+func TestUpdatePremiumPost(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	premiumpost.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	authHeader := premiumPostAdminAuthHeader(t, testDB)
+	premiumpostDB := premiumpost.NewPremiumPostDB(testDB.DB)
+
+	post, err := premiumpostDB.CreatePremiumPost(&models.PremiumPost{
+		AuthorID: JohnID,
+		SportID:  &SoccerID,
+		Title:    "Original Title",
+		Content:  "Original content.",
+	})
+	if err != nil {
+		t.Fatalf("failed to create premium post: %v", err)
+	}
+
+	updatedTitle := "Updated Title"
+	updatedContent := "Updated content."
+	body := map[string]any{
+		"title":   updatedTitle,
+		"content": updatedContent,
+	}
+
+	resp := api.Patch("/api/v1/posts/premium/"+post.ID.String(), authHeader, body)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result premiumpost.PremiumPostResponse
+	DecodeTo(&result, resp)
+
+	if result.Title != updatedTitle {
+		t.Errorf("expected title %q, got %q", updatedTitle, result.Title)
+	}
+	if result.Content != updatedContent {
+		t.Errorf("expected content %q, got %q", updatedContent, result.Content)
+	}
+	if result.ID != post.ID {
+		t.Errorf("expected id %v, got %v", post.ID, result.ID)
+	}
+}
+
+// test that a regular user cannot update a premium post
+func TestUpdatePremiumPost_UserForbidden(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	premiumpost.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	premiumpostDB := premiumpost.NewPremiumPostDB(testDB.DB)
+
+	post, err := premiumpostDB.CreatePremiumPost(&models.PremiumPost{
+		AuthorID: JohnID,
+		SportID:  &SoccerID,
+		Title:    "Original Title",
+		Content:  "Original content.",
+	})
+	if err != nil {
+		t.Fatalf("failed to create premium post: %v", err)
+	}
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{}, JohnID)
+
+	body := map[string]any{
+		"title": "Hacked Title",
+	}
+
+	resp := api.Patch("/api/v1/posts/premium/"+post.ID.String(), authHeader, body)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for regular user, got %d", resp.Code)
+	}
+}
+
+// test deleting a premium post
+func TestDeletePremiumPost(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	premiumpost.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	authHeader := premiumPostAdminAuthHeader(t, testDB)
+	premiumpostDB := premiumpost.NewPremiumPostDB(testDB.DB)
+
+	post, err := premiumpostDB.CreatePremiumPost(&models.PremiumPost{
+		AuthorID: JohnID,
+		SportID:  &SoccerID,
+		Title:    "Post to delete",
+		Content:  "This post will be deleted.",
+	})
+	if err != nil {
+		t.Fatalf("failed to create premium post: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/posts/premium/"+post.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var result premiumpost.DeletePremiumPostRequest
+	DecodeTo(&result, resp)
+
+	if result.ID != post.ID {
+		t.Errorf("expected deleted post id %v, got %v", post.ID, result.ID)
+	}
+}
+
+// test that a regular user cannot delete a premium post
+func TestDeletePremiumPost_UserForbidden(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	premiumpost.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	premiumpostDB := premiumpost.NewPremiumPostDB(testDB.DB)
+
+	post, err := premiumpostDB.CreatePremiumPost(&models.PremiumPost{
+		AuthorID: JohnID,
+		SportID:  &SoccerID,
+		Title:    "Post to delete",
+		Content:  "This post will be deleted.",
+	})
+	if err != nil {
+		t.Fatalf("failed to create premium post: %v", err)
+	}
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{}, JohnID)
+
+	resp := api.Delete("/api/v1/posts/premium/"+post.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for regular user, got %d", resp.Code)
+	}
+}
+
+// test deleting a non-existent premium post
+func TestDeletePremiumPost_NotFound(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	premiumpost.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	authHeader := premiumPostAdminAuthHeader(t, testDB)
+
+	resp := api.Delete("/api/v1/posts/premium/"+uuid.New().String(), authHeader)
+	if resp.Code != http.StatusNotFound {
+		t.Fatalf("expected 404, got %d: %s", resp.Code, resp.Body.String())
+	}
+}

@@ -7,7 +7,6 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type PremiumPostDB struct {
@@ -188,24 +187,31 @@ func (s *PremiumPostDB) GetPremiumPostsByTagID(limit, offset int, tagID uuid.UUI
 
 // UpdatePremiumPost updates an existing premium post
 func (s *PremiumPostDB) UpdatePremiumPost(id uuid.UUID, updates UpdatePremiumPostRequest, userID uuid.UUID) (*models.PremiumPost, error) {
-	var updatedPost models.PremiumPost
 	dbResponse := s.db.Model(&models.PremiumPost{}).
-		Clauses(clause.Returning{}).
-		Preload("Author").
-		Preload("Sport", "id IS NOT NULL").
-		Preload("College", "id IS NOT NULL").
-		Preload("Media").
-		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
-		}).
 		Where("id = ?", id).
-		Updates(updates).
-		Scan(&updatedPost)
+		Updates(updates)
 
 	if dbResponse.RowsAffected == 0 {
 		return nil, huma.Error404NotFound("Resource not found")
 	}
-	return utils.HandleDBError(&updatedPost, dbResponse.Error)
+	if dbResponse.Error != nil {
+		return utils.HandleDBError(&models.PremiumPost{}, dbResponse.Error)
+	}
+
+	// reload with associations
+	var updatedPost models.PremiumPost
+	if err := s.db.
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
+		First(&updatedPost, "id = ?", id).Error; err != nil {
+		return utils.HandleDBError(&updatedPost, err)
+	}
+
+	return &updatedPost, nil
 }
 
 // DeletePremiumPost soft deletes a premium post by ID

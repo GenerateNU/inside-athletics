@@ -1,4 +1,4 @@
-h1:Wh27hFkSZk1sEygnuSsq3iStz99/etl766ESvK7VX6k=
+h1:zU0/wGJa9HHQkqbYE+fYf2TSNixnqGMpj0iaNq7yG40=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
 20260128024854_WebsiteNotNull.sql h1:F/lCDtHb5MVs4SUul6NryNERzQCfWFCMFVEBoMz8OGc=
@@ -27,4 +27,4 @@ h1:Wh27hFkSZk1sEygnuSsq3iStz99/etl766ESvK7VX6k=
 20260330030738_AddPremiumPostPermissions.sql h1:2j5vb29o3Ll+W3UYQhyZhTGtATvYCtFucWLaeY5pcrM=
 20260330225810_MediaAddedMediaType.sql h1:I40Mh5n5SSD5r/hJjoogC8gFi5zTkRT/mqKJRtVp9g8=
 20260406190511_MigrateTagPostsPolymorphic.sql h1:z9QlS0Q0TPNgva8b4zDi4vxyoZdmaXVq+4/Ci3FB6+8=
-20260407024704_AddMediaToPremiumPost.sql h1:qPrxOhIvpeU33ESrkGB+MJGFtAj/vttkV68UoFbuWAM=
+20260407024704_AddMediaToPremiumPost.sql h1:K6PEAmLz824Dy41KPdxvU207I/1ky67Es+jmdOG8NoE=
