@@ -225,6 +225,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
               title={label}
+              nativeButton={false}
               render={<Link href={href} />}
             >
               <Icon className={cn("size-[clamp(0.9rem,1.2vw,1rem)] shrink-0", isActive ? "text-zinc-900" : "text-zinc-700")} />
@@ -245,7 +246,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
           <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
           {!isCollapsed && (
             <span className="truncate text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-800">
-              Schools/Sports/Tags Following
+              Followed Tags & Schools
             </span>
           )}
         </div>

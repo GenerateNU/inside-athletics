@@ -91,12 +91,12 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
+    <div className="flex min-h-screen bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60">
       <Navbar className="sticky top-0 h-screen shrink-0" />
 
       <main className="flex min-w-0 flex-1 flex-col">
         {/* Search bar */}
-        <div className="sticky top-0 z-10 border-b border-zinc-100 bg-white px-6 py-3">
+        <div className="sticky top-0 z-10 px-6 py-3">
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
@@ -105,87 +105,8 @@ export default function ExplorePage() {
           />
         </div>
 
-        <div className="mx-auto w-full max-w-2xl">
-          {/* Popular Tags */}
-          <div className="border-b border-zinc-100 bg-white px-6 py-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-              Popular Tags
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {popularTags.length === 0 && !loadingPopular && (
-                <span className="text-xs text-zinc-400">No tags found</span>
-              )}
-              {popularTags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => handleTagClick(tag)}
-                >
-                  <Badge
-                    variant={selectedTag?.id === tag.id ? "default" : "outline"}
-                    className="cursor-pointer rounded-full px-3 py-1 text-xs"
-                  >
-                    {tag.name}
-                  </Badge>
-                </button>
-              ))}
-            </div>
-          </div>
+        
 
-          {/* Tabs */}
-          <div className="flex gap-1 border-b border-zinc-100 bg-white px-6">
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedTag(null);
-                setSearchQuery("");
-              }}
-              className={cn(
-                "pb-3 pr-1 pt-3 text-sm font-medium transition-colors",
-                !selectedTag && !isSearching
-                  ? "border-b-2 border-zinc-900 text-zinc-900"
-                  : "text-zinc-400 hover:text-zinc-700",
-              )}
-            >
-              Explore
-            </button>
-            {isSearching && (
-              <button
-                type="button"
-                className="ml-5 border-b-2 border-zinc-900 pb-3 pt-3 text-sm font-medium text-zinc-900"
-              >
-                &ldquo;{debouncedSearch}&rdquo;
-              </button>
-            )}
-            {!isSearching && selectedTag && (
-              <button
-                type="button"
-                className="ml-5 border-b-2 border-zinc-900 pb-3 pt-3 text-sm font-medium text-zinc-900"
-              >
-                {selectedTag.name}
-              </button>
-            )}
-          </div>
-
-          {/* Post feed */}
-          <div className="bg-white">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-16 text-sm text-zinc-400">
-                Loading posts...
-              </div>
-            ) : displayedPosts.length === 0 ? (
-              <div className="flex items-center justify-center py-16 text-sm text-zinc-400">
-                {isSearching
-                  ? `No results for "${debouncedSearch}".`
-                  : "No posts found."}
-              </div>
-            ) : (
-              displayedPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))
-            )}
-          </div>
-        </div>
       </main>
     </div>
   );

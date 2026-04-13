@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Heart, MessageCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -24,7 +25,7 @@ export function PostCard({ post }: PostCardProps) {
   ];
 
   return (
-    <div className="border-b border-zinc-100 px-6 py-5">
+    <Link href={`/posts/${post.id}`} className="block border-b border-zinc-100 px-6 py-5 hover:bg-zinc-50 transition-colors">
       {/* Sport / tag labels */}
       <div className="mb-1.5 flex flex-wrap gap-3 text-xs text-zinc-400">
         {tagLabels.map((label) => (
@@ -69,6 +70,6 @@ export function PostCard({ post }: PostCardProps) {
           </Avatar>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
