@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-
 // Tests POST /api/v1/content/confirm-upload with mock S3.
 func TestConfirmUpload(t *testing.T) {
+	t.Parallel()
 	api := RegisterContentTestAPI(t)
 
 	body := map[string]string{"key": "premium/image/user-1/photo.jpg"}
@@ -41,6 +41,7 @@ func TestConfirmUpload(t *testing.T) {
 
 // Tests DELETE /api/v1/content?key=... with mock S3.
 func TestDeleteContent(t *testing.T) {
+	t.Parallel()
 	api := RegisterContentTestAPI(t)
 
 	key := "premium/pdf/user-1/doc.pdf"

@@ -8,6 +8,7 @@ import (
 )
 
 func TestCreateMedia(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -52,6 +53,7 @@ func TestCreateMedia(t *testing.T) {
 }
 
 func TestGetMedia(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -94,6 +96,7 @@ func TestGetMedia(t *testing.T) {
 }
 
 func TestDeleteMedia(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 

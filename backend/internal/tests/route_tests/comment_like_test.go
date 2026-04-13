@@ -25,6 +25,7 @@ func seedUserPostAndComment(t *testing.T, testDB *TestDatabase, unique string) (
 }
 
 func TestCreateCommentLike(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -63,6 +64,7 @@ func TestCreateCommentLike(t *testing.T) {
 }
 
 func TestGetCommentLike(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -94,6 +96,7 @@ func TestGetCommentLike(t *testing.T) {
 }
 
 func TestGetCommentLikeInfo(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -127,6 +130,7 @@ func TestGetCommentLikeInfo(t *testing.T) {
 }
 
 func TestDeleteCommentLike(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -170,6 +174,7 @@ func TestDeleteCommentLike(t *testing.T) {
 }
 
 func TestCreateCommentLikeDuplicateReturns409(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

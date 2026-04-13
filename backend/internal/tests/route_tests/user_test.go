@@ -33,6 +33,7 @@ func addCollegeAndSport(t *testing.T, testDB *TestDatabase) (models.College, mod
 }
 
 func TestGetUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -84,6 +85,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetUserWithCollegeAndSport(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -125,6 +127,7 @@ func TestGetUserWithCollegeAndSport(t *testing.T) {
 }
 
 func TestGetUserNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -139,6 +142,7 @@ func TestGetUserNotFound(t *testing.T) {
 }
 
 func TestGetCurrentUserID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -177,6 +181,7 @@ func TestGetCurrentUserID(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -208,6 +213,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestCreateUserWithNoneStatus(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -234,6 +240,7 @@ func TestCreateUserWithNoneStatus(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -274,6 +281,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -309,6 +317,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestAssignRoleToUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

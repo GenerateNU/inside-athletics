@@ -10,6 +10,7 @@ import (
 )
 
 func TestRoleCRUD(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -85,6 +86,7 @@ func TestRoleCRUD(t *testing.T) {
 }
 
 func TestCreateRoleDuplicateReturnsConflict(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
