@@ -89,7 +89,7 @@ export default function CreatePostPopup() {
     const tag: Tag = { id: option.value, name: option.label, type: "schools" };
     setActiveTags((prev) => {
       if (prev.find((t) => t.id === tag.id)) return prev.filter((t) => t.id !== tag.id);
-      if (prev.filter((t) => t.type === "schools").length >= 3) return prev;
+      if (prev.filter((t) => t.type === "schools").length > 1) return prev;
       return [...prev, tag];
     });
     setSelectedSchool(null);
@@ -98,6 +98,8 @@ export default function CreatePostPopup() {
   const removeTag = (tag: Tag) => {
     setActiveTags((prev) => prev.filter((t) => t.id !== tag.id));
   };
+
+  const firstSchoolTag = activeTags.find((t) => t.type === "schools");
 
   if (showSearchPopup) {
     return (
@@ -137,7 +139,7 @@ export default function CreatePostPopup() {
           required
         />
         <label className="block text-1xl text-[#001225] font-bold">Add School</label>
-        <label className="block text-xs text-[#001225]">Select Max 3</label>
+        <label className="block text-xs text-[#001225]">Select ONE School</label>
         <Select
           instanceId="school-select"
           options={schools}
@@ -154,9 +156,14 @@ export default function CreatePostPopup() {
         />
         {activeTags.filter((t) => t.type === "schools").length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {activeTags.filter((t) => t.type === "schools").map((tag) => (
-              <TagButton key={tag.id} tag={tag} active={true} onClick={() => removeTag(tag)} />
-            ))}
+            {firstSchoolTag && (
+              <TagButton
+                key={firstSchoolTag.id}
+                tag={firstSchoolTag}
+                active={true}
+                onClick={() => removeTag(firstSchoolTag)}
+              />
+            )}
           </div>
         )}
         <div className="flex flex-wrap gap-2 mt-2">

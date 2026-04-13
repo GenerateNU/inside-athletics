@@ -122,7 +122,7 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	if err != nil {
 		return respBody, err
 	}
-	
+
 	response := &UpdateCollegeResponse{
 		ID:           college.ID,
 		Name:         college.Name,
@@ -157,4 +157,21 @@ func (u *CollegeService) DeleteCollege(ctx context.Context, input *DeleteCollege
 	return &utils.ResponseBody[DeleteCollegeResponse]{
 		Body: response,
 	}, err
+}
+
+func (u *CollegeService) FuzzySearchForCollege(ctx context.Context, input *utils.SearchParam) (*utils.ResponseBody[utils.SearchResults[*GetCollegeResponse]], error) {
+	return utils.FuzzySearchService(input, models.College{}, GetCollegeResponse{}, "name", u.collegeDB.db, toCollegeResponse)
+}
+
+func toCollegeResponse(college *models.College) *GetCollegeResponse {
+	return &GetCollegeResponse{
+		ID:           college.ID,
+		Name:         college.Name,
+		State:        college.State,
+		City:         college.City,
+		Website:      college.Website,
+		AcademicRank: college.AcademicRank,
+		DivisionRank: college.DivisionRank,
+		Logo:         StringPtrOrNil(college.Logo),
+	}
 }
