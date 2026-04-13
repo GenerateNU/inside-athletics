@@ -115,6 +115,37 @@
       "examples": ["Suli"],
       "type": "string"
     },
+    "profile_picture": {
+      "description": "The media of the profile picture",
+      "additionalProperties": false,
+      "properties": {
+        "created_at": { "format": "date-time", "type": "string" },
+        "id": { "type": "string" },
+        "media_type": {
+          "description": "The media type of the object",
+          "examples": ["jpeg"],
+          "type": "string"
+        },
+        "s3key": {
+          "description": "The S3 key of the media object",
+          "examples": ["1"],
+          "type": "string"
+        },
+        "title": {
+          "description": "The title of the media",
+          "examples": ["Video of Athlete"],
+          "type": "string"
+        }
+      },
+      "required": ["id", "s3key", "title", "media_type", "created_at"],
+      "type": "object",
+      "x-readme-ref-name": "Media"
+    },
+    "profile_picture_url": {
+      "description": "The url of the profile picture",
+      "examples": ["https://example.com/images/photo.jpg"],
+      "type": "string"
+    },
     "roles": {
       "description": "Roles assigned to the user",
       "items": {

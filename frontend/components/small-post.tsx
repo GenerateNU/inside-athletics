@@ -72,7 +72,7 @@ export default function SmallPost({ id, className, ...props }: SmallPostProps) {
 
     const pfpURL = post.is_anonymous 
         ? ""
-        : user.profile_picture_url
+        : user?.profile_picture_url
 
     return (
         <div className="bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm">
@@ -112,7 +112,13 @@ export default function SmallPost({ id, className, ...props }: SmallPostProps) {
 
                 <div className="flex items-center gap-2">
                     {!post.is_anonymous && (
-                        <div className="w-7 h-7 rounded-full bg-zinc-200 shrink-0" />
+                        pfpURL
+                            ? <img
+                                src={pfpURL}
+                                alt={authorName}
+                                className="w-7 h-7 rounded-full object-cover shrink-0"
+                              />
+                            : <div className="w-7 h-7 rounded-full bg-zinc-200 shrink-0" />
                     )}
                     <span className="text-sm font-semibold text-gray-800">{authorName}</span>
                 </div>

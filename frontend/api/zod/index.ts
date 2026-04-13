@@ -12,6 +12,7 @@ export { createCommentBodySchema } from "./createCommentBodySchema.ts";
 export { createCommentLikeBodySchema } from "./createCommentLikeBodySchema.ts";
 export { createCommentLikeResponseSchema } from "./createCommentLikeResponseSchema.ts";
 export { createCommentResponseSchema } from "./createCommentResponseSchema.ts";
+export { createMediaRequestSchema } from "./createMediaRequestSchema.ts";
 export { createPermissionRequestSchema } from "./createPermissionRequestSchema.ts";
 export { createPostLikeBodySchema } from "./createPostLikeBodySchema.ts";
 export { createPostLikeResponseSchema } from "./createPostLikeResponseSchema.ts";
@@ -62,6 +63,12 @@ export {
   deleteApiV1ContentErrorSchema,
   deleteApiV1ContentMutationResponseSchema,
 } from "./deleteApiV1ContentSchema.ts";
+export {
+  deleteApiV1MediaByIdPathParamsSchema,
+  deleteApiV1MediaById200Schema,
+  deleteApiV1MediaByIdErrorSchema,
+  deleteApiV1MediaByIdMutationResponseSchema,
+} from "./deleteApiV1MediaByIdSchema.ts";
 export {
   deleteApiV1PermissionByIdPathParamsSchema,
   deleteApiV1PermissionById200Schema,
@@ -208,6 +215,12 @@ export {
   getApiV1HealthErrorSchema,
   getApiV1HealthQueryResponseSchema,
 } from "./getApiV1HealthSchema.ts";
+export {
+  getApiV1MediaByIdPathParamsSchema,
+  getApiV1MediaById200Schema,
+  getApiV1MediaByIdErrorSchema,
+  getApiV1MediaByIdQueryResponseSchema,
+} from "./getApiV1MediaByIdSchema.ts";
 export {
   getApiV1PermissionByIdPathParamsSchema,
   getApiV1PermissionById200Schema,
@@ -441,6 +454,8 @@ export {
   listApiV1StripeProductsErrorSchema,
   listApiV1StripeProductsQueryResponseSchema,
 } from "./listApiV1StripeProductsSchema.ts";
+export { mediaResponseSchema } from "./mediaResponseSchema.ts";
+export { mediaSchema } from "./mediaSchema.ts";
 export {
   patchApiV1CommentByIdPathParamsSchema,
   patchApiV1CommentById200Schema,
@@ -555,6 +570,12 @@ export {
   postApiV1ContentUploadUrlMutationRequestSchema,
   postApiV1ContentUploadUrlMutationResponseSchema,
 } from "./postApiV1ContentUploadUrlSchema.ts";
+export {
+  postApiV1Media200Schema,
+  postApiV1MediaErrorSchema,
+  postApiV1MediaMutationRequestSchema,
+  postApiV1MediaMutationResponseSchema,
+} from "./postApiV1MediaSchema.ts";
 export {
   postApiV1Permission200Schema,
   postApiV1PermissionErrorSchema,

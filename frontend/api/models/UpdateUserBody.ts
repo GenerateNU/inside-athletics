@@ -52,6 +52,16 @@ export type UpdateUserBody = {
    */
   last_name?: string;
   /**
+   * @description The id of the media object of the profile picture
+   * @type string | undefined
+   */
+  profile_picture_id?: string;
+  /**
+   * @description The url of the profile picture
+   * @type string | undefined
+   */
+  profile_picture_url?: string;
+  /**
    * @description The sport(s) the user is interested in
    * @type string | undefined
    */

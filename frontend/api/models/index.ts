@@ -18,6 +18,7 @@ export type { CreateCommentBody } from "./CreateCommentBody.ts";
 export type { CreateCommentLikeBody } from "./CreateCommentLikeBody.ts";
 export type { CreateCommentLikeResponse } from "./CreateCommentLikeResponse.ts";
 export type { CreateCommentResponse } from "./CreateCommentResponse.ts";
+export type { CreateMediaRequest } from "./CreateMediaRequest.ts";
 export type { CreatePermissionRequest } from "./CreatePermissionRequest.ts";
 export type { CreatePostLikeBody } from "./CreatePostLikeBody.ts";
 export type { CreatePostLikeResponse } from "./CreatePostLikeResponse.ts";
@@ -73,6 +74,13 @@ export type {
   DeleteApiV1ContentMutationResponse,
   DeleteApiV1ContentMutation,
 } from "./DeleteApiV1Content.ts";
+export type {
+  DeleteApiV1MediaByIdPathParams,
+  DeleteApiV1MediaById200,
+  DeleteApiV1MediaByIdError,
+  DeleteApiV1MediaByIdMutationResponse,
+  DeleteApiV1MediaByIdMutation,
+} from "./DeleteApiV1MediaById.ts";
 export type {
   DeleteApiV1PermissionByIdPathParams,
   DeleteApiV1PermissionById200,
@@ -241,6 +249,13 @@ export type {
   GetApiV1HealthHealthcheckQueryResponse,
   GetApiV1HealthHealthcheckQuery,
 } from "./GetApiV1HealthHealthcheck.ts";
+export type {
+  GetApiV1MediaByIdPathParams,
+  GetApiV1MediaById200,
+  GetApiV1MediaByIdError,
+  GetApiV1MediaByIdQueryResponse,
+  GetApiV1MediaByIdQuery,
+} from "./GetApiV1MediaById.ts";
 export type {
   GetApiV1PermissionByIdPathParams,
   GetApiV1PermissionById200,
@@ -512,6 +527,8 @@ export type {
   ListApiV1StripeProductsQueryResponse,
   ListApiV1StripeProductsQuery,
 } from "./ListApiV1StripeProducts.ts";
+export type { Media } from "./Media.ts";
+export type { MediaResponse } from "./MediaResponse.ts";
 export type {
   PatchApiV1CommentByIdPathParams,
   PatchApiV1CommentById200,
@@ -643,6 +660,13 @@ export type {
   PostApiV1ContentUploadUrlMutationResponse,
   PostApiV1ContentUploadUrlMutation,
 } from "./PostApiV1ContentUploadUrl.ts";
+export type {
+  PostApiV1Media200,
+  PostApiV1MediaError,
+  PostApiV1MediaMutationRequest,
+  PostApiV1MediaMutationResponse,
+  PostApiV1MediaMutation,
+} from "./PostApiV1Media.ts";
 export type {
   PostApiV1Permission200,
   PostApiV1PermissionError,

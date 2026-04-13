@@ -4,6 +4,7 @@
  */
 
 import { collegeSchema } from "./collegeSchema.ts";
+import { mediaSchema } from "./mediaSchema.ts";
 import { roleResponseSchema } from "./roleResponseSchema.ts";
 import { sportSchema } from "./sportSchema.ts";
 import { z } from "zod/v4";
@@ -29,6 +30,12 @@ export const getUserResponseSchema = z.object({
   first_name: z.string().describe("The first name of a user"),
   id: z.string().describe("ID of the user"),
   last_name: z.string().describe("The last name of a user"),
+  get profile_picture() {
+    return mediaSchema.describe("The media of the profile picture").optional();
+  },
+  profile_picture_url: z.optional(
+    z.string().describe("The url of the profile picture"),
+  ),
   get roles() {
     return z
       .array(roleResponseSchema)

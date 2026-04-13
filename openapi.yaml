@@ -536,6 +536,35 @@ components:
         - post_id
         - description
       type: object
+    CreateMediaRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateMediaRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          type: string
+        media_type:
+          examples:
+            - jpeg
+          type: string
+        s3key:
+          examples:
+            - example_s3_key
+          type: string
+        title:
+          examples:
+            - Suli doing a backflip !!
+          type: string
+      required:
+        - s3key
+        - title
+        - media_type
+      type: object
     CreatePermissionRequest:
       additionalProperties: false
       properties:
@@ -1074,6 +1103,14 @@ components:
           description: The last name of a user
           examples:
             - Suli
+          type: string
+        profile_picture_id:
+          description: The id of the media object of the profile picture
+          type: string
+        profile_picture_url:
+          description: The url of the profile picture
+          examples:
+            - https://example.com/images/photo.jpg
           type: string
         sport:
           description: The sport(s) the user is interested in
@@ -2354,6 +2391,14 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          $ref: "#/components/schemas/Media"
+          description: The media of the profile picture
+        profile_picture_url:
+          description: The url of the profile picture
+          examples:
+            - https://example.com/images/photo.jpg
+          type: string
         roles:
           description: Roles assigned to the user
           items:
@@ -2423,6 +2468,65 @@ components:
         - default_payment_method
         - footer
         - rendering_options
+      type: object
+    Media:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        media_type:
+          description: The media type of the object
+          examples:
+            - jpeg
+          type: string
+        s3key:
+          description: The S3 key of the media object
+          examples:
+            - "1"
+          type: string
+        title:
+          description: The title of the media
+          examples:
+            - Video of Athlete
+          type: string
+      required:
+        - id
+        - s3key
+        - title
+        - media_type
+        - created_at
+      type: object
+    MediaResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/MediaResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          type: string
+        media_type:
+          examples:
+            - jpeg
+          type: string
+        s3key:
+          examples:
+            - example_s3_key
+          type: string
+        title:
+          examples:
+            - Suli doing a backflip !!
+          type: string
+      required:
+        - s3key
+        - title
+        - media_type
       type: object
     PermissionResponse:
       additionalProperties: false
@@ -3392,6 +3496,14 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture_id:
+          description: The id of the media object of the profile picture
+          type: string
+        profile_picture_url:
+          description: The url of the profile picture
+          examples:
+            - https://example.com/images/photo.jpg
+          type: string
         sport:
           description: The sport(s) the user is interested in
           examples:
@@ -3467,6 +3579,16 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture_id:
+          description: The id of the profile picture media id
+          examples:
+            - "1"
+          type: string
+        profile_picture_url:
+          description: The url of the profile picture
+          examples:
+            - https://example.com/images/photo.jpg
+          type: string
         sport:
           description: The sport the user plays
           examples:
@@ -3500,6 +3622,8 @@ components:
         - verified_athelete_status
         - college
         - division
+        - profile_picture_id
+        - profile_picture_url
       type: object
     UserRoleResponse:
       additionalProperties: false
@@ -4135,6 +4259,79 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 health healthcheck
+  /api/v1/media/:
+    post:
+      operationId: post-api-v1-media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMediaRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 media
+  /api/v1/media/{id}:
+    delete:
+      operationId: delete-api-v1-media-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 media by ID
+    get:
+      operationId: get-api-v1-media-by-id
+      parameters:
+        - description: ID of the media
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the media
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 media by ID
   /api/v1/permission/:
     post:
       operationId: post-api-v1-permission

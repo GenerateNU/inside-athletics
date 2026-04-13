@@ -23,6 +23,12 @@ export const updateUserBodySchema = z.object({
   ),
   first_name: z.optional(z.string().describe("The first name of a user")),
   last_name: z.optional(z.string().describe("The last name of a user")),
+  profile_picture_id: z.optional(
+    z.string().describe("The id of the media object of the profile picture"),
+  ),
+  profile_picture_url: z.optional(
+    z.string().describe("The url of the profile picture"),
+  ),
   sport: z.optional(
     z.string().describe("The sport(s) the user is interested in"),
   ),

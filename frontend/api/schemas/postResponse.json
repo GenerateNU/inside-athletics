@@ -54,6 +54,16 @@
           "examples": ["Suli"],
           "type": "string"
         },
+        "profile_picture_id": {
+          "description": "The id of the profile picture media id",
+          "examples": ["1"],
+          "type": "string"
+        },
+        "profile_picture_url": {
+          "description": "The url of the profile picture",
+          "examples": ["https://example.com/images/photo.jpg"],
+          "type": "string"
+        },
         "sport": {
           "description": "The sport the user plays",
           "examples": ["hockey"],
@@ -85,7 +95,9 @@
         "expected_grad_year",
         "verified_athelete_status",
         "college",
-        "division"
+        "division",
+        "profile_picture_id",
+        "profile_picture_url"
       ],
       "type": "object",
       "x-readme-ref-name": "User"

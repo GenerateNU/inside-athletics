@@ -3,6 +3,7 @@ export type { DeleteApiV1CollegeByIdMutationKey } from "./hooks/useDeleteApiV1Co
 export type { DeleteApiV1CommentByIdMutationKey } from "./hooks/useDeleteApiV1CommentById.ts";
 export type { DeleteApiV1CommentLikeByIdMutationKey } from "./hooks/useDeleteApiV1CommentLikeById.ts";
 export type { DeleteApiV1ContentMutationKey } from "./hooks/useDeleteApiV1Content.ts";
+export type { DeleteApiV1MediaByIdMutationKey } from "./hooks/useDeleteApiV1MediaById.ts";
 export type { DeleteApiV1PermissionByIdMutationKey } from "./hooks/useDeleteApiV1PermissionById.ts";
 export type { DeleteApiV1PostByIdMutationKey } from "./hooks/useDeleteApiV1PostById.ts";
 export type { DeleteApiV1PostLikeByIdMutationKey } from "./hooks/useDeleteApiV1PostLikeById.ts";
@@ -33,6 +34,8 @@ export type { GetApiV1HealthQueryKey } from "./hooks/useGetApiV1Health.ts";
 export type { GetApiV1HealthHealthcheckQueryKey } from "./hooks/useGetApiV1HealthHealthcheck.ts";
 export type { GetApiV1HealthHealthcheckSuspenseQueryKey } from "./hooks/useGetApiV1HealthHealthcheckSuspense.ts";
 export type { GetApiV1HealthSuspenseQueryKey } from "./hooks/useGetApiV1HealthSuspense.ts";
+export type { GetApiV1MediaByIdQueryKey } from "./hooks/useGetApiV1MediaById.ts";
+export type { GetApiV1MediaByIdSuspenseQueryKey } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
 export type { GetApiV1PermissionByIdQueryKey } from "./hooks/useGetApiV1PermissionById.ts";
 export type { GetApiV1PermissionByIdSuspenseQueryKey } from "./hooks/useGetApiV1PermissionByIdSuspense.ts";
 export type { GetApiV1PermissionsQueryKey } from "./hooks/useGetApiV1Permissions.ts";
@@ -120,6 +123,7 @@ export type { PostApiV1CommentMutationKey } from "./hooks/usePostApiV1Comment.ts
 export type { PostApiV1CommentLikeMutationKey } from "./hooks/usePostApiV1CommentLike.ts";
 export type { PostApiV1ContentConfirmUploadMutationKey } from "./hooks/usePostApiV1ContentConfirmUpload.ts";
 export type { PostApiV1ContentUploadUrlMutationKey } from "./hooks/usePostApiV1ContentUploadUrl.ts";
+export type { PostApiV1MediaMutationKey } from "./hooks/usePostApiV1Media.ts";
 export type { PostApiV1PermissionMutationKey } from "./hooks/usePostApiV1Permission.ts";
 export type { PostApiV1PostMutationKey } from "./hooks/usePostApiV1Post.ts";
 export type { PostApiV1PostLikeMutationKey } from "./hooks/usePostApiV1PostLike.ts";
@@ -157,6 +161,7 @@ export type { CreateCommentBody } from "./models/CreateCommentBody.ts";
 export type { CreateCommentLikeBody } from "./models/CreateCommentLikeBody.ts";
 export type { CreateCommentLikeResponse } from "./models/CreateCommentLikeResponse.ts";
 export type { CreateCommentResponse } from "./models/CreateCommentResponse.ts";
+export type { CreateMediaRequest } from "./models/CreateMediaRequest.ts";
 export type { CreatePermissionRequest } from "./models/CreatePermissionRequest.ts";
 export type { CreatePostLikeBody } from "./models/CreatePostLikeBody.ts";
 export type { CreatePostLikeResponse } from "./models/CreatePostLikeResponse.ts";
@@ -212,6 +217,13 @@ export type {
   DeleteApiV1ContentMutationResponse,
   DeleteApiV1ContentMutation,
 } from "./models/DeleteApiV1Content.ts";
+export type {
+  DeleteApiV1MediaByIdPathParams,
+  DeleteApiV1MediaById200,
+  DeleteApiV1MediaByIdError,
+  DeleteApiV1MediaByIdMutationResponse,
+  DeleteApiV1MediaByIdMutation,
+} from "./models/DeleteApiV1MediaById.ts";
 export type {
   DeleteApiV1PermissionByIdPathParams,
   DeleteApiV1PermissionById200,
@@ -380,6 +392,13 @@ export type {
   GetApiV1HealthHealthcheckQueryResponse,
   GetApiV1HealthHealthcheckQuery,
 } from "./models/GetApiV1HealthHealthcheck.ts";
+export type {
+  GetApiV1MediaByIdPathParams,
+  GetApiV1MediaById200,
+  GetApiV1MediaByIdError,
+  GetApiV1MediaByIdQueryResponse,
+  GetApiV1MediaByIdQuery,
+} from "./models/GetApiV1MediaById.ts";
 export type {
   GetApiV1PermissionByIdPathParams,
   GetApiV1PermissionById200,
@@ -651,6 +670,8 @@ export type {
   ListApiV1StripeProductsQueryResponse,
   ListApiV1StripeProductsQuery,
 } from "./models/ListApiV1StripeProducts.ts";
+export type { Media } from "./models/Media.ts";
+export type { MediaResponse } from "./models/MediaResponse.ts";
 export type {
   PatchApiV1CommentByIdPathParams,
   PatchApiV1CommentById200,
@@ -782,6 +803,13 @@ export type {
   PostApiV1ContentUploadUrlMutationResponse,
   PostApiV1ContentUploadUrlMutation,
 } from "./models/PostApiV1ContentUploadUrl.ts";
+export type {
+  PostApiV1Media200,
+  PostApiV1MediaError,
+  PostApiV1MediaMutationRequest,
+  PostApiV1MediaMutationResponse,
+  PostApiV1MediaMutation,
+} from "./models/PostApiV1Media.ts";
 export type {
   PostApiV1Permission200,
   PostApiV1PermissionError,
@@ -942,6 +970,7 @@ export { deleteApiV1CollegeById } from "./clients/deleteApiV1CollegeById.ts";
 export { deleteApiV1CommentById } from "./clients/deleteApiV1CommentById.ts";
 export { deleteApiV1CommentLikeById } from "./clients/deleteApiV1CommentLikeById.ts";
 export { deleteApiV1Content } from "./clients/deleteApiV1Content.ts";
+export { deleteApiV1MediaById } from "./clients/deleteApiV1MediaById.ts";
 export { deleteApiV1PermissionById } from "./clients/deleteApiV1PermissionById.ts";
 export { deleteApiV1PostById } from "./clients/deleteApiV1PostById.ts";
 export { deleteApiV1PostLikeById } from "./clients/deleteApiV1PostLikeById.ts";
@@ -964,6 +993,7 @@ export { getApiV1CommentLikeById } from "./clients/getApiV1CommentLikeById.ts";
 export { getApiV1ContentDownloadUrl } from "./clients/getApiV1ContentDownloadUrl.ts";
 export { getApiV1Health } from "./clients/getApiV1Health.ts";
 export { getApiV1HealthHealthcheck } from "./clients/getApiV1HealthHealthcheck.ts";
+export { getApiV1MediaById } from "./clients/getApiV1MediaById.ts";
 export { getApiV1PermissionById } from "./clients/getApiV1PermissionById.ts";
 export { getApiV1Permissions } from "./clients/getApiV1Permissions.ts";
 export { getApiV1PostById } from "./clients/getApiV1PostById.ts";
@@ -1016,6 +1046,7 @@ export { postApiV1Comment } from "./clients/postApiV1Comment.ts";
 export { postApiV1CommentLike } from "./clients/postApiV1CommentLike.ts";
 export { postApiV1ContentConfirmUpload } from "./clients/postApiV1ContentConfirmUpload.ts";
 export { postApiV1ContentUploadUrl } from "./clients/postApiV1ContentUploadUrl.ts";
+export { postApiV1Media } from "./clients/postApiV1Media.ts";
 export { postApiV1Permission } from "./clients/postApiV1Permission.ts";
 export { postApiV1Post } from "./clients/postApiV1Post.ts";
 export { postApiV1PostLike } from "./clients/postApiV1PostLike.ts";
@@ -1048,6 +1079,9 @@ export { useDeleteApiV1CommentLikeById } from "./hooks/useDeleteApiV1CommentLike
 export { deleteApiV1ContentMutationKey } from "./hooks/useDeleteApiV1Content.ts";
 export { deleteApiV1ContentMutationOptions } from "./hooks/useDeleteApiV1Content.ts";
 export { useDeleteApiV1Content } from "./hooks/useDeleteApiV1Content.ts";
+export { deleteApiV1MediaByIdMutationKey } from "./hooks/useDeleteApiV1MediaById.ts";
+export { deleteApiV1MediaByIdMutationOptions } from "./hooks/useDeleteApiV1MediaById.ts";
+export { useDeleteApiV1MediaById } from "./hooks/useDeleteApiV1MediaById.ts";
 export { deleteApiV1PermissionByIdMutationKey } from "./hooks/useDeleteApiV1PermissionById.ts";
 export { deleteApiV1PermissionByIdMutationOptions } from "./hooks/useDeleteApiV1PermissionById.ts";
 export { useDeleteApiV1PermissionById } from "./hooks/useDeleteApiV1PermissionById.ts";
@@ -1138,6 +1172,12 @@ export { useGetApiV1HealthHealthcheckSuspense } from "./hooks/useGetApiV1HealthH
 export { getApiV1HealthSuspenseQueryKey } from "./hooks/useGetApiV1HealthSuspense.ts";
 export { getApiV1HealthSuspenseQueryOptions } from "./hooks/useGetApiV1HealthSuspense.ts";
 export { useGetApiV1HealthSuspense } from "./hooks/useGetApiV1HealthSuspense.ts";
+export { getApiV1MediaByIdQueryKey } from "./hooks/useGetApiV1MediaById.ts";
+export { getApiV1MediaByIdQueryOptions } from "./hooks/useGetApiV1MediaById.ts";
+export { useGetApiV1MediaById } from "./hooks/useGetApiV1MediaById.ts";
+export { getApiV1MediaByIdSuspenseQueryKey } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
+export { getApiV1MediaByIdSuspenseQueryOptions } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
+export { useGetApiV1MediaByIdSuspense } from "./hooks/useGetApiV1MediaByIdSuspense.ts";
 export { getApiV1PermissionByIdQueryKey } from "./hooks/useGetApiV1PermissionById.ts";
 export { getApiV1PermissionByIdQueryOptions } from "./hooks/useGetApiV1PermissionById.ts";
 export { useGetApiV1PermissionById } from "./hooks/useGetApiV1PermissionById.ts";
@@ -1399,6 +1439,9 @@ export { usePostApiV1ContentConfirmUpload } from "./hooks/usePostApiV1ContentCon
 export { postApiV1ContentUploadUrlMutationKey } from "./hooks/usePostApiV1ContentUploadUrl.ts";
 export { postApiV1ContentUploadUrlMutationOptions } from "./hooks/usePostApiV1ContentUploadUrl.ts";
 export { usePostApiV1ContentUploadUrl } from "./hooks/usePostApiV1ContentUploadUrl.ts";
+export { postApiV1MediaMutationKey } from "./hooks/usePostApiV1Media.ts";
+export { postApiV1MediaMutationOptions } from "./hooks/usePostApiV1Media.ts";
+export { usePostApiV1Media } from "./hooks/usePostApiV1Media.ts";
 export { postApiV1PermissionMutationKey } from "./hooks/usePostApiV1Permission.ts";
 export { postApiV1PermissionMutationOptions } from "./hooks/usePostApiV1Permission.ts";
 export { usePostApiV1Permission } from "./hooks/usePostApiV1Permission.ts";
@@ -1470,6 +1513,7 @@ export { createCommentBodySchema } from "./zod/createCommentBodySchema.ts";
 export { createCommentLikeBodySchema } from "./zod/createCommentLikeBodySchema.ts";
 export { createCommentLikeResponseSchema } from "./zod/createCommentLikeResponseSchema.ts";
 export { createCommentResponseSchema } from "./zod/createCommentResponseSchema.ts";
+export { createMediaRequestSchema } from "./zod/createMediaRequestSchema.ts";
 export { createPermissionRequestSchema } from "./zod/createPermissionRequestSchema.ts";
 export { createPostLikeBodySchema } from "./zod/createPostLikeBodySchema.ts";
 export { createPostLikeResponseSchema } from "./zod/createPostLikeResponseSchema.ts";
@@ -1520,6 +1564,12 @@ export {
   deleteApiV1ContentErrorSchema,
   deleteApiV1ContentMutationResponseSchema,
 } from "./zod/deleteApiV1ContentSchema.ts";
+export {
+  deleteApiV1MediaByIdPathParamsSchema,
+  deleteApiV1MediaById200Schema,
+  deleteApiV1MediaByIdErrorSchema,
+  deleteApiV1MediaByIdMutationResponseSchema,
+} from "./zod/deleteApiV1MediaByIdSchema.ts";
 export {
   deleteApiV1PermissionByIdPathParamsSchema,
   deleteApiV1PermissionById200Schema,
@@ -1666,6 +1716,12 @@ export {
   getApiV1HealthErrorSchema,
   getApiV1HealthQueryResponseSchema,
 } from "./zod/getApiV1HealthSchema.ts";
+export {
+  getApiV1MediaByIdPathParamsSchema,
+  getApiV1MediaById200Schema,
+  getApiV1MediaByIdErrorSchema,
+  getApiV1MediaByIdQueryResponseSchema,
+} from "./zod/getApiV1MediaByIdSchema.ts";
 export {
   getApiV1PermissionByIdPathParamsSchema,
   getApiV1PermissionById200Schema,
@@ -1899,6 +1955,8 @@ export {
   listApiV1StripeProductsErrorSchema,
   listApiV1StripeProductsQueryResponseSchema,
 } from "./zod/listApiV1StripeProductsSchema.ts";
+export { mediaResponseSchema } from "./zod/mediaResponseSchema.ts";
+export { mediaSchema } from "./zod/mediaSchema.ts";
 export {
   patchApiV1CommentByIdPathParamsSchema,
   patchApiV1CommentById200Schema,
@@ -2013,6 +2071,12 @@ export {
   postApiV1ContentUploadUrlMutationRequestSchema,
   postApiV1ContentUploadUrlMutationResponseSchema,
 } from "./zod/postApiV1ContentUploadUrlSchema.ts";
+export {
+  postApiV1Media200Schema,
+  postApiV1MediaErrorSchema,
+  postApiV1MediaMutationRequestSchema,
+  postApiV1MediaMutationResponseSchema,
+} from "./zod/postApiV1MediaSchema.ts";
 export {
   postApiV1Permission200Schema,
   postApiV1PermissionErrorSchema,

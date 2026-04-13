@@ -59,6 +59,16 @@ export type User = {
    */
   last_name: string;
   /**
+   * @description The id of the profile picture media id
+   * @type string
+   */
+  profile_picture_id: string;
+  /**
+   * @description The url of the profile picture
+   * @type string
+   */
+  profile_picture_url: string;
+  /**
    * @description The sport the user plays
    * @type string
    */

@@ -4,6 +4,7 @@
  */
 
 import type { College } from "./College.ts";
+import type { Media } from "./Media.ts";
 import type { RoleResponse } from "./RoleResponse.ts";
 import type { Sport } from "./Sport.ts";
 
@@ -60,6 +61,16 @@ export type GetUserResponse = {
    * @type string
    */
   last_name: string;
+  /**
+   * @description The media of the profile picture
+   * @type object | undefined
+   */
+  profile_picture?: Media;
+  /**
+   * @description The url of the profile picture
+   * @type string | undefined
+   */
+  profile_picture_url?: string;
   /**
    * @description Roles assigned to the user
    * @type array | undefined

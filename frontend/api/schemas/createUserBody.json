@@ -48,6 +48,15 @@
       "examples": ["Suli"],
       "type": "string"
     },
+    "profile_picture_id": {
+      "description": "The id of the media object of the profile picture",
+      "type": "string"
+    },
+    "profile_picture_url": {
+      "description": "The url of the profile picture",
+      "examples": ["https://example.com/images/photo.jpg"],
+      "type": "string"
+    },
     "sport": {
       "description": "The sport(s) the user is interested in",
       "examples": ["[\"hockey\",\"soccer\"]"],
