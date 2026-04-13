@@ -3,7 +3,7 @@
 import { BookOpen, Heart, MessageSquareText } from "lucide-react";
 import { useSession } from "@/utils/SessionContext";
 import { cn } from "@/lib/utils";
-import { useGetApiV1PostById, } from "@/api/hooks";
+import { useGetApiV1PostById, useGetApiV1UserById} from "@/api/hooks";
 
 type SmallPostProps = React.ComponentProps<"div"> & {
     id: string;
@@ -33,6 +33,15 @@ export default function SmallPost({ id, className, ...props }: SmallPostProps) {
 
     const post = unwrapBody<import("@/api").PostResponse>(raw);
 
+
+    const { } = useGetApiV1UserById(id, {
+        client: {
+            headers: { Authorization: `Bearer ${session?.access_token}` },
+        },
+    });
+
+    const user = unwrapBody<import("@/api").GetUserResponse>(raw);
+
     if (isLoading) {
         return (
             <div className={cn("bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm animate-pulse", className)} {...props}>
@@ -61,6 +70,9 @@ export default function SmallPost({ id, className, ...props }: SmallPostProps) {
         ? "Anonymous"
         : `${post.author.first_name} ${post.author.last_name}`;
 
+    const pfpURL = post.is_anonymous 
+        ? ""
+        : user.profile_picture_url
 
     return (
         <div className="bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm">
