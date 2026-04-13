@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostLikeByIdQueryResponse,
   GetApiV1PostLikeByIdPathParams,
@@ -44,8 +43,10 @@ export function getApiV1PostLikeByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostLikeById(id, config);
+      return getApiV1PostLikeById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useGetApiV1PostLikeByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostLikeByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1PostLikeByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PostLikeByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {
