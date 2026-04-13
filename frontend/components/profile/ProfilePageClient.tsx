@@ -9,6 +9,7 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import type { FeedView } from "@/components/profile/types";
 import { Navbar } from "@/components/ui/navbar";
+import Loading from "@/components/ui/loading";
 import {
   getApiV1TagByIdQueryOptions,
   listApiV1PostByPostIdCommentsQueryOptions,
@@ -100,9 +101,31 @@ export function ProfilePageClient() {
       <div className="min-h-screen bg-zinc-50">
         <div className="flex min-h-screen">
           <Navbar className="h-screen shrink-0" />
-          <main className="flex min-w-0 flex-1 items-center justify-center p-6">
-            <p className="text-muted-foreground">Loading profile…</p>
-          </main>
+          <div className="mx-auto flex min-w-0 flex-1 max-w-[1400px] border-x border-black/5 bg-[#eff2f5]">
+            <main className="min-w-0 flex-1 border-r border-slate-300/80 px-6 py-8 md:px-10">
+              <div className="mb-8 flex gap-5">
+                <div className="h-[120px] w-[120px] shrink-0 rounded-full bg-gray-200 animate-pulse" />
+                <div className="min-w-0 flex-1 space-y-3 pt-2">
+                  <Loading lines={5} />
+                </div>
+              </div>
+              <div className="mb-5 max-w-[70ch]">
+                <Loading lines={3} />
+              </div>
+              <div className="mb-4 border-b border-slate-300 pb-2">
+                <div className="h-5 w-48 rounded-full bg-gray-200 animate-pulse" />
+              </div>
+              <Loading lines={8} />
+            </main>
+            <aside className="hidden w-[310px] shrink-0 space-y-6 px-4 py-8 md:block">
+              <div className="rounded-xl border border-[#27537f]/40 bg-white/70 p-4">
+                <Loading lines={4} />
+              </div>
+              <div className="rounded-xl border border-[#27537f]/40 bg-white/70 p-4">
+                <Loading lines={3} />
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     );
