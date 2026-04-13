@@ -1,12 +1,20 @@
+"use client";
+
+import { useState } from "react";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/ui/navbar";
 import { RatingPanel } from "@/components/ui/rating-panel";
 import { CiUser } from "react-icons/ci";
 
-const demoCollegeId = "014d2c09-4023-445d-9779-66aff4824245";
+const northeasternCollegeId = "014d2c09-4023-445d-9779-66aff4824245";
 
 export default function Page() {
+  const [selectedCollegeId, setSelectedCollegeId] = useState(
+    northeasternCollegeId,
+  );
+
   return (
     <div className="min-h-screen bg-zinc-50">
       <div className="flex min-h-screen">
@@ -32,7 +40,20 @@ export default function Page() {
                 <Button variant="outline"> Click here</Button>
               </div>
             </div>
-            <RatingPanel collegeId={demoCollegeId} />
+            <div className="flex w-full max-w-3xl flex-col items-start gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  onClick={() => setSelectedCollegeId(northeasternCollegeId)}
+                >
+                  Use Northeastern Ratings
+                </Button>
+              </div>
+              <p className="text-sm text-zinc-600">
+                Active college: Northeastern
+              </p>
+            </div>
+            <RatingPanel collegeId={selectedCollegeId} />
           </div>
         </main>
       </div>
