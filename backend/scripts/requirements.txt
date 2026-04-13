@@ -1,3 +1,7 @@
 jwcrypto
 pandas
 kagglehub
+boto3
+requests
+thefuzz
+python-Levenshtein

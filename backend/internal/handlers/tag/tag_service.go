@@ -135,3 +135,14 @@ func (u *TagService) DeleteTag(ctx context.Context, input *GetTagByIDParams) (*u
 
 	return respBody, nil
 }
+
+func (u *TagService) FuzzySearchFor(ctx context.Context, input *utils.SearchParam) (*utils.ResponseBody[utils.SearchResults[*GetTagResponse]], error) {
+	return utils.FuzzySearchService(input, models.Tag{}, GetTagResponse{}, "name", u.tagDB.db, getTagResponse)
+}
+
+func getTagResponse(tag *models.Tag) *GetTagResponse {
+	return &GetTagResponse{
+		ID:   tag.ID,
+		Name: tag.Name,
+	}
+}

@@ -2,9 +2,11 @@ package post
 
 import (
 	"errors"
+	"fmt"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 	"math"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -21,12 +23,19 @@ var (
 	ErrFreePostViewLimitReached     = errors.New("free-tier post view limit reached")
 )
 
+const (
+	POST_SELECT_QUERY string = `posts.*,
+            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
+            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
+            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`
+)
+
 // NewPostDB creates a new PostDB instance
 func NewPostDB(db *gorm.DB) *PostDB {
 	return &PostDB{db: db}
 }
 
-// CreatePost creates a new sport in the database
+// CreatePost creates a new post in the database
 func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post, error) {
 	dbError := s.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&post).Error; err != nil {
@@ -187,10 +196,7 @@ func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, erro
 	var post models.Post
 	dbResponse := s.db.
 		Model(&models.Post{}).
-		Select(`posts.*,
-            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
-            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
-            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+		Select(POST_SELECT_QUERY,
 			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
@@ -218,10 +224,7 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID 
 	// Get paginated results
 	if err := s.db.
 		Table("posts").
-		Select(`posts.*,
-            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
-            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
-            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+		Select(POST_SELECT_QUERY,
 			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
@@ -254,10 +257,7 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userI
 	// Get paginated results
 	if err := s.db.
 		Table("posts").
-		Select(`posts.*,
-            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
-            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
-            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+		Select(POST_SELECT_QUERY,
 			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
@@ -301,10 +301,7 @@ func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.
 	// Get paginated posts
 	dbResponse := p.db.
 		Table("posts").
-		Select(`posts.*,
-            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
-            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
-            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+		Select(POST_SELECT_QUERY,
 			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
@@ -451,10 +448,7 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 	var updatedPost models.Post
 	dbResponse := p.db.Model(&models.Post{}).
 		Clauses(clause.Returning{}).
-		Select(`posts.*,
-            (SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = posts.id) AS like_count,
-            (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
-            (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
+		Select(POST_SELECT_QUERY,
 			userID).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
@@ -469,4 +463,84 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 		return nil, huma.Error404NotFound("Resource not found")
 	}
 	return utils.HandleDBError(&updatedPost, dbResponse.Error)
+}
+
+func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit int, offset int) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+
+	selectQuery, whereQuery, orderQuery := utils.FuzzySearchByQueries("title", searchStr)
+	selectQuery = POST_SELECT_QUERY + "," + selectQuery
+	if err := p.db.
+		Model(&models.Post{}).
+		Select(selectQuery,
+			userID).
+		Where(whereQuery).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+		}).
+		Order(orderQuery).
+		Count(&total).
+		Limit(limit).
+		Offset(offset).
+		Scan(&posts).Error; err != nil {
+		return posts, 0, err
+	}
+
+	if total == 0 {
+		return []models.Post{}, 0, nil
+	}
+
+	return posts, total, nil
+}
+
+func (p *PostDB) FilterPosts(userId uuid.UUID, colleges []uuid.UUID, sports []uuid.UUID, tags []uuid.UUID, limit int, offset int) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+
+	filters := make([]string, 0)
+	if len(colleges) > 0 {
+		mappedColleges := utils.MapList(colleges, func(c uuid.UUID) string { return fmt.Sprintf("posts.college_id = '%s'", c.String()) })
+		collegeQuery := strings.Join(mappedColleges, " OR ")
+		filters = append(filters, collegeQuery)
+	}
+
+	if len(sports) > 0 {
+		mappedSports := utils.MapList(sports, func(c uuid.UUID) string { return fmt.Sprintf("posts.sport_id = '%s'", c.String()) })
+		sportQuery := strings.Join(mappedSports, " OR ")
+		filters = append(filters, sportQuery)
+	}
+
+	if len(tags) > 0 {
+		mappedTags := utils.MapList(tags, func(c uuid.UUID) string { return fmt.Sprintf("tag_posts.tag_id = '%s'", c.String()) })
+		tagQuery := strings.Join(mappedTags, " OR ")
+		filters = append(filters, tagQuery)
+	}
+
+	whereQuery := strings.Join(filters, " OR ")
+
+	if err := p.db.
+		Model(&models.Post{}).
+		Select(POST_SELECT_QUERY, userId).
+		Joins("JOIN tag_posts ON posts.id = tag_posts.post_id").
+		Where(whereQuery).
+		Group("posts.id").
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+		}).
+		Count(&total).
+		Limit(limit).
+		Offset(offset).
+		Order("posts.created_at DESC").
+		Scan(&posts).Error; err != nil {
+		return posts, 0, err
+	}
+
+	return posts, total, nil
 }
