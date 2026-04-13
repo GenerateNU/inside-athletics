@@ -54,8 +54,8 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 		College:               user.College,
 		Division:              user.Division,
 		ProfilePictureMedia:   user.Profile_Picture_Media,
-		ProfilePictureURL:     user.Profile_Picture_URL,
-		Roles:                 roleResponses,
+		//ProfilePictureURL:     user.Profile_Picture_URL,
+		Roles: roleResponses,
 	}
 
 	return &utils.ResponseBody[GetUserResponse]{
@@ -95,8 +95,8 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		College:               user.College,
 		Division:              user.Division,
 		ProfilePictureMedia:   user.Profile_Picture_Media,
-		ProfilePictureURL:     user.Profile_Picture_URL,
-		Roles:                 roleResponses,
+		//ProfilePictureURL:     user.Profile_Picture_URL,
+		Roles: roleResponses,
 	}
 
 	return respBody, nil
@@ -129,7 +129,6 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		CollegeID:               input.Body.CollegeID,
 		Division:                input.Body.Division,
 		Profile_Picture_ID:      input.Body.ProfilePictureID,
-		Profile_Picture_URL:     input.Body.ProfilePictureURL,
 	}
 
 	createdUser, err := u.userDB.CreateUser(user)
@@ -184,7 +183,6 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 		College:               updatedUser.College,
 		Division:              updatedUser.Division,
 		ProfilePictureMedia:   updatedUser.Profile_Picture_Media,
-		ProfilePictureURL:     updatedUser.Profile_Picture_URL,
 		Roles:                 roleResponses,
 	}
 

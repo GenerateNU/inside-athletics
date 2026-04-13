@@ -28,7 +28,6 @@ type User struct {
 	Division                *Division             `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint;"`
 	Profile_Picture_ID      *uuid.UUID            `json:"profile_picture_id" example:"1" doc:"The id of the profile picture media id" gorm:"type:uuid;"`
 	Profile_Picture_Media   *Media                `json:"-" gorm:"foreignKey:Profile_Picture_ID;references:ID"`
-	Profile_Picture_URL     string                `json:"profile_picture_url" example:"https://example.com/images/photo.jpg" doc:"The url of the profile picture" gorm:"type:string;"`
 }
 
 type VerifiedAthleteStatus string
