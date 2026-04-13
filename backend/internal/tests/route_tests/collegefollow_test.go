@@ -44,6 +44,7 @@ func seedUserAndCollege(t *testing.T, testDB *TestDatabase, unique string) (mode
 }
 
 func TestGetCollegeFollowsByUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -52,8 +53,7 @@ func TestGetCollegeFollowsByUser(t *testing.T) {
 	assignRoleToUser(t, testDB.DB, user.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	},
 		user.ID,
 	)
@@ -81,14 +81,14 @@ func TestGetCollegeFollowsByUser(t *testing.T) {
 }
 
 func TestGetFollowingUsersByCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "get-following-users-by-college")
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	})
 
 	createdCollegeFollow := models.CollegeFollow{
@@ -114,14 +114,14 @@ func TestGetFollowingUsersByCollege(t *testing.T) {
 }
 
 func TestCreateCollegeFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "create-college-follow")
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	},
 		user.ID,
 	)
@@ -149,17 +149,15 @@ func TestCreateCollegeFollow(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "delete-college-follow")
 
-	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "college"},
-	})
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "collegefollow"},
+	}, user.ID)
 
 	createdCollegeFollow := models.CollegeFollow{
 		ID:        uuid.New(),
@@ -187,14 +185,108 @@ func TestDeleteCollegeFollow(t *testing.T) {
 	}
 }
 
+func TestDeleteCollegeFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, college := seedUserAndCollege(t, testDB, "delete-other-college-follow-owner")
+	otherUser, _ := seedUserAndCollege(t, testDB, "delete-other-college-follow-actor")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+	assignRoleToUser(t, testDB.DB, otherUser.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "collegefollow"},
+	}, otherUser.ID)
+
+	createdCollegeFollow := models.CollegeFollow{
+		ID:        uuid.New(),
+		UserID:    owner.ID,
+		CollegeID: college.ID,
+	}
+
+	if err := testDB.DB.Create(&createdCollegeFollow).Error; err != nil {
+		t.Fatalf("Unable to add college follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when deleting another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestDeleteCollegeFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, college := seedUserAndCollege(t, testDB, "delete-other-college-follow-owner-moderator")
+	moderatorUser, _ := seedUserAndCollege(t, testDB, "delete-other-college-follow-moderator")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleModerator, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "collegefollow"},
+	}, moderatorUser.ID)
+
+	createdCollegeFollow := models.CollegeFollow{
+		ID:        uuid.New(),
+		UserID:    owner.ID,
+		CollegeID: college.ID,
+	}
+
+	if err := testDB.DB.Create(&createdCollegeFollow).Error; err != nil {
+		t.Fatalf("Unable to add college follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 when moderator deletes another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestDeleteCollegeFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	owner, college := seedUserAndCollege(t, testDB, "delete-other-college-follow-owner-admin")
+	adminUser, _ := seedUserAndCollege(t, testDB, "delete-other-college-follow-admin")
+
+	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionDelete, Resource: "collegefollow"},
+	}, adminUser.ID)
+
+	createdCollegeFollow := models.CollegeFollow{
+		ID:        uuid.New(),
+		UserID:    owner.ID,
+		CollegeID: college.ID,
+	}
+
+	if err := testDB.DB.Create(&createdCollegeFollow).Error; err != nil {
+		t.Fatalf("Unable to add college follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected 200 when admin deletes another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestGetCollegeFollowsByUser_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	})
 
 	resp := api.Get("/api/v1/user/college/not-a-valid-uuid/follows", authHeader)
@@ -208,13 +300,13 @@ func TestGetCollegeFollowsByUser_InvalidUUID(t *testing.T) {
 }
 
 func TestGetFollowingUsersByCollege_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	})
 
 	resp := api.Get("/api/v1/user/college/invalid-uuid/users", authHeader)
@@ -228,14 +320,14 @@ func TestGetFollowingUsersByCollege_InvalidUUID(t *testing.T) {
 }
 
 func TestCreateCollegeFollow_DuplicateReturns409(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, college := seedUserAndCollege(t, testDB, "dup-collegefollow")
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	},
 		user.ID,
 	)
@@ -256,14 +348,14 @@ func TestCreateCollegeFollow_DuplicateReturns409(t *testing.T) {
 }
 
 func TestCreateCollegeFollow_NonExistentCollegeReturnsError(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 	user, _ := seedUserAndCollege(t, testDB, "create-nonexistent-college")
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionCreate, Resource: "collegefollow"},
 	},
 		user.ID,
 	)
@@ -280,15 +372,13 @@ func TestCreateCollegeFollow_NonExistentCollegeReturnsError(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow_NonExistentReturns404(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "collegefollow"},
 	})
 
 	nonExistentID := uuid.New()
@@ -300,15 +390,13 @@ func TestDeleteCollegeFollow_NonExistentReturns404(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
-		{Action: models.PermissionCreate, Resource: "user"},
-		{Action: models.PermissionCreate, Resource: "college"},
-		{Action: models.PermissionDelete, Resource: "user"},
-		{Action: models.PermissionDelete, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "collegefollow"},
 	})
 
 	resp := api.Delete("/api/v1/user/college/not-a-valid-uuid", authHeader)

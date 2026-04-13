@@ -12,6 +12,7 @@ import (
 )
 
 func TestGetTagByName(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -39,6 +40,7 @@ func TestGetTagByName(t *testing.T) {
 }
 
 func TestGetTagByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -67,6 +69,7 @@ func TestGetTagByID(t *testing.T) {
 }
 
 func TestCreateTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -89,6 +92,7 @@ func TestCreateTag(t *testing.T) {
 }
 
 func TestUpdateTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -117,6 +121,7 @@ func TestUpdateTag(t *testing.T) {
 }
 
 func TestDeleteTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

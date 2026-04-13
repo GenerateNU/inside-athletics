@@ -1,6 +1,7 @@
 package comment
 
 import (
+	"errors"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -108,4 +109,36 @@ func (c *CommentDB) DeleteComment(id uuid.UUID) error {
 		return huma.Error404NotFound("Resource not found")
 	}
 	return nil
+}
+
+// IsUserPremium returns true when the user has premium access.
+// If the user record is missing, we do not apply free-tier restrictions.
+func (c *CommentDB) IsUserPremium(userID uuid.UUID) (bool, error) {
+	var user models.User
+	err := c.db.Select("account_type").Where("id = ?", userID).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return true, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return user.Account_Type, nil
+}
+
+// IsPostWithinFirstViewedPosts returns true when the post is in the user's first N viewed posts.
+func (c *CommentDB) IsPostWithinFirstViewedPosts(userID, postID uuid.UUID, maxPosts int) (bool, error) {
+	var count int64
+	subQuery := c.db.Model(&models.ViewedPost{}).
+		Select("post_id").
+		Where("user_id = ?", userID).
+		Order("created_at ASC").
+		Limit(maxPosts)
+
+	err := c.db.Model(&models.ViewedPost{}).
+		Where("user_id = ? AND post_id = ? AND post_id IN (?)", userID, postID, subQuery).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

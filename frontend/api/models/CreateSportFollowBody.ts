@@ -14,9 +14,4 @@ export type CreateSportFollowBody = {
    * @type string
    */
   sport_id: string;
-  /**
-   * @description ID of the user
-   * @type string
-   */
-  user_id: string;
 };

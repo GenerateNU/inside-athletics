@@ -9,6 +9,7 @@ import (
 )
 
 func TestCreateSport(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -48,6 +49,7 @@ func TestCreateSport(t *testing.T) {
 }
 
 func TestGetSportById(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -86,6 +88,7 @@ func TestGetSportById(t *testing.T) {
 }
 
 func TestGetSportByName(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -124,6 +127,7 @@ func TestGetSportByName(t *testing.T) {
 }
 
 func TestGetAllSports(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -168,6 +172,7 @@ func TestGetAllSports(t *testing.T) {
 }
 
 func TestUpdateSport(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -213,6 +218,7 @@ func TestUpdateSport(t *testing.T) {
 }
 
 func TestDeleteSport(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 

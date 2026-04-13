@@ -1,3 +1,4 @@
+h1:GfUIsrNLw70dibj2+I/+fM4IPDv+IMW/H0zgxLbO/uY=
 h1:uxD3QK9Y0MHRdg/Gfsh9R/DQOPtqeFoKbetTsxTmPIA=
 20260119165327_CreateUserTable.sql h1:A2nfYAPSA4LoguTxgO4LFzT0wVow+BE03LA8OPAL0pE=
 20260126173028_CreateCollegeTable.sql h1://pcmUuF6gXJQMWp4Hy5It96wQ0JeSlvJD6da0khwNQ=
@@ -20,5 +21,10 @@ h1:uxD3QK9Y0MHRdg/Gfsh9R/DQOPtqeFoKbetTsxTmPIA=
 20260313110000_CreateUserTagSubscriptions.sql h1:B99Lbu9o0aHVN8EYfhKVcyo2BKMOmvxkzJvxD7a5yEI=
 20260315000000_AddSportFollowTable.sql h1:uK5I29g31QM0exsKgte1P+ug5BnOjeVigqPyxOz3GJo=
 20260315100000_AddCollegeFollowTable.sql h1:xJZQdPrjYv5dzWXj68BnWuocbYSd+lTDz29mL8RKN44=
+20260316234932_CreateViewedPostsTable.sql h1:z/wal8f8du9o5wGv9VcRcRhqcmZHwPBMokVuKhZQfog=
+20260323000652_AddUniqueIndexFollowCollegeSportTag.sql h1:ZYWGxRSbShCl0PO0w283zSdS7a7ll0PNQ7G6c/E7Wug=
+20260324190000_SeedFollowRolePermissions.sql h1:PiSRTq/RdintpgqYr+4B2JBAJ4fF/MkG/x1zTDCny8E=
+20260330225810_MediaAddedMediaType.sql h1:nIsevTXSgwgb4oAmmp/sGzMOy+4W6YSYeRRNQS5onqU=
+20260409023619_AthleteSurveyTable.sql h1:n8Bc4XsS3juO7YytEMcatpBM3NAC+wFApbRDqA+voDc=
 20260323000652_AddUniqueIndexFollowCollegeSportTag.sql h1:FMxeNRY6jUg/yfqroCYpC/BkXM1Waq0oysYZmXk5pr4=
 20260325181724_FuzzySearch.sql h1:oEZJV3QZXwBSeGLWGfkymlMbZEtQ8OIJIfr4zayF2zA=

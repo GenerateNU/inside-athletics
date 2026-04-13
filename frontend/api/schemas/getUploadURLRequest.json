@@ -1,0 +1,27 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/GetUploadURLRequest.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "fileName": {
+      "description": "Optional; used as documentId in response (defaults to last segment of key)",
+      "type": "string"
+    },
+    "fileType": {
+      "description": "MIME type, e.g. image/jpeg, application/pdf",
+      "type": "string"
+    },
+    "key": {
+      "description": "Full S3 object key, e.g. premium/image/content-123/photo.jpg",
+      "type": "string"
+    }
+  },
+  "required": ["key", "fileType", "fileName"],
+  "type": "object",
+  "x-readme-ref-name": "GetUploadURLRequest"
+}

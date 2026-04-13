@@ -77,6 +77,9 @@ run-test:
 run-route-tests:
 	doppler run --command="go test $(V_FLAG) ./internal/tests/route_tests"
 
+run-test:
+	doppler run --command="go test -v -run "^$(TEST_NAME)" ./internal/tests/route_tests "
+
 .PHONY: run-unit-tests
 # Runs all the unit tests, if passed verbose, log test details
 run-unit-tests:

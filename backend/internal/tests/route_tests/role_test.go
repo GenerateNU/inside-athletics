@@ -10,6 +10,7 @@ import (
 )
 
 func TestRoleCRUD(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -81,5 +82,41 @@ func TestRoleCRUD(t *testing.T) {
 	deleteResp := api.Delete("/api/v1/role/"+created.ID.String(), "Authorization: Bearer "+adminUserID.String())
 	if deleteResp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", deleteResp.Code, deleteResp.Body.String())
+	}
+}
+
+func TestCreateRoleDuplicateReturnsConflict(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	adminRoleID := getRoleID(t, testDB.DB, models.RoleAdmin)
+	adminUserID := uuid.New()
+	adminUser := models.User{
+		ID:                      adminUserID,
+		FirstName:               "Admin",
+		LastName:                "User",
+		Email:                   "admin-dup@example.com",
+		Username:                "admin-dup",
+		Account_Type:            true,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&adminUser).Error; err != nil {
+		t.Fatalf("failed to create admin user: %v", err)
+	}
+	assignRoleToUser(t, testDB.DB, adminUserID, adminRoleID)
+
+	roleName := "dup_role_" + uuid.NewString()[:8]
+	createBody := role.CreateRoleRequest{Name: roleName}
+
+	firstResp := api.Post("/api/v1/role/", createBody, "Authorization: Bearer "+adminUserID.String())
+	if firstResp.Code != http.StatusOK {
+		t.Fatalf("expected first create status 200, got %d: %s", firstResp.Code, firstResp.Body.String())
+	}
+
+	secondResp := api.Post("/api/v1/role/", createBody, "Authorization: Bearer "+adminUserID.String())
+	if secondResp.Code != http.StatusConflict {
+		t.Fatalf("expected duplicate create status 409, got %d: %s", secondResp.Code, secondResp.Body.String())
 	}
 }

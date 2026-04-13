@@ -1,0 +1,19 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/ConfirmUploadRequest.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "key": {
+      "description": "S3 object key from upload-url response",
+      "type": "string"
+    }
+  },
+  "required": ["key"],
+  "type": "object",
+  "x-readme-ref-name": "ConfirmUploadRequest"
+}

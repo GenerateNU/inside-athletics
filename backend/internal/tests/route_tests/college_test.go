@@ -12,6 +12,7 @@ import (
 )
 
 func TestGetCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -48,6 +49,7 @@ func TestGetCollege(t *testing.T) {
 }
 
 func TestCreateCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -84,6 +86,7 @@ func TestCreateCollege(t *testing.T) {
 }
 
 func TestUpdateCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -148,6 +151,7 @@ func TestUpdateCollege(t *testing.T) {
 }
 
 func TestDeleteCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -186,6 +190,7 @@ func TestDeleteCollege(t *testing.T) {
 }
 
 func TestCreateCollegeMissingName(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -217,6 +222,7 @@ func TestCreateCollegeMissingName(t *testing.T) {
 }
 
 func TestCreateCollegeMissingState(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -248,6 +254,7 @@ func TestCreateCollegeMissingState(t *testing.T) {
 }
 
 func TestCreateCollegeMissingCity(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -279,6 +286,7 @@ func TestCreateCollegeMissingCity(t *testing.T) {
 }
 
 func TestCreateCollegeMissingDivisionRank(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -310,6 +318,7 @@ func TestCreateCollegeMissingDivisionRank(t *testing.T) {
 }
 
 func TestCreateCollegeMissingWebsite(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

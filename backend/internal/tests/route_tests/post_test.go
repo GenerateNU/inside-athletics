@@ -1,13 +1,16 @@
 package routeTests
 
 import (
+	"errors"
 	"fmt"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 	"net/http"
+	"strconv"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/google/uuid"
@@ -40,6 +43,7 @@ func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
 	}
 }
 func TestCreatePost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -93,6 +97,7 @@ func TestCreatePost(t *testing.T) {
 }
 
 func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -122,6 +127,7 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 }
 
 func TestCreatePostWithTags(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -167,6 +173,7 @@ func TestCreatePostWithTags(t *testing.T) {
 }
 
 func TestGetPostById(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -225,6 +232,7 @@ func TestGetPostById(t *testing.T) {
 }
 
 func TestGetPostByIdWithLikes(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -321,6 +329,7 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 }
 
 func TestGetPostByIdNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -336,6 +345,7 @@ func TestGetPostByIdNotFound(t *testing.T) {
 }
 
 func TestBadValidation(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -365,6 +375,7 @@ func TestBadValidation(t *testing.T) {
 }
 
 func TestGetPostByAuthorId(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -427,6 +438,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 }
 
 func TestGetPostsBySportId(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -474,6 +486,7 @@ func TestGetPostsBySportId(t *testing.T) {
 }
 
 func TestGetAllPosts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -521,6 +534,7 @@ func TestGetAllPosts(t *testing.T) {
 }
 
 func TestUpdatePost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -570,6 +584,7 @@ func TestUpdatePost(t *testing.T) {
 }
 
 func TestUpdatePostNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -588,6 +603,7 @@ func TestUpdatePostNotFound(t *testing.T) {
 }
 
 func TestDeletePost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -622,6 +638,7 @@ func TestDeletePost(t *testing.T) {
 }
 
 func TestDeletePostNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -635,6 +652,277 @@ func TestDeletePostNotFound(t *testing.T) {
 	resp := api.Delete("/api/v1/post/"+uuid.New().String(), authHeader)
 	if resp.Code != http.StatusNotFound {
 		t.Errorf("expected 404, got %d", resp.Code)
+	}
+}
+
+// TestFreeUserCannotCreateSecondPost asserts free users get 403 when creating a second post.
+func TestFreeUserCannotCreateSecondPost(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	}, JohnID)
+
+	body := map[string]any{
+		"sport_id": SoccerID, "title": "First post", "content": "Content.", "is_anonymous": false, "tags": []map[string]any{},
+	}
+	resp1 := api.Post("/api/v1/post/", body, authHeader)
+	if resp1.Code != http.StatusOK {
+		t.Fatalf("first post expected 200, got %d: %s", resp1.Code, resp1.Body.String())
+	}
+
+	body["title"] = "Second post"
+	resp2 := api.Post("/api/v1/post/", body, authHeader)
+	if resp2.Code != http.StatusForbidden {
+		t.Fatalf("second post (free user) expected 403, got %d: %s", resp2.Code, resp2.Body.String())
+	}
+	if resp2.Body.String() != "" && !strings.Contains(resp2.Body.String(), "free post views") {
+		t.Logf("response body (expected free limit message): %s", resp2.Body.String())
+	}
+}
+
+func TestFreeUserConcurrentPostCreationEnforcesLimit(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	CreateUserAndSport(testDB, t)
+	postDB := post.NewPostDB(testDB.DB)
+
+	errs := make(chan error, 2)
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			<-start
+			_, err := postDB.CreatePostWithAuthorLimit(&models.Post{
+				AuthorID:    JohnID,
+				SportID:     &SoccerID,
+				Title:       "Concurrent post " + strconv.Itoa(i),
+				Content:     "Content",
+				IsAnonymous: false,
+			}, []post.TagRequest{}, post.FreeUserMaxPosts)
+			errs <- err
+		}(i)
+	}
+
+	close(start)
+	wg.Wait()
+	close(errs)
+
+	var successCount int
+	var limitErrorCount int
+	for err := range errs {
+		switch {
+		case err == nil:
+			successCount++
+		case errors.Is(err, post.ErrFreePostCreationLimitReached):
+			limitErrorCount++
+		default:
+			t.Fatalf("unexpected error: %v", err)
+		}
+	}
+
+	if successCount != 1 {
+		t.Fatalf("expected exactly one successful post creation, got %d", successCount)
+	}
+	if limitErrorCount != 1 {
+		t.Fatalf("expected exactly one free-tier limit error, got %d", limitErrorCount)
+	}
+
+	count, err := postDB.CountPostsByAuthor(JohnID)
+	if err != nil {
+		t.Fatalf("failed to count posts by author: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("expected exactly one persisted post, got %d", count)
+	}
+}
+
+// TestFreeUserGetPostReturns403AfterMaxViews asserts free users get 403 when viewing more than FreeUserMaxPostViews distinct posts.
+func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
+	t.Parallel()
+	const maxViews = 5
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+	postDB := post.NewPostDB(testDB.DB)
+
+	CreateUserAndSport(testDB, t)
+
+	freeUserID := uuid.New()
+	freeUser := models.User{
+		ID:                      freeUserID,
+		FirstName:               "Free",
+		LastName:                "User",
+		Email:                   "free@example.com",
+		Username:                "freeuser",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&freeUser).Error; err != nil {
+		t.Fatalf("failed to create free user: %v", err)
+	}
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+	}, freeUserID)
+
+	var postIDs []uuid.UUID
+	for i := 0; i < maxViews+1; i++ {
+		p, err := postDB.CreatePost(&models.Post{
+			AuthorID: JohnID, SportID: &SoccerID,
+			Title: "Post " + strconv.Itoa(i), Content: "Content", IsAnonymous: false,
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, p.ID)
+	}
+
+	for i := 0; i < maxViews; i++ {
+		resp := api.Get("/api/v1/post/"+postIDs[i].String(), authHeader)
+		if resp.Code != http.StatusOK {
+			t.Fatalf("view %d (post %s) expected 200, got %d: %s", i, postIDs[i], resp.Code, resp.Body.String())
+		}
+	}
+
+	resp := api.Get("/api/v1/post/"+postIDs[maxViews].String(), authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("view %d (over limit) expected 403, got %d: %s", maxViews, resp.Code, resp.Body.String())
+	}
+
+	respAgain := api.Get("/api/v1/post/"+postIDs[0].String(), authHeader)
+	if respAgain.Code != http.StatusOK {
+		t.Fatalf("re-viewing first post should still be 200, got %d: %s", respAgain.Code, respAgain.Body.String())
+	}
+}
+
+func TestFreeUserConcurrentDistinctPostViewsEnforceLimit(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	postDB := post.NewPostDB(testDB.DB)
+	CreateUserAndSport(testDB, t)
+
+	freeUserID := uuid.New()
+	freeUser := models.User{
+		ID:                      freeUserID,
+		FirstName:               "Free",
+		LastName:                "User",
+		Email:                   "free-concurrent@example.com",
+		Username:                "freeuser-concurrent",
+		Account_Type:            false,
+		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
+	}
+	if err := testDB.DB.Create(&freeUser).Error; err != nil {
+		t.Fatalf("failed to create free user: %v", err)
+	}
+
+	postIDs := make([]uuid.UUID, 0, post.FreeUserMaxPostViews+1)
+	for i := 0; i < post.FreeUserMaxPostViews+1; i++ {
+		createdPost, err := postDB.CreatePost(&models.Post{
+			AuthorID:    JohnID,
+			SportID:     &SoccerID,
+			Title:       "Concurrent view target " + strconv.Itoa(i),
+			Content:     "Content",
+			IsAnonymous: false,
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, createdPost.ID)
+	}
+
+	errs := make(chan error, len(postIDs))
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+
+	for _, postID := range postIDs {
+		wg.Add(1)
+		go func(postID uuid.UUID) {
+			defer wg.Done()
+			<-start
+			errs <- postDB.RecordPostViewIfAllowed(freeUserID, postID, post.FreeUserMaxPostViews)
+		}(postID)
+	}
+
+	close(start)
+	wg.Wait()
+	close(errs)
+
+	var successCount int
+	var limitErrorCount int
+	for err := range errs {
+		switch {
+		case err == nil:
+			successCount++
+		case errors.Is(err, post.ErrFreePostViewLimitReached):
+			limitErrorCount++
+		default:
+			t.Fatalf("unexpected error: %v", err)
+		}
+	}
+
+	if successCount != post.FreeUserMaxPostViews {
+		t.Fatalf("expected %d successful view records, got %d", post.FreeUserMaxPostViews, successCount)
+	}
+	if limitErrorCount != 1 {
+		t.Fatalf("expected exactly one free-tier view limit error, got %d", limitErrorCount)
+	}
+
+	count, err := postDB.CountViewedPostsByUser(freeUserID)
+	if err != nil {
+		t.Fatalf("failed to count viewed posts: %v", err)
+	}
+	if count != post.FreeUserMaxPostViews {
+		t.Fatalf("expected %d persisted viewed posts, got %d", post.FreeUserMaxPostViews, count)
+	}
+}
+
+// TestPremiumUserCanCreateMultiplePosts asserts premium users can create more than one post.
+func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	post.Route(testDB.API, testDB.DB)
+	api := testDB.API
+
+	CreateUserAndSport(testDB, t)
+	if err := testDB.DB.Model(&models.User{}).Where("id = ?", JohnID).Update("Account_Type", true).Error; err != nil {
+		t.Fatalf("failed to set premium: %v", err)
+	}
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "sport"},
+		{Action: models.PermissionCreate, Resource: "post"},
+	}, JohnID)
+
+	body := map[string]any{
+		"sport_id": SoccerID, "title": "First", "content": "Content.", "is_anonymous": false, "tags": []map[string]any{},
+	}
+	resp1 := api.Post("/api/v1/post/", body, authHeader)
+	if resp1.Code != http.StatusOK {
+		t.Fatalf("first post expected 200, got %d: %s", resp1.Code, resp1.Body.String())
+	}
+	body["title"] = "Second"
+	resp2 := api.Post("/api/v1/post/", body, authHeader)
+	if resp2.Code != http.StatusOK {
+		t.Fatalf("second post (premium) expected 200, got %d: %s", resp2.Code, resp2.Body.String())
 	}
 }
 
