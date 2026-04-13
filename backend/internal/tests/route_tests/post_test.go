@@ -40,6 +40,7 @@ func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
 	}
 }
 func TestCreatePost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -93,6 +94,7 @@ func TestCreatePost(t *testing.T) {
 }
 
 func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -122,6 +124,7 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 }
 
 func TestCreatePostWithTags(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -167,6 +170,7 @@ func TestCreatePostWithTags(t *testing.T) {
 }
 
 func TestGetPostById(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -225,6 +229,7 @@ func TestGetPostById(t *testing.T) {
 }
 
 func TestGetPostByIdWithLikes(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -321,6 +326,7 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 }
 
 func TestGetPostByIdNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -336,6 +342,7 @@ func TestGetPostByIdNotFound(t *testing.T) {
 }
 
 func TestBadValidation(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -365,6 +372,7 @@ func TestBadValidation(t *testing.T) {
 }
 
 func TestGetPostByAuthorId(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -427,6 +435,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 }
 
 func TestGetPostsBySportId(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -474,6 +483,7 @@ func TestGetPostsBySportId(t *testing.T) {
 }
 
 func TestGetAllPosts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -521,6 +531,7 @@ func TestGetAllPosts(t *testing.T) {
 }
 
 func TestUpdatePost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -570,6 +581,7 @@ func TestUpdatePost(t *testing.T) {
 }
 
 func TestUpdatePostNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -588,6 +600,7 @@ func TestUpdatePostNotFound(t *testing.T) {
 }
 
 func TestDeletePost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -622,6 +635,7 @@ func TestDeletePost(t *testing.T) {
 }
 
 func TestDeletePostNotFound(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -640,6 +654,7 @@ func TestDeletePostNotFound(t *testing.T) {
 
 // TestFreeUserCannotCreateSecondPost asserts free users get 403 when creating a second post.
 func TestFreeUserCannotCreateSecondPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -672,6 +687,7 @@ func TestFreeUserCannotCreateSecondPost(t *testing.T) {
 }
 
 func TestFreeUserConcurrentPostCreationEnforcesLimit(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -733,6 +749,7 @@ func TestFreeUserConcurrentPostCreationEnforcesLimit(t *testing.T) {
 
 // TestFreeUserGetPostReturns403AfterMaxViews asserts free users get 403 when viewing more than FreeUserMaxPostViews distinct posts.
 func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
+	t.Parallel()
 	const maxViews = 5
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -791,6 +808,7 @@ func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 }
 
 func TestFreeUserConcurrentDistinctPostViewsEnforceLimit(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -874,6 +892,7 @@ func TestFreeUserConcurrentDistinctPostViewsEnforceLimit(t *testing.T) {
 
 // TestPremiumUserCanCreateMultiplePosts asserts premium users can create more than one post.
 func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 

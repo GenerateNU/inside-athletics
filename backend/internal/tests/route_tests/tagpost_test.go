@@ -59,6 +59,7 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 }
 
 func TestGetPostsByTag(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -88,6 +89,7 @@ func TestGetPostsByTag(t *testing.T) {
 }
 
 func TestGetTagpostByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -117,6 +119,7 @@ func TestGetTagpostByID(t *testing.T) {
 }
 
 func TestCreateTagPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -145,6 +148,7 @@ func TestCreateTagPost(t *testing.T) {
 }
 
 func TestUpdateTagPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -181,6 +185,7 @@ func TestUpdateTagPost(t *testing.T) {
 }
 
 func TestDeleteTagPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

@@ -11,6 +11,7 @@ import (
 )
 
 func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 

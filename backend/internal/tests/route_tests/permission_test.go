@@ -10,6 +10,7 @@ import (
 )
 
 func TestPermissionCRUD(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

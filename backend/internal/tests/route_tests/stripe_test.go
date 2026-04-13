@@ -14,6 +14,7 @@ import (
 )
 
 func TestCreateProduct(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -39,6 +40,7 @@ func TestCreateProduct(t *testing.T) {
 }
 
 func TestGetProductByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -80,6 +82,7 @@ func TestGetProductByID(t *testing.T) {
 }
 
 func TestUpdateStripeProduct(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -125,6 +128,7 @@ func TestUpdateStripeProduct(t *testing.T) {
 }
 
 func TestArchiveStripeProduct(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -162,6 +166,7 @@ func TestArchiveStripeProduct(t *testing.T) {
 }
 
 func TestGetAllProducts(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -208,6 +213,7 @@ func TestGetAllProducts(t *testing.T) {
 }
 
 func TestCreatePrice(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -264,6 +270,7 @@ func TestCreatePrice(t *testing.T) {
 }
 
 func TestGetStripePriceByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -334,6 +341,7 @@ func TestGetStripePriceByID(t *testing.T) {
 }
 
 func TestUpdateStripePrice(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -413,6 +421,7 @@ func TestUpdateStripePrice(t *testing.T) {
 }
 
 func TestArchiveStripePrice(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -469,6 +478,7 @@ func TestArchiveStripePrice(t *testing.T) {
 }
 
 func TestGetAllStripePrices(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -539,6 +549,7 @@ func TestGetAllStripePrices(t *testing.T) {
 }
 
 func TestGetCustomer(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -574,6 +585,7 @@ func TestGetCustomer(t *testing.T) {
 	}
 }
 func TestGetCustomerByEmail(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -607,6 +619,7 @@ func TestGetCustomerByEmail(t *testing.T) {
 }
 
 func TestRegisterCustomer(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -650,6 +663,7 @@ func TestRegisterCustomer(t *testing.T) {
 }
 
 func TestUpdateCustomer(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -696,6 +710,7 @@ func TestUpdateCustomer(t *testing.T) {
 }
 
 func TestCreateCheckoutSession(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -755,6 +770,7 @@ func TestCreateCheckoutSession(t *testing.T) {
 }
 
 func TestGetStripeCheckoutSessionByID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -829,6 +845,7 @@ func TestGetStripeCheckoutSessionByID(t *testing.T) {
 }
 
 func TestDeleteStripeCheckoutSession(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -876,6 +893,7 @@ func TestDeleteStripeCheckoutSession(t *testing.T) {
 }
 
 func TestGetAllStripeSessions(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

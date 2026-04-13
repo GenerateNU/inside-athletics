@@ -10,6 +10,7 @@ import (
 )
 
 func TestCreatePostLike(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -48,6 +49,7 @@ func TestCreatePostLike(t *testing.T) {
 }
 
 func TestGetPostLike(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -77,6 +79,7 @@ func TestGetPostLike(t *testing.T) {
 }
 
 func TestGetPostLikeInfo(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -108,6 +111,7 @@ func TestGetPostLikeInfo(t *testing.T) {
 }
 
 func TestDeletePostLike(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -151,6 +155,7 @@ func TestDeletePostLike(t *testing.T) {
 }
 
 func TestCreatePostLikeDuplicateReturns409(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
