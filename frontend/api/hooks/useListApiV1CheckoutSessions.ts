@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   ListApiV1CheckoutSessionsQueryResponse,
   ListApiV1CheckoutSessionsQueryParams,
@@ -23,7 +22,7 @@ import { listApiV1CheckoutSessions } from "../clients/listApiV1CheckoutSessions.
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const listApiV1CheckoutSessionsQueryKey = (
-  params: ListApiV1CheckoutSessionsQueryParams = {},
+  params?: ListApiV1CheckoutSessionsQueryParams,
 ) =>
   [{ url: "/api/v1/checkout/sessions/" }, ...(params ? [params] : [])] as const;
 
@@ -44,8 +43,10 @@ export function listApiV1CheckoutSessionsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return listApiV1CheckoutSessions(params, config);
+      return listApiV1CheckoutSessions(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,15 +75,15 @@ export function useListApiV1CheckoutSessions<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? listApiV1CheckoutSessionsQueryKey(params);
+    resolvedOptions?.queryKey ?? listApiV1CheckoutSessionsQueryKey(params);
 
   const query = useQuery(
     {
       ...listApiV1CheckoutSessionsQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1CheckoutSessionsByIdQueryResponse,
   GetApiV1CheckoutSessionsByIdPathParams,
@@ -44,8 +43,10 @@ export function getApiV1CheckoutSessionsByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1CheckoutSessionsById(id, config);
+      return getApiV1CheckoutSessionsById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,16 @@ export function useGetApiV1CheckoutSessionsByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1CheckoutSessionsByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ??
+    getApiV1CheckoutSessionsByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1CheckoutSessionsByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

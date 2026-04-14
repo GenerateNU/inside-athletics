@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostTagByIdQueryResponse,
   GetApiV1PostTagByIdPathParams,
@@ -44,8 +43,10 @@ export function getApiV1PostTagByIdSuspenseQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostTagById(id, config);
+      return getApiV1PostTagById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -72,15 +73,15 @@ export function useGetApiV1PostTagByIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostTagByIdSuspenseQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1PostTagByIdSuspenseQueryKey(id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PostTagByIdSuspenseQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

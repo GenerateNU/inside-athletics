@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1RolesQueryResponse,
   GetApiV1RolesQueryParams,
@@ -23,7 +22,7 @@ import { getApiV1Roles } from "../clients/getApiV1Roles.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1RolesSuspenseQueryKey = (
-  params: GetApiV1RolesQueryParams = {},
+  params?: GetApiV1RolesQueryParams,
 ) => [{ url: "/api/v1/roles/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1RolesSuspenseQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1RolesSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1Roles(params, config);
+      return getApiV1Roles(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -71,15 +72,15 @@ export function useGetApiV1RolesSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1RolesSuspenseQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1RolesSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1RolesSuspenseQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {
