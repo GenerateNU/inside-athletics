@@ -16,6 +16,7 @@ import { CommentCard } from "@/components/explore/CommentCard";
 import { Badge } from "@/components/explore/Badge";
 import { Tag } from "@/components/explore/Tag";
 import { cn } from "@/lib/utils";
+import { SearchBar } from "@/components/explore/SearchBar";
 
 export default function PostPage({
   params,
@@ -101,12 +102,13 @@ export default function PostPage({
     : [];
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-white bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60">
       <Navbar className="sticky top-0 h-screen shrink-0" />
 
-      <main className="flex min-w-0 pt-15 px-10 flex-1 flex-col bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60">
+
+      <main className="flex min-w-0 pt-10 px-10 flex-1 flex-col bg-white m-10 rounded-4xl">
         {/* Back + title */}
-        <div className="flex items-center gap-3 px-6 py-4">
+        <div className="flex items-center gap-3 px-2">
           <Link
             href="/explore"
             className="shrink-0 text-zinc-400 transition-colors hover:text-zinc-700"
@@ -141,15 +143,6 @@ export default function PostPage({
                   {authorName}
                 </span>
               </div>
-
-              {/* Tag labels */}
-              {tagLabels.length > 0 && (
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {tagLabels.map((label) => (
-                    <Tag key={label} label={label} />
-                  ))}
-                </div>
-              )}
 
               {/* Content */}
               <p className="text-md leading-relaxed text-black">

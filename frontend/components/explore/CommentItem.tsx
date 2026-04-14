@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   usePostApiV1CommentLike,
@@ -69,12 +69,10 @@ export function CommentItem({
         <button
           type="button"
           onClick={handleLikeToggle}
-          className={cn(
-            "flex items-center gap-1 text-xs text-zinc-400 transition-colors hover:text-red-500",
-            isLiked && "text-red-500",
-          )}
+          className={"flex items-center gap-1 text-xs text-black transition-colors"
+          }
         >
-          <Heart className={cn("size-3.5", isLiked && "fill-red-500")} />
+          <Heart className={"size-3.5"} stroke="url(#green-gradient)" fill={isLiked ? "url(#green-gradient)" : "none"} />
           {likeCount}
         </button>
 
@@ -82,8 +80,9 @@ export function CommentItem({
           <button
             type="button"
             onClick={onReply}
-            className="text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-700"
+            className="flex items-center gap-1 text-xs text-black"
           >
+            <MessageCircle className={"size-3.5"} stroke="url(#green-gradient)"/>
             Reply
           </button>
         )}
