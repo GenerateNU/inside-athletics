@@ -121,10 +121,17 @@ generate-sports-data:
 # Generates both colleges.json and sports.json
 generate-seed-data: generate-colleges-data generate-sports-data
 
+.PHONY: seed-logos
+seed-logos:
+	cd scripts/seed && doppler run -- python3 seed_college_logos.py --colleges data/colleges.json
+
 .PHONY: seed
-# Generates seed data and seeds the database with college and sports data
-seed: generate-seed-data
+seed: generate-seed-data seed-logos
 	doppler run --command="go run scripts/seed/seed.go"
+
+.PHONY: seed-prod
+seed-prod: generate-seed-data seed-logos
+	doppler run --command="go run scripts/seed/seed.go --db \$$PROD_DB_CONNECTION_STRING"
 
 
 # generate openapi.yaml file from server that is generated from huma. Server must
