@@ -9,6 +9,7 @@ import (
 )
 
 func TestPermissionMiddleware_DeniesWithoutRolePermission(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -49,6 +50,7 @@ func TestPermissionMiddleware_DeniesWithoutRolePermission(t *testing.T) {
 }
 
 func TestPermissionMiddleware_AllowsWithRolePermission(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API

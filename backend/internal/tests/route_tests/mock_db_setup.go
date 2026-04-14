@@ -7,8 +7,8 @@ import (
 
 	"fmt"
 	"inside-athletics/internal/handlers/content"
-	"inside-athletics/internal/server"
 	"inside-athletics/internal/s3"
+	"inside-athletics/internal/server"
 	unitTests "inside-athletics/internal/tests/unit_tests"
 	"log"
 	"net/http/httptest"

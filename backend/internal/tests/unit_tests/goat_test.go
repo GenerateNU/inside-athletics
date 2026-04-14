@@ -7,6 +7,7 @@ import (
 )
 
 func TestGoat(t *testing.T) {
+	t.Parallel()
 	goat := models.Goat{Name: "Joe", Age: 67}
 	actual := goat.MakeSomeNoise()
 	expected := "BAAAAA Joe"
@@ -17,6 +18,7 @@ func TestGoat(t *testing.T) {
 }
 
 func TestPointers(t *testing.T) {
+	t.Parallel()
 	goat := models.Goat{Name: "Joe", Age: 67}
 	goat.SetName("Suli")
 	if goat.Name != "Suli" {

@@ -44,6 +44,7 @@ func seedUserAndCollege(t *testing.T, testDB *TestDatabase, unique string) (mode
 }
 
 func TestGetCollegeFollowsByUser(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -80,6 +81,7 @@ func TestGetCollegeFollowsByUser(t *testing.T) {
 }
 
 func TestGetFollowingUsersByCollege(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -112,6 +114,7 @@ func TestGetFollowingUsersByCollege(t *testing.T) {
 }
 
 func TestCreateCollegeFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -146,6 +149,7 @@ func TestCreateCollegeFollow(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -182,6 +186,7 @@ func TestDeleteCollegeFollow(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -213,6 +218,7 @@ func TestDeleteCollegeFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -243,6 +249,7 @@ func TestDeleteCollegeFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.
 }
 
 func TestDeleteCollegeFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -273,6 +280,7 @@ func TestDeleteCollegeFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
 }
 
 func TestGetCollegeFollowsByUser_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -292,6 +300,7 @@ func TestGetCollegeFollowsByUser_InvalidUUID(t *testing.T) {
 }
 
 func TestGetFollowingUsersByCollege_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -311,6 +320,7 @@ func TestGetFollowingUsersByCollege_InvalidUUID(t *testing.T) {
 }
 
 func TestCreateCollegeFollow_DuplicateReturns409(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -338,6 +348,7 @@ func TestCreateCollegeFollow_DuplicateReturns409(t *testing.T) {
 }
 
 func TestCreateCollegeFollow_NonExistentCollegeReturnsError(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -361,6 +372,7 @@ func TestCreateCollegeFollow_NonExistentCollegeReturnsError(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow_NonExistentReturns404(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -378,6 +390,7 @@ func TestDeleteCollegeFollow_NonExistentReturns404(t *testing.T) {
 }
 
 func TestDeleteCollegeFollow_InvalidUUID(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
