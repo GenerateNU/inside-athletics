@@ -43,6 +43,7 @@ function buildCreateUserPayload(data: OnboardingData, sessionEmail?: string) {
     last_name: lastName || firstName,
     email,
     username: data.account.username,
+    profile_image_key: data.role.profileImageKey,
     account_type: data.plan.selectedPlan === "premium",
     verified_athlete_status: data.role.role === "athlete" ? "pending" : "none",
   };
@@ -217,4 +218,18 @@ export async function submitOnboardingUser(
   }
 
   await syncSelectedTagFollows(data, headers);
+
+  if (data.role.profileImageKey) {
+    const updateUserResponse = await fetch("/api/v1/user", {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        profile_image_key: data.role.profileImageKey,
+      }),
+    });
+
+    if (!updateUserResponse.ok) {
+      throw new Error("Unable to save profile image.");
+    }
+  }
 }

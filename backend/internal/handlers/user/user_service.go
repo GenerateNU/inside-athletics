@@ -4,6 +4,7 @@ import (
 	"context"
 	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
+	"inside-athletics/internal/s3"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -13,6 +14,7 @@ import (
 type UserService struct {
 	userDB *UserDB
 	roleDB *role.RoleDB
+	s3     *s3.Service
 }
 
 /*
@@ -36,25 +38,7 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	if err != nil {
 		return nil, err
 	}
-
-	// mapping to correct response type
-	// we do this so we can control what values are
-	// returned by the API
-	response := &GetUserResponse{
-		ID:                    user.ID,
-		FirstName:             user.FirstName,
-		LastName:              user.LastName,
-		Email:                 user.Email,
-		Username:              user.Username,
-		Bio:                   user.Bio,
-		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
-		ExpectedGradYear:      user.Expected_Grad_Year,
-		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
-		Division:              user.Division,
-		Roles:                 roleResponses,
-	}
+	response := u.buildUserResponse(ctx, user, roleResponses)
 
 	return &utils.ResponseBody[GetUserResponse]{
 		Body: response,
@@ -79,21 +63,7 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		return nil, err
 	}
 
-	respBody.Body = &GetUserResponse{
-		ID:                    user.ID,
-		FirstName:             user.FirstName,
-		LastName:              user.LastName,
-		Email:                 user.Email,
-		Username:              user.Username,
-		Bio:                   user.Bio,
-		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
-		ExpectedGradYear:      user.Expected_Grad_Year,
-		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
-		Division:              user.Division,
-		Roles:                 roleResponses,
-	}
+	respBody.Body = u.buildUserResponse(ctx, user, roleResponses)
 
 	return respBody, nil
 }
@@ -118,6 +88,7 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Email:                   input.Body.Email,
 		Username:                input.Body.Username,
 		Bio:                     input.Body.Bio,
+		ProfileImageKey:         input.Body.ProfileImageKey,
 		Account_Type:            input.Body.AccountType,
 		SportID:                 input.Body.SportID,
 		Expected_Grad_Year:      input.Body.ExpectedGradYear,
@@ -164,21 +135,7 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 		return nil, err
 	}
 
-	respBody.Body = &UpdateUserResponse{
-		ID:                    updatedUser.ID,
-		FirstName:             updatedUser.FirstName,
-		LastName:              updatedUser.LastName,
-		Email:                 updatedUser.Email,
-		Username:              updatedUser.Username,
-		Bio:                   updatedUser.Bio,
-		AccountType:           updatedUser.Account_Type,
-		Sport:                 updatedUser.Sport,
-		ExpectedGradYear:      updatedUser.Expected_Grad_Year,
-		VerifiedAthleteStatus: updatedUser.Verified_Athlete_Status,
-		College:               updatedUser.College,
-		Division:              updatedUser.Division,
-		Roles:                 roleResponses,
-	}
+	respBody.Body = u.buildUserResponse(ctx, updatedUser, roleResponses)
 
 	return respBody, nil
 }
@@ -245,4 +202,31 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	}
 
 	return parsedID, nil
+}
+
+func (u *UserService) buildUserResponse(ctx context.Context, user *models.User, roleResponses *[]role.RoleResponse) *GetUserResponse {
+	response := &GetUserResponse{
+		ID:                    user.ID,
+		FirstName:             user.FirstName,
+		LastName:              user.LastName,
+		Email:                 user.Email,
+		Username:              user.Username,
+		Bio:                   user.Bio,
+		ProfileImageKey:       user.ProfileImageKey,
+		AccountType:           user.Account_Type,
+		Sport:                 user.Sport,
+		ExpectedGradYear:      user.Expected_Grad_Year,
+		VerifiedAthleteStatus: user.Verified_Athlete_Status,
+		College:               user.College,
+		Division:              user.Division,
+		Roles:                 roleResponses,
+	}
+
+	if u.s3 != nil && user.ProfileImageKey != nil && *user.ProfileImageKey != "" {
+		if download, err := u.s3.GetDownloadURL(ctx, *user.ProfileImageKey); err == nil {
+			response.ProfileImageURL = &download.DownloadURL
+		}
+	}
+
+	return response
 }
