@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Heart, MessageCircle } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { PostResponse } from "@/api/models/PostResponse";
 
@@ -23,6 +23,7 @@ export function PostCard({ post }: PostCardProps) {
     ...(post.sport?.name ? [post.sport.name] : []),
     ...(post.tags?.map((t) => t.name) ?? []),
   ];
+
 
   return (
     <Link
@@ -67,6 +68,9 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex items-center gap-2">
           <span className="text-xs text-zinc-500">{authorName}</span>
           <Avatar size="sm">
+            {!post.is_anonymous && post.author.profile_picture && (
+              <AvatarImage src={post.author.profile_picture} alt={authorName} />
+            )}
             <AvatarFallback className="bg-zinc-100 text-[10px] font-medium text-zinc-600">
               {authorInitials}
             </AvatarFallback>

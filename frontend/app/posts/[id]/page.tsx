@@ -15,11 +15,11 @@ import {
   usePostApiV1Comment,
   listApiV1PostByPostIdCommentsQueryKey,
 } from "@/api/hooks";
-import { CommentCard } from "@/components/explore/CommentCard";
-import { Badge } from "@/components/explore/Badge";
-import { Tag } from "@/components/explore/Tag";
+import { CommentCard } from "@/components/post/CommentCard";
+import { Badge } from "@/components/post/Badge";
+import { Tag } from "@/components/post/Tag";
 import { cn } from "@/lib/utils";
-import { SearchBar } from "@/components/explore/SearchBar";
+import { SearchBar } from "@/components/post/SearchBar";
 
 export default function PostPage({
   params,
@@ -43,6 +43,8 @@ export default function PostPage({
       query: { enabled },
       client: { headers: authHeaders },
     });
+
+  console.log(post)
 
   const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(false);
