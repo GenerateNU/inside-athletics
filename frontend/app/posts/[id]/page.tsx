@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { use, useState, useEffect } from "react";
 import { ArrowLeft, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Navbar } from "@/components/ui/navbar";
 import { useSession } from "@/utils/SessionContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,11 +16,11 @@ import {
   usePostApiV1Comment,
   listApiV1PostByPostIdCommentsQueryKey,
 } from "@/api/hooks";
-import { CommentCard } from "@/components/explore/CommentCard";
-import { Badge } from "@/components/explore/Badge";
-import { Tag } from "@/components/explore/Tag";
+import { CommentCard } from "@/components/post/CommentCard";
+import { Badge } from "@/components/post/Badge";
+import { Tag } from "@/components/post/Tag";
 import { cn } from "@/lib/utils";
-import { SearchBar } from "@/components/explore/SearchBar";
+import { SearchBar } from "@/components/post/SearchBar";
 
 export default function PostPage({
   params,
@@ -43,6 +44,8 @@ export default function PostPage({
       query: { enabled },
       client: { headers: authHeaders },
     });
+
+  console.log(post?.author.profile_picture)
 
   const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(false);
@@ -173,10 +176,13 @@ export default function PostPage({
               {/* Author */}
               <div className="mb-3 flex items-center gap-2">
                 <Avatar size="lg">
-                  <AvatarFallback className="bg-zinc-200 text-[10px] font-medium text-black">
-                    {authorInitials}
-                  </AvatarFallback>
-                </Avatar>
+            {!post.is_anonymous && post.author.profile_picture && (
+              <AvatarImage src={post.author.profile_picture} alt={authorName} />
+            )}
+            <AvatarFallback className="bg-zinc-100 text-[10px] font-medium text-zinc-600">
+              {authorInitials}
+            </AvatarFallback>
+          </Avatar>
                 <span className="text-lg font-semibold text-black">
                   {authorName}
                 </span>

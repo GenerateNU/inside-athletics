@@ -1,6 +1,9 @@
 package post
 
 import (
+	"strings"
+
+	"inside-athletics/internal/handlers/user"
 	models "inside-athletics/internal/models"
 
 	"github.com/google/uuid"
@@ -34,9 +37,9 @@ type CreatePostResponse struct {
 
 // PostResponse defines the response structure for a post
 type PostResponse struct {
-	ID                uuid.UUID       `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Author            *models.User    `json:"author" type:"user"`
-	Sport             *models.Sport   `json:"sport" type:"sport"`
+	ID                uuid.UUID            `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Author            *user.GetUserResponse `json:"author"`
+	Sport             *models.Sport        `json:"sport" type:"sport"`
 	College           *models.College `json:"college" type:"college"`
 	Tags              []models.Tag    `json:"tags" type:"tag"`
 	Title             string          `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
@@ -131,10 +134,26 @@ type UpdatePostRequest struct {
 
 // ToPostResponse converts a Post model to a postResponse
 func ToPostResponse(post *models.Post, id uuid.UUID) *PostResponse {
-	var author *models.User
+	var author *user.GetUserResponse
 	if !post.IsAnonymous || id == post.AuthorID {
-		a := post.Author
-		author = &a
+		var profilePicture *string
+		if strings.HasPrefix(post.Author.ProfilePicture, "https://") {
+			pfp := post.Author.ProfilePicture
+			profilePicture = &pfp
+		}
+		author = &user.GetUserResponse{
+			ID:                    post.Author.ID,
+			FirstName:             post.Author.FirstName,
+			LastName:              post.Author.LastName,
+			Email:                 post.Author.Email,
+			Username:              post.Author.Username,
+			Bio:                   post.Author.Bio,
+			ProfilePicture:        profilePicture,
+			AccountType:           post.Author.Account_Type,
+			ExpectedGradYear:      post.Author.Expected_Grad_Year,
+			VerifiedAthleteStatus: post.Author.Verified_Athlete_Status,
+			Division:              post.Author.Division,
+		}
 	}
 	return &PostResponse{
 		ID:                post.ID,

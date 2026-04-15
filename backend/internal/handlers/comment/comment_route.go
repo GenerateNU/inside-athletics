@@ -1,17 +1,14 @@
 package comment
 
 import (
-	"inside-athletics/internal/s3"
-
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
 
-func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
+func Route(api huma.API, db *gorm.DB) {
 	commentDB := NewCommentDB(db)
 	commentService := &CommentService{
 		commentDB: commentDB,
-		s3:        s3Svc,
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/comment")
