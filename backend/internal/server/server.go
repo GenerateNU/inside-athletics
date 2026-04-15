@@ -77,7 +77,7 @@ func CreateApp(db *gorm.DB) *App {
 // CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route, comment.Route, premiumpost.Route}
+	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, sport.Route, role.Route, permission.Route, collegefollow.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route, comment.Route, premiumpost.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
