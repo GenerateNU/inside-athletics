@@ -30,14 +30,9 @@
             "description": "The name of the tag",
             "examples": ["Hockey"],
             "type": "string"
-          },
-          "type": {
-            "description": "The type of the tag",
-            "examples": ["sports"],
-            "type": "string"
           }
         },
-        "required": ["id", "name", "type"],
+        "required": ["id", "name"],
         "type": "object",
         "x-readme-ref-name": "GetTagResponse"
       },

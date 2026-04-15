@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1SportByNameByNameQueryResponse,
   GetApiV1SportByNameByNamePathParams,
@@ -44,8 +43,10 @@ export function getApiV1SportByNameByNameQueryOptions(
     enabled: !!name,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1SportByNameByName(name, config);
+      return getApiV1SportByNameByName(name, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,15 +75,15 @@ export function useGetApiV1SportByNameByName<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1SportByNameByNameQueryKey(name);
+    resolvedOptions?.queryKey ?? getApiV1SportByNameByNameQueryKey(name);
 
   const query = useQuery(
     {
       ...getApiV1SportByNameByNameQueryOptions(name, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

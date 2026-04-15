@@ -190,6 +190,11 @@ components:
             - This is a helpful thread
           maxLength: 1500
           type: string
+        has_replies:
+          description: True if this comment has at least one reply
+          examples:
+            - true
+          type: boolean
         id:
           description: ID of comment
           examples:
@@ -236,6 +241,7 @@ components:
         - like_count
         - is_liked
         - is_verified_athlete
+        - has_replies
       type: object
     ConfirmUploadRequest:
       additionalProperties: false
@@ -2612,6 +2618,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: Presigned download URL for the user's profile picture
+          type: string
         roles:
           description: Roles assigned to the user
           items:
@@ -3892,6 +3901,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: The S3 key for the user's profile picture
+          type: string
         sport:
           description: The sport the user plays
           examples:
@@ -3919,6 +3931,7 @@ components:
         - email
         - username
         - bio
+        - profile_picture
         - account_type
         - sport
         - expected_grad_year
@@ -4178,23 +4191,6 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Put API v1 college by ID
-  /api/v1/colleges/:
-    get:
-      operationId: get-api-v1-colleges
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetAllCollegesResponse"
-          description: OK
-        default:
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-          description: Error
-      summary: Get API v1 colleges
   /api/v1/colleges/search:
     get:
       operationId: get-api-v1-colleges-search

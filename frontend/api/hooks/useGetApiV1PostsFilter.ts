@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsFilterQueryResponse,
   GetApiV1PostsFilterQueryParams,
@@ -23,7 +22,7 @@ import { getApiV1PostsFilter } from "../clients/getApiV1PostsFilter.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsFilterQueryKey = (
-  params: GetApiV1PostsFilterQueryParams = {},
+  params?: GetApiV1PostsFilterQueryParams,
 ) => [{ url: "/api/v1/posts/filter" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PostsFilterQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1PostsFilterQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsFilter(params, config);
+      return getApiV1PostsFilter(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -73,15 +74,15 @@ export function useGetApiV1PostsFilter<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostsFilterQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1PostsFilterQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1PostsFilterQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

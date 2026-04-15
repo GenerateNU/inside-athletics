@@ -47,7 +47,7 @@ func TestCreatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -101,7 +101,7 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -131,7 +131,7 @@ func TestCreatePostWithTags(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -159,7 +159,7 @@ func TestCreatePostWithTags(t *testing.T) {
 		},
 	}
 
-	resp := api.Post("/api/v1/post/", body, authHeader)
+	resp := api.Post("/api/v1/post/", authHeader, body)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -177,7 +177,7 @@ func TestGetPostById(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -236,7 +236,7 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -333,7 +333,7 @@ func TestGetPostByIdNotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
@@ -353,7 +353,7 @@ func TestBadValidation(t *testing.T) {
 		t.Fatalf("failed to migrate posts table: %v", err)
 	}
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
@@ -379,7 +379,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -442,7 +442,7 @@ func TestGetPostsBySportId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -490,7 +490,7 @@ func TestGetAllPosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -538,7 +538,7 @@ func TestUpdatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -588,7 +588,7 @@ func TestUpdatePostNotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
@@ -607,7 +607,7 @@ func TestDeletePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -642,7 +642,7 @@ func TestDeletePostNotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
@@ -661,7 +661,7 @@ func TestFreeUserCannotCreateSecondPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -757,7 +757,7 @@ func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -899,7 +899,7 @@ func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)

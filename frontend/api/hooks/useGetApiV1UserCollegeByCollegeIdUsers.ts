@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1UserCollegeByCollegeIdUsersQueryResponse,
   GetApiV1UserCollegeByCollegeIdUsersPathParams,
@@ -50,8 +49,10 @@ export function getApiV1UserCollegeByCollegeIdUsersQueryOptions(
     enabled: !!college_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1UserCollegeByCollegeIdUsers(college_id, config);
+      return getApiV1UserCollegeByCollegeIdUsers(college_id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -80,16 +81,16 @@ export function useGetApiV1UserCollegeByCollegeIdUsers<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1UserCollegeByCollegeIdUsersQueryKey(college_id);
 
   const query = useQuery(
     {
       ...getApiV1UserCollegeByCollegeIdUsersQueryOptions(college_id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

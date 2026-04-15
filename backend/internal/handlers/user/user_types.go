@@ -18,6 +18,7 @@ type GetUserResponse struct {
 	Email                 string                       `json:"email" example:"suli123@email.com" doc:"The email of a user"`
 	Username              string                       `json:"username" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                      `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
+	ProfilePicture        *string                      `json:"profile_picture,omitempty" doc:"Presigned download URL for the user's profile picture"`
 	AccountType           bool                         `json:"account_type" example:"true" doc:"If the user has access to premium features"`
 	Sport                 *models.Sport                `json:"sport,omitempty" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear      uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`

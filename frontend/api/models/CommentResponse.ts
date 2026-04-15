@@ -18,6 +18,11 @@ export type CommentResponse = {
    */
   description: string;
   /**
+   * @description True if this comment has at least one reply
+   * @type boolean
+   */
+  has_replies: boolean;
+  /**
    * @description ID of comment
    * @type string
    */

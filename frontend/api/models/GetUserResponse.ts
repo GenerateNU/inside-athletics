@@ -61,6 +61,11 @@ export type GetUserResponse = {
    */
   last_name: string;
   /**
+   * @description Presigned download URL for the user\'s profile picture
+   * @type string | undefined
+   */
+  profile_picture?: string;
+  /**
    * @description Roles assigned to the user
    * @type array | undefined
    */

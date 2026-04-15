@@ -4,6 +4,7 @@ import (
 	"context"
 	"inside-athletics/internal/handlers/role"
 	models "inside-athletics/internal/models"
+	"inside-athletics/internal/s3"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -13,6 +14,7 @@ import (
 type UserService struct {
 	userDB *UserDB
 	roleDB *role.RoleDB
+	s3     *s3.Service
 }
 
 /*
@@ -40,24 +42,8 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	// mapping to correct response type
 	// we do this so we can control what values are
 	// returned by the API
-	response := &GetUserResponse{
-		ID:                    user.ID,
-		FirstName:             user.FirstName,
-		LastName:              user.LastName,
-		Email:                 user.Email,
-		Username:              user.Username,
-		Bio:                   user.Bio,
-		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
-		ExpectedGradYear:      user.Expected_Grad_Year,
-		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
-		Division:              user.Division,
-		Roles:                 roleResponses,
-	}
-
 	return &utils.ResponseBody[GetUserResponse]{
-		Body: response,
+		Body: u.toUserResponse(ctx, user, roleResponses),
 	}, err
 }
 
@@ -79,21 +65,7 @@ func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInpu
 		return nil, err
 	}
 
-	respBody.Body = &GetUserResponse{
-		ID:                    user.ID,
-		FirstName:             user.FirstName,
-		LastName:              user.LastName,
-		Email:                 user.Email,
-		Username:              user.Username,
-		Bio:                   user.Bio,
-		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
-		ExpectedGradYear:      user.Expected_Grad_Year,
-		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
-		Division:              user.Division,
-		Roles:                 roleResponses,
-	}
+	respBody.Body = u.toUserResponse(ctx, user, roleResponses)
 
 	return respBody, nil
 }
@@ -164,23 +136,38 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 		return nil, err
 	}
 
-	respBody.Body = &UpdateUserResponse{
-		ID:                    updatedUser.ID,
-		FirstName:             updatedUser.FirstName,
-		LastName:              updatedUser.LastName,
-		Email:                 updatedUser.Email,
-		Username:              updatedUser.Username,
-		Bio:                   updatedUser.Bio,
-		AccountType:           updatedUser.Account_Type,
-		Sport:                 updatedUser.Sport,
-		ExpectedGradYear:      updatedUser.Expected_Grad_Year,
-		VerifiedAthleteStatus: updatedUser.Verified_Athlete_Status,
-		College:               updatedUser.College,
-		Division:              updatedUser.Division,
-		Roles:                 roleResponses,
-	}
+	respBody.Body = u.toUserResponse(ctx, updatedUser, roleResponses)
 
 	return respBody, nil
+}
+
+// toUserResponse builds a GetUserResponse, resolving any S3 keys to presigned URLs.
+func (u *UserService) toUserResponse(ctx context.Context, user *models.User, roles *[]role.RoleResponse) *GetUserResponse {
+	var profilePicture *string
+	if url := s3.ResolveKey(ctx, u.s3, user.ProfilePicture); url != "" {
+		profilePicture = &url
+	}
+	if user.College != nil {
+		if url := s3.ResolveKey(ctx, u.s3, user.College.Logo); url != "" {
+			user.College.Logo = url
+		}
+	}
+	return &GetUserResponse{
+		ID:                    user.ID,
+		FirstName:             user.FirstName,
+		LastName:              user.LastName,
+		Email:                 user.Email,
+		Username:              user.Username,
+		Bio:                   user.Bio,
+		ProfilePicture:        profilePicture,
+		AccountType:           user.Account_Type,
+		Sport:                 user.Sport,
+		ExpectedGradYear:      user.Expected_Grad_Year,
+		VerifiedAthleteStatus: user.Verified_Athlete_Status,
+		College:               user.College,
+		Division:              user.Division,
+		Roles:                 roles,
+	}
 }
 
 func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*utils.ResponseBody[DeleteUserResponse], error) {

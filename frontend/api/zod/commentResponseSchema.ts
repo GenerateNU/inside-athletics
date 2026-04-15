@@ -11,6 +11,9 @@ export const commentResponseSchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   description: z.string().max(1500).describe("Content of the comment"),
+  has_replies: z
+    .boolean()
+    .describe("True if this comment has at least one reply"),
   id: z.string().describe("ID of comment"),
   is_anonymous: z
     .boolean()

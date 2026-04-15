@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1SurveyUserByUserIdQueryResponse,
   GetApiV1SurveyUserByUserIdPathParams,
@@ -25,7 +24,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1SurveyUserByUserIdQueryKey = (
   user_id: GetApiV1SurveyUserByUserIdPathParams["user_id"],
-  params: GetApiV1SurveyUserByUserIdQueryParams = {},
+  params?: GetApiV1SurveyUserByUserIdQueryParams,
 ) =>
   [
     { url: "/api/v1/survey/user/:user_id", params: { user_id: user_id } },
@@ -51,8 +50,10 @@ export function getApiV1SurveyUserByUserIdQueryOptions(
     enabled: !!user_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1SurveyUserByUserId(user_id, params, config);
+      return getApiV1SurveyUserByUserId(user_id, params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -82,16 +83,16 @@ export function useGetApiV1SurveyUserByUserId<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1SurveyUserByUserIdQueryKey(user_id, params);
 
   const query = useQuery(
     {
       ...getApiV1SurveyUserByUserIdQueryOptions(user_id, params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {
