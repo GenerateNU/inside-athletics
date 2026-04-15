@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Briefcase, Home, Plus, Search } from "lucide-react";
+import { BookOpen, Briefcase, Crown, Home, Plus, Search } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -315,6 +315,49 @@ export function Navbar({ className, ...props }: NavbarProps) {
           ))}
         </div>
       </div>
+
+      <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
+
+      {/* Insider Content */}
+      <nav
+        aria-label="Premium"
+        className={cn(
+          "flex flex-col gap-1",
+          isCollapsed && "w-full items-center",
+        )}
+      >
+        {(() => {
+          const href = "/insidercontent";
+          const isActive = pathname === href;
+          return (
+            <Button
+              key="insider-content"
+              variant="ghost"
+              size="lg"
+              className={cn(
+                "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium hover:bg-zinc-100 hover:text-zinc-900",
+                isActive ? "bg-zinc-100 text-zinc-900" : "text-zinc-700",
+                isCollapsed
+                  ? "w-12 justify-center px-0"
+                  : "justify-start gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+              )}
+              aria-label="Insider Content"
+              aria-current={isActive ? "page" : undefined}
+              title="Insider Content"
+              nativeButton={false}
+              render={<Link href={href} />}
+            >
+              <Crown
+                className={cn(
+                  "size-[clamp(0.9rem,1.2vw,1rem)] shrink-0",
+                  isActive ? "text-zinc-900" : "text-zinc-700",
+                )}
+              />
+              {!isCollapsed && <span className="truncate">Insider Content</span>}
+            </Button>
+          );
+        })()}
+      </nav>
     </aside>
   );
 }

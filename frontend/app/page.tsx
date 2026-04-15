@@ -9,6 +9,7 @@ import { RatingPanel } from "@/components/ui/rating-panel";
 import { CiUser } from "react-icons/ci";
 import SmallPost from "@/components/post/SmallPost";
 import type { PostResponse } from "@/api/models/PostResponse";
+import PremiumSmallPost from "@/components/post/PremiumSmallPost";
 
 const examplePost: PostResponse = {
   id: "example-post-1",
