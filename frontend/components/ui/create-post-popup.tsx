@@ -41,9 +41,9 @@ export default function CreatePostPopup() {
   const router = useRouter();
 
   const session = useSession();
-  const enabled = true;
+  const enabled = !!session?.access_token;
   const authHeaders = session?.access_token
-    ? { Authorization: `Bearer ${session.access_token}` }
+      ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
 
   const { data: collegesData } = useGetApiV1Colleges({

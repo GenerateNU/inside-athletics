@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Plus, X, Search } from "lucide-react";
 import { useListApiV1TagTypeByType } from "@/api/hooks";
+import { useSession } from "@/utils/SessionContext";
 
 function TagButton({ tag, active, onClick }: { tag: Tag; active: boolean; onClick: () => void }) {
   return (
@@ -70,12 +71,36 @@ const TAG_SECTIONS: { header: string; type: TagType; max: number; group?: string
 
 // One hook call per tag type — all run in parallel
 function useAllTagSections() {
-  const sports             = useListApiV1TagTypeByType("sports");
-  const divisions          = useListApiV1TagTypeByType("divisions");
-  const athleticsPerf      = useListApiV1TagTypeByType("athletics_performance");
-  const healthWellness     = useListApiV1TagTypeByType("health_wellness");
-  const studentAthleteLife = useListApiV1TagTypeByType("student_athlete_life");
-  const recruitingLogistic = useListApiV1TagTypeByType("recruiting_logistics");
+  const session = useSession();
+  const enabled = !!session?.access_token;
+  const authHeaders = session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : undefined;
+
+  const sports = useListApiV1TagTypeByType("sports", {
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+  const divisions          = useListApiV1TagTypeByType("divisions", {
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+  const athleticsPerf      = useListApiV1TagTypeByType("athletics_performance", {
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+  const healthWellness     = useListApiV1TagTypeByType("health_wellness", {
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+  const studentAthleteLife = useListApiV1TagTypeByType("student_athlete_life", {
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
+  const recruitingLogistic = useListApiV1TagTypeByType("recruiting_logistics", {
+    query: { enabled },
+    client: { headers: authHeaders },
+  });
 
   const results: Record<TagType, Tag[]> = {
     sports:               sports.data             ?? [],
