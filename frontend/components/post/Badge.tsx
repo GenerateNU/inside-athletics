@@ -15,7 +15,7 @@ export function Badge({ icon, count, onClick, active, className }: BadgeProps) {
       onClick={onClick}
       disabled={!onClick}
       className={cn(
-        "flex items-center gap-5 rounded-full border border-[#3E7DBB] bg-white px-2 w-17 py-2 text-xs text-zinc-500 transition-colors text-md",
+        "flex items-center justify-between rounded-full border border-[#3E7DBB] bg-white px-2 w-17 py-2 text-xs text-zinc-500 transition-colors text-md",
         onClick && "hover:border-[#043D26] hover:text-[#043D26]",
         !onClick && "cursor-default",
         active && "text-red-500",

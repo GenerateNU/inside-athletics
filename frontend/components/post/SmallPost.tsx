@@ -33,11 +33,11 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Badge
-                            icon={<Heart size={16} className="text-blue-500" />}
+                            icon={<Heart className="text-[#3E7DBB] size-5 shrink-0" />}
                             count={post.like_count ?? 0}
                         />
                         <Badge
-                            icon={<MessageSquareText size={16} className="text-blue-500" />}
+                            icon={<MessageSquareText className="text-[#3E7DBB] size-5 shrink-0" />}
                             count={post.comment_count ?? 0}
                         />
                     </div>
