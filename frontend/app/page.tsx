@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CreatePostPopup from "@/components/ui/create-post-popup";
 import { Navbar } from "@/components/ui/navbar";
@@ -15,21 +15,25 @@ export default function Page() {
         <Navbar className="h-screen shrink-0" />
         <main className="flex min-w-0 flex-1 items-center justify-center p-6">
           {isPostOpen && <CreatePostPopup />}
-          {!isPostOpen && <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-6xl">🐸</p>
-            <h1 className="text-4xl font-bold">Welcome to Inside Athletics</h1>
-            <p className="text-muted-foreground">
-              Under Construction! but here are some components:
-            </p>
-            <div className="flex flex-row gap-5">
-              <Avatar> </Avatar>
-              <Avatar>
-                <AvatarFallback>
-                  <CiUser strokeWidth={1.3} />
-                </AvatarFallback>
-              </Avatar>
+          {!isPostOpen && (
+            <div className="flex flex-col items-center gap-4 text-center">
+              <p className="text-6xl">🐸</p>
+              <h1 className="text-4xl font-bold">
+                Welcome to Inside Athletics
+              </h1>
+              <p className="text-muted-foreground">
+                Under Construction! but here are some components:
+              </p>
+              <div className="flex flex-row gap-5">
+                <Avatar> </Avatar>
+                <Avatar>
+                  <AvatarFallback>
+                    <CiUser strokeWidth={1.3} />
+                  </AvatarFallback>
+                </Avatar>
+              </div>
             </div>
-          </div>}
+          )}
         </main>
       </div>
     </div>
