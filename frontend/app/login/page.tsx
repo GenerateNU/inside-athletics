@@ -30,7 +30,7 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6 bg-white p-8">
           <div className="w-full flex flex-col items-center space-y-4">
             <p className="text-center text-sm text-gray-600">
-              Enter your email and we&apos;ll send you a 6-digit login code.
+              Enter your email and we&apos;ll send you an 8-digit login code.
             </p>
             <Input
               id="email"

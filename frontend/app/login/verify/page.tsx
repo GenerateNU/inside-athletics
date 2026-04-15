@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
-const CODE_LENGTH = 6;
+const CODE_LENGTH = 8;
 
 function normalizeDigits(value: string) {
   return value.replace(/\D/g, "").slice(0, CODE_LENGTH);
@@ -149,7 +149,7 @@ function LoginVerifyContent() {
         return;
       }
 
-      setNotice(`A new 6-digit code was sent to ${email}.`);
+      setNotice(`A new 8-digit code was sent to ${email}.`);
     } finally {
       setIsResending(false);
     }
@@ -161,7 +161,7 @@ function LoginVerifyContent() {
         <div className="space-y-2 text-center">
           <h1 className="text-4xl font-bold text-black">Verify Login</h1>
           <p className="text-sm text-gray-600">
-            Enter the 6-digit code sent to {email || "your email"}.
+            Enter the 8-digit code sent to {email || "your email"}.
           </p>
         </div>
 

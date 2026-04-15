@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useOnboarding } from "@/utils/onboarding";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
-const CODE_LENGTH = 6;
+const CODE_LENGTH = 8;
 
 function normalizeDigits(value: string) {
   return value.replace(/\D/g, "").slice(0, CODE_LENGTH);
@@ -46,49 +46,6 @@ export default function OnboardingVerificationCodePage() {
   const code = useMemo(() => digits.join(""), [digits]);
   const canContinue = code.length === CODE_LENGTH;
   const isSignupVerification = source === "signup" && Boolean(signupEmail);
-
-  useEffect(() => {
-    if (!isSignupVerification) {
-      return;
-    }
-
-    let cancelled = false;
-
-    async function resendSignupCode() {
-      setIsResending(true);
-      setError("");
-      setNotice("");
-
-      try {
-        const supabase = createSupabaseBrowserClient();
-        const { error: resendError } = await supabase.auth.resend({
-          type: "signup",
-          email: signupEmail,
-        });
-
-        if (cancelled) {
-          return;
-        }
-
-        if (resendError) {
-          setError(resendError.message || "Unable to send verification code.");
-          return;
-        }
-
-        setNotice(`A 6-digit code was sent to ${signupEmail}.`);
-      } finally {
-        if (!cancelled) {
-          setIsResending(false);
-        }
-      }
-    }
-
-    resendSignupCode();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isSignupVerification, signupEmail]);
 
   const focusInput = (index: number) => {
     inputRefs.current[index]?.focus();
@@ -226,7 +183,7 @@ export default function OnboardingVerificationCodePage() {
         return;
       }
 
-      setNotice(`A new 6-digit code was sent to ${signupEmail}.`);
+      setNotice(`A new 8-digit code was sent to ${signupEmail}.`);
     } finally {
       setIsResending(false);
     }
