@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1TagByTagIdPostsQueryResponse,
   GetApiV1TagByTagIdPostsPathParams,
@@ -25,7 +24,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1TagByTagIdPostsSuspenseQueryKey = (
   tag_id: GetApiV1TagByTagIdPostsPathParams["tag_id"],
-  params: GetApiV1TagByTagIdPostsQueryParams = {},
+  params?: GetApiV1TagByTagIdPostsQueryParams,
 ) =>
   [
     { url: "/api/v1/tag/:tag_id/posts", params: { tag_id: tag_id } },
@@ -51,8 +50,10 @@ export function getApiV1TagByTagIdPostsSuspenseQueryOptions(
     enabled: !!tag_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1TagByTagIdPosts(tag_id, params, config);
+      return getApiV1TagByTagIdPosts(tag_id, params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -80,16 +81,16 @@ export function useGetApiV1TagByTagIdPostsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1TagByTagIdPostsSuspenseQueryKey(tag_id, params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1TagByTagIdPostsSuspenseQueryOptions(tag_id, params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

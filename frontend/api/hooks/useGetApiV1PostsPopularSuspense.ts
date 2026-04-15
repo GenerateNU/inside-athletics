@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsPopularQueryResponse,
   GetApiV1PostsPopularQueryParams,
@@ -23,7 +22,7 @@ import { getApiV1PostsPopular } from "../clients/getApiV1PostsPopular.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsPopularSuspenseQueryKey = (
-  params: GetApiV1PostsPopularQueryParams = {},
+  params?: GetApiV1PostsPopularQueryParams,
 ) => [{ url: "/api/v1/posts/popular" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PostsPopularSuspenseQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1PostsPopularSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsPopular(params, config);
+      return getApiV1PostsPopular(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -71,15 +72,15 @@ export function useGetApiV1PostsPopularSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostsPopularSuspenseQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1PostsPopularSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PostsPopularSuspenseQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

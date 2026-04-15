@@ -1,6 +1,8 @@
 package college
 
 import (
+	"inside-athletics/internal/s3"
+
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
@@ -13,9 +15,9 @@ Groups together all of the College routes. Huma is a wrapper here that automatic
  2. maps the response to the correct response type (if no error 200, 201, etc.) if error it will use the Huma
     error status code
 */
-func Route(api huma.API, db *gorm.DB) {
-	var collegeDB = &CollegeDB{db}                  // create object storing all database level functions for college
-	var collegeService = &CollegeService{collegeDB} // create object with college functionality
+func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
+	var collegeDB = &CollegeDB{db}                         // create object storing all database level functions for college
+	var collegeService = &CollegeService{collegeDB, s3Svc} // create object with college functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/college")
 		huma.Get(grp, "/{id}", collegeService.GetCollege)

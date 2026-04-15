@@ -14,6 +14,11 @@
       "maxLength": 1500,
       "type": "string"
     },
+    "has_replies": {
+      "description": "True if this comment has at least one reply",
+      "examples": [true],
+      "type": "boolean"
+    },
     "id": {
       "description": "ID of comment",
       "examples": ["550e8400-e29b-41d4-a716-446655440000"],
@@ -141,7 +146,8 @@
     "description",
     "like_count",
     "is_liked",
-    "is_verified_athlete"
+    "is_verified_athlete",
+    "has_replies"
   ],
   "type": "object",
   "x-readme-ref-name": "CommentResponse"

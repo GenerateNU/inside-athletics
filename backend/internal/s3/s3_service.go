@@ -97,3 +97,16 @@ func (s *Service) DeleteObject(ctx context.Context, key string) error {
 	}
 	return s.client.DeleteObject(ctx, key)
 }
+
+// ResolveKey returns the presigned download URL for key.
+// Returns "" if svc is nil, key is empty, or the request fails.
+func ResolveKey(ctx context.Context, svc *Service, key string) string {
+	if svc == nil || key == "" {
+		return ""
+	}
+	resp, err := svc.GetDownloadURL(ctx, key)
+	if err != nil {
+		return ""
+	}
+	return resp.DownloadURL
+}

@@ -26,7 +26,8 @@ func (c *CommentDB) GetCommentByID(id uuid.UUID, userID uuid.UUID) (*models.Comm
 		Model(&models.Comment{}).
 		Select(`comments.*,
             (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
-            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked`,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked,
+            (SELECT COUNT(*) > 0 FROM comments AS replies WHERE replies.parent_comment_id = comments.id AND replies.deleted_at IS NULL) AS has_replies`,
 			userID).
 		Preload("User").
 		Where("id = ?", id).
@@ -47,7 +48,8 @@ func (c *CommentDB) GetCommentsByPost(postID uuid.UUID, userID uuid.UUID) ([]mod
 		Model(&models.Comment{}).
 		Select(`comments.*,
             (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
-            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked`,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked,
+            (SELECT COUNT(*) > 0 FROM comments AS replies WHERE replies.parent_comment_id = comments.id AND replies.deleted_at IS NULL) AS has_replies`,
 			userID).
 		Preload("User").
 		Where("post_id = ? AND parent_comment_id IS NULL", postID).

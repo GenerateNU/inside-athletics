@@ -40,6 +40,69 @@ components:
         - user_id
         - role
       type: object
+    AverageRatingsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/AverageRatingsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        averages:
+          description: Average ratings grouped by sport and college
+          items:
+            $ref: "#/components/schemas/AverageRatingsRow"
+          type:
+            - array
+            - "null"
+      required:
+        - averages
+      type: object
+    AverageRatingsRow:
+      additionalProperties: false
+      properties:
+        academic_career_resources:
+          format: double
+          type: number
+        academics_athletics_priority:
+          format: double
+          type: number
+        college_id:
+          type: string
+        culture:
+          format: double
+          type: number
+        environment:
+          format: double
+          type: number
+        mental_health_priority:
+          format: double
+          type: number
+        player_dev:
+          format: double
+          type: number
+        response_count:
+          format: int64
+          type: integer
+        sport_id:
+          type: string
+        transparency:
+          format: double
+          type: number
+      required:
+        - sport_id
+        - college_id
+        - player_dev
+        - academics_athletics_priority
+        - academic_career_resources
+        - mental_health_priority
+        - environment
+        - culture
+        - transparency
+        - response_count
+      type: object
     College:
       additionalProperties: false
       properties:
@@ -127,6 +190,11 @@ components:
             - This is a helpful thread
           maxLength: 1500
           type: string
+        has_replies:
+          description: True if this comment has at least one reply
+          examples:
+            - true
+          type: boolean
         id:
           description: ID of comment
           examples:
@@ -173,6 +241,7 @@ components:
         - like_count
         - is_liked
         - is_verified_athlete
+        - has_replies
       type: object
     ConfirmUploadRequest:
       additionalProperties: false
@@ -536,6 +605,35 @@ components:
         - post_id
         - description
       type: object
+    CreateMediaRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateMediaRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          type: string
+        media_type:
+          examples:
+            - jpeg
+          type: string
+        s3key:
+          examples:
+            - example_s3_key
+          type: string
+        title:
+          examples:
+            - Suli doing a backflip !!
+          type: string
+      required:
+        - s3key
+        - title
+        - media_type
+      type: object
     CreatePermissionRequest:
       additionalProperties: false
       properties:
@@ -878,6 +976,79 @@ components:
       required:
         - name
         - description
+      type: object
+    CreateSurveyRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSurveyRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_career_resources:
+          description: Academic/career resources rating (1–5)
+          examples:
+            - 4
+          format: int32
+          type: integer
+        academics_athletics_priority:
+          description: Academics vs athletics priority rating (1–5)
+          examples:
+            - 3
+          format: int32
+          type: integer
+        college_id:
+          description: ID of the college being rated
+          type: string
+        culture:
+          description: Culture rating (1–5)
+          examples:
+            - 4
+          format: int32
+          type: integer
+        environment:
+          description: Environment rating (1–5)
+          examples:
+            - 5
+          format: int32
+          type: integer
+        mental_health_priority:
+          description: Mental health priority rating (1–5)
+          examples:
+            - 3
+          format: int32
+          type: integer
+        player_dev:
+          description: Player development rating (1–5)
+          examples:
+            - 4
+          format: int32
+          type: integer
+        sport_id:
+          description: ID of the sport program being rated
+          type: string
+        transparency:
+          description: Transparency rating (1–5)
+          examples:
+            - 3
+          format: int32
+          type: integer
+        user_id:
+          description: ID of the user submitting the survey
+          type: string
+      required:
+        - user_id
+        - college_id
+        - sport_id
+        - player_dev
+        - academics_athletics_priority
+        - academic_career_resources
+        - mental_health_priority
+        - environment
+        - culture
+        - transparency
       type: object
     CreateTagBody:
       additionalProperties: false
@@ -1969,6 +2140,33 @@ components:
       required:
         - post_ids
       type: object
+    GetSearchResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetSearchResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        count:
+          description: Count of search results found for given search
+          examples:
+            - 5
+          format: int64
+          type: integer
+        posts:
+          description: List of post responses found for given search
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - posts
+        - count
+      type: object
     GetSportFollowsByUserResponse:
       additionalProperties: false
       properties:
@@ -2164,6 +2362,31 @@ components:
         - shipping
         - tax_exempt
         - test_clock
+      type: object
+    GetSurveysByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetSurveysByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        surveys:
+          description: List of survey responses
+          items:
+            $ref: "#/components/schemas/SurveyResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of surveys submitted by this user
+          format: int64
+          type: integer
+      required:
+        - surveys
+        - total
       type: object
     GetTagFollowsByUserResponse:
       additionalProperties: false
@@ -2424,6 +2647,35 @@ components:
         - footer
         - rendering_options
       type: object
+    MediaResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/MediaResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          type: string
+        media_type:
+          examples:
+            - jpeg
+          type: string
+        s3key:
+          examples:
+            - example_s3_key
+          type: string
+        title:
+          examples:
+            - Suli doing a backflip !!
+          type: string
+      required:
+        - s3key
+        - title
+        - media_type
+      type: object
     PermissionResponse:
       additionalProperties: false
       properties:
@@ -2630,6 +2882,63 @@ components:
         - id
         - name
       type: object
+    SearchResultsGetCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SearchResultsGetCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        results:
+          items:
+            $ref: "#/components/schemas/GetCollegeResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - results
+      type: object
+    SearchResultsGetTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SearchResultsGetTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        results:
+          items:
+            $ref: "#/components/schemas/GetTagResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - results
+      type: object
+    SearchResultsSportResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SearchResultsSportResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        results:
+          items:
+            $ref: "#/components/schemas/SportResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - results
+      type: object
     Sport:
       additionalProperties: false
       properties:
@@ -2822,6 +3131,69 @@ components:
         - description
         - active
         - created
+      type: object
+    SurveyResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SurveyResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_career_resources:
+          description: Academic/career resources rating
+          format: int32
+          type: integer
+        academics_athletics_priority:
+          description: Academics vs athletics priority rating
+          format: int32
+          type: integer
+        college_id:
+          description: College ID
+          type: string
+        culture:
+          description: Culture rating
+          format: int32
+          type: integer
+        environment:
+          description: Environment rating
+          format: int32
+          type: integer
+        id:
+          description: Survey ID
+          type: string
+        mental_health_priority:
+          description: Mental health priority rating
+          format: int32
+          type: integer
+        player_dev:
+          description: Player development rating
+          format: int32
+          type: integer
+        sport_id:
+          description: Sport ID
+          type: string
+        transparency:
+          description: Transparency rating
+          format: int32
+          type: integer
+        user_id:
+          description: User ID
+          type: string
+      required:
+        - id
+        - user_id
+        - college_id
+        - sport_id
+        - player_dev
+        - academics_athletics_priority
+        - academic_career_resources
+        - mental_health_priority
+        - environment
+        - culture
+        - transparency
       type: object
     Tag:
       additionalProperties: false
@@ -3753,6 +4125,42 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Put API v1 college by ID
+  /api/v1/colleges/search:
+    get:
+      operationId: get-api-v1-colleges-search
+      parameters:
+        - example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            examples:
+              - Northeastern University
+            type: string
+        - example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            examples:
+              - 20
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResultsGetCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 colleges search
   /api/v1/comment/:
     post:
       operationId: post-api-v1-comment
@@ -4135,6 +4543,79 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 health healthcheck
+  /api/v1/media/:
+    post:
+      operationId: post-api-v1-media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMediaRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 media
+  /api/v1/media/{id}:
+    delete:
+      operationId: delete-api-v1-media-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 media by ID
+    get:
+      operationId: get-api-v1-media-by-id
+      parameters:
+        - description: ID of the media
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the media
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 media by ID
   /api/v1/permission/:
     post:
       operationId: post-api-v1-permission
@@ -4780,6 +5261,78 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 posts by sport by sport ID
+  /api/v1/posts/filter:
+    get:
+      operationId: get-api-v1-posts-filter
+      parameters:
+        - description: Comma seperated list of college_ids to filter by
+          example: 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+          explode: false
+          in: query
+          name: college_ids
+          schema:
+            description: Comma seperated list of college_ids to filter by
+            examples:
+              - 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+            type: string
+        - description: Comma seperated list of sport_ids to filter by
+          example: 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+          explode: false
+          in: query
+          name: sport_ids
+          schema:
+            description: Comma seperated list of sport_ids to filter by
+            examples:
+              - 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+            type: string
+        - description: Comma seperated list of tag_ids to filter by
+          example: 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+          explode: false
+          in: query
+          name: tag_ids
+          schema:
+            description: Comma seperated list of tag_ids to filter by
+            examples:
+              - 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+            type: string
+        - description: Number of posts to return when filtering
+          example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            description: Number of posts to return when filtering
+            examples:
+              - 20
+            format: int64
+            type: integer
+        - description: Number of entries in the database to offset by
+          example: 8
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of entries in the database to offset by
+            examples:
+              - 8
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts filter
   /api/v1/posts/popular:
     get:
       operationId: get-api-v1-posts-popular
@@ -4834,6 +5387,58 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 posts popular
+  /api/v1/posts/search:
+    get:
+      operationId: get-api-v1-posts-search
+      parameters:
+        - description: String to fuzzy search posts/tags/colleges/sports on
+          example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            description: String to fuzzy search posts/tags/colleges/sports on
+            examples:
+              - Northeastern University
+            type: string
+        - description: Cap on the number of posts to return
+          example: 10
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            description: Cap on the number of posts to return
+            examples:
+              - 10
+            format: int64
+            type: integer
+        - description: Number of entries to skip for pagination
+          example: 8
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of entries to skip for pagination
+            examples:
+              - 8
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSearchResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts search
   /api/v1/role/:
     post:
       operationId: post-api-v1-role
@@ -5182,6 +5787,42 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 sports
+  /api/v1/sports/search:
+    get:
+      operationId: get-api-v1-sports-search
+      parameters:
+        - example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            examples:
+              - Northeastern University
+            type: string
+        - example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            examples:
+              - 20
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResultsSportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sports search
   /api/v1/stripe_customers/:
     post:
       operationId: post-api-v1-stripe-customers
@@ -5556,6 +6197,138 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: List API v1 stripe products
+  /api/v1/survey/:
+    post:
+      operationId: post-api-v1-survey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSurveyRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SurveyResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 survey
+  /api/v1/survey/averages:
+    get:
+      operationId: get-api-v1-survey-averages
+      parameters:
+        - description: Filter by sport ID
+          explode: false
+          in: query
+          name: sport_id
+          schema:
+            description: Filter by sport ID
+            type: string
+        - description: Filter by college ID
+          explode: false
+          in: query
+          name: college_id
+          schema:
+            description: Filter by college ID
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AverageRatingsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 survey averages
+  /api/v1/survey/user/{user_id}:
+    get:
+      operationId: get-api-v1-survey-user-by-user-id
+      parameters:
+        - description: ID of the user
+          in: path
+          name: user_id
+          required: true
+          schema:
+            description: ID of the user
+            type: string
+        - description: Number of surveys to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of surveys to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of surveys to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of surveys to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSurveysByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 survey user by user ID
+  /api/v1/survey/{id}:
+    delete:
+      operationId: delete-api-v1-survey-by-id
+      parameters:
+        - description: ID of the survey to delete
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the survey to delete
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SurveyResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 survey by ID
   /api/v1/tag/:
     post:
       operationId: post-api-v1-tag
@@ -5747,6 +6520,42 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 tag by tag ID posts
+  /api/v1/tags/search:
+    get:
+      operationId: get-api-v1-tags-search
+      parameters:
+        - example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            examples:
+              - Northeastern University
+            type: string
+        - example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            examples:
+              - 20
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResultsGetTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 tags search
   /api/v1/user:
     patch:
       operationId: patch-api-v1-user
