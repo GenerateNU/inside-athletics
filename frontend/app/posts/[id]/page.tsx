@@ -6,11 +6,14 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Navbar } from "@/components/ui/navbar";
 import { useSession } from "@/utils/SessionContext";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetApiV1PostById,
   useListApiV1PostByPostIdComments,
   usePostApiV1PostLike,
   useDeleteApiV1PostLikeById,
+  usePostApiV1Comment,
+  listApiV1PostByPostIdCommentsQueryKey,
 } from "@/api/hooks";
 import { CommentCard } from "@/components/explore/CommentCard";
 import { Badge } from "@/components/explore/Badge";
@@ -41,8 +44,29 @@ export default function PostPage({
       client: { headers: authHeaders },
     });
 
+  const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  const { mutate: submitComment, isPending: submittingComment } = usePostApiV1Comment({
+    client: { headers: authHeaders },
+  });
+
+  function handleCommentSubmit() {
+    if (!commentText.trim()) return;
+    submitComment(
+      { data: { description: commentText.trim(), is_anonymous: false, post_id: id } },
+      {
+        onSuccess: () => {
+          setCommentText("");
+          setCommentOpen(false);
+          queryClient.invalidateQueries({ queryKey: listApiV1PostByPostIdCommentsQueryKey(id) });
+        },
+      },
+    );
+  }
 
   useEffect(() => {
     if (post) {
@@ -167,8 +191,10 @@ export default function PostPage({
                 <Badge
                   icon={<MessageCircle className="size-5 shrink-0 text-[#3E7DBB]" />}
                   count={post.comment_count ?? 0}
+                  onClick={() => setCommentOpen((o) => !o)}
                 />
               </div>
+
             </div>
 
             {/* Comments */}
@@ -176,6 +202,26 @@ export default function PostPage({
               <p className="py-4 text-lg font-semibold text-black">
                 Comments
               </p>
+
+              {commentOpen && (
+                <div className="mb-4 flex gap-2 relative">
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Write a comment..."
+                    rows={4}
+                    className="min-h-0 flex-1 resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCommentSubmit}
+                    disabled={!commentText.trim() || submittingComment}
+                    className="absolute bottom-2 right-2 rounded-3xl bg-[#A8C8E8] px-4 py-1.5 text-sm font-medium text-[#E8F1FA] disabled:opacity-50"
+                  >
+                    {submittingComment ? "Posting..." : "Post"}
+                  </button>
+                </div>
+              )}
 
               {loadingComments ? (
                 <div className="space-y-5">
