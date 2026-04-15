@@ -6,16 +6,20 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Navbar } from "@/components/ui/navbar";
 import { useSession } from "@/utils/SessionContext";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetApiV1PostById,
   useListApiV1PostByPostIdComments,
   usePostApiV1PostLike,
   useDeleteApiV1PostLikeById,
+  usePostApiV1Comment,
+  listApiV1PostByPostIdCommentsQueryKey,
 } from "@/api/hooks";
 import { CommentCard } from "@/components/explore/CommentCard";
 import { Badge } from "@/components/explore/Badge";
 import { Tag } from "@/components/explore/Tag";
 import { cn } from "@/lib/utils";
+import { SearchBar } from "@/components/explore/SearchBar";
 
 export default function PostPage({
   params,
@@ -40,8 +44,38 @@ export default function PostPage({
       client: { headers: authHeaders },
     });
 
+  const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  const { mutate: submitComment, isPending: submittingComment } =
+    usePostApiV1Comment({
+      client: { headers: authHeaders },
+    });
+
+  function handleCommentSubmit() {
+    if (!commentText.trim()) return;
+    submitComment(
+      {
+        data: {
+          description: commentText.trim(),
+          is_anonymous: false,
+          post_id: id,
+        },
+      },
+      {
+        onSuccess: () => {
+          setCommentText("");
+          setCommentOpen(false);
+          queryClient.invalidateQueries({
+            queryKey: listApiV1PostByPostIdCommentsQueryKey(id),
+          });
+        },
+      },
+    );
+  }
 
   useEffect(() => {
     if (post) {
@@ -65,7 +99,10 @@ export default function PostPage({
       unlikePost(
         { id },
         {
-          onError: () => { setIsLiked(true); setLikeCount((c) => c + 1); },
+          onError: () => {
+            setIsLiked(true);
+            setLikeCount((c) => c + 1);
+          },
         },
       );
     } else {
@@ -74,7 +111,10 @@ export default function PostPage({
       likePost(
         { data: { post_id: id } },
         {
-          onError: () => { setIsLiked(false); setLikeCount((c) => c - 1); },
+          onError: () => {
+            setIsLiked(false);
+            setLikeCount((c) => c - 1);
+          },
         },
       );
     }
@@ -101,12 +141,12 @@ export default function PostPage({
     : [];
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-white bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60">
       <Navbar className="sticky top-0 h-screen shrink-0" />
 
-      <main className="flex min-w-0 pt-15 px-10 flex-1 flex-col bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60">
+      <main className="flex min-w-0 pt-10 px-10 flex-1 flex-col bg-white m-10 rounded-4xl">
         {/* Back + title */}
-        <div className="flex items-center gap-3 px-6 py-4">
+        <div className="flex items-center gap-3 px-2">
           <Link
             href="/explore"
             className="shrink-0 text-zinc-400 transition-colors hover:text-zinc-700"
@@ -142,15 +182,6 @@ export default function PostPage({
                 </span>
               </div>
 
-              {/* Tag labels */}
-              {tagLabels.length > 0 && (
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {tagLabels.map((label) => (
-                    <Tag key={label} label={label} />
-                  ))}
-                </div>
-              )}
-
               {/* Content */}
               <p className="text-md leading-relaxed text-black">
                 {post.content}
@@ -163,7 +194,9 @@ export default function PostPage({
                     <Heart
                       className={cn(
                         "size-5 shrink-0",
-                        isLiked ? "fill-red-500 text-red-500" : "text-[#3E7DBB]",
+                        isLiked
+                          ? "fill-red-500 text-red-500"
+                          : "text-[#3E7DBB]",
                       )}
                     />
                   }
@@ -172,17 +205,38 @@ export default function PostPage({
                   onClick={handleLikeToggle}
                 />
                 <Badge
-                  icon={<MessageCircle className="size-5 shrink-0 text-[#3E7DBB]" />}
+                  icon={
+                    <MessageCircle className="size-5 shrink-0 text-[#3E7DBB]" />
+                  }
                   count={post.comment_count ?? 0}
+                  onClick={() => setCommentOpen((o) => !o)}
                 />
               </div>
             </div>
 
             {/* Comments */}
             <div className=" border-zinc-100 px-15 pb-8">
-              <p className="py-4 text-lg font-semibold text-black">
-                Comments
-              </p>
+              <p className="py-4 text-lg font-semibold text-black">Comments</p>
+
+              {commentOpen && (
+                <div className="mb-4 flex gap-2 relative">
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Write a comment..."
+                    rows={4}
+                    className="min-h-0 flex-1 resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCommentSubmit}
+                    disabled={!commentText.trim() || submittingComment}
+                    className="absolute bottom-2 right-2 rounded-3xl bg-[#A8C8E8] px-4 py-1.5 text-sm font-medium text-[#E8F1FA] disabled:opacity-50"
+                  >
+                    {submittingComment ? "Posting..." : "Post"}
+                  </button>
+                </div>
+              )}
 
               {loadingComments ? (
                 <div className="space-y-5">
