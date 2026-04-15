@@ -13,6 +13,7 @@ func Route(api huma.API, db *gorm.DB) {
 	var tagService = &TagService{tagDB, tagPostDB} // create object with user functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/tag")
+		huma.Get(grp, "", tagService.ListTags)
 		huma.Post(grp, "/", tagService.CreateTag)
 		huma.Get(grp, "/name/{name}", tagService.GetTagByName)
 		huma.Get(grp, "/{id}", tagService.GetTagById)

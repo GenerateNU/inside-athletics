@@ -11,6 +11,10 @@ type Props = {
   onEdit: () => void;
 };
 
+/** Figma: profile header tags (D1 / sport / school) */
+const headerTagClassName =
+  "h-[30px] rounded-[12px] border border-[#7F8C2D] bg-[#D4E94B]/50 px-[8px] py-[5px] text-xs font-semibold text-slate-900 gap-[5px]";
+
 export function ProfileHeader({ user, isAthlete, onEdit }: Props) {
   return (
     <>
@@ -30,19 +34,13 @@ export function ProfileHeader({ user, isAthlete, onEdit }: Props) {
             {isAthlete ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {user.divisionTag ? (
-                  <Badge className="rounded-md bg-[#067b78] px-3 py-1 text-xs text-white">
-                    {user.divisionTag}
-                  </Badge>
+                  <Badge className={headerTagClassName}>{user.divisionTag}</Badge>
                 ) : null}
                 {user.sportTag ? (
-                  <Badge className="rounded-md bg-[#0f965b] px-3 py-1 text-xs text-white">
-                    {user.sportTag}
-                  </Badge>
+                  <Badge className={headerTagClassName}>{user.sportTag}</Badge>
                 ) : null}
                 {user.collegeTag ? (
-                  <Badge className="rounded-md bg-[#19558f] px-3 py-1 text-xs text-white">
-                    {user.collegeTag}
-                  </Badge>
+                  <Badge className={headerTagClassName}>{user.collegeTag}</Badge>
                 ) : null}
               </div>
             ) : null}

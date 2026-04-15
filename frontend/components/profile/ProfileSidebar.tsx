@@ -9,6 +9,10 @@ type Props = {
   interests: string[];
 };
 
+/** Figma: Communities / Interests tags */
+const sidebarTagClassName =
+  "h-[30px] rounded-[12px] border border-[#D4E94B] bg-[#FCFDF1] px-[8px] py-[5px] text-xs font-semibold text-slate-900 gap-[5px]";
+
 export function ProfileSidebar({
   showSurveyPrompt,
   communities,
@@ -29,10 +33,7 @@ export function ProfileSidebar({
         <h3 className="text-3xl font-black">Communities</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {communities.map((community) => (
-            <Badge
-              key={community}
-              className="rounded-xl border-none bg-gradient-to-r from-[#8eb86c] via-[#86b97a] to-[#6da9c8] px-3 py-1 text-xs font-semibold text-slate-900"
-            >
+            <Badge key={community} className={sidebarTagClassName}>
               {community}
             </Badge>
           ))}
@@ -43,10 +44,7 @@ export function ProfileSidebar({
         <h3 className="text-3xl font-black">Interests</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {interests.map((tag) => (
-            <Badge
-              key={tag}
-              className="rounded-xl border border-[#87b76f] bg-[#d9edcd] px-3 py-1 text-xs font-semibold text-slate-800"
-            >
+            <Badge key={tag} className={sidebarTagClassName}>
               {tag}
             </Badge>
           ))}

@@ -145,6 +145,42 @@ func TestDeleteTag(t *testing.T) {
 	}
 }
 
+func TestListTags(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	names := []string{"Zeta", "Alpha", "Beta"}
+	for _, name := range names {
+		tag := models.Tag{
+			ID:   uuid.New(),
+			Name: name,
+		}
+		tagResp := testDB.DB.Create(&tag)
+		if _, err := utils.HandleDBError(&tag, tagResp.Error); err != nil {
+			t.Fatalf("Unable to add tag to table: %s", err.Error())
+		}
+	}
+
+	resp := api.Get("/api/v1/tag?limit=50&offset=0", "Authorization: Bearer "+mockUUID)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var out tagPackage.ListTagsResponse
+	DecodeTo(&out, resp)
+	if len(out.Tags) != len(names) {
+		t.Fatalf("expected %d tags, got %d: %s", len(names), len(out.Tags), resp.Body.String())
+	}
+	wantOrder := []string{"Alpha", "Beta", "Zeta"}
+	for i, want := range wantOrder {
+		if out.Tags[i].Name != want {
+			t.Fatalf("tag[%d]: want name %q, got %q (full body: %s)", i, want, out.Tags[i].Name, resp.Body.String())
+		}
+	}
+}
+
 func TestTagSearch(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)

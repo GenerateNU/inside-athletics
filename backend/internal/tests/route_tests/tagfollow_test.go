@@ -148,6 +148,51 @@ func TestCreateTagFollow(t *testing.T) {
 	}
 }
 
+func TestDeleteTagFollowByTagID(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+	user, tag := seedUserAndTag(t, testDB, "delete-tag-follow-by-tag-id")
+
+	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionDeleteOwn, Resource: "tagfollow"},
+	}, user.ID)
+
+	createdTagFollow := models.TagFollow{
+		ID:     uuid.New(),
+		UserID: user.ID,
+		TagID:  tag.ID,
+	}
+	if err := testDB.DB.Create(&createdTagFollow).Error; err != nil {
+		t.Fatalf("Unable to add tag follow to table: %v", err)
+	}
+
+	resp := api.Delete("/api/v1/user/tag/tag/"+tag.ID.String(), authHeader)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var response tagfollow.DeleteTagFollowResponse
+	DecodeTo(&response, resp)
+	if response.Message != "Tag follow was deleted successfully" {
+		t.Fatalf("Unexpected response: %s", resp.Body.String())
+	}
+
+	// Follow must no longer appear for normal (non-unscoped) queries — whether the API
+	// soft-deletes or hard-deletes, the user should see zero active follows for this pair.
+	var activeCount int64
+	err := testDB.DB.Model(&models.TagFollow{}).
+		Where("user_id = ? AND tag_id = ?", user.ID, tag.ID).
+		Count(&activeCount).Error
+	if err != nil {
+		t.Fatalf("count tag_follows: %v", err)
+	}
+	if activeCount != 0 {
+		t.Fatalf("expected 0 active tag_follow rows for user/tag after DELETE by tag id, got %d", activeCount)
+	}
+}
+
 func TestDeleteTagFollow(t *testing.T) {
 	t.Parallel()
 	testDB := SetupTestDB(t)

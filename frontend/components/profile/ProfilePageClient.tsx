@@ -13,6 +13,8 @@ import Loading from "@/components/ui/loading";
 import {
   getApiV1TagByIdQueryOptions,
   listApiV1PostByPostIdCommentsQueryOptions,
+  usePatchApiV1User,
+  usePostApiV1UserTag,
   useGetApiV1PostsByAuthorByAuthorId,
   useGetApiV1UserCurrent,
   useGetApiV1UserTagFollows,
@@ -30,6 +32,10 @@ export function ProfilePageClient() {
 
   const [activeView, setActiveView] = React.useState<FeedView>("posts");
   const [showEditModal, setShowEditModal] = React.useState(false);
+  const [pronouns, setPronouns] = React.useState("Pro/nouns");
+  const [availableTags, setAvailableTags] = React.useState<
+    Array<{ id: string; name: string }>
+  >([]);
 
   const userQuery = useGetApiV1UserCurrent({
     query: { enabled },
@@ -38,6 +44,40 @@ export function ProfilePageClient() {
 
   const user = userQuery.data;
   const userId = user?.id;
+  const patchUserMutation = usePatchApiV1User({
+    client: { headers: authHeaders },
+  });
+  const createTagFollowMutation = usePostApiV1UserTag({
+    client: { headers: authHeaders },
+  });
+
+  React.useEffect(() => {
+    const saved = window.localStorage.getItem("profile_pronouns");
+    if (saved?.trim()) {
+      setPronouns(saved);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (!enabled || !authHeaders) return;
+    const controller = new AbortController();
+
+    const loadTags = async () => {
+      const response = await fetch("/api/v1/tag?limit=200&offset=0", {
+        method: "GET",
+        headers: authHeaders,
+        signal: controller.signal,
+      });
+      if (!response.ok) return;
+      const data = (await response.json()) as {
+        tags?: Array<{ id: string; name: string }>;
+      };
+      setAvailableTags(data.tags ?? []);
+    };
+
+    void loadTags();
+    return () => controller.abort();
+  }, [enabled, authHeaders]);
 
   const postsQuery = useGetApiV1PostsByAuthorByAuthorId(
     userId ?? "",
@@ -178,7 +218,7 @@ export function ProfilePageClient() {
     username: user.username,
     firstName: user.first_name,
     lastName: user.last_name,
-    pronouns: "pro/nouns",
+    pronouns,
     email: isAthlete ? user.email : undefined,
     about: user.bio || "No bio yet.",
     divisionTag: user.division ? `D${user.division}` : undefined,
@@ -235,6 +275,49 @@ export function ProfilePageClient() {
       <EditProfileModal
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
+        isSaving={patchUserMutation.isPending}
+        user={{
+          firstName: user.first_name,
+          lastName: user.last_name,
+          pronouns,
+          about: user.bio || "",
+        }}
+        onSave={async (values) => {
+          await patchUserMutation.mutateAsync({
+            data: {
+              first_name: values.firstName,
+              last_name: values.lastName,
+              bio: values.about,
+            },
+          });
+
+          const existingTagIds = new Set(tagIds);
+          const selectedTagIds = new Set(values.selectedTagIds);
+          const tagsToAdd = values.selectedTagIds.filter((id) => !existingTagIds.has(id));
+          const tagsToRemove = tagIds.filter((id) => !selectedTagIds.has(id));
+
+          await Promise.all(
+            tagsToAdd.map((tagId) =>
+              createTagFollowMutation.mutateAsync({ data: { tag_id: tagId } }),
+            ),
+          );
+
+          await Promise.all(
+            tagsToRemove.map((tagId) =>
+              fetch(`/api/v1/user/tag/tag/${tagId}`, {
+                method: "DELETE",
+                headers: authHeaders,
+              }),
+            ),
+          );
+
+          setPronouns(values.pronouns);
+          window.localStorage.setItem("profile_pronouns", values.pronouns);
+          setShowEditModal(false);
+          await Promise.all([userQuery.refetch(), tagFollowsQuery.refetch()]);
+        }}
+        availableTags={availableTags}
+        selectedTagIds={tagIds}
       />
     </div>
   );

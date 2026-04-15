@@ -39,6 +39,10 @@ type DeleteTagFollowParams struct {
 	ID uuid.UUID `path:"id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the tag follow to be deleted"`
 }
 
+type DeleteTagFollowByTagParams struct {
+	TagID uuid.UUID `path:"tag_id" example:"123e4567-e89b-12d3-a456-426614174000" doc:"ID of the tag follow's tag to be deleted for current user"`
+}
+
 type DeleteTagFollowResponse struct {
 	Message string `json:"message" example:"Tag follow was deleted successfully" doc:"Message to display"`
 }
