@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/ui/navbar";
+import CreatePostPopup from "@/components/ui/create-post-popup";
 import { RatingPanel } from "@/components/ui/rating-panel";
 import { CiUser } from "react-icons/ci";
 import SmallPost from "@/components/post/SmallPost";
@@ -64,9 +66,16 @@ export default function Page() {
   const [selectedCollegeId, setSelectedCollegeId] = useState(
     northeasternCollegeId,
   );
+  const searchParams = useSearchParams();
+  const showCreatePost = searchParams.get("createPost") === "true";
 
   return (
     <div className="min-h-screen bg-zinc-50">
+      {showCreatePost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <CreatePostPopup />
+        </div>
+      )}
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
         <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
