@@ -2577,6 +2577,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: Presigned download URL for the user's profile picture
+          type: string
         roles:
           description: Roles assigned to the user
           items:
@@ -3839,6 +3842,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: The S3 key for the user's profile picture
+          type: string
         sport:
           description: The sport the user plays
           examples:
@@ -3866,6 +3872,7 @@ components:
         - email
         - username
         - bio
+        - profile_picture
         - account_type
         - sport
         - expected_grad_year
