@@ -29,7 +29,7 @@ type CreatePostResponse struct {
 	AuthorID    *uuid.UUID   `json:"author" type:"uuid"`
 	SportID     *uuid.UUID   `json:"sport" type:"uuid"`
 	CollegeID   *uuid.UUID   `json:"college" type:"uuid"`
-	Tags        []models.Tag `json:"tag" type:"tag"`
+	Tags        []models.Tag `json:"tags" type:"tag"`
 	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
 	IsAnonymous bool         `json:"is_anonymous"`
