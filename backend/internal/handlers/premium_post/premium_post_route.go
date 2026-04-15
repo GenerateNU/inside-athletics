@@ -1,13 +1,14 @@
 package premiumpost
 
 import (
+	"inside-athletics/internal/s3"
+
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
 
-func Route(api huma.API, db *gorm.DB) {
-	var premiumPostDB = &PremiumPostDB{db: db}
-	var premiumPostService = &PremiumPostService{premiumPostDB}
+func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
+	var premiumPostService = NewPremiumPostService(db, s3Svc)
 	{
 		grp := huma.NewGroup(api, "/api/v1/post/premium")
 		huma.Post(grp, "/", premiumPostService.CreatePremiumPost) // Create post

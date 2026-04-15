@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"inside-athletics/internal/models"
+	"inside-athletics/internal/s3"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -17,11 +18,23 @@ import (
 
 type PremiumPostService struct {
 	premiumPostDB *PremiumPostDB
+	s3            *s3.Service
 }
 
-func NewPremiumPostService(db *gorm.DB) *PremiumPostService {
+func NewPremiumPostService(db *gorm.DB, s3Svc *s3.Service) *PremiumPostService {
 	return &PremiumPostService{
 		premiumPostDB: NewPremiumPostDB(db),
+		s3:            s3Svc,
+	}
+}
+
+// resolveMediaKey replaces post.Media.S3Key with a presigned download URL in-place.
+func (s *PremiumPostService) resolveMediaKey(ctx context.Context, post *models.PremiumPost) {
+	if post.Media == nil {
+		return
+	}
+	if url := s3.ResolveKey(ctx, s.s3, post.Media.S3Key); url != "" {
+		post.Media.S3Key = url
 	}
 }
 
@@ -53,6 +66,8 @@ func (s *PremiumPostService) CreatePremiumPost(ctx context.Context, input *struc
 		return nil, err
 	}
 
+	s.resolveMediaKey(ctx, createdPost)
+
 	return &utils.ResponseBody[CreatePremiumPostResponse]{
 		Body: ToCreatePremiumPostResponse(createdPost, id),
 	}, nil
@@ -67,6 +82,7 @@ func (s *PremiumPostService) GetAllPremiumPosts(ctx context.Context, input *GetA
 
 	postResponses := make([]PremiumPostResponse, 0, len(posts))
 	for i := range posts {
+		s.resolveMediaKey(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPremiumPostResponse(&posts[i]))
 	}
 
@@ -87,6 +103,7 @@ func (s *PremiumPostService) GetPremiumPostsByAuthorID(ctx context.Context, inpu
 
 	postResponses := make([]PremiumPostResponse, 0, len(posts))
 	for i := range posts {
+		s.resolveMediaKey(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPremiumPostResponse(&posts[i]))
 	}
 
@@ -107,6 +124,7 @@ func (s *PremiumPostService) GetPremiumPostsBySportID(ctx context.Context, input
 
 	postResponses := make([]PremiumPostResponse, 0, len(posts))
 	for i := range posts {
+		s.resolveMediaKey(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPremiumPostResponse(&posts[i]))
 	}
 
@@ -127,6 +145,7 @@ func (s *PremiumPostService) GetPremiumPostsByCollegeID(ctx context.Context, inp
 
 	postResponses := make([]PremiumPostResponse, 0, len(posts))
 	for i := range posts {
+		s.resolveMediaKey(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPremiumPostResponse(&posts[i]))
 	}
 
@@ -147,6 +166,7 @@ func (s *PremiumPostService) GetPremiumPostsByTagID(ctx context.Context, input *
 
 	postResponses := make([]PremiumPostResponse, 0, len(posts))
 	for i := range posts {
+		s.resolveMediaKey(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPremiumPostResponse(&posts[i]))
 	}
 
@@ -172,6 +192,8 @@ func (s *PremiumPostService) UpdatePremiumPost(ctx context.Context, input *struc
 	if err != nil {
 		return nil, err
 	}
+
+	s.resolveMediaKey(ctx, updatedPost)
 
 	return &utils.ResponseBody[PremiumPostResponse]{
 		Body: ToPremiumPostResponse(updatedPost),

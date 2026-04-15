@@ -49,7 +49,7 @@ func TestCreatePremiumPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -112,7 +112,7 @@ func TestCreatePremiumPost_UserForbidden(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -157,7 +157,7 @@ func TestGetPremiumPostByAuthorId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -215,7 +215,7 @@ func TestGetPremiumPostBySportId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -269,7 +269,7 @@ func TestGetPremiumPostByTagId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -345,7 +345,7 @@ func TestGetAllPremiumPosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -401,7 +401,7 @@ func TestCreatePremiumPostMissingRequiredJSONFields(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -423,7 +423,7 @@ func TestAdminCanCreateMultiplePremiumPosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -448,7 +448,7 @@ func TestGetPremiumPostsByAuthorEmpty(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -476,7 +476,7 @@ func TestBadValidationPremiumPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
@@ -507,7 +507,7 @@ func TestGetAllPremiumPostsPagination(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	premiumpostDB := premiumpost.NewPremiumPostDB(testDB.DB)
 
@@ -562,7 +562,7 @@ func TestUpdatePremiumPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -610,7 +610,7 @@ func TestUpdatePremiumPost_UserForbidden(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -643,7 +643,7 @@ func TestDeletePremiumPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -678,7 +678,7 @@ func TestDeletePremiumPost_UserForbidden(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -707,7 +707,7 @@ func TestDeletePremiumPost_NotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	premiumpost.Route(testDB.API, testDB.DB)
+	premiumpost.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
