@@ -5,6 +5,7 @@ import (
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/models"
+	"inside-athletics/internal/s3"
 	"inside-athletics/internal/utils"
 	"net/url"
 )
@@ -12,6 +13,7 @@ import (
 type TagService struct {
 	tagDB     *TagDB
 	tagPostDB *tagpost.TagPostDB
+	s3        *s3.Service
 }
 
 func (u *TagService) GetTagByName(ctx context.Context, input *GetTagByNameParams) (*utils.ResponseBody[GetTagResponse], error) {
@@ -70,7 +72,16 @@ func (u *TagService) GetPostsByTag(ctx context.Context, input *GetPostsByTagPara
 
 	postResponses := make([]post.PostResponse, 0, len(*posts))
 	for i := range *posts {
-		postResponses = append(postResponses, *post.ToPostResponse(&((*posts)[i]), userID))
+		p := &(*posts)[i]
+		if url := s3.ResolveKey(ctx, u.s3, p.Author.ProfilePicture); url != "" {
+			p.Author.ProfilePicture = url
+		}
+		if p.College != nil {
+			if url := s3.ResolveKey(ctx, u.s3, p.College.Logo); url != "" {
+				p.College.Logo = url
+			}
+		}
+		postResponses = append(postResponses, *post.ToPostResponse(p, userID))
 	}
 
 	response := &GetPostsByTagResponse{
@@ -134,4 +145,15 @@ func (u *TagService) DeleteTag(ctx context.Context, input *GetTagByIDParams) (*u
 	}
 
 	return respBody, nil
+}
+
+func (u *TagService) FuzzySearchFor(ctx context.Context, input *utils.SearchParam) (*utils.ResponseBody[utils.SearchResults[*GetTagResponse]], error) {
+	return utils.FuzzySearchService(input, models.Tag{}, GetTagResponse{}, "name", u.tagDB.db, getTagResponse)
+}
+
+func getTagResponse(tag *models.Tag) *GetTagResponse {
+	return &GetTagResponse{
+		ID:   tag.ID,
+		Name: tag.Name,
+	}
 }

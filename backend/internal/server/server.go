@@ -13,6 +13,7 @@ import (
 	"inside-athletics/internal/handlers/permission"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/post_like"
+	premiumpost "inside-athletics/internal/handlers/premium_post"
 	"inside-athletics/internal/handlers/role"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/sportfollow"
@@ -75,26 +76,40 @@ func CreateApp(db *gorm.DB) *App {
 
 // CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
-	// Create all the routing groups:
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-	var s3Service *s3.Service
-	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
-		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
-			s3Service = s3.NewService(client, s3Cfg)
-		}
+	routeGroups := [...]RouteFN{
+		survey.Route,
+		media.Route,
+		health.Route,
+		sport.Route,
+		role.Route,
+		permission.Route,
+		collegefollow.Route,
+		tagfollow.Route,
+		sportfollow.Route,
+		tagpost.Route,
+		comment.Route,
+		comment_like.Route,
+		post_like.Route,
+		stripe.Route,
 	}
-
-	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
 
-	user.Route(api, db, s3Service)
-
-	// S3 content routes when backend/.env has S3_BUCKET and AWS_REGION.
-	if s3Service != nil {
-		content.Route(api, db, s3Service)
+	var s3Svc *s3.Service
+	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
+		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
+			s3Svc = s3.NewService(client, s3Cfg)
+		}
 	}
+
+	college.Route(api, db, s3Svc)
+	user.Route(api, db, s3Svc)
+	post.Route(api, db, s3Svc)
+	tag.Route(api, db, s3Svc)
+	content.Route(api, db, s3Svc)
+	premiumpost.Route(api, db, s3Svc)
 }
 
 // setupApp initializes the Fiber app with middleware and returns the configured instance.

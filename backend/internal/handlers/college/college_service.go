@@ -3,6 +3,7 @@ package college
 import (
 	"context"
 	"fmt"
+	"inside-athletics/internal/s3"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 )
@@ -10,6 +11,7 @@ import (
 // Contains business logic for colleges
 type CollegeService struct {
 	collegeDB *CollegeDB
+	s3        *s3.Service
 }
 
 // Convert empty string to nil pointer
@@ -39,7 +41,7 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 		Website:      college.Website,
 		AcademicRank: college.AcademicRank,
 		DivisionRank: college.DivisionRank,
-		Logo:         StringPtrOrNil(college.Logo),
+		Logo:         StringPtrOrNil(s3.ResolveKey(ctx, u.s3, college.Logo)),
 	}
 
 	return &utils.ResponseBody[GetCollegeResponse]{
@@ -106,7 +108,7 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 		Website:      createdCollege.Website,
 		AcademicRank: createdCollege.AcademicRank,
 		DivisionRank: createdCollege.DivisionRank,
-		Logo:         StringPtrOrNil(createdCollege.Logo),
+		Logo:         StringPtrOrNil(s3.ResolveKey(ctx, u.s3, createdCollege.Logo)),
 	}
 
 	return &utils.ResponseBody[CreateCollegeResponse]{
@@ -133,7 +135,7 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 		Website:      college.Website,
 		AcademicRank: college.AcademicRank,
 		DivisionRank: college.DivisionRank,
-		Logo:         StringPtrOrNil(college.Logo),
+		Logo:         StringPtrOrNil(s3.ResolveKey(ctx, u.s3, college.Logo)),
 	}
 
 	return &utils.ResponseBody[UpdateCollegeResponse]{
@@ -159,4 +161,20 @@ func (u *CollegeService) DeleteCollege(ctx context.Context, input *DeleteCollege
 	return &utils.ResponseBody[DeleteCollegeResponse]{
 		Body: response,
 	}, err
+}
+
+func (u *CollegeService) FuzzySearchForCollege(ctx context.Context, input *utils.SearchParam) (*utils.ResponseBody[utils.SearchResults[*GetCollegeResponse]], error) {
+	toResponse := func(college *models.College) *GetCollegeResponse {
+		return &GetCollegeResponse{
+			ID:           college.ID,
+			Name:         college.Name,
+			State:        college.State,
+			City:         college.City,
+			Website:      college.Website,
+			AcademicRank: college.AcademicRank,
+			DivisionRank: college.DivisionRank,
+			Logo:         StringPtrOrNil(s3.ResolveKey(ctx, u.s3, college.Logo)),
+		}
+	}
+	return utils.FuzzySearchService(input, models.College{}, GetCollegeResponse{}, "name", u.collegeDB.db, toResponse)
 }
