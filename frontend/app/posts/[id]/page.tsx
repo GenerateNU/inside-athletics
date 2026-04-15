@@ -50,19 +50,28 @@ export default function PostPage({
   const [commentOpen, setCommentOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
 
-  const { mutate: submitComment, isPending: submittingComment } = usePostApiV1Comment({
-    client: { headers: authHeaders },
-  });
+  const { mutate: submitComment, isPending: submittingComment } =
+    usePostApiV1Comment({
+      client: { headers: authHeaders },
+    });
 
   function handleCommentSubmit() {
     if (!commentText.trim()) return;
     submitComment(
-      { data: { description: commentText.trim(), is_anonymous: false, post_id: id } },
+      {
+        data: {
+          description: commentText.trim(),
+          is_anonymous: false,
+          post_id: id,
+        },
+      },
       {
         onSuccess: () => {
           setCommentText("");
           setCommentOpen(false);
-          queryClient.invalidateQueries({ queryKey: listApiV1PostByPostIdCommentsQueryKey(id) });
+          queryClient.invalidateQueries({
+            queryKey: listApiV1PostByPostIdCommentsQueryKey(id),
+          });
         },
       },
     );
@@ -90,7 +99,10 @@ export default function PostPage({
       unlikePost(
         { id },
         {
-          onError: () => { setIsLiked(true); setLikeCount((c) => c + 1); },
+          onError: () => {
+            setIsLiked(true);
+            setLikeCount((c) => c + 1);
+          },
         },
       );
     } else {
@@ -99,7 +111,10 @@ export default function PostPage({
       likePost(
         { data: { post_id: id } },
         {
-          onError: () => { setIsLiked(false); setLikeCount((c) => c - 1); },
+          onError: () => {
+            setIsLiked(false);
+            setLikeCount((c) => c - 1);
+          },
         },
       );
     }
@@ -128,7 +143,6 @@ export default function PostPage({
   return (
     <div className="flex min-h-screen bg-white bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60">
       <Navbar className="sticky top-0 h-screen shrink-0" />
-
 
       <main className="flex min-w-0 pt-10 px-10 flex-1 flex-col bg-white m-10 rounded-4xl">
         {/* Back + title */}
@@ -180,7 +194,9 @@ export default function PostPage({
                     <Heart
                       className={cn(
                         "size-5 shrink-0",
-                        isLiked ? "fill-red-500 text-red-500" : "text-[#3E7DBB]",
+                        isLiked
+                          ? "fill-red-500 text-red-500"
+                          : "text-[#3E7DBB]",
                       )}
                     />
                   }
@@ -189,19 +205,18 @@ export default function PostPage({
                   onClick={handleLikeToggle}
                 />
                 <Badge
-                  icon={<MessageCircle className="size-5 shrink-0 text-[#3E7DBB]" />}
+                  icon={
+                    <MessageCircle className="size-5 shrink-0 text-[#3E7DBB]" />
+                  }
                   count={post.comment_count ?? 0}
                   onClick={() => setCommentOpen((o) => !o)}
                 />
               </div>
-
             </div>
 
             {/* Comments */}
             <div className=" border-zinc-100 px-15 pb-8">
-              <p className="py-4 text-lg font-semibold text-black">
-                Comments
-              </p>
+              <p className="py-4 text-lg font-semibold text-black">Comments</p>
 
               {commentOpen && (
                 <div className="mb-4 flex gap-2 relative">

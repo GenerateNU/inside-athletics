@@ -25,7 +25,10 @@ export function PostCard({ post }: PostCardProps) {
   ];
 
   return (
-    <Link href={`/posts/${post.id}`} className="block border-b border-zinc-100 px-6 py-5 hover:bg-zinc-50 transition-colors">
+    <Link
+      href={`/posts/${post.id}`}
+      className="block border-b border-zinc-100 px-6 py-5 hover:bg-zinc-50 transition-colors"
+    >
       {/* Sport / tag labels */}
       <div className="mb-1.5 flex flex-wrap gap-3 text-xs text-zinc-400">
         {tagLabels.map((label) => (

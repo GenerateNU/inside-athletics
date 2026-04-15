@@ -19,7 +19,11 @@ interface CommentCardProps {
   authHeaders?: Record<string, string>;
 }
 
-export function CommentCard({ comment, postId, authHeaders }: CommentCardProps) {
+export function CommentCard({
+  comment,
+  postId,
+  authHeaders,
+}: CommentCardProps) {
   const queryClient = useQueryClient();
 
   const [replyOpen, setReplyOpen] = useState(false);
@@ -27,13 +31,11 @@ export function CommentCard({ comment, postId, authHeaders }: CommentCardProps) 
   const [repliesOpen, setRepliesOpen] = useState(false);
   const [localHasReplies, setLocalHasReplies] = useState(comment.has_replies);
 
-  const { data: replies, isLoading: loadingReplies } = useListApiV1CommentByIdReplies(
-    comment.id,
-    {
+  const { data: replies, isLoading: loadingReplies } =
+    useListApiV1CommentByIdReplies(comment.id, {
       query: { enabled: repliesOpen },
       client: { headers: authHeaders },
-    },
-  );
+    });
 
   const { mutate: submitReply, isPending: submittingReply } =
     usePostApiV1Comment({ client: { headers: authHeaders } });
@@ -70,7 +72,13 @@ export function CommentCard({ comment, postId, authHeaders }: CommentCardProps) 
     <div className="py-4">
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <defs>
-          <linearGradient id="green-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient
+            id="green-gradient"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
             <stop offset="0%" stopColor="#00804D" />
             <stop offset="100%" stopColor="#043D26" />
           </linearGradient>
@@ -112,13 +120,15 @@ export function CommentCard({ comment, postId, authHeaders }: CommentCardProps) 
               className="min-h-0 flex-1 resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
             />
             <Button
-                className={"absolute bottom-1 right-2 rounded-3xl bg-[#A8C8E8] text-[#E8F1FA]"}
-                size="lg"
-                onClick={handleReplySubmit}
-                disabled={!replyText.trim() || submittingReply}
-              >
-                {submittingReply ? "Posting..." : "Post"}
-              </Button>
+              className={
+                "absolute bottom-1 right-2 rounded-3xl bg-[#A8C8E8] text-[#E8F1FA]"
+              }
+              size="lg"
+              onClick={handleReplySubmit}
+              disabled={!replyText.trim() || submittingReply}
+            >
+              {submittingReply ? "Posting..." : "Post"}
+            </Button>
           </div>
         )}
 
@@ -138,7 +148,11 @@ export function CommentCard({ comment, postId, authHeaders }: CommentCardProps) 
             ) : (
               <div className="space-y-3">
                 {replies.map((reply) => (
-                  <CommentItem key={reply.id} comment={reply} authHeaders={authHeaders} />
+                  <CommentItem
+                    key={reply.id}
+                    comment={reply}
+                    authHeaders={authHeaders}
+                  />
                 ))}
               </div>
             )}
