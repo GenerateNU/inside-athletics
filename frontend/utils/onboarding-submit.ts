@@ -218,18 +218,4 @@ export async function submitOnboardingUser(
   }
 
   await syncSelectedTagFollows(data, headers);
-
-  if (data.role.profileImageKey) {
-    const updateUserResponse = await fetch("/api/v1/user", {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({
-        profile_image_key: data.role.profileImageKey,
-      }),
-    });
-
-    if (!updateUserResponse.ok) {
-      throw new Error("Unable to save profile image.");
-    }
-  }
 }
