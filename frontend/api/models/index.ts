@@ -227,6 +227,13 @@ export type {
   GetApiV1CollegesQuery,
 } from "./GetApiV1Colleges.ts";
 export type {
+  GetApiV1CollegesSearchQueryParams,
+  GetApiV1CollegesSearch200,
+  GetApiV1CollegesSearchError,
+  GetApiV1CollegesSearchQueryResponse,
+  GetApiV1CollegesSearchQuery,
+} from "./GetApiV1CollegesSearch.ts";
+export type {
   GetApiV1CommentByIdPathParams,
   GetApiV1CommentById200,
   GetApiV1CommentByIdError,
@@ -332,12 +339,26 @@ export type {
   GetApiV1PostsBySportBySportIdQuery,
 } from "./GetApiV1PostsBySportBySportId.ts";
 export type {
+  GetApiV1PostsFilterQueryParams,
+  GetApiV1PostsFilter200,
+  GetApiV1PostsFilterError,
+  GetApiV1PostsFilterQueryResponse,
+  GetApiV1PostsFilterQuery,
+} from "./GetApiV1PostsFilter.ts";
+export type {
   GetApiV1PostsPopularQueryParams,
   GetApiV1PostsPopular200,
   GetApiV1PostsPopularError,
   GetApiV1PostsPopularQueryResponse,
   GetApiV1PostsPopularQuery,
 } from "./GetApiV1PostsPopular.ts";
+export type {
+  GetApiV1PostsSearchQueryParams,
+  GetApiV1PostsSearch200,
+  GetApiV1PostsSearchError,
+  GetApiV1PostsSearchQueryResponse,
+  GetApiV1PostsSearchQuery,
+} from "./GetApiV1PostsSearch.ts";
 export type {
   GetApiV1PostTagByIdPathParams,
   GetApiV1PostTagById200,
@@ -380,6 +401,13 @@ export type {
   GetApiV1SportsQueryResponse,
   GetApiV1SportsQuery,
 } from "./GetApiV1Sports.ts";
+export type {
+  GetApiV1SportsSearchQueryParams,
+  GetApiV1SportsSearch200,
+  GetApiV1SportsSearchError,
+  GetApiV1SportsSearchQueryResponse,
+  GetApiV1SportsSearchQuery,
+} from "./GetApiV1SportsSearch.ts";
 export type {
   GetApiV1StripeCustomersByIdPathParams,
   GetApiV1StripeCustomersById200,
@@ -445,6 +473,13 @@ export type {
   GetApiV1TagNameByNameQueryResponse,
   GetApiV1TagNameByNameQuery,
 } from "./GetApiV1TagNameByName.ts";
+export type {
+  GetApiV1TagsSearchQueryParams,
+  GetApiV1TagsSearch200,
+  GetApiV1TagsSearchError,
+  GetApiV1TagsSearchQueryResponse,
+  GetApiV1TagsSearchQuery,
+} from "./GetApiV1TagsSearch.ts";
 export type {
   GetApiV1UserByIdPathParams,
   GetApiV1UserById200,
@@ -514,6 +549,7 @@ export type { GetPostLikeResponse } from "./GetPostLikeResponse.ts";
 export type { GetPostsByAuthorIDResponse } from "./GetPostsByAuthorIDResponse.ts";
 export type { GetPostsBySportIDResponse } from "./GetPostsBySportIDResponse.ts";
 export type { GetPostsByTagResponse } from "./GetPostsByTagResponse.ts";
+export type { GetSearchResponse } from "./GetSearchResponse.ts";
 export type { GetSportFollowsByUserResponse } from "./GetSportFollowsByUserResponse.ts";
 export type { GetStripeCustomerByEmailResponse } from "./GetStripeCustomerByEmailResponse.ts";
 export type { GetStripeCustomerResponse } from "./GetStripeCustomerResponse.ts";
@@ -838,6 +874,9 @@ export type {
 export type { RegisterStripeCustomerBody } from "./RegisterStripeCustomerBody.ts";
 export type { RegisterStripeCustomerResponse } from "./RegisterStripeCustomerResponse.ts";
 export type { RoleResponse } from "./RoleResponse.ts";
+export type { SearchResultsGetCollegeResponse } from "./SearchResultsGetCollegeResponse.ts";
+export type { SearchResultsGetTagResponse } from "./SearchResultsGetTagResponse.ts";
+export type { SearchResultsSportResponse } from "./SearchResultsSportResponse.ts";
 export type { Sport } from "./Sport.ts";
 export type { SportResponse } from "./SportResponse.ts";
 export type { StripeCheckoutSessionResponse } from "./StripeCheckoutSessionResponse.ts";

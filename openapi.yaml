@@ -716,6 +716,8 @@ components:
         content:
           examples:
             - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          maxLength: 5000
+          minLength: 1
           type: string
         is_anonymous:
           type: boolean
@@ -730,6 +732,8 @@ components:
         title:
           examples:
             - Looking for thoughts on NEU Fencing!
+          maxLength: 100
+          minLength: 1
           type: string
       required:
         - title
@@ -2165,6 +2169,33 @@ components:
       required:
         - post_ids
       type: object
+    GetSearchResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetSearchResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        count:
+          description: Count of search results found for given search
+          examples:
+            - 5
+          format: int64
+          type: integer
+        posts:
+          description: List of post responses found for given search
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - posts
+        - count
+      type: object
     GetSportFollowsByUserResponse:
       additionalProperties: false
       properties:
@@ -2885,6 +2916,63 @@ components:
       required:
         - id
         - name
+      type: object
+    SearchResultsGetCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SearchResultsGetCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        results:
+          items:
+            $ref: "#/components/schemas/GetCollegeResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - results
+      type: object
+    SearchResultsGetTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SearchResultsGetTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        results:
+          items:
+            $ref: "#/components/schemas/GetTagResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - results
+      type: object
+    SearchResultsSportResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SearchResultsSportResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        results:
+          items:
+            $ref: "#/components/schemas/SportResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - results
       type: object
     Sport:
       additionalProperties: false
@@ -4107,6 +4195,42 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 colleges
+  /api/v1/colleges/search:
+    get:
+      operationId: get-api-v1-colleges-search
+      parameters:
+        - example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            examples:
+              - Northeastern University
+            type: string
+        - example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            examples:
+              - 20
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResultsGetCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 colleges search
   /api/v1/comment/:
     post:
       operationId: post-api-v1-comment
@@ -5207,6 +5331,78 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 posts by sport by sport ID
+  /api/v1/posts/filter:
+    get:
+      operationId: get-api-v1-posts-filter
+      parameters:
+        - description: Comma seperated list of college_ids to filter by
+          example: 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+          explode: false
+          in: query
+          name: college_ids
+          schema:
+            description: Comma seperated list of college_ids to filter by
+            examples:
+              - 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+            type: string
+        - description: Comma seperated list of sport_ids to filter by
+          example: 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+          explode: false
+          in: query
+          name: sport_ids
+          schema:
+            description: Comma seperated list of sport_ids to filter by
+            examples:
+              - 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+            type: string
+        - description: Comma seperated list of tag_ids to filter by
+          example: 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+          explode: false
+          in: query
+          name: tag_ids
+          schema:
+            description: Comma seperated list of tag_ids to filter by
+            examples:
+              - 98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894
+            type: string
+        - description: Number of posts to return when filtering
+          example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            description: Number of posts to return when filtering
+            examples:
+              - 20
+            format: int64
+            type: integer
+        - description: Number of entries in the database to offset by
+          example: 8
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of entries in the database to offset by
+            examples:
+              - 8
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts filter
   /api/v1/posts/popular:
     get:
       operationId: get-api-v1-posts-popular
@@ -5261,6 +5457,58 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 posts popular
+  /api/v1/posts/search:
+    get:
+      operationId: get-api-v1-posts-search
+      parameters:
+        - description: String to fuzzy search posts/tags/colleges/sports on
+          example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            description: String to fuzzy search posts/tags/colleges/sports on
+            examples:
+              - Northeastern University
+            type: string
+        - description: Cap on the number of posts to return
+          example: 10
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            description: Cap on the number of posts to return
+            examples:
+              - 10
+            format: int64
+            type: integer
+        - description: Number of entries to skip for pagination
+          example: 8
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of entries to skip for pagination
+            examples:
+              - 8
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSearchResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts search
   /api/v1/role/:
     post:
       operationId: post-api-v1-role
@@ -5609,6 +5857,42 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 sports
+  /api/v1/sports/search:
+    get:
+      operationId: get-api-v1-sports-search
+      parameters:
+        - example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            examples:
+              - Northeastern University
+            type: string
+        - example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            examples:
+              - 20
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResultsSportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sports search
   /api/v1/stripe_customers/:
     post:
       operationId: post-api-v1-stripe-customers
@@ -6338,6 +6622,42 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 tag by tag ID posts
+  /api/v1/tags/search:
+    get:
+      operationId: get-api-v1-tags-search
+      parameters:
+        - example: Northeastern University
+          explode: false
+          in: query
+          name: search_str
+          schema:
+            examples:
+              - Northeastern University
+            type: string
+        - example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            examples:
+              - 20
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResultsGetTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 tags search
   /api/v1/user:
     patch:
       operationId: patch-api-v1-user

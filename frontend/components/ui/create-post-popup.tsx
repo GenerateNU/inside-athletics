@@ -65,7 +65,12 @@ export default function CreatePostPopup() {
     const parsed = createPostRequestSchema.safeParse(payload);
     if (!parsed.success) {
       const firstIssue = parsed.error.issues[0];
-      setError(firstIssue?.message ?? "Invalid post data.");
+      const field = firstIssue?.path[0];
+      const fieldMessages: Record<string, string> = {
+        title: "Please enter a title for your post.",
+        content: "Please enter a message for your post.",
+      };
+      setError(fieldMessages[field as string] ?? "Please fill out all required fields.");
       return;
     }
 

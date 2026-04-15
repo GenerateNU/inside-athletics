@@ -16,6 +16,8 @@ export type CreatePostRequest = {
    */
   college_id?: string;
   /**
+   * @minLength 1
+   * @maxLength 5000
    * @type string
    */
   content: string;
@@ -32,6 +34,8 @@ export type CreatePostRequest = {
    */
   tags?: TagRequest[] | null;
   /**
+   * @minLength 1
+   * @maxLength 100
    * @type string
    */
   title: string;

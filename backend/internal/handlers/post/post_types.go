@@ -11,8 +11,8 @@ type CreatePostRequest struct {
 	SportId     *uuid.UUID   `json:"sport_id,omitempty"`
 	CollegeId   *uuid.UUID   `json:"college_id,omitempty"`
 	Tags        []TagRequest `json:"tags,omitempty"`
-	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
-	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
+	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" minLength:"1" maxLength:"100"`
+	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" minLength:"1" maxLength:"5000"`
 	IsAnonymous bool         `json:"is_anonymous"`
 }
 
