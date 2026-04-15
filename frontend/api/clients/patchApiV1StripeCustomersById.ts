@@ -31,7 +31,7 @@ function getPatchApiV1StripeCustomersByIdUrl(
  */
 export async function patchApiV1StripeCustomersById(
   id: PatchApiV1StripeCustomersByIdPathParams["id"],
-  data: PatchApiV1StripeCustomersByIdMutationRequest,
+  data?: PatchApiV1StripeCustomersByIdMutationRequest,
   config: Partial<
     RequestConfig<PatchApiV1StripeCustomersByIdMutationRequest>
   > & { client?: Client } = {},

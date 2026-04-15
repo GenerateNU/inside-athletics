@@ -8,23 +8,12 @@
       "readOnly": true,
       "type": "string"
     },
-    "id": {
-      "description": "ID of the tagpost updated",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    },
-    "post_id": {
-      "description": "the updated post id",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    },
-    "tag_id": {
-      "description": "the updated tag id",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    }
+    "id": { "type": "string" },
+    "postable_id": { "type": "string" },
+    "postable_type": { "type": "string" },
+    "tag_id": { "type": "string" }
   },
-  "required": ["id", "post_id", "tag_id"],
+  "required": ["id", "postable_id", "postable_type", "tag_id"],
   "type": "object",
   "x-readme-ref-name": "UpdateTagPostResponse"
 }

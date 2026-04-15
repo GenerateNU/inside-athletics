@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PatchApiV1PostByIdMutationRequest,
   PatchApiV1PostByIdMutationResponse,
@@ -39,7 +40,7 @@ export function patchApiV1PostByIdMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data: PatchApiV1PostByIdMutationRequest;
+      data?: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >({
@@ -61,7 +62,7 @@ export function usePatchApiV1PostById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1PostByIdPathParams["id"];
-        data: PatchApiV1PostByIdMutationRequest;
+        data?: PatchApiV1PostByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -82,7 +83,7 @@ export function usePatchApiV1PostById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data: PatchApiV1PostByIdMutationRequest;
+      data?: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >;
@@ -92,7 +93,7 @@ export function usePatchApiV1PostById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data: PatchApiV1PostByIdMutationRequest;
+      data?: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >(
@@ -107,7 +108,7 @@ export function usePatchApiV1PostById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PostByIdPathParams["id"];
-      data: PatchApiV1PostByIdMutationRequest;
+      data?: PatchApiV1PostByIdMutationRequest;
     },
     TContext
   >;

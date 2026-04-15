@@ -10,17 +10,18 @@ export type CreateTagPostsResponse = {
    */
   readonly $schema?: string;
   /**
-   * @description ID of the tagpost item created
    * @type string
    */
   id: string;
   /**
-   * @description ID of the post
    * @type string
    */
-  post_id: string;
+  postable_id: string;
   /**
-   * @description ID of the tag
+   * @type string
+   */
+  postable_type: string;
+  /**
    * @type string
    */
   tag_id: string;

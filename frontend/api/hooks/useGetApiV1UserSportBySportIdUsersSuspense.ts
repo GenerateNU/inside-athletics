@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1UserSportBySportIdUsersQueryResponse,
   GetApiV1UserSportBySportIdUsersPathParams,
@@ -49,10 +50,8 @@ export function getApiV1UserSportBySportIdUsersSuspenseQueryOptions(
     enabled: !!sport_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1UserSportBySportIdUsers(sport_id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1UserSportBySportIdUsers(sport_id, config);
     },
   });
 }
@@ -79,16 +78,16 @@ export function useGetApiV1UserSportBySportIdUsersSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
+    queryOptions?.queryKey ??
     getApiV1UserSportBySportIdUsersSuspenseQueryKey(sport_id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1UserSportBySportIdUsersSuspenseQueryOptions(sport_id, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

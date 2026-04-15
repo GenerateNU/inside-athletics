@@ -10,7 +10,6 @@ export type DeleteTagPostResponse = {
    */
   readonly $schema?: string;
   /**
-   * @description ID of the deleted tagpost
    * @type string
    */
   id: string;

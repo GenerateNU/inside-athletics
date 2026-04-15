@@ -9,7 +9,8 @@ export const createTagPostsResponseSchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  id: z.string().describe("ID of the tagpost item created"),
-  post_id: z.string().describe("ID of the post"),
-  tag_id: z.string().describe("ID of the tag"),
+  id: z.string(),
+  postable_id: z.string(),
+  postable_type: z.string(),
+  tag_id: z.string(),
 });

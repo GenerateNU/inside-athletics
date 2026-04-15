@@ -24,7 +24,7 @@ function getPatchApiV1UserUrl() {
  * {@link /api/v1/user}
  */
 export async function patchApiV1User(
-  data: PatchApiV1UserMutationRequest,
+  data?: PatchApiV1UserMutationRequest,
   config: Partial<RequestConfig<PatchApiV1UserMutationRequest>> & {
     client?: Client;
   } = {},

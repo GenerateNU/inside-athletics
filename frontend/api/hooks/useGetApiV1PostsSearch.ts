@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsSearchQueryResponse,
   GetApiV1PostsSearchQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1PostsSearch } from "../clients/getApiV1PostsSearch.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsSearchQueryKey = (
-  params?: GetApiV1PostsSearchQueryParams,
+  params: GetApiV1PostsSearchQueryParams = {},
 ) => [{ url: "/api/v1/posts/search" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PostsSearchQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1PostsSearchQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1PostsSearch(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1PostsSearch(params, config);
     },
   });
 }
@@ -74,15 +73,15 @@ export function useGetApiV1PostsSearch<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1PostsSearchQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1PostsSearchQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1PostsSearchQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

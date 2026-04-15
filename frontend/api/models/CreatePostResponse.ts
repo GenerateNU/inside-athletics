@@ -38,7 +38,7 @@ export type CreatePostResponse = {
   /**
    * @type array,null
    */
-  tag: Tag[] | null;
+  tags: Tag[] | null;
   /**
    * @type string
    */

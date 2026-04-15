@@ -19,7 +19,7 @@
     "id": { "type": "string" },
     "is_anonymous": { "type": "boolean" },
     "sport": { "type": "string" },
-    "tag": {
+    "tags": {
       "items": {
         "additionalProperties": false,
         "properties": {
@@ -61,7 +61,7 @@
     "author",
     "sport",
     "college",
-    "tag",
+    "tags",
     "title",
     "content",
     "is_anonymous"

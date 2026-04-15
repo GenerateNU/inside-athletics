@@ -9,6 +9,7 @@ export const updateTagPostBodySchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  post_id: z.string().describe("the post id to update to"),
+  postable_id: z.string().describe("the postable id to update to"),
+  postable_type: z.string().describe("Type: post or premium_post"),
   tag_id: z.string().describe("the tag id to update to"),
 });

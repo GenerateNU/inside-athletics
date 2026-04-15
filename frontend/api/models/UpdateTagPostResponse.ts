@@ -10,17 +10,18 @@ export type UpdateTagPostResponse = {
    */
   readonly $schema?: string;
   /**
-   * @description ID of the tagpost updated
    * @type string
    */
   id: string;
   /**
-   * @description the updated post id
    * @type string
    */
-  post_id: string;
+  postable_id: string;
   /**
-   * @description the updated tag id
+   * @type string
+   */
+  postable_type: string;
+  /**
    * @type string
    */
   tag_id: string;
