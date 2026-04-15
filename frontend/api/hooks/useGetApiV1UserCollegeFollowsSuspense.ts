@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetApiV1UserCollegeFollowsQueryResponse } from "../models/GetApiV1UserCollegeFollows.ts";
 import type {
   Client,
@@ -38,8 +37,10 @@ export function getApiV1UserCollegeFollowsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1UserCollegeFollows(config);
+      return getApiV1UserCollegeFollows({
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -65,15 +66,15 @@ export function useGetApiV1UserCollegeFollowsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1UserCollegeFollowsSuspenseQueryKey();
+    resolvedOptions?.queryKey ?? getApiV1UserCollegeFollowsSuspenseQueryKey();
 
   const query = useSuspenseQuery(
     {
       ...getApiV1UserCollegeFollowsSuspenseQueryOptions(config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

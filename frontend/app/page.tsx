@@ -7,6 +7,56 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/ui/navbar";
 import { RatingPanel } from "@/components/ui/rating-panel";
 import { CiUser } from "react-icons/ci";
+import SmallPost from "@/components/post/SmallPost";
+import type { PostResponse } from "@/api/models/PostResponse";
+
+const examplePost: PostResponse = {
+  id: "example-post-1",
+  title: "My Experience on the Track Team",
+  content: "Being on the track team has been one of the best decisions I've made at Northeastern. The coaches are incredibly supportive and the team culture is amazing.",
+  is_anonymous: false,
+  is_verified_athlete: true,
+  like_count: 24,
+  comment_count: 7,
+  sport: {
+    id: "sport-1",
+    name: "Track & Field",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  college: {
+    id: "college-1",
+    name: "Northeastern University",
+    city: "Boston",
+    state: "MA",
+    academic_rank: 49,
+    division_rank: 1,
+    logo: "",
+    website: "https://northeastern.edu",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+    deleted_at: null,
+  },
+  author: {
+    id: "ac26eeb9-2877-425f-a1cd-887a9c979578",
+    first_name: "Zainab",
+    last_name: "Imadulla",
+    profile_picture: "IMG_1363.JPG",
+    username: "nubslovesdubs",
+    email: "Zainab.imadulla@icloud.com",
+    bio: null,
+    college: "",
+    sport: "",
+    account_type: true,
+    division: null,
+    expected_grad_year: 0,
+    verified_athelete_status: "False",
+    created_at: "",
+    updated_at: "",
+    deleted_at: null,
+  },
+  tags: null,
+};
 
 const northeasternCollegeId = "014d2c09-4023-445d-9779-66aff4824245";
 
@@ -54,6 +104,10 @@ export default function Page() {
               </p>
             </div>
             <RatingPanel collegeId={selectedCollegeId} />
+            <div className="flex w-full max-w-3xl flex-col gap-3">
+              <h2 className="text-lg font-semibold">SmallPost Example</h2>
+              <SmallPost post={examplePost} />
+            </div>
           </div>
         </main>
       </div>

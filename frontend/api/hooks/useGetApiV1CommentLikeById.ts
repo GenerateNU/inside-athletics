@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1CommentLikeByIdQueryResponse,
   GetApiV1CommentLikeByIdPathParams,
@@ -44,8 +43,10 @@ export function getApiV1CommentLikeByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1CommentLikeById(id, config);
+      return getApiV1CommentLikeById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,15 +75,15 @@ export function useGetApiV1CommentLikeById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1CommentLikeByIdQueryKey(id);
+    resolvedOptions?.queryKey ?? getApiV1CommentLikeByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1CommentLikeByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

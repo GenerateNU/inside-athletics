@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostByIdQueryResponse,
   GetApiV1PostByIdPathParams,
@@ -44,8 +43,10 @@ export function getApiV1PostByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostById(id, config);
+      return getApiV1PostById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,14 +75,14 @@ export function useGetApiV1PostById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1PostByIdQueryKey(id);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1PostByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1PostByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

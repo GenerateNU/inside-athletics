@@ -76,18 +76,24 @@ func CreateApp(db *gorm.DB) *App {
 
 // CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
-	// Create all the routing groups:
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route, premiumpost.Route}
+	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route, comment.Route, premiumpost.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
-	// S3 content routes when backend/.env has S3_BUCKET and AWS_REGION.
+
+	var s3Svc *s3.Service
 	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
 		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
-			content.Route(api, db, s3.NewService(client, s3Cfg))
+			s3Svc = s3.NewService(client, s3Cfg)
 		}
 	}
+
+	college.Route(api, db, s3Svc)
+	user.Route(api, db, s3Svc)
+	post.Route(api, db, s3Svc)
+	tag.Route(api, db, s3Svc)
+	content.Route(api, db, s3Svc)
 }
 
 // setupApp initializes the Fiber app with middleware and returns the configured instance.

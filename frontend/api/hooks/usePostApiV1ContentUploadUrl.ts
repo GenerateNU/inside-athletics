@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PostApiV1ContentUploadUrlMutationRequest,
   PostApiV1ContentUploadUrlMutationResponse,

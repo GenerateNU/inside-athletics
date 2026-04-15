@@ -2,14 +2,15 @@ package post
 
 import (
 	"inside-athletics/internal/handlers/user"
+	"inside-athletics/internal/s3"
 
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
 
-func Route(api huma.API, db *gorm.DB) {
+func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
 	userDB := user.NewUserDB(db)
-	postService := NewPostService(db, userDB)
+	postService := NewPostService(db, userDB, s3Svc)
 	{
 		grp := huma.NewGroup(api, "/api/v1/post")
 		huma.Post(grp, "/", postService.CreatePost)       // Create post
