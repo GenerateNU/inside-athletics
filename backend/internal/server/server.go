@@ -23,6 +23,7 @@ import (
 	"inside-athletics/internal/handlers/tagfollow"
 	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/handlers/user"
+	"inside-athletics/internal/handlers/utility"
 	"inside-athletics/internal/s3"
 	"strings"
 
@@ -81,6 +82,8 @@ func CreateRoutes(db *gorm.DB, api huma.API) {
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
+
+	utility.Route(api, db)
 
 	var s3Svc *s3.Service
 	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {

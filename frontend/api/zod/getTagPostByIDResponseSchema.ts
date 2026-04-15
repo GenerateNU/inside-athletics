@@ -9,7 +9,8 @@ export const getTagPostByIDResponseSchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  id: z.string().describe("the id of the item"),
-  post_ids: z.string().describe("The post id"),
-  tag_id: z.string().describe("the tag id"),
+  id: z.string(),
+  postable_id: z.string(),
+  postable_type: z.string(),
+  tag_id: z.string(),
 });

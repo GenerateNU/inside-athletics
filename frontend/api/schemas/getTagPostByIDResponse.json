@@ -8,23 +8,12 @@
       "readOnly": true,
       "type": "string"
     },
-    "id": {
-      "description": "the id of the item",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    },
-    "post_ids": {
-      "description": "The post id",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    },
-    "tag_id": {
-      "description": "the tag id",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    }
+    "id": { "type": "string" },
+    "postable_id": { "type": "string" },
+    "postable_type": { "type": "string" },
+    "tag_id": { "type": "string" }
   },
-  "required": ["id", "tag_id", "post_ids"],
+  "required": ["id", "tag_id", "postable_id", "postable_type"],
   "type": "object",
   "x-readme-ref-name": "GetTagPostByIDResponse"
 }
