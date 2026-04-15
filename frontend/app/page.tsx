@@ -78,7 +78,7 @@ export default function Page() {
       )}
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
-        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
+        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-scroll max-h-screen">
           <div className="flex w-full max-w-5xl flex-col items-center gap-10">
             <div className="flex flex-col items-center gap-4 text-center">
               <p className="text-6xl">🐸</p>
