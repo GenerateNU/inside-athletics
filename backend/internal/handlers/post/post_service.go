@@ -47,14 +47,7 @@ func NewPostService(db *gorm.DB, userDB *user.UserDB, s3Svc *s3.Service) *PostSe
 
 // resolvePostKeys resolves S3 keys in a post's author and college to presigned URLs.
 func (s *PostService) resolvePostKeys(ctx context.Context, p *models.Post) {
-	if url := s3.ResolveKey(ctx, s.s3, p.Author.ProfilePicture); url != "" {
-		p.Author.ProfilePicture = url
-	}
-	if p.College != nil {
-		if url := s3.ResolveKey(ctx, s.s3, p.College.Logo); url != "" {
-			p.College.Logo = url
-		}
-	}
+	p.Author.ProfilePicture = s3.ResolveKey(ctx, s.s3, p.Author.ProfilePicture)
 }
 
 func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[CreatePostResponse], error) {
