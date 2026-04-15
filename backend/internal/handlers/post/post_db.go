@@ -480,7 +480,7 @@ func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit in
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Order(orderQuery).
 		Count(&total).
@@ -525,14 +525,14 @@ func (p *PostDB) FilterPosts(userId uuid.UUID, colleges []uuid.UUID, sports []uu
 	if err := p.db.
 		Model(&models.Post{}).
 		Select(POST_SELECT_QUERY, userId).
-		Joins("JOIN tag_posts ON posts.id = tag_posts.post_id").
+		Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'").
 		Where(whereQuery).
 		Group("posts.id").
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Count(&total).
 		Limit(limit).
