@@ -39,7 +39,6 @@ const programOptions = [
 type UploadUrlPayload = {
   upload_url: string;
   key: string;
-  document_id: string;
 };
 
 type ConfirmUploadPayload = {
@@ -242,11 +241,7 @@ export default function OnboardingRolePage() {
         await uploadUrlResponse.json(),
       );
 
-      if (
-        !uploadUrlPayload?.upload_url ||
-        !uploadUrlPayload.key ||
-        !uploadUrlPayload.document_id
-      ) {
+      if (!uploadUrlPayload?.upload_url || !uploadUrlPayload.key) {
         throw new Error("Upload URL response was incomplete.");
       }
 
@@ -254,7 +249,6 @@ export default function OnboardingRolePage() {
         method: "PUT",
         headers: {
           "Content-Type": file.type || "application/octet-stream",
-          "x-amz-meta-filename": uploadUrlPayload.document_id,
         },
         body: file,
       });
