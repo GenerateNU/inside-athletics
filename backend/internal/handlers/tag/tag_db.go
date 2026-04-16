@@ -22,13 +22,13 @@ func (u *TagDB) GetPostsByTag(tag_id uuid.UUID, limit int, offset int, userID uu
             (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
             (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
 			userID).
-		Joins("JOIN tag_posts tp ON tp.postable_id = posts.id AND tp.postable_type = 'post'").
+		Joins("JOIN tag_posts tp ON tp.post_id = posts.id").
 		Where("tp.tag_id = ?", tag_id).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+			return db.Table("tags t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
 		}).
 		Limit(limit).
 		Offset(offset).
@@ -77,8 +77,4 @@ func (u *TagDB) DeleteTag(id uuid.UUID) error {
 		return huma.Error404NotFound("Resource not found")
 	}
 	return nil
-}
-
-func (u *TagDB) FuzzySearchFor(searchStr string, limit int) ([]models.Tag, error) {
-	return utils.FuzzySearchForDB(searchStr, limit, u.db, "name", models.Tag{})
 }

@@ -14,11 +14,6 @@
       "maxLength": 1500,
       "type": "string"
     },
-    "has_replies": {
-      "description": "True if this comment has at least one reply",
-      "examples": [true],
-      "type": "boolean"
-    },
     "id": {
       "description": "ID of comment",
       "examples": ["550e8400-e29b-41d4-a716-446655440000"],
@@ -101,10 +96,6 @@
           "examples": ["Suli"],
           "type": "string"
         },
-        "profile_picture": {
-          "description": "The S3 key for the user's profile picture",
-          "type": "string"
-        },
         "sport": {
           "description": "The sport the user plays",
           "examples": ["hockey"],
@@ -131,7 +122,6 @@
         "email",
         "username",
         "bio",
-        "profile_picture",
         "account_type",
         "sport",
         "expected_grad_year",
@@ -151,8 +141,7 @@
     "description",
     "like_count",
     "is_liked",
-    "is_verified_athlete",
-    "has_replies"
+    "is_verified_athlete"
   ],
   "type": "object",
   "x-readme-ref-name": "CommentResponse"

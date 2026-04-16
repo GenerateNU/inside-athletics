@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1ContentDownloadUrlQueryResponse,
   GetApiV1ContentDownloadUrlQueryParams,
@@ -47,10 +48,8 @@ export function getApiV1ContentDownloadUrlQueryOptions(
     enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1ContentDownloadUrl(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1ContentDownloadUrl(params, config);
     },
   });
 }
@@ -79,15 +78,15 @@ export function useGetApiV1ContentDownloadUrl<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1ContentDownloadUrlQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1ContentDownloadUrlQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1ContentDownloadUrlQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

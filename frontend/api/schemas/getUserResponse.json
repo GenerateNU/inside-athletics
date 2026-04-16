@@ -115,10 +115,6 @@
       "examples": ["Suli"],
       "type": "string"
     },
-    "profile_picture": {
-      "description": "Presigned download URL for the user's profile picture",
-      "type": "string"
-    },
     "roles": {
       "description": "Roles assigned to the user",
       "items": {

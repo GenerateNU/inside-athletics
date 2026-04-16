@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type { ListApiV1StripeProductsQueryResponse } from "../models/ListApiV1StripeProducts.ts";
 import type {
   Client,
@@ -37,10 +38,8 @@ export function listApiV1StripeProductsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return listApiV1StripeProducts({
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return listApiV1StripeProducts(config);
     },
   });
 }
@@ -66,15 +65,15 @@ export function useListApiV1StripeProductsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? listApiV1StripeProductsSuspenseQueryKey();
+    queryOptions?.queryKey ?? listApiV1StripeProductsSuspenseQueryKey();
 
   const query = useSuspenseQuery(
     {
       ...listApiV1StripeProductsSuspenseQueryOptions(config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

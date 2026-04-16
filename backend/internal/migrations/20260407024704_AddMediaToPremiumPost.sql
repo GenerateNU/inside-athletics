@@ -1,2 +1,0 @@
--- Modify "premium_posts" table
-ALTER TABLE "public"."premium_posts" DROP COLUMN "attachment_key", DROP COLUMN "attachment_type", ADD COLUMN "media_id" uuid NULL, ADD CONSTRAINT "fk_premium_posts_media" FOREIGN KEY ("media_id") REFERENCES "public"."media" ("id") ON UPDATE NO ACTION ON DELETE SET NULL;

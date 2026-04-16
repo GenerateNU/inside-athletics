@@ -38,8 +38,11 @@ func (u *UserService) GetUser(ctx context.Context, input *GetUserParams) (*utils
 	if err != nil {
 		return nil, err
 	}
-	respBody.Body = u.buildUserResponse(ctx, user, roleResponses)
-	return respBody, nil
+	response := u.buildUserResponse(ctx, user, roleResponses)
+
+	return &utils.ResponseBody[GetUserResponse]{
+		Body: response,
+	}, err
 }
 
 func (u *UserService) GetCurrentUser(ctx context.Context, input *utils.EmptyInput) (*utils.ResponseBody[GetUserResponse], error) {
@@ -85,7 +88,7 @@ func (u *UserService) CreateUser(ctx context.Context, input *CreateUserInput) (*
 		Email:                   input.Body.Email,
 		Username:                input.Body.Username,
 		Bio:                     input.Body.Bio,
-		ProfilePicture:          stringValue(input.Body.ProfileImageKey),
+		ProfileImageKey:         input.Body.ProfileImageKey,
 		Account_Type:            input.Body.AccountType,
 		SportID:                 input.Body.SportID,
 		Expected_Grad_Year:      input.Body.ExpectedGradYear,
@@ -135,35 +138,6 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 	respBody.Body = u.buildUserResponse(ctx, updatedUser, roleResponses)
 
 	return respBody, nil
-}
-
-// toUserResponse builds a GetUserResponse, resolving any S3 keys to presigned URLs.
-func (u *UserService) toUserResponse(ctx context.Context, user *models.User, roles *[]role.RoleResponse) *GetUserResponse {
-	var profilePicture *string
-	if url := s3.ResolveKey(ctx, u.s3, user.ProfilePicture); url != "" {
-		profilePicture = &url
-	}
-	if user.College != nil {
-		if url := s3.ResolveKey(ctx, u.s3, user.College.Logo); url != "" {
-			user.College.Logo = url
-		}
-	}
-	return &GetUserResponse{
-		ID:                    user.ID,
-		FirstName:             user.FirstName,
-		LastName:              user.LastName,
-		Email:                 user.Email,
-		Username:              user.Username,
-		Bio:                   user.Bio,
-		ProfilePicture:        profilePicture,
-		AccountType:           user.Account_Type,
-		Sport:                 user.Sport,
-		ExpectedGradYear:      user.Expected_Grad_Year,
-		VerifiedAthleteStatus: user.Verified_Athlete_Status,
-		College:               user.College,
-		Division:              user.Division,
-		Roles:                 roles,
-	}
 }
 
 func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*utils.ResponseBody[DeleteUserResponse], error) {
@@ -231,12 +205,28 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 }
 
 func (u *UserService) buildUserResponse(ctx context.Context, user *models.User, roleResponses *[]role.RoleResponse) *GetUserResponse {
-	return u.toUserResponse(ctx, user, roleResponses)
-}
-
-func stringValue(value *string) string {
-	if value == nil {
-		return ""
+	response := &GetUserResponse{
+		ID:                    user.ID,
+		FirstName:             user.FirstName,
+		LastName:              user.LastName,
+		Email:                 user.Email,
+		Username:              user.Username,
+		Bio:                   user.Bio,
+		ProfileImageKey:       user.ProfileImageKey,
+		AccountType:           user.Account_Type,
+		Sport:                 user.Sport,
+		ExpectedGradYear:      user.Expected_Grad_Year,
+		VerifiedAthleteStatus: user.Verified_Athlete_Status,
+		College:               user.College,
+		Division:              user.Division,
+		Roles:                 roleResponses,
 	}
-	return *value
+
+	if u.s3 != nil && user.ProfileImageKey != nil && *user.ProfileImageKey != "" {
+		if download, err := u.s3.GetDownloadURL(ctx, *user.ProfileImageKey); err == nil {
+			response.ProfileImageURL = &download.DownloadURL
+		}
+	}
+
+	return response
 }

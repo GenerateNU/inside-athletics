@@ -7,10 +7,7 @@ import (
 	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/handlers/user"
 	models "inside-athletics/internal/models"
-	"inside-athletics/internal/s3"
 	"inside-athletics/internal/utils"
-	"regexp"
-	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -32,22 +29,15 @@ type PostService struct {
 	postDB    *PostDB
 	tagPostDB *tagpost.TagPostDB
 	userDB    *user.UserDB
-	s3        *s3.Service
 }
 
 // NewPostService creates a new PostService instance.
-func NewPostService(db *gorm.DB, userDB *user.UserDB, s3Svc *s3.Service) *PostService {
+func NewPostService(db *gorm.DB, userDB *user.UserDB) *PostService {
 	return &PostService{
 		postDB:    NewPostDB(db),
 		tagPostDB: tagpost.NewTagPostDB(db),
 		userDB:    userDB,
-		s3:        s3Svc,
 	}
-}
-
-// resolvePostKeys resolves S3 keys in a post's author and college to presigned URLs.
-func (s *PostService) resolvePostKeys(ctx context.Context, p *models.Post) {
-	p.Author.ProfilePicture = s3.ResolveKey(ctx, s.s3, p.Author.ProfilePicture)
 }
 
 func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body CreatePostRequest }) (*utils.ResponseBody[CreatePostResponse], error) {
@@ -116,7 +106,6 @@ func (s *PostService) GetAllPosts(ctx context.Context, input *GetAllPostsParams)
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		s.resolvePostKeys(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
@@ -141,7 +130,6 @@ func (s *PostService) GetPopularPosts(ctx context.Context, input *GetPopularPost
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		s.resolvePostKeys(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
@@ -167,7 +155,6 @@ func (s *PostService) UpdatePost(ctx context.Context, input *struct {
 		return nil, err
 	}
 
-	s.resolvePostKeys(ctx, updatedPost)
 	return &utils.ResponseBody[PostResponse]{
 		Body: ToPostResponse(updatedPost, userID),
 	}, nil
@@ -196,7 +183,6 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 		}
 	}
 
-	s.resolvePostKeys(ctx, post)
 	return &utils.ResponseBody[PostResponse]{
 		Body: ToPostResponse(post, userID),
 	}, nil
@@ -214,7 +200,6 @@ func (s *PostService) GetPostBySportID(ctx context.Context, input *GetPostsBySpo
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		s.resolvePostKeys(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
@@ -238,7 +223,6 @@ func (s *PostService) GetPostByAuthorID(ctx context.Context, input *GetPostsByAu
 
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
-		s.resolvePostKeys(ctx, &posts[i])
 		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
 	}
 
@@ -270,82 +254,4 @@ func (s *PostService) DeletePost(ctx context.Context, input *struct {
 	return &utils.ResponseBody[DeletePostResponse]{
 		Body: response,
 	}, err
-}
-
-func (s *PostService) FuzzySearchForPost(ctx context.Context, input *GetSearchParam) (*utils.ResponseBody[GetSearchResponse], error) {
-	userID, err := utils.GetCurrentUserID(ctx)
-	if err != nil {
-		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
-	}
-	searchStr := input.SearchStr
-	posts, total, err := s.postDB.FuzzySearchForPost(userID, searchStr, input.Limit, input.Offset)
-	if err != nil {
-		return utils.HandleDBError(&utils.ResponseBody[GetSearchResponse]{}, err)
-	}
-	postResponses := make([]PostResponse, 0, len(posts))
-	for i := range posts {
-		s.resolvePostKeys(ctx, &posts[i])
-		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
-	}
-
-	return &utils.ResponseBody[GetSearchResponse]{
-		Body: &GetSearchResponse{
-			Posts: postResponses,
-			Count: total,
-		},
-	}, nil
-}
-
-func (s *PostService) FilterPosts(ctx context.Context, input *GetFilterPostsParams) (*utils.ResponseBody[GetAllPostsResponse], error) {
-	userID, err := utils.GetCurrentUserID(ctx)
-	if err != nil {
-		return nil, err
-	}
-	uuidPattern := `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`
-	fullPattern := fmt.Sprintf(`^%s(?:,%s)*$`, uuidPattern, uuidPattern)
-	re := regexp.MustCompile(fullPattern)
-
-	// input validation
-	if input.CollegeIds != "" && !re.MatchString(input.CollegeIds) {
-		return nil, huma.Error400BadRequest("Expected comma seperated list of uuids with no spaces for college input uuid,uuid")
-	}
-	if input.SportIds != "" && !re.MatchString(input.SportIds) {
-		return nil, huma.Error400BadRequest("Expected comma seperated list of uuids with no spaces for sport input uuid,uuid")
-	}
-	if input.TagIds != "" && !re.MatchString(input.TagIds) {
-		return nil, huma.Error400BadRequest("Expected comma seperated list of uuids with no spaces for tag input uuid,uuid")
-	}
-	mapUUID := func(id string) uuid.UUID {
-		parsedId, _ := uuid.Parse(id)
-		return parsedId
-	}
-
-	collegeIds := []uuid.UUID{}
-	sportIds := []uuid.UUID{}
-	tagIds := []uuid.UUID{}
-	if input.CollegeIds != "" {
-		collegeIds = utils.MapList(strings.Split(input.CollegeIds, ","), mapUUID)
-	}
-	if input.SportIds != "" {
-		sportIds = utils.MapList(strings.Split(input.SportIds, ","), mapUUID)
-	}
-	if input.TagIds != "" {
-		tagIds = utils.MapList(strings.Split(input.TagIds, ","), mapUUID)
-	}
-
-	posts, total, err := s.postDB.FilterPosts(userID, collegeIds, sportIds, tagIds, input.Limit, input.Offset)
-	if err != nil {
-		return nil, err
-	}
-	postResponses := make([]PostResponse, 0, len(posts))
-	for i := range posts {
-		s.resolvePostKeys(ctx, &posts[i])
-		postResponses = append(postResponses, *ToPostResponse(&posts[i], posts[i].ID))
-	}
-	return &utils.ResponseBody[GetAllPostsResponse]{
-		Body: &GetAllPostsResponse{
-			Posts: postResponses,
-			Total: int(total),
-		},
-	}, nil
 }

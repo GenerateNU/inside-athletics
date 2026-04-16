@@ -32,7 +32,6 @@ type CommentResponse struct {
 	LikeCount         int64        `json:"like_count" doc:"Number of total likes on comment" example:"20000" gorm:"type:int"`
 	IsLiked           bool         `json:"is_liked" doc:"If current user has liked this comment" example:"true" gorm:"type:bool"`
 	IsVerifiedAthlete bool         `json:"is_verified_athlete" doc:"If commenter is a verified athlete" example:"true" gorm:"type:bool"`
-	HasReplies        bool         `json:"has_replies" doc:"True if this comment has at least one reply" example:"true" gorm:"type:bool"`
 }
 
 type CreateCommentResponse struct {
@@ -90,7 +89,6 @@ func ToCommentResponse(c *models.Comment, id uuid.UUID) *CommentResponse {
 		LikeCount:         c.LikeCount,
 		IsLiked:           c.IsLiked,
 		IsVerifiedAthlete: c.User.Verified_Athlete_Status == models.VerifiedAthleteStatusVerified,
-		HasReplies:        c.HasReplies,
 	}
 }
 

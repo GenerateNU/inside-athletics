@@ -87,7 +87,3 @@ func (s *SportDB) DeleteSport(id uuid.UUID) error {
 	}
 	return nil
 }
-
-func (s *SportDB) FuzzySearchFor(searchStr string, limit int) ([]models.Sport, error) {
-	return utils.FuzzySearchForDB(searchStr, limit, s.db, "name", models.Sport{})
-}

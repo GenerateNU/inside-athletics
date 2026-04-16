@@ -24,8 +24,6 @@ func TestS3Service_GetUploadURL(t *testing.T) {
 
 	t.Run("returns upload URL and correct key format for contentID", func(t *testing.T) {
 		t.Parallel()
-		mock := NewMockS3Client()
-		svc := s3.NewService(mock, cfg)
 		resp, err := svc.GetUploadURL(ctx, s3.GetUploadURLInput{
 			Key:      "premium/image/content-123/photo.jpg",
 			FileType: "image/jpeg",

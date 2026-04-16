@@ -72,7 +72,3 @@ func (c *CollegeDB) DeleteCollege(id uuid.UUID) error {
 	dbResponse := c.db.Delete(&college)
 	return dbResponse.Error
 }
-
-func (c *CollegeDB) FuzzySearchFor(searchStr string, limit int) ([]models.College, error) {
-	return utils.FuzzySearchForDB(searchStr, limit, c.db, "name", models.College{})
-}

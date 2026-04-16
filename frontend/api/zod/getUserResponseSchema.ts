@@ -29,11 +29,6 @@ export const getUserResponseSchema = z.object({
   first_name: z.string().describe("The first name of a user"),
   id: z.string().describe("ID of the user"),
   last_name: z.string().describe("The last name of a user"),
-  profile_picture: z.optional(
-    z
-      .string()
-      .describe("Presigned download URL for the user's profile picture"),
-  ),
   get roles() {
     return z
       .array(roleResponseSchema)

@@ -19,9 +19,6 @@ export const userSchema = z.object({
   first_name: z.string().describe("The first name of a user"),
   id: z.string(),
   last_name: z.string().describe("The last name of a user"),
-  profile_picture: z
-    .string()
-    .describe("The S3 key for the user's profile picture"),
   sport: z.string().describe("The sport the user plays"),
   updated_at: z.iso.datetime(),
   username: z.string().describe("The username of a user"),

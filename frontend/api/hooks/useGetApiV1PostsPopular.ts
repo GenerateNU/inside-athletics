@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsPopularQueryResponse,
   GetApiV1PostsPopularQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1PostsPopular } from "../clients/getApiV1PostsPopular.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsPopularQueryKey = (
-  params?: GetApiV1PostsPopularQueryParams,
+  params: GetApiV1PostsPopularQueryParams = {},
 ) => [{ url: "/api/v1/posts/popular" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PostsPopularQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1PostsPopularQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1PostsPopular(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1PostsPopular(params, config);
     },
   });
 }
@@ -74,15 +73,15 @@ export function useGetApiV1PostsPopular<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1PostsPopularQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1PostsPopularQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1PostsPopularQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

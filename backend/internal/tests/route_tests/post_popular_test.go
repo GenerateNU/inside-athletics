@@ -96,10 +96,10 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 		t.Fatalf("create old post: %v", err)
 	}
 
-	if err := testDB.DB.Create(&models.TagPost{ID: uuid.New(), PostableID: relevantPost.ID, PostableType: "post", TagID: subscribedTag.ID}).Error; err != nil {
+	if err := testDB.DB.Create(&models.TagPost{ID: uuid.New(), PostID: relevantPost.ID, TagID: subscribedTag.ID}).Error; err != nil {
 		t.Fatalf("tag relevant post: %v", err)
 	}
-	if err := testDB.DB.Create(&models.TagPost{ID: uuid.New(), PostableID: likedPost.ID, PostableType: "post", TagID: otherTag.ID}).Error; err != nil {
+	if err := testDB.DB.Create(&models.TagPost{ID: uuid.New(), PostID: likedPost.ID, TagID: otherTag.ID}).Error; err != nil {
 		t.Fatalf("tag liked post: %v", err)
 	}
 	if err := testDB.DB.Create(&models.TagFollow{ID: uuid.New(), UserID: currentUser.ID, TagID: subscribedTag.ID}).Error; err != nil {

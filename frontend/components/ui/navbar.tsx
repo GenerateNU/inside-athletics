@@ -1,9 +1,13 @@
 "use client";
-import Image from "next/image";
+
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BookOpen, Briefcase, Home, Plus, Search } from "lucide-react";
+import {
+  BookOpen,
+  Briefcase,
+  Home,
+  Plus,
+  Search,
+} from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -29,9 +33,9 @@ import type { GetTagResponse } from "@/api/models/GetTagResponse";
 import type { SportResponse } from "@/api/models/SportResponse";
 
 const navItems = [
-  { label: "Home", icon: Home, href: "/" },
-  { label: "Explore", icon: Search, href: "/explore" },
-  { label: "Post", icon: Plus, href: "/post" },
+  { label: "Home", icon: Home },
+  { label: "Explore", icon: Search },
+  { label: "Post", icon: Plus },
 ];
 
 function unwrapBody<T>(value: unknown): T | undefined {
@@ -62,7 +66,6 @@ type NavbarProps = React.ComponentProps<"aside">;
 
 export function Navbar({ className, ...props }: NavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const pathname = usePathname();
   const session = useSession();
   const enabled = !!session?.access_token;
   const authHeaders = session?.access_token
@@ -132,33 +135,18 @@ export function Navbar({ className, ...props }: NavbarProps) {
   const followingItems = [
     ...sportResults.flatMap((r) =>
       unwrapBody<SportResponse>(r.data)
-        ? [
-            {
-              label: unwrapBody<SportResponse>(r.data)!.name,
-              type: "sport" as const,
-            },
-          ]
-        : [],
+        ? [{ label: unwrapBody<SportResponse>(r.data)!.name, type: "sport" as const }]
+        : []
     ),
     ...tagResults.flatMap((r) =>
       unwrapBody<GetTagResponse>(r.data)
-        ? [
-            {
-              label: unwrapBody<GetTagResponse>(r.data)!.name,
-              type: "tag" as const,
-            },
-          ]
-        : [],
+        ? [{ label: unwrapBody<GetTagResponse>(r.data)!.name, type: "tag" as const }]
+        : []
     ),
     ...collegeResults.flatMap((r) =>
       unwrapBody<GetCollegeResponse>(r.data)
-        ? [
-            {
-              label: unwrapBody<GetCollegeResponse>(r.data)!.name,
-              type: "school" as const,
-            },
-          ]
-        : [],
+        ? [{ label: unwrapBody<GetCollegeResponse>(r.data)!.name, type: "school" as const }]
+        : []
     ),
   ];
 
@@ -187,12 +175,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
             isCollapsed && "justify-center",
           )}
         >
-          <Image
-            src={"/logo_image.svg"}
-            width={45}
-            height={45}
-            alt="Picture of the author"
-          />
+          <div aria-hidden="true" className="h-[clamp(2rem,3vw,2.5rem)] w-[clamp(2rem,3vw,2.5rem)] shrink-0 rounded-sm bg-zinc-300" />
           {!isCollapsed && (
             <span className="truncate text-[clamp(0.95rem,1.4vw,1.125rem)] font-bold tracking-tight text-black">
               Inside Athletics
@@ -215,53 +198,30 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
       <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
 
-      {/* Nav items */}
-      <nav
-        aria-label="Primary"
-        className={cn(
-          "flex flex-col gap-1",
-          isCollapsed && "w-full items-center",
-        )}
-      >
-        {navItems.map(({ label, icon: Icon, href }) => {
-          const isActive = pathname === href;
-          return (
-            <Button
-              key={label}
-              variant="ghost"
-              size="lg"
-              className={cn(
-                "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium hover:bg-zinc-100 hover:text-zinc-900",
-                isActive ? "bg-zinc-100 text-zinc-900" : "text-zinc-700",
-                isCollapsed
-                  ? "w-12 justify-center px-0"
-                  : "justify-start gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
-              )}
-              aria-label={label}
-              aria-current={isActive ? "page" : undefined}
-              title={label}
-              nativeButton={false}
-              render={<Link href={href} />}
-            >
-              <Icon
-                className={cn(
-                  "size-[clamp(0.9rem,1.2vw,1rem)] shrink-0",
-                  isActive ? "text-zinc-900" : "text-zinc-700",
-                )}
-              />
-              {!isCollapsed && <span className="truncate">{label}</span>}
-            </Button>
-          );
-        })}
+      {/* Nav items — unchanged */}
+      <nav aria-label="Primary" className={cn("flex flex-col gap-1", isCollapsed && "w-full items-center")}>
+        {navItems.map(({ label, icon: Icon }) => (
+          <Button
+            key={label}
+            variant="ghost"
+            size="lg"
+            className={cn(
+              "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900",
+              isCollapsed
+                ? "w-12 justify-center px-0"
+                : "justify-start gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+            )}
+            aria-label={label}
+            title={label}
+          >
+            <Icon className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
+            {!isCollapsed && <span className="truncate">{label}</span>}
+          </Button>
+        ))}
       </nav>
 
       {/* Following section — same JSX, driven by new data */}
-      <div
-        className={cn(
-          "mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]",
-          isCollapsed && "w-full",
-        )}
-      >
+      <div className={cn("mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]", isCollapsed && "w-full")}>
         <div
           className={cn(
             "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
@@ -271,7 +231,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
           <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
           {!isCollapsed && (
             <span className="truncate text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium text-zinc-800">
-              Followed Tags & Schools
+              Schools/Sports/Tags Following
             </span>
           )}
         </div>
@@ -305,10 +265,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
               ) : type === "sport" ? (
                 <Briefcase className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
               ) : (
-                <span
-                  aria-hidden="true"
-                  className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black"
-                />
+                <span aria-hidden="true" className="h-[clamp(0.3rem,0.5vw,0.375rem)] w-[clamp(0.3rem,0.5vw,0.375rem)] shrink-0 rounded-full bg-black" />
               )}
               {!isCollapsed && <span className="truncate">{label}</span>}
             </button>

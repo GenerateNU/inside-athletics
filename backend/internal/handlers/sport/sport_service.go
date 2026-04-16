@@ -2,7 +2,6 @@ package sport
 
 import (
 	"context"
-	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -119,8 +118,4 @@ func (s *SportService) DeleteSport(ctx context.Context, input *DeleteSportReques
 	return &utils.ResponseBody[SportResponse]{
 		Body: ToSportResponse(sport),
 	}, nil
-}
-
-func (s *SportService) FuzzySearchFor(ctx context.Context, input *utils.SearchParam) (*utils.ResponseBody[utils.SearchResults[*SportResponse]], error) {
-	return utils.FuzzySearchService(input, models.Sport{}, SportResponse{}, "name", s.sportDB.db, ToSportResponse)
 }
