@@ -23,11 +23,12 @@ func TestGetCollege(t *testing.T) {
 	})
 
 	college := models.College{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
@@ -60,11 +61,12 @@ func TestCreateCollege(t *testing.T) {
 	})
 
 	requestBody := h.CreateCollegeRequest{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 
 	// converting to json string format
@@ -97,11 +99,12 @@ func TestUpdateCollege(t *testing.T) {
 	})
 
 	college := models.College{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
@@ -162,11 +165,12 @@ func TestDeleteCollege(t *testing.T) {
 	})
 
 	college := models.College{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&college)
 	_, err := utils.HandleDBError(&college, collegeResp.Error)
@@ -201,10 +205,11 @@ func TestCreateCollegeMissingName(t *testing.T) {
 	})
 
 	requestBody := h.CreateCollegeRequest{
-		State:        "Massachusetts",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -233,10 +238,11 @@ func TestCreateCollegeMissingState(t *testing.T) {
 	})
 
 	requestBody := h.CreateCollegeRequest{
-		Name:         "Northeastern University",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -265,10 +271,11 @@ func TestCreateCollegeMissingCity(t *testing.T) {
 	})
 
 	requestBody := h.CreateCollegeRequest{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -297,10 +304,11 @@ func TestCreateCollegeMissingDivisionRank(t *testing.T) {
 	})
 
 	requestBody := h.CreateCollegeRequest{
-		Name:    "Northeastern University",
-		State:   "Massachusetts",
-		City:    "Boston",
-		Website: "https://www.northeastern.edu",
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -329,10 +337,11 @@ func TestCreateCollegeMissingWebsite(t *testing.T) {
 	})
 
 	requestBody := h.CreateCollegeRequest{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		City:         "Boston",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		DivisionRank:     models.DivisionI,
+		AthleticsWebsite: "https://www.huskies.edu",
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -358,11 +367,12 @@ func TestCollegeSearch(t *testing.T) {
 	})
 
 	neu := models.College{
-		Name:         "Northeastern University",
-		State:        "Massachusetts",
-		City:         "Boston",
-		Website:      "https://www.northeastern.edu",
-		DivisionRank: models.DivisionI,
+		Name:             "Northeastern University",
+		State:            "Massachusetts",
+		City:             "Boston",
+		Website:          "https://www.northeastern.edu",
+		AthleticsWebsite: "https://www.huskies.edu",
+		DivisionRank:     models.DivisionI,
 	}
 	collegeResp := testDB.DB.Create(&neu)
 	_, err := utils.HandleDBError(&neu, collegeResp.Error)
@@ -372,11 +382,12 @@ func TestCollegeSearch(t *testing.T) {
 	}
 
 	erm := models.College{
-		Name:         "Erm University",
-		State:        "Ur moms house",
-		City:         "ur moms house",
-		Website:      "urmom.com",
-		DivisionRank: models.DivisionI,
+		Name:             "Erm University",
+		State:            "Ur moms house",
+		City:             "ur moms house",
+		Website:          "urmom.com",
+		AthleticsWebsite: "urmom.comagain",
+		DivisionRank:     models.DivisionI,
 	}
 	ermResp := testDB.DB.Create(&erm)
 	_, err1 := utils.HandleDBError(&erm, ermResp.Error)

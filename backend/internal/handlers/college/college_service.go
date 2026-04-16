@@ -140,13 +140,14 @@ func (u *CollegeService) FuzzySearchForCollege(ctx context.Context, input *utils
 
 func toCollegeResponse(college *models.College) *GetCollegeResponse {
 	return &GetCollegeResponse{
-		ID:           college.ID,
-		Name:         college.Name,
-		State:        college.State,
-		City:         college.City,
-		Website:      college.Website,
-		AcademicRank: college.AcademicRank,
-		DivisionRank: college.DivisionRank,
-		Logo:         StringPtrOrNil(college.Logo),
+		ID:               college.ID,
+		Name:             college.Name,
+		State:            college.State,
+		City:             college.City,
+		Website:          college.Website,
+		AthleticsWebsite: college.AthleticsWebsite,
+		AcademicRank:     college.AcademicRank,
+		DivisionRank:     college.DivisionRank,
+		Logo:             StringPtrOrNil(college.Logo),
 	}
 }
