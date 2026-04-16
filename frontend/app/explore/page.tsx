@@ -1,31 +1,32 @@
 "use client";
 
 import { useState } from "react";
-// import { useSession } from "@/utils/SessionContext";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/utils/SessionContext";
 
 import { SearchBar } from "@/components/post/SearchBar";
 import SmallPost from "@/components/post/SmallPost";
 import { Navbar } from "@/components/ui/navbar";
 import { Tag } from "@/components/post/Tag";
 
-// import {
-//     useGetApiV1Posts,
-//     useGetApiV1TagsSearch,
-//     useGetApiV1TagByTagIdPosts,
-// } from "@/api/hooks";
-import type { GetTagResponse } from "@/api/models/GetTagResponse";
+import { useQueries } from "@tanstack/react-query";
+import {
+    useGetApiV1Sports,
+    useGetApiV1CollegesSearch,
+    useGetApiV1Posts,
+    useGetApiV1UserTagFollows,
+    useGetApiV1PostsSearch,
+    useGetApiV1TagsSearch,
+    useGetApiV1TagByTagIdPosts,
+    getApiV1TagByIdQueryOptions,
+} from "@/api/hooks";
+import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
 import type { PostResponse } from "@/api/models/PostResponse";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
+import { GetTagResponse } from "@/api";
 
 // --- MOCK DATA (remove fallbacks once API is fixed) ---
-const MOCK_TAGS: GetTagResponse[] = [
-    { id: "1", name: "Basketball" },
-    { id: "2", name: "Swimming" },
-    { id: "3", name: "Football" },
-    { id: "4", name: "Northeastern University" },
-    { id: "5", name: "Binghamton University" },
-    { id: "6", name: "Baseball" },
-    { id: "7", name: "Diving" },
+const MOCK_TAGS: GetTagFollowsByUserResponse[] = [
 ];
 
 const MOCK_USER = {
@@ -112,51 +113,70 @@ const MOCK_POSTS: PostResponse[] = [
 // --- END MOCK DATA ---
 
 export default function ExplorePage() {
-    // const session = useSession();
-    // const authHeaders = session?.access_token
-    //     ? { Authorization: `Bearer ${session.access_token}` }
-    //     : undefined;
+    const session = useSession();
+    const enabled = !!session?.access_token;
 
+    const authHeaders = session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : undefined;
+
+    const router = useRouter();
     const [query, setQuery] = useState("");
     const [activeTag, setActiveTag] = useState<GetTagResponse | null>(null);
 
-    // const { data: tagsData } = useGetApiV1TagsSearch(
-    //     {},
-    //     { client: { headers: authHeaders } },
-    // );
+    const { data: tagsfollowsData } = useGetApiV1UserTagFollows(
+        { 
+            query: { enabled },
+            client: { headers: authHeaders } 
+        },
+    );
 
-    // const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1Posts(
-    //     {},
-    //     { client: { headers: authHeaders } },
-    // );
+    const tagIds = tagsfollowsData?.tag_ids ?? [];
+    const tagQueries = useQueries({
+        queries: tagIds.map((id) =>
+            getApiV1TagByIdQueryOptions(id, { headers: authHeaders }),
+        ),
+    });
+    const followedTags = tagQueries
+        .map((q) => q.data)
+        .filter((t) => t !== undefined);
 
-    // const { data: tagPostsData, isLoading: loadingTagPosts } = useGetApiV1TagByTagIdPosts(
-    //     activeTag?.id ?? "",
-    //     {},
-    //     {
-    //         query: { enabled: !!activeTag },
-    //         client: { headers: authHeaders },
-    //     },
-    // );
+    const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1Posts(
+        { },
+        { 
+            query: { enabled },
+            client: { headers: authHeaders } },
+    );
+    console.log(allPostsData)
 
-    // const popularTags = tagsData?.results ?? [];
-    // const posts = activeTag
-    //     ? (tagPostsData?.post_ids ?? [])
-    //     : (allPostsData?.posts ?? []);
-    // const isLoading = activeTag ? loadingTagPosts : loadingAllPosts;
-    const popularTags = MOCK_TAGS;
-    const posts = MOCK_POSTS;
-    const isLoading = false;
+    const { data: tagPostsData, isLoading: loadingTagPosts } = useGetApiV1TagByTagIdPosts(
+        activeTag?.id ?? "",
+        {},
+        {
+            query: { enabled: !!activeTag },
+            client: { headers: authHeaders },
+        },
+    );
+
+    const posts = activeTag
+        ? (tagPostsData?.post_ids ?? [])
+        : (allPostsData?.posts ?? []);
+    const isLoading = activeTag ? loadingTagPosts : loadingAllPosts;
+
+    // const popularTags = MOCK_TAGS;
+    // const posts = MOCK_POSTS;
+    // const isLoading = false;
 
     return (
         <div className="min-h-screen bg-zinc-50">
             <div className="flex min-h-screen">
                 <Navbar className="h-screen shrink-0" />
                 <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
-                    <div className="flex w-full max-w-3xl flex-col gap-10">
+                    <div className="flex w-full max-w-5xl flex-col gap-10">
                         <SearchBar
                             value={query}
                             onChange={setQuery}
+                            onSubmit={() => query.trim() && router.push(`/search?q=${encodeURIComponent(query.trim())}`)}
                             placeholder="Search posts..."
                             className="w-full"
                         />
@@ -164,7 +184,7 @@ export default function ExplorePage() {
                         <div className="flex flex-col gap-3 w-full">
                             <h2 className="font-semibold text-base">Popular Tags</h2>
                             <div className="flex flex-wrap gap-2">
-                                {popularTags.map((tag) => (
+                                {followedTags.map((tag) => (
                                     <button
                                         key={tag.id}
                                         onClick={() => setActiveTag(activeTag?.id === tag.id ? null : tag)}
