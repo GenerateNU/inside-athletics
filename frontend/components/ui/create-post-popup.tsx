@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { UseEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
@@ -14,10 +14,13 @@ import { createPostRequestSchema } from "@/api/zod/createPostRequestSchema";
 import { errorModelSchema } from "@/api/zod/errorModelSchema";
 
 export default function CreatePostPopup() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeTags, setActiveTags] = useState<Tag[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isInsiderContent, setIsInsiderContent] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<{
     value: string;
     label: string;
@@ -73,6 +76,17 @@ export default function CreatePostPopup() {
       setError(fieldMessages[field as string] ?? "Please fill out all required fields.");
       return;
     }
+
+    UseEffect(() => {
+    fetch("/api/v1/role/roles", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setIsAdmin(data.roles.some((r: { name: string }) => r.name === "admin"));
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
     try {
       await createPost({ data: parsed.data });
@@ -154,6 +168,21 @@ export default function CreatePostPopup() {
         <label className="block text-1xl text-[#001225] font-bold">
           Message
         </label>
+        {isAdmin && (
+                    <div className="flex items-center gap-1">
+            <label className="text-xs font-bold text-[#001225]">
+              Mark as Insider Content
+            </label>
+            <button
+              onClick={() => setIsInsiderContent(!isInsiderContent)}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isInsiderContent ? "bg-[#2C649A]" : "bg-gray-300"}`}
+            >
+              <span
+                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isInsiderContent ? "translate-x-5" : "translate-x-1"}`}
+              />
+            </button>
+          </div>
+        )}
         <Textarea
           placeholder="Body Text"
           value={content}

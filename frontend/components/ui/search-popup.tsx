@@ -11,7 +11,6 @@ function TagSection({
   header,
   tags,
   activeTags,
-  maxTagNum,
   onToggle,
 }: {
   header: string;
