@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url,
+).toString();
 
 export default function PDFViewer({ src }: { src: string }) {
   const [numPages, setNumPages] = useState<number>(0);
@@ -17,7 +20,12 @@ export default function PDFViewer({ src }: { src: string }) {
   return (
     <div className="flex flex-col items-center gap-4">
       <Document file={src} onLoadSuccess={onLoadSuccess}>
-        <Page pageNumber={pageNumber} />
+        <Page
+          pageNumber={pageNumber}
+          width={600}
+          renderTextLayer={false}
+          renderAnnotationLayer={false}
+        />
       </Document>
 
       {/* Controls */}
