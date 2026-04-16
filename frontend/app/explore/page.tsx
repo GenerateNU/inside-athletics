@@ -16,15 +16,8 @@ import {
     useGetApiV1PostsFilter,
     useGetApiV1Posts,
     useGetApiV1UserTagFollows,
-    useGetApiV1UserCollegeFollows,
-    useGetApiV1UserSportFollows,
-    useGetApiV1PostsSearch,
-    useGetApiV1TagsSearch,
-
     getApiV1TagByIdQueryOptions,
 } from "@/api/hooks";
-import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
-import type { PostResponse } from "@/api/models/PostResponse";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
 import { GetTagResponse } from "@/api";
 
