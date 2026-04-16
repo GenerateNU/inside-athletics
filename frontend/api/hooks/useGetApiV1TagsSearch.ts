@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1TagsSearchQueryResponse,
   GetApiV1TagsSearchQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1TagsSearch } from "../clients/getApiV1TagsSearch.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1TagsSearchQueryKey = (
-  params?: GetApiV1TagsSearchQueryParams,
+  params: GetApiV1TagsSearchQueryParams = {},
 ) => [{ url: "/api/v1/tags/search" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1TagsSearchQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1TagsSearchQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1TagsSearch(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1TagsSearch(params, config);
     },
   });
 }
@@ -74,15 +73,14 @@ export function useGetApiV1TagsSearch<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
-  const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1TagsSearchQueryKey(params);
+  const { client: queryClient, ...queryOptions } = queryConfig;
+  const queryKey = queryOptions?.queryKey ?? getApiV1TagsSearchQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1TagsSearchQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

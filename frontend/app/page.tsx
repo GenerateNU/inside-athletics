@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
 import { SearchBar } from "@/components/post/SearchBar";
+import CreatePostPopup from "@/components/ui/create-post-popup";
 import SmallPost from "@/components/post/SmallPost";
 import { Navbar } from "@/components/ui/navbar";
 import { Tag } from "@/components/post/Tag";
@@ -92,6 +94,11 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
+      {showCreatePost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <CreatePostPopup />
+        </div>
+      )}
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
         <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">

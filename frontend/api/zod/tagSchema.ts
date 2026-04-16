@@ -10,5 +10,6 @@ export const tagSchema = z.object({
   deleted_at: z.nullable(z.iso.datetime()),
   id: z.string(),
   name: z.string().describe("The name of the tag"),
+  type: z.string().describe("The type of the tag"),
   updated_at: z.iso.datetime(),
 });

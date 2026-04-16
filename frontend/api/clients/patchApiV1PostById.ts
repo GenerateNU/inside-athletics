@@ -26,7 +26,7 @@ function getPatchApiV1PostByIdUrl(id: PatchApiV1PostByIdPathParams["id"]) {
  */
 export async function patchApiV1PostById(
   id: PatchApiV1PostByIdPathParams["id"],
-  data: PatchApiV1PostByIdMutationRequest,
+  data?: PatchApiV1PostByIdMutationRequest,
   config: Partial<RequestConfig<PatchApiV1PostByIdMutationRequest>> & {
     client?: Client;
   } = {},

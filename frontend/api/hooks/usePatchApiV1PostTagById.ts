@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PatchApiV1PostTagByIdMutationRequest,
   PatchApiV1PostTagByIdMutationResponse,

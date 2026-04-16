@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1UserTagByTagIdUsersQueryResponse,
   GetApiV1UserTagByTagIdUsersPathParams,
@@ -46,10 +47,8 @@ export function getApiV1UserTagByTagIdUsersSuspenseQueryOptions(
     enabled: !!tag_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1UserTagByTagIdUsers(tag_id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1UserTagByTagIdUsers(tag_id, config);
     },
   });
 }
@@ -76,16 +75,16 @@ export function useGetApiV1UserTagByTagIdUsersSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
+    queryOptions?.queryKey ??
     getApiV1UserTagByTagIdUsersSuspenseQueryKey(tag_id);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1UserTagByTagIdUsersSuspenseQueryOptions(tag_id, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

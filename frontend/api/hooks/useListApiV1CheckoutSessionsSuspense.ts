@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   ListApiV1CheckoutSessionsQueryResponse,
   ListApiV1CheckoutSessionsQueryParams,
@@ -22,7 +23,7 @@ import { listApiV1CheckoutSessions } from "../clients/listApiV1CheckoutSessions.
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const listApiV1CheckoutSessionsSuspenseQueryKey = (
-  params?: ListApiV1CheckoutSessionsQueryParams,
+  params: ListApiV1CheckoutSessionsQueryParams = {},
 ) =>
   [{ url: "/api/v1/checkout/sessions/" }, ...(params ? [params] : [])] as const;
 
@@ -43,10 +44,8 @@ export function listApiV1CheckoutSessionsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return listApiV1CheckoutSessions(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return listApiV1CheckoutSessions(params, config);
     },
   });
 }
@@ -73,16 +72,15 @@ export function useListApiV1CheckoutSessionsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
-    listApiV1CheckoutSessionsSuspenseQueryKey(params);
+    queryOptions?.queryKey ?? listApiV1CheckoutSessionsSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...listApiV1CheckoutSessionsSuspenseQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

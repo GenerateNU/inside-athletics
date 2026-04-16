@@ -10,10 +10,15 @@ export type CreateTagPostBody = {
    */
   readonly $schema?: string;
   /**
-   * @description ID of the post
+   * @description ID of the post or premium post
    * @type string
    */
-  post_id: string;
+  postable_id: string;
+  /**
+   * @description Type: post or premium_post
+   * @type string
+   */
+  postable_type: string;
   /**
    * @description ID of the tag
    * @type string

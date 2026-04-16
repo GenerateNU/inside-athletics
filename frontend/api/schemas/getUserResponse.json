@@ -19,6 +19,7 @@
       "type": "string"
     },
     "college": {
+      "description": "The college of a user",
       "additionalProperties": false,
       "properties": {
         "academic_rank": {
@@ -78,8 +79,7 @@
         "logo"
       ],
       "type": "object",
-      "x-readme-ref-name": "College",
-      "description": "The college of a user"
+      "x-readme-ref-name": "College"
     },
     "division": {
       "description": "The division of their college",
@@ -185,6 +185,7 @@
       "type": "array"
     },
     "sport": {
+      "description": "The sport(s) the user is interested in",
       "additionalProperties": false,
       "properties": {
         "created_at": { "format": "date-time", "type": "string" },
@@ -209,8 +210,7 @@
       },
       "required": ["id", "created_at", "updated_at", "name"],
       "type": "object",
-      "x-readme-ref-name": "Sport",
-      "description": "The sport(s) the user is interested in"
+      "x-readme-ref-name": "Sport"
     },
     "username": {
       "description": "The username of a user",

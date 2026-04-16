@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsBySportBySportIdQueryResponse,
   GetApiV1PostsBySportBySportIdPathParams,
@@ -24,7 +25,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsBySportBySportIdQueryKey = (
   sport_id: GetApiV1PostsBySportBySportIdPathParams["sport_id"],
-  params?: GetApiV1PostsBySportBySportIdQueryParams,
+  params: GetApiV1PostsBySportBySportIdQueryParams = {},
 ) =>
   [
     { url: "/api/v1/posts/by-sport/:sport_id", params: { sport_id: sport_id } },
@@ -50,10 +51,8 @@ export function getApiV1PostsBySportBySportIdQueryOptions(
     enabled: !!sport_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1PostsBySportBySportId(sport_id, params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1PostsBySportBySportId(sport_id, params, config);
     },
   });
 }
@@ -83,16 +82,16 @@ export function useGetApiV1PostsBySportBySportId<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
+    queryOptions?.queryKey ??
     getApiV1PostsBySportBySportIdQueryKey(sport_id, params);
 
   const query = useQuery(
     {
       ...getApiV1PostsBySportBySportIdQueryOptions(sport_id, params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

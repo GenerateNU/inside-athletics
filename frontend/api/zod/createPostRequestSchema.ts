@@ -11,11 +11,11 @@ export const createPostRequestSchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   college_id: z.optional(z.string()),
-  content: z.string(),
+  content: z.string().min(1).max(5000),
   is_anonymous: z.boolean(),
   sport_id: z.optional(z.string()),
   get tags() {
     return z.array(tagRequestSchema).nullish();
   },
-  title: z.string(),
+  title: z.string().min(1).max(100),
 });

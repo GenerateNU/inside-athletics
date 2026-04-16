@@ -26,7 +26,7 @@ function getPatchApiV1RoleByIdUrl(id: PatchApiV1RoleByIdPathParams["id"]) {
  */
 export async function patchApiV1RoleById(
   id: PatchApiV1RoleByIdPathParams["id"],
-  data: PatchApiV1RoleByIdMutationRequest,
+  data?: PatchApiV1RoleByIdMutationRequest,
   config: Partial<RequestConfig<PatchApiV1RoleByIdMutationRequest>> & {
     client?: Client;
   } = {},

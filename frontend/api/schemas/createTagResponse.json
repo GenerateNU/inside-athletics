@@ -17,9 +17,14 @@
       "description": "The name of the tag created",
       "examples": ["Hockey"],
       "type": "string"
+    },
+    "type": {
+      "description": "The type of the tag",
+      "examples": ["sports"],
+      "type": "string"
     }
   },
-  "required": ["id", "name"],
+  "required": ["id", "name", "type"],
   "type": "object",
   "x-readme-ref-name": "CreateTagResponse"
 }

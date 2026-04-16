@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1SurveyAveragesQueryResponse,
   GetApiV1SurveyAveragesQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1SurveyAverages } from "../clients/getApiV1SurveyAverages.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1SurveyAveragesSuspenseQueryKey = (
-  params?: GetApiV1SurveyAveragesQueryParams,
+  params: GetApiV1SurveyAveragesQueryParams = {},
 ) => [{ url: "/api/v1/survey/averages" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1SurveyAveragesSuspenseQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1SurveyAveragesSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1SurveyAverages(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1SurveyAverages(params, config);
     },
   });
 }
@@ -72,15 +71,15 @@ export function useGetApiV1SurveyAveragesSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1SurveyAveragesSuspenseQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1SurveyAveragesSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1SurveyAveragesSuspenseQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

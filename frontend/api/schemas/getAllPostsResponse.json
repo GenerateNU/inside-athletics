@@ -23,31 +23,97 @@
           "author": {
             "additionalProperties": false,
             "properties": {
+              "$schema": {
+                "description": "A URL to the JSON Schema for this object.",
+                "examples": [
+                  "https://example.com/schemas/GetUserResponse.json"
+                ],
+                "format": "uri",
+                "readOnly": true,
+                "type": "string"
+              },
               "account_type": {
                 "description": "If the user has access to premium features",
                 "examples": [true],
                 "type": "boolean"
               },
               "bio": {
-                "description": "The name of a user",
+                "description": "The bio of a user",
                 "examples": ["My name is Suli and I'm a pro athlete"],
-                "type": ["string", "null"]
+                "type": "string"
               },
               "college": {
                 "description": "The college of a user",
-                "type": "string"
-              },
-              "created_at": { "format": "date-time", "type": "string" },
-              "deleted_at": {
-                "format": "date-time",
-                "type": ["string", "null"]
+                "additionalProperties": false,
+                "properties": {
+                  "academic_rank": {
+                    "description": "The academic rank of the college",
+                    "examples": [53],
+                    "format": "int32",
+                    "type": ["integer", "null"]
+                  },
+                  "city": {
+                    "description": "The city of the college",
+                    "examples": ["Boston"],
+                    "type": "string"
+                  },
+                  "created_at": { "format": "date-time", "type": "string" },
+                  "deleted_at": {
+                    "format": "date-time",
+                    "type": ["string", "null"]
+                  },
+                  "division_rank": {
+                    "description": "NCAA division (1, 2, or 3)",
+                    "enum": [1, 2, 3],
+                    "examples": [1],
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "id": { "type": "string" },
+                  "logo": {
+                    "description": "The S3 key for the logo of the college",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "The name of a college",
+                    "examples": ["Northeastern University"],
+                    "type": "string"
+                  },
+                  "state": {
+                    "description": "The state of the college",
+                    "examples": ["Massachusetts"],
+                    "type": "string"
+                  },
+                  "updated_at": { "format": "date-time", "type": "string" },
+                  "website": {
+                    "description": "The website of the college",
+                    "examples": ["https://www.northeastern.edu"],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "created_at",
+                  "updated_at",
+                  "deleted_at",
+                  "name",
+                  "state",
+                  "city",
+                  "website",
+                  "academic_rank",
+                  "division_rank",
+                  "logo"
+                ],
+                "type": "object",
+                "x-readme-ref-name": "College"
               },
               "division": {
-                "description": "The divison of their college",
+                "description": "The division of their college",
                 "examples": [1],
                 "format": "int64",
                 "minimum": 0,
-                "type": ["integer", "null"]
+                "type": "integer"
               },
               "email": {
                 "description": "The email of a user",
@@ -66,52 +132,137 @@
                 "examples": ["Suli"],
                 "type": "string"
               },
-              "id": { "type": "string" },
+              "id": {
+                "description": "ID of the user",
+                "examples": ["1"],
+                "type": "string"
+              },
               "last_name": {
                 "description": "The last name of a user",
                 "examples": ["Suli"],
                 "type": "string"
               },
               "profile_picture": {
-                "description": "The S3 key for the user's profile picture",
+                "description": "Presigned download URL for the user's profile picture",
                 "type": "string"
+              },
+              "roles": {
+                "description": "Roles assigned to the user",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "$schema": {
+                      "description": "A URL to the JSON Schema for this object.",
+                      "examples": [
+                        "https://example.com/schemas/RoleResponse.json"
+                      ],
+                      "format": "uri",
+                      "readOnly": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "ID of the role",
+                      "examples": ["1"],
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name of the role",
+                      "examples": ["admin"],
+                      "type": "string"
+                    },
+                    "permissions": {
+                      "description": "Permissions attached to the role",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "$schema": {
+                            "description": "A URL to the JSON Schema for this object.",
+                            "examples": [
+                              "https://example.com/schemas/PermissionResponse.json"
+                            ],
+                            "format": "uri",
+                            "readOnly": true,
+                            "type": "string"
+                          },
+                          "action": {
+                            "description": "Action for the permission",
+                            "examples": ["create"],
+                            "type": "string"
+                          },
+                          "id": {
+                            "description": "ID of the permission",
+                            "examples": ["1"],
+                            "type": "string"
+                          },
+                          "resource": {
+                            "description": "Resource for the permission",
+                            "examples": ["user"],
+                            "type": "string"
+                          }
+                        },
+                        "required": ["id", "action", "resource"],
+                        "type": "object",
+                        "x-readme-ref-name": "PermissionResponse"
+                      },
+                      "type": ["array", "null"]
+                    }
+                  },
+                  "required": ["id", "name"],
+                  "type": "object",
+                  "x-readme-ref-name": "RoleResponse"
+                },
+                "type": "array"
               },
               "sport": {
-                "description": "The sport the user plays",
-                "examples": ["hockey"],
-                "type": "string"
+                "description": "The sport(s) the user is interested in",
+                "additionalProperties": false,
+                "properties": {
+                  "created_at": { "format": "date-time", "type": "string" },
+                  "deleted_at": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "Time": { "format": "date-time", "type": "string" },
+                      "Valid": { "type": "boolean" }
+                    },
+                    "required": ["Time", "Valid"],
+                    "type": "object",
+                    "x-readme-ref-name": "DeletedAt"
+                  },
+                  "id": { "type": "string" },
+                  "name": { "examples": ["Women's Soccer"], "type": "string" },
+                  "popularity": {
+                    "examples": [20000],
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "updated_at": { "format": "date-time", "type": "string" }
+                },
+                "required": ["id", "created_at", "updated_at", "name"],
+                "type": "object",
+                "x-readme-ref-name": "Sport"
               },
-              "updated_at": { "format": "date-time", "type": "string" },
               "username": {
                 "description": "The username of a user",
-                "examples": ["suliproathelete"],
+                "examples": ["suliproathlete"],
                 "type": "string"
               },
-              "verified_athelete_status": {
+              "verified_athlete_status": {
+                "description": "Verification status for the athlete",
                 "examples": ["pending"],
                 "type": "string"
               }
             },
             "required": [
               "id",
-              "created_at",
-              "updated_at",
-              "deleted_at",
               "first_name",
               "last_name",
               "email",
               "username",
-              "bio",
-              "profile_picture",
               "account_type",
-              "sport",
-              "expected_grad_year",
-              "verified_athelete_status",
-              "college",
-              "division"
+              "verified_athlete_status"
             ],
             "type": "object",
-            "x-readme-ref-name": "User"
+            "x-readme-ref-name": "GetUserResponse"
           },
           "college": {
             "additionalProperties": false,
@@ -245,6 +396,11 @@
                   "examples": ["Hockey"],
                   "type": "string"
                 },
+                "type": {
+                  "description": "The type of the tag",
+                  "examples": ["sports"],
+                  "type": "string"
+                },
                 "updated_at": { "format": "date-time", "type": "string" }
               },
               "required": [
@@ -252,7 +408,8 @@
                 "created_at",
                 "updated_at",
                 "deleted_at",
-                "name"
+                "name",
+                "type"
               ],
               "type": "object",
               "x-readme-ref-name": "Tag"

@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PatchApiV1UserMutationRequest,
   PatchApiV1UserMutationResponse,
@@ -36,7 +37,7 @@ export function patchApiV1UserMutationOptions<TContext = unknown>(
   return mutationOptions<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data: PatchApiV1UserMutationRequest },
+    { data?: PatchApiV1UserMutationRequest },
     TContext
   >({
     mutationKey,
@@ -55,7 +56,7 @@ export function usePatchApiV1User<TContext>(
     mutation?: UseMutationOptions<
       PatchApiV1UserMutationResponse,
       ResponseErrorConfig<Error>,
-      { data: PatchApiV1UserMutationRequest },
+      { data?: PatchApiV1UserMutationRequest },
       TContext
     > & { client?: QueryClient };
     client?: Partial<RequestConfig<PatchApiV1UserMutationRequest>> & {
@@ -73,14 +74,14 @@ export function usePatchApiV1User<TContext>(
   ) as UseMutationOptions<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data: PatchApiV1UserMutationRequest },
+    { data?: PatchApiV1UserMutationRequest },
     TContext
   >;
 
   return useMutation<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data: PatchApiV1UserMutationRequest },
+    { data?: PatchApiV1UserMutationRequest },
     TContext
   >(
     {
@@ -92,7 +93,7 @@ export function usePatchApiV1User<TContext>(
   ) as UseMutationResult<
     PatchApiV1UserMutationResponse,
     ResponseErrorConfig<Error>,
-    { data: PatchApiV1UserMutationRequest },
+    { data?: PatchApiV1UserMutationRequest },
     TContext
   >;
 }

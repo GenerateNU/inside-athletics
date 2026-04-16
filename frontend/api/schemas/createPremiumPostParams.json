@@ -1,0 +1,32 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/CreatePremiumPostParams.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "college_id": { "type": "string" },
+    "content": {
+      "examples": [
+        "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?"
+      ],
+      "type": "string"
+    },
+    "media_id": {
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
+      "type": "string"
+    },
+    "sport_id": { "type": "string" },
+    "tag": { "items": { "type": "string" }, "type": ["array", "null"] },
+    "title": {
+      "examples": ["Looking for thoughts on NEU Fencing!"],
+      "type": "string"
+    }
+  },
+  "required": ["sport_id", "college_id", "tag", "title", "content"],
+  "type": "object",
+  "x-readme-ref-name": "CreatePremiumPostParams"
+}

@@ -84,6 +84,42 @@ func TestCreateCollege(t *testing.T) {
 	}
 }
 
+func TestGetAllColleges(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	_, authHeader := seedUserWithRoleAndPermissions(t, testDB.DB, models.RoleAdmin, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "college"},
+		{Action: models.PermissionUpdate, Resource: "college"},
+		{Action: models.PermissionDelete, Resource: "college"},
+	})
+
+	colleges := []models.College{
+		{Name: "Northeastern University", State: "Massachusetts", City: "Boston", Website: "https://www.northeastern.edu", DivisionRank: models.DivisionI},
+		{Name: "Boston University", State: "Massachusetts", City: "Boston", Website: "https://www.bu.edu", DivisionRank: models.DivisionI},
+		{Name: "University of Maine", State: "Maine", City: "Orono", Website: "https://www.umaine.edu", DivisionRank: models.DivisionI},
+	}
+
+	for _, college := range colleges {
+		c := college
+		resp := testDB.DB.Create(&c)
+		_, err := utils.HandleDBError(&c, resp.Error)
+		if err != nil {
+			t.Fatalf("Unable to add college to table: %s", err.Error())
+		}
+	}
+
+	resp := api.Get("/api/v1/colleges/", authHeader)
+
+	var response h.GetAllCollegesResponse
+	DecodeTo(&response, resp)
+
+	if len(response.Colleges) != 3 {
+		t.Fatalf("Expected 3 colleges, got %d", len(response.Colleges))
+	}
+}
+
 func TestUpdateCollege(t *testing.T) {
 	t.Parallel()
 	testDB := SetupTestDB(t)
