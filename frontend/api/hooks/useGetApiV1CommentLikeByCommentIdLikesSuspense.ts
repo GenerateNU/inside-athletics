@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1CommentLikeByCommentIdLikesQueryResponse,
   GetApiV1CommentLikeByCommentIdLikesPathParams,
@@ -50,10 +51,8 @@ export function getApiV1CommentLikeByCommentIdLikesSuspenseQueryOptions(
     enabled: !!comment_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1CommentLikeByCommentIdLikes(comment_id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1CommentLikeByCommentIdLikes(comment_id, config);
     },
   });
 }
@@ -81,9 +80,9 @@ export function useGetApiV1CommentLikeByCommentIdLikesSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
+    queryOptions?.queryKey ??
     getApiV1CommentLikeByCommentIdLikesSuspenseQueryKey(comment_id);
 
   const query = useSuspenseQuery(
@@ -92,8 +91,8 @@ export function useGetApiV1CommentLikeByCommentIdLikesSuspense<
         comment_id,
         config,
       ),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

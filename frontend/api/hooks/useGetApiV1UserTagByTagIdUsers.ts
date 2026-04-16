@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1UserTagByTagIdUsersQueryResponse,
   GetApiV1UserTagByTagIdUsersPathParams,
@@ -46,10 +47,8 @@ export function getApiV1UserTagByTagIdUsersQueryOptions(
     enabled: !!tag_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1UserTagByTagIdUsers(tag_id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1UserTagByTagIdUsers(tag_id, config);
     },
   });
 }
@@ -78,15 +77,15 @@ export function useGetApiV1UserTagByTagIdUsers<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1UserTagByTagIdUsersQueryKey(tag_id);
+    queryOptions?.queryKey ?? getApiV1UserTagByTagIdUsersQueryKey(tag_id);
 
   const query = useQuery(
     {
       ...getApiV1UserTagByTagIdUsersQueryOptions(tag_id, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetApiV1HealthHealthcheckQueryResponse } from "../models/GetApiV1HealthHealthcheck.ts";
 import type {
   Client,
@@ -37,10 +38,8 @@ export function getApiV1HealthHealthcheckSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1HealthHealthcheck({
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1HealthHealthcheck(config);
     },
   });
 }
@@ -66,15 +65,15 @@ export function useGetApiV1HealthHealthcheckSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1HealthHealthcheckSuspenseQueryKey();
+    queryOptions?.queryKey ?? getApiV1HealthHealthcheckSuspenseQueryKey();
 
   const query = useSuspenseQuery(
     {
       ...getApiV1HealthHealthcheckSuspenseQueryOptions(config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

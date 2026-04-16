@@ -1,0 +1,312 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": [
+        "https://example.com/schemas/GetPremiumPostsByAuthorIDResponse.json"
+      ],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "posts": {
+      "description": "List of premium posts for the author",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "$schema": {
+            "description": "A URL to the JSON Schema for this object.",
+            "examples": [
+              "https://example.com/schemas/PremiumPostResponse.json"
+            ],
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "author": {
+            "additionalProperties": false,
+            "properties": {
+              "account_type": {
+                "description": "If the user has access to premium features",
+                "examples": [true],
+                "type": "boolean"
+              },
+              "bio": {
+                "description": "The name of a user",
+                "examples": ["My name is Suli and I'm a pro athlete"],
+                "type": ["string", "null"]
+              },
+              "college": {
+                "description": "The college of a user",
+                "type": "string"
+              },
+              "created_at": { "format": "date-time", "type": "string" },
+              "deleted_at": {
+                "format": "date-time",
+                "type": ["string", "null"]
+              },
+              "division": {
+                "description": "The divison of their college",
+                "examples": [1],
+                "format": "int64",
+                "minimum": 0,
+                "type": ["integer", "null"]
+              },
+              "email": {
+                "description": "The email of a user",
+                "examples": ["suli123@email.com"],
+                "type": "string"
+              },
+              "expected_grad_year": {
+                "description": "The user's grad year",
+                "examples": [2027],
+                "format": "int64",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "first_name": {
+                "description": "The first name of a user",
+                "examples": ["Suli"],
+                "type": "string"
+              },
+              "id": { "type": "string" },
+              "last_name": {
+                "description": "The last name of a user",
+                "examples": ["Suli"],
+                "type": "string"
+              },
+              "profile_picture": {
+                "description": "The S3 key for the user's profile picture",
+                "type": "string"
+              },
+              "sport": {
+                "description": "The sport the user plays",
+                "examples": ["hockey"],
+                "type": "string"
+              },
+              "updated_at": { "format": "date-time", "type": "string" },
+              "username": {
+                "description": "The username of a user",
+                "examples": ["suliproathelete"],
+                "type": "string"
+              },
+              "verified_athelete_status": {
+                "examples": ["pending"],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "deleted_at",
+              "first_name",
+              "last_name",
+              "email",
+              "username",
+              "bio",
+              "profile_picture",
+              "account_type",
+              "sport",
+              "expected_grad_year",
+              "verified_athelete_status",
+              "college",
+              "division"
+            ],
+            "type": "object",
+            "x-readme-ref-name": "User"
+          },
+          "college": {
+            "additionalProperties": false,
+            "properties": {
+              "academic_rank": {
+                "description": "The academic rank of the college",
+                "examples": [53],
+                "format": "int32",
+                "type": ["integer", "null"]
+              },
+              "city": {
+                "description": "The city of the college",
+                "examples": ["Boston"],
+                "type": "string"
+              },
+              "created_at": { "format": "date-time", "type": "string" },
+              "deleted_at": {
+                "format": "date-time",
+                "type": ["string", "null"]
+              },
+              "division_rank": {
+                "description": "NCAA division (1, 2, or 3)",
+                "enum": [1, 2, 3],
+                "examples": [1],
+                "format": "int64",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "id": { "type": "string" },
+              "logo": {
+                "description": "The S3 key for the logo of the college",
+                "type": "string"
+              },
+              "name": {
+                "description": "The name of a college",
+                "examples": ["Northeastern University"],
+                "type": "string"
+              },
+              "state": {
+                "description": "The state of the college",
+                "examples": ["Massachusetts"],
+                "type": "string"
+              },
+              "updated_at": { "format": "date-time", "type": "string" },
+              "website": {
+                "description": "The website of the college",
+                "examples": ["https://www.northeastern.edu"],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "created_at",
+              "updated_at",
+              "deleted_at",
+              "name",
+              "state",
+              "city",
+              "website",
+              "academic_rank",
+              "division_rank",
+              "logo"
+            ],
+            "type": "object",
+            "x-readme-ref-name": "College"
+          },
+          "content": {
+            "examples": [
+              "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?"
+            ],
+            "type": "string"
+          },
+          "id": { "type": "string" },
+          "media": {
+            "additionalProperties": false,
+            "properties": {
+              "created_at": { "format": "date-time", "type": "string" },
+              "id": { "type": "string" },
+              "media_type": {
+                "description": "The media type of the object",
+                "examples": ["jpeg"],
+                "type": "string"
+              },
+              "s3key": {
+                "description": "The S3 key of the media object",
+                "examples": ["1"],
+                "type": "string"
+              },
+              "title": {
+                "description": "The title of the media",
+                "examples": ["Video of Athlete"],
+                "type": "string"
+              }
+            },
+            "required": ["id", "s3key", "title", "media_type", "created_at"],
+            "type": "object",
+            "x-readme-ref-name": "Media"
+          },
+          "media_id": {
+            "examples": ["123e4567-e89b-12d3-a456-426614174000"],
+            "type": "string"
+          },
+          "sport": {
+            "additionalProperties": false,
+            "properties": {
+              "created_at": { "format": "date-time", "type": "string" },
+              "deleted_at": {
+                "additionalProperties": false,
+                "properties": {
+                  "Time": { "format": "date-time", "type": "string" },
+                  "Valid": { "type": "boolean" }
+                },
+                "required": ["Time", "Valid"],
+                "type": "object",
+                "x-readme-ref-name": "DeletedAt"
+              },
+              "id": { "type": "string" },
+              "name": { "examples": ["Women's Soccer"], "type": "string" },
+              "popularity": {
+                "examples": [20000],
+                "format": "int32",
+                "type": "integer"
+              },
+              "updated_at": { "format": "date-time", "type": "string" }
+            },
+            "required": ["id", "created_at", "updated_at", "name"],
+            "type": "object",
+            "x-readme-ref-name": "Sport"
+          },
+          "tags": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "created_at": { "format": "date-time", "type": "string" },
+                "deleted_at": {
+                  "format": "date-time",
+                  "type": ["string", "null"]
+                },
+                "id": { "type": "string" },
+                "name": {
+                  "description": "The name of the tag",
+                  "examples": ["Hockey"],
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The type of the tag",
+                  "examples": ["sports"],
+                  "type": "string"
+                },
+                "updated_at": { "format": "date-time", "type": "string" }
+              },
+              "required": [
+                "id",
+                "created_at",
+                "updated_at",
+                "deleted_at",
+                "name",
+                "type"
+              ],
+              "type": "object",
+              "x-readme-ref-name": "Tag"
+            },
+            "type": ["array", "null"]
+          },
+          "title": {
+            "examples": ["Looking for thoughts on NEU Fencing!"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "sport",
+          "college",
+          "tags",
+          "title",
+          "content"
+        ],
+        "type": "object",
+        "x-readme-ref-name": "PremiumPostResponse"
+      },
+      "type": ["array", "null"]
+    },
+    "total": {
+      "description": "Total number of premium posts for this author",
+      "examples": [25],
+      "format": "int64",
+      "type": "integer"
+    }
+  },
+  "required": ["posts", "total"],
+  "type": "object",
+  "x-readme-ref-name": "GetPremiumPostsByAuthorIDResponse"
+}

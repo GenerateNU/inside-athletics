@@ -81,3 +81,7 @@ type DeleteCollegeResponse struct {
 	Message string    `json:"message" example:"College deleted successfully" doc:"Success message"`
 	ID      uuid.UUID `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the deleted college"`
 }
+
+type GetAllCollegesResponse struct {
+    Colleges []GetCollegeResponse `json:"colleges"`
+}

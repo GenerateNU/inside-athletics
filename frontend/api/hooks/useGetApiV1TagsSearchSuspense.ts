@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1TagsSearchQueryResponse,
   GetApiV1TagsSearchQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1TagsSearch } from "../clients/getApiV1TagsSearch.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1TagsSearchSuspenseQueryKey = (
-  params?: GetApiV1TagsSearchQueryParams,
+  params: GetApiV1TagsSearchQueryParams = {},
 ) => [{ url: "/api/v1/tags/search" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1TagsSearchSuspenseQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1TagsSearchSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1TagsSearch(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1TagsSearch(params, config);
     },
   });
 }
@@ -72,15 +71,15 @@ export function useGetApiV1TagsSearchSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1TagsSearchSuspenseQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1TagsSearchSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1TagsSearchSuspenseQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

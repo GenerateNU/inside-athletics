@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1SurveyAveragesQueryResponse,
   GetApiV1SurveyAveragesQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1SurveyAverages } from "../clients/getApiV1SurveyAverages.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1SurveyAveragesQueryKey = (
-  params?: GetApiV1SurveyAveragesQueryParams,
+  params: GetApiV1SurveyAveragesQueryParams = {},
 ) => [{ url: "/api/v1/survey/averages" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1SurveyAveragesQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1SurveyAveragesQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1SurveyAverages(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1SurveyAverages(params, config);
     },
   });
 }
@@ -74,15 +73,15 @@ export function useGetApiV1SurveyAverages<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1SurveyAveragesQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1SurveyAveragesQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1SurveyAveragesQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

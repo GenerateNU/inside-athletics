@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetApiV1UserTagFollowsQueryResponse } from "../models/GetApiV1UserTagFollows.ts";
 import type {
   Client,
@@ -37,10 +38,8 @@ export function getApiV1UserTagFollowsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1UserTagFollows({
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1UserTagFollows(config);
     },
   });
 }
@@ -66,15 +65,15 @@ export function useGetApiV1UserTagFollowsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1UserTagFollowsSuspenseQueryKey();
+    queryOptions?.queryKey ?? getApiV1UserTagFollowsSuspenseQueryKey();
 
   const query = useSuspenseQuery(
     {
       ...getApiV1UserTagFollowsSuspenseQueryOptions(config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

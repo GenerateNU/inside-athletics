@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1MediaByIdQueryResponse,
   GetApiV1MediaByIdPathParams,
@@ -43,10 +44,8 @@ export function getApiV1MediaByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1MediaById(id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1MediaById(id, config);
     },
   });
 }
@@ -75,14 +74,14 @@ export function useGetApiV1MediaById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
-  const queryKey = resolvedOptions?.queryKey ?? getApiV1MediaByIdQueryKey(id);
+  const { client: queryClient, ...queryOptions } = queryConfig;
+  const queryKey = queryOptions?.queryKey ?? getApiV1MediaByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1MediaByIdQueryOptions(id, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

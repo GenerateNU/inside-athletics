@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetApiV1UserSportFollowsQueryResponse } from "../models/GetApiV1UserSportFollows.ts";
 import type {
   Client,
@@ -37,10 +38,8 @@ export function getApiV1UserSportFollowsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1UserSportFollows({
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1UserSportFollows(config);
     },
   });
 }
@@ -68,15 +67,14 @@ export function useGetApiV1UserSportFollows<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
-  const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1UserSportFollowsQueryKey();
+  const { client: queryClient, ...queryOptions } = queryConfig;
+  const queryKey = queryOptions?.queryKey ?? getApiV1UserSportFollowsQueryKey();
 
   const query = useQuery(
     {
       ...getApiV1UserSportFollowsQueryOptions(config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {
