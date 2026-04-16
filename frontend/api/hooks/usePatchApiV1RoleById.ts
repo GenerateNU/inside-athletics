@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PatchApiV1RoleByIdMutationRequest,
   PatchApiV1RoleByIdMutationResponse,
@@ -39,7 +40,7 @@ export function patchApiV1RoleByIdMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data: PatchApiV1RoleByIdMutationRequest;
+      data?: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >({
@@ -61,7 +62,7 @@ export function usePatchApiV1RoleById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1RoleByIdPathParams["id"];
-        data: PatchApiV1RoleByIdMutationRequest;
+        data?: PatchApiV1RoleByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -82,7 +83,7 @@ export function usePatchApiV1RoleById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data: PatchApiV1RoleByIdMutationRequest;
+      data?: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >;
@@ -92,7 +93,7 @@ export function usePatchApiV1RoleById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data: PatchApiV1RoleByIdMutationRequest;
+      data?: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >(
@@ -107,7 +108,7 @@ export function usePatchApiV1RoleById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1RoleByIdPathParams["id"];
-      data: PatchApiV1RoleByIdMutationRequest;
+      data?: PatchApiV1RoleByIdMutationRequest;
     },
     TContext
   >;

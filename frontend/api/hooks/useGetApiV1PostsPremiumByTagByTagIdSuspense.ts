@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsPremiumByTagByTagIdQueryResponse,
   GetApiV1PostsPremiumByTagByTagIdPathParams,
@@ -24,7 +25,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsPremiumByTagByTagIdSuspenseQueryKey = (
   tag_id: GetApiV1PostsPremiumByTagByTagIdPathParams["tag_id"],
-  params?: GetApiV1PostsPremiumByTagByTagIdQueryParams,
+  params: GetApiV1PostsPremiumByTagByTagIdQueryParams = {},
 ) =>
   [
     { url: "/api/v1/posts/premium/by-tag/:tag_id", params: { tag_id: tag_id } },
@@ -53,10 +54,8 @@ export function getApiV1PostsPremiumByTagByTagIdSuspenseQueryOptions(
     enabled: !!tag_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1PostsPremiumByTagByTagId(tag_id, params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1PostsPremiumByTagByTagId(tag_id, params, config);
     },
   });
 }
@@ -84,9 +83,9 @@ export function useGetApiV1PostsPremiumByTagByTagIdSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ??
+    queryOptions?.queryKey ??
     getApiV1PostsPremiumByTagByTagIdSuspenseQueryKey(tag_id, params);
 
   const query = useSuspenseQuery(
@@ -96,8 +95,8 @@ export function useGetApiV1PostsPremiumByTagByTagIdSuspense<
         params,
         config,
       ),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

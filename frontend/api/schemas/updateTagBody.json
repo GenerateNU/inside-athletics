@@ -12,9 +12,14 @@
       "description": "The new name to update",
       "examples": ["Hockey"],
       "type": "string"
+    },
+    "type": {
+      "description": "The type of the tag",
+      "examples": ["sports"],
+      "type": "string"
     }
   },
-  "required": ["name"],
+  "required": ["name", "type"],
   "type": "object",
   "x-readme-ref-name": "UpdateTagBody"
 }

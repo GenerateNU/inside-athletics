@@ -49,6 +49,34 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	}, err
 }
 
+func (u *CollegeService) GetAllColleges(ctx context.Context, input *struct{}) (*utils.ResponseBody[GetAllCollegesResponse], error) {
+	colleges, err := u.collegeDB.GetAllColleges()
+
+	if err != nil {
+		return nil, err
+	}
+
+	collegeResponses := make([]GetCollegeResponse, 0, len(colleges))
+	for _, college := range colleges {
+		collegeResponses = append(collegeResponses, GetCollegeResponse{
+			ID:           college.ID,
+			Name:         college.Name,
+			State:        college.State,
+			City:         college.City,
+			Website:      college.Website,
+			AcademicRank: college.AcademicRank,
+			DivisionRank: college.DivisionRank,
+			Logo:         StringPtrOrNil(college.Logo),
+		})
+	}
+
+	return &utils.ResponseBody[GetAllCollegesResponse]{
+		Body: &GetAllCollegesResponse{
+			Colleges: collegeResponses,
+		},
+	}, nil
+}
+
 // Creates a single college
 func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollegeInput) (*utils.ResponseBody[CreateCollegeResponse], error) {
 	college := &models.College{

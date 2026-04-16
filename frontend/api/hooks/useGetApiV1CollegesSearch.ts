@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1CollegesSearchQueryResponse,
   GetApiV1CollegesSearchQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1CollegesSearch } from "../clients/getApiV1CollegesSearch.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1CollegesSearchQueryKey = (
-  params?: GetApiV1CollegesSearchQueryParams,
+  params: GetApiV1CollegesSearchQueryParams = {},
 ) => [{ url: "/api/v1/colleges/search" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1CollegesSearchQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1CollegesSearchQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1CollegesSearch(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1CollegesSearch(params, config);
     },
   });
 }
@@ -74,15 +73,15 @@ export function useGetApiV1CollegesSearch<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1CollegesSearchQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1CollegesSearchQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1CollegesSearchQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

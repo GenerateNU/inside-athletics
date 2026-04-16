@@ -28,7 +28,7 @@ function getPatchApiV1PermissionByIdUrl(
  */
 export async function patchApiV1PermissionById(
   id: PatchApiV1PermissionByIdPathParams["id"],
-  data: PatchApiV1PermissionByIdMutationRequest,
+  data?: PatchApiV1PermissionByIdMutationRequest,
   config: Partial<RequestConfig<PatchApiV1PermissionByIdMutationRequest>> & {
     client?: Client;
   } = {},

@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   ListApiV1PostByPostIdCommentsQueryResponse,
   ListApiV1PostByPostIdCommentsPathParams,
@@ -46,10 +47,8 @@ export function listApiV1PostByPostIdCommentsQueryOptions(
     enabled: !!post_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return listApiV1PostByPostIdComments(post_id, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return listApiV1PostByPostIdComments(post_id, config);
     },
   });
 }
@@ -78,15 +77,15 @@ export function useListApiV1PostByPostIdComments<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? listApiV1PostByPostIdCommentsQueryKey(post_id);
+    queryOptions?.queryKey ?? listApiV1PostByPostIdCommentsQueryKey(post_id);
 
   const query = useQuery(
     {
       ...listApiV1PostByPostIdCommentsQueryOptions(post_id, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

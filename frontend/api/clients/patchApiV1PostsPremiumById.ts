@@ -28,7 +28,7 @@ function getPatchApiV1PostsPremiumByIdUrl(
  */
 export async function patchApiV1PostsPremiumById(
   id: PatchApiV1PostsPremiumByIdPathParams["id"],
-  data: PatchApiV1PostsPremiumByIdMutationRequest,
+  data?: PatchApiV1PostsPremiumByIdMutationRequest,
   config: Partial<RequestConfig<PatchApiV1PostsPremiumByIdMutationRequest>> & {
     client?: Client;
   } = {},

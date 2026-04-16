@@ -742,6 +742,8 @@ components:
         content:
           examples:
             - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          maxLength: 5000
+          minLength: 1
           type: string
         is_anonymous:
           type: boolean
@@ -756,6 +758,8 @@ components:
         title:
           examples:
             - Looking for thoughts on NEU Fencing!
+          maxLength: 100
+          minLength: 1
           type: string
       required:
         - title
@@ -1171,8 +1175,14 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - name
+        - type
       type: object
     CreateTagFollowBody:
       additionalProperties: false
@@ -1296,9 +1306,15 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     CreateUserBody:
       additionalProperties: false
@@ -1757,6 +1773,25 @@ components:
             - https://example.com/errors/example
           format: uri
           type: string
+      type: object
+    GetAllCollegesResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllCollegesResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        colleges:
+          items:
+            $ref: "#/components/schemas/GetCollegeResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - colleges
       type: object
     GetAllPermissionsResponse:
       additionalProperties: false
@@ -2723,9 +2758,15 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     GetUploadURLRequest:
       additionalProperties: false
@@ -3549,6 +3590,11 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
         updated_at:
           format: date-time
           type: string
@@ -3558,6 +3604,7 @@ components:
         - updated_at
         - deleted_at
         - name
+        - type
       type: object
     TagRequest:
       additionalProperties: false
@@ -3988,8 +4035,14 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - name
+        - type
       type: object
     UpdateTagPostBody:
       additionalProperties: false
@@ -4065,9 +4118,15 @@ components:
           examples:
             - Northeastern Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     UpdateUserBody:
       additionalProperties: false
@@ -4486,6 +4545,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Put API v1 college by ID
+  /api/v1/colleges/:
+    get:
+      operationId: get-api-v1-colleges
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllCollegesResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 colleges
   /api/v1/colleges/search:
     get:
       operationId: get-api-v1-colleges-search
@@ -7065,6 +7141,38 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 tag name by name
+  /api/v1/tag/type/{type}:
+    get:
+      operationId: list-api-v1-tag-type-by-type
+      parameters:
+        - description: The type of the tag
+          example: sports
+          in: path
+          name: type
+          required: true
+          schema:
+            description: The type of the tag
+            examples:
+              - sports
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/GetTagResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 tag type by type
   /api/v1/tag/{id}:
     delete:
       operationId: delete-api-v1-tag-by-id

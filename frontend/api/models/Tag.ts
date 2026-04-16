@@ -22,6 +22,11 @@ export type Tag = {
    */
   name: string;
   /**
+   * @description The type of the tag
+   * @type string
+   */
+  type: string;
+  /**
    * @type string, date-time
    */
   updated_at: string;

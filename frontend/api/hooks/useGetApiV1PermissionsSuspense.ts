@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PermissionsQueryResponse,
   GetApiV1PermissionsQueryParams,
@@ -22,7 +23,7 @@ import { getApiV1Permissions } from "../clients/getApiV1Permissions.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1PermissionsSuspenseQueryKey = (
-  params?: GetApiV1PermissionsQueryParams,
+  params: GetApiV1PermissionsQueryParams = {},
 ) => [{ url: "/api/v1/permissions/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PermissionsSuspenseQueryKey = ReturnType<
@@ -42,10 +43,8 @@ export function getApiV1PermissionsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1Permissions(params, {
-        ...config,
-        signal: config.signal ?? signal,
-      });
+      config.signal = signal;
+      return getApiV1Permissions(params, config);
     },
   });
 }
@@ -72,15 +71,15 @@ export function useGetApiV1PermissionsSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const { client: queryClient, ...queryOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1PermissionsSuspenseQueryKey(params);
+    queryOptions?.queryKey ?? getApiV1PermissionsSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PermissionsSuspenseQueryOptions(params, config),
-      ...resolvedOptions,
       queryKey,
+      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {
