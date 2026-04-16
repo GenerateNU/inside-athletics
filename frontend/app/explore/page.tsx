@@ -11,13 +11,14 @@ import { Tag } from "@/components/post/Tag";
 
 import { useQueries } from "@tanstack/react-query";
 import {
+    useGetApiV1PostsFilter,
     useGetApiV1Sports,
     useGetApiV1CollegesSearch,
     useGetApiV1Posts,
     useGetApiV1UserTagFollows,
     useGetApiV1PostsSearch,
     useGetApiV1TagsSearch,
-    useGetApiV1TagByTagIdPosts,
+
     getApiV1TagByIdQueryOptions,
 } from "@/api/hooks";
 import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
@@ -25,92 +26,6 @@ import type { PostResponse } from "@/api/models/PostResponse";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
 import { GetTagResponse } from "@/api";
 
-// --- MOCK DATA (remove fallbacks once API is fixed) ---
-const MOCK_TAGS: GetTagFollowsByUserResponse[] = [
-];
-
-const MOCK_USER = {
-    id: "u1",
-    first_name: "Alex",
-    last_name: "Johnson",
-    username: "alexj",
-    email: "alex@example.com",
-    bio: null,
-    college: "Northeastern University",
-    sport: "Basketball",
-    division: 1,
-    account_type: false,
-    expected_grad_year: 2026,
-    profile_picture: "",
-    verified_athelete_status: "verified",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    deleted_at: null,
-};
-
-const MOCK_COLLEGE = {
-    id: "c1",
-    name: "Northeastern University",
-    city: "Boston",
-    state: "MA",
-    division_rank: 1 as const,
-    academic_rank: 49,
-    logo: "",
-    website: "https://northeastern.edu",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    deleted_at: null,
-};
-
-const MOCK_SPORT = {
-    id: "s1",
-    name: "Basketball",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-};
-
-const MOCK_POSTS: PostResponse[] = [
-    {
-        id: "p1",
-        title: "Thoughts on our last home game",
-        content: "The energy in the arena was incredible. We came back from 12 down in the second half and the crowd never stopped believing.",
-        author: MOCK_USER,
-        college: MOCK_COLLEGE,
-        sport: MOCK_SPORT,
-        tags: [{ id: "1", name: "Basketball", created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z", deleted_at: null }],
-        is_anonymous: false,
-        is_verified_athlete: true,
-        like_count: 34,
-        comment_count: 12,
-    },
-    {
-        id: "p2",
-        title: "Recruiting tips for D1 swimmers",
-        content: "Start reaching out to coaches junior year. Send a swim resume with your best times and a short highlight reel. Persistence matters more than perfection.",
-        author: { ...MOCK_USER, id: "u2", first_name: "Jamie", last_name: "Lee", sport: "Swimming" },
-        college: { ...MOCK_COLLEGE, id: "c2", name: "Binghamton University" },
-        sport: { ...MOCK_SPORT, id: "s2", name: "Swimming" },
-        tags: [{ id: "2", name: "Swimming", created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z", deleted_at: null }],
-        is_anonymous: false,
-        is_verified_athlete: true,
-        like_count: 57,
-        comment_count: 8,
-    },
-    {
-        id: "p3",
-        title: "Balancing practice and midterms",
-        content: "Block study sessions right after practice while the routine is still fresh. Professors are usually understanding if you communicate early.",
-        author: { ...MOCK_USER, id: "u3", first_name: "Morgan", last_name: "Smith" },
-        college: MOCK_COLLEGE,
-        sport: { ...MOCK_SPORT, id: "s3", name: "Football" },
-        tags: [],
-        is_anonymous: true,
-        is_verified_athlete: false,
-        like_count: 21,
-        comment_count: 5,
-    },
-];
-// --- END MOCK DATA ---
 
 export default function ExplorePage() {
     const session = useSession();
@@ -149,23 +64,20 @@ export default function ExplorePage() {
     );
     console.log(allPostsData)
 
-    const { data: tagPostsData, isLoading: loadingTagPosts } = useGetApiV1TagByTagIdPosts(
-        activeTag?.id ?? "",
-        {},
+    const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
+        { tag_ids: activeTag?.id },
         {
             query: { enabled: !!activeTag },
             client: { headers: authHeaders },
         },
     );
-
+    console.log(filteredPostsData)
+    
     const posts = activeTag
-        ? (tagPostsData?.post_ids ?? [])
+        ? (filteredPostsData?.posts ?? [])
         : (allPostsData?.posts ?? []);
-    const isLoading = activeTag ? loadingTagPosts : loadingAllPosts;
+    const isLoading = activeTag ? loadingFilteredPosts : loadingAllPosts;
 
-    // const popularTags = MOCK_TAGS;
-    // const posts = MOCK_POSTS;
-    // const isLoading = false;
 
     return (
         <div className="min-h-screen bg-zinc-50">
