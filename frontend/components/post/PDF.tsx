@@ -22,7 +22,7 @@ export default function PDFViewer({ src }: { src: string }) {
       <Document file={src} onLoadSuccess={onLoadSuccess}>
         <Page
           pageNumber={pageNumber}
-          width={600}
+          width={400}
           renderTextLayer={false}
           renderAnnotationLayer={false}
         />
