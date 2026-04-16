@@ -1151,6 +1151,10 @@ func TestFilterPosts(t *testing.T) {
 
 	DecodeTo(&filteredSports, filterSportsResp)
 
+	if filteredSports.Posts[0].College == nil {
+		t.Fatalf("Sport filter results in college data not loaded")
+	}
+
 	if filteredSports.Total != 1 {
 		t.Fatalf("Expected to get 1 filtered post got %d", filteredSports.Total)
 	}
@@ -1193,6 +1197,14 @@ func TestFilterPosts(t *testing.T) {
 
 	if filteredTags.Total != 1 {
 		t.Fatalf("Expected 1 filtered posts but got %d", filteredTags.Total)
+	}
+
+	if filteredTags.Posts[0].College == nil {
+		t.Fatalf("College is not getting loaded %s", filteredTags.Posts[0].College.Name)
+	}
+
+	if filteredTags.Posts[0].College.Name != neu.Name {
+		t.Fatalf("Filter isn't returning college information when the info exists")
 	}
 
 	filterSportAndTagResp := api.Get(fmt.Sprintf("/api/v1/posts/filter?sport_ids=%s&tag_ids=%s", SoccerID.String(), tagIds[2]), authHeader)
