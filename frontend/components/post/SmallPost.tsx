@@ -23,9 +23,12 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
             <div className={cn("bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm hover:shadow-md transition-shadow cursor-pointer", className)} {...props}>
                 <h2 className="font-bold text-gray-900 text-base mb-3 text-left">{post.title}</h2>
 
-                <div className="flex gap-2 mb-3">
-                    <Tag label={post.sport.name} />
-                    <Tag label={post.college.name} />
+                <div className="flex flex-wrap gap-2 mb-3">
+                    {post.sport && <Tag label={post.sport.name} />}
+                    {post.college && <Tag label={post.college.name} />}
+                    {post.tags?.map((tag) => (
+                        <Tag key={tag.id} label={tag.name} />
+                    ))}
                 </div>
 
                 <p className="text-gray-700 text-sm leading-relaxed mb-4 text-left">{post.content}</p>

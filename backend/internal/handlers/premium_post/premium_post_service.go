@@ -30,13 +30,17 @@ func NewPremiumPostService(db *gorm.DB, s3Svc *s3.Service) *PremiumPostService {
 	}
 }
 
-// resolveMediaKey replaces post.Media.S3Key with a presigned download URL in-place.
+// resolveMediaKey replaces post.Media.S3Key and post.Author.ProfilePicture with presigned download URLs in-place.
 func (s *PremiumPostService) resolveMediaKey(ctx context.Context, post *models.PremiumPost) {
-	if post.Media == nil {
-		return
+	if post.Media != nil {
+		if url := s3.ResolveKey(ctx, s.s3, post.Media.S3Key); url != "" {
+			post.Media.S3Key = url
+		}
 	}
-	if url := s3.ResolveKey(ctx, s.s3, post.Media.S3Key); url != "" {
-		post.Media.S3Key = url
+	if post.Author.ProfilePicture != "" {
+		if url := s3.ResolveKey(ctx, s.s3, post.Author.ProfilePicture); url != "" {
+			post.Author.ProfilePicture = url
+		}
 	}
 }
 

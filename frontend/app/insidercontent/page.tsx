@@ -28,8 +28,8 @@ export default function InsiderContentPage() {
             <div className="flex min-h-screen">
                 <Navbar className="h-screen shrink-0" />
                 <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
-                    <div className="w-full max-w-3xl">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-6">Insider Content</h1>
+                    <div className="w-full">
+                        <h1 className="text-4xl font-bold text-gray-900 mb-6">Insider Content</h1>
                         {isLoading && <p className="text-gray-500">Loading...</p>}
                         {isError && <p className="text-red-500">Failed to load insider content.</p>}
                         {!isLoading && !isError && posts.length === 0 && (
