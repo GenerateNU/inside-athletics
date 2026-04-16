@@ -2,8 +2,10 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
+import CreatePostPopup from "@/components/ui/create-post-popup";
 import { SearchBar } from "@/components/post/SearchBar";
 import SmallPost from "@/components/post/SmallPost";
 import { Navbar } from "@/components/ui/navbar";
@@ -107,6 +109,8 @@ function HomePageContent() {
       : (allPostsData?.posts ?? []);
   const isLoading = activeTags.length > 0 ? loadingFilteredPosts : loadingAllPosts;
 
+  const searchParams = useSearchParams();
+  const showCreatePost = searchParams.get("createPost") === "true";
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -127,9 +131,14 @@ function HomePageContent() {
         </div>
       )}
 
+      {showCreatePost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <CreatePostPopup />
+        </div>
+      )}
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
-        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
+        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-scroll max-h-screen">
           <div className="flex w-full max-w-5xl flex-col gap-6">
             <SearchBar
               value={searchQuery}
