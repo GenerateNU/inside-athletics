@@ -7,8 +7,8 @@ import (
 
 	"fmt"
 	"inside-athletics/internal/handlers/content"
-	"inside-athletics/internal/server"
 	"inside-athletics/internal/s3"
+	"inside-athletics/internal/server"
 	unitTests "inside-athletics/internal/tests/unit_tests"
 	"log"
 	"net/http/httptest"
@@ -21,9 +21,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2/humatest"
 	"github.com/stripe/stripe-go/v81"
-	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 	gormPostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -47,10 +45,7 @@ func SetupTestDB(t *testing.T) *TestDatabase {
 		postgres.WithDatabase("test_db"),
 		postgres.WithUsername("test_user"),
 		postgres.WithPassword("test_password"),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(60*time.Second)),
+		postgres.BasicWaitStrategies(),
 	)
 	if err != nil {
 		t.Fatalf("failed to start postgres container: %s", err)

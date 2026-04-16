@@ -19,6 +19,12 @@ var (
 	errUnsupportedResource = errors.New("unsupported resource for ownership check")
 )
 
+var resourceByPathPrefix = map[string]string{
+	"user/tag":     "tagfollow",
+	"user/sport":   "sportfollow",
+	"user/college": "collegefollow",
+}
+
 func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		switch ctx.Method() {
@@ -56,9 +62,9 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 		}
 
 		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
-			(resource == "post" || resource == "comment") &&
+			(resource == "post" || resource == "comment" || resource == "tagfollow" || resource == "sportfollow" || resource == "collegefollow") &&
 			ctx.Param("id") != "" {
-			owned, err := IsOwnerOfPostOrComment(db, parsedUserID, ctx.Param("id"), resource)
+			owned, err := IsOwnerOfResource(db, parsedUserID, ctx.Param("id"), resource)
 			if err != nil {
 				status := http.StatusInternalServerError
 				if errors.Is(err, errInvalidResourceID) || errors.Is(err, errUnsupportedResource) {
@@ -105,7 +111,7 @@ func authorizeByPermission(db *gorm.DB, userID uuid.UUID, action models.Permissi
 	return true, 0, ""
 }
 
-func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, error) {
+func IsOwnerOfResource(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, error) {
 	parsedResourceID, err := uuid.Parse(resourceID)
 	if err != nil {
 		return false, errInvalidResourceID
@@ -121,6 +127,18 @@ func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource 
 		err = db.Table("comments").
 			Where("id = ? AND user_id = ?", parsedResourceID, userID).
 			Count(&count).Error
+	case "tagfollow":
+		err = db.Table("tag_follows").
+			Where("id = ? AND user_id = ?", parsedResourceID, userID).
+			Count(&count).Error
+	case "sportfollow":
+		err = db.Table("sport_follows").
+			Where("id = ? AND user_id = ?", parsedResourceID, userID).
+			Count(&count).Error
+	case "collegefollow":
+		err = db.Table("college_follows").
+			Where("id = ? AND user_id = ?", parsedResourceID, userID).
+			Count(&count).Error
 	default:
 		return false, errUnsupportedResource
 	}
@@ -129,6 +147,10 @@ func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource 
 		return false, fmt.Errorf("unable to check ownership: %w", err)
 	}
 	return count > 0, nil
+}
+
+func IsOwnerOfPostOrComment(db *gorm.DB, userID uuid.UUID, resourceID, resource string) (bool, error) {
+	return IsOwnerOfResource(db, userID, resourceID, resource)
 }
 
 func resolveResourceAndAction(method, path, userID, pathID string) (models.PermissionAction, string) {
@@ -180,7 +202,13 @@ var resourceByPathSegment = map[string]string{
 }
 
 func resolveResourceFromPath(path string) string {
-	path = strings.TrimPrefix(path, "/api/v1/")
+	path = strings.Trim(strings.TrimPrefix(path, "/api/v1/"), "/")
+	for prefix, resource := range resourceByPathPrefix {
+		if path == prefix || strings.HasPrefix(path, prefix+"/") {
+			return resource
+		}
+	}
+
 	segment := strings.SplitN(path, "/", 2)[0]
 	return resourceByPathSegment[segment]
 }

@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": [
+        "https://example.com/schemas/RegisterStripeCustomerBody.json"
+      ],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "description": {
+      "description": "A description of the user",
+      "examples": ["A verified athelete"],
+      "type": ["string", "null"]
+    },
+    "email": {
+      "description": "The email of the user",
+      "examples": ["suli@northeastern.edu"],
+      "type": ["string", "null"]
+    },
+    "name": {
+      "description": "The name of the user",
+      "examples": ["Suli"],
+      "type": ["string", "null"]
+    },
+    "phone": {
+      "description": "The phone number of the user",
+      "examples": ["(111) 222-3333"],
+      "type": ["string", "null"]
+    }
+  },
+  "required": ["name", "email", "phone", "description"],
+  "type": "object",
+  "x-readme-ref-name": "RegisterStripeCustomerBody"
+}

@@ -4,6 +4,8 @@
 # Generates a new migration if there have been changes
 # made to any of the models
 
+# makes it so command isn't echoed before executing
+.SILENT: 
 .PHONY: gen-migration
 gen-migration:
 	if [ -z "$(MIGRATION_NAME)" ]; then \
@@ -60,10 +62,15 @@ revert-single-dev:
 VERBOSE ?=
 V_FLAG := $(if $(filter true,$(VERBOSE)),-v,)
 
+TEST_NAME ?=
+
 .PHONY: run-all-tests
 # Runs all tests, if passed verbose, log test details
 run-all-tests:
 	doppler run --command="go test $(V_FLAG)  ./internal/tests/route_tests ./internal/tests/unit_tests"
+
+run-test:
+	doppler run --command="go test -v -run "^$(TEST_NAME)" ./internal/tests/route_tests "
 
 .PHONY: run-route-tests
 # Runs all the route tests, if passed verbose, log test details
@@ -114,14 +121,30 @@ generate-sports-data:
 # Generates both colleges.json and sports.json
 generate-seed-data: generate-colleges-data generate-sports-data
 
+.PHONY: seed-logos
+seed-logos:
+	cd scripts/seed && doppler run -- python3 seed_college_logos.py --colleges data/colleges.json
+
 .PHONY: seed
 # Generates seed data and seeds the database with college and sports data
-seed: generate-seed-data
+seed: generate-seed-data seed-logos
 	doppler run --command="go run scripts/seed/seed.go --colleges scripts/athlete_scraping/college_info.json"
 
-generate-college-info:
-	python3 -m pip install -r ./scripts/requirements.txt && \
-	cd scripts/athlete_scraping && doppler run --command="python3 crawl.py"
+.PHONY: seed-prod
+seed-prod: generate-seed-data seed-logos
+	doppler run --command="go run scripts/seed/seed.go --db \$$PROD_DB_CONNECTION_STRING"
+
+
+# generate openapi.yaml file from server that is generated from huma. Server must
+# be running to work
+fetch-openapi:
+	if curl -s http://localhost:8080/openapi.yaml > /dev/null 2>&1; then \
+		curl http://localhost:8080/openapi.yaml > ../openapi.yaml; \
+		echo "OpenAPI spec fetched successfully"; \
+	else \
+		echo "Server is not running, cannot generate openapi.yaml file"; \
+	fi
+
 
 
 

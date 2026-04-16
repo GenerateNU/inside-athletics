@@ -1,6 +1,10 @@
 jwcrypto
 pandas
 kagglehub
+boto3
+requests
+thefuzz
+python-Levenshtein
 beautifulsoup4
 aiohttp
 asyncio

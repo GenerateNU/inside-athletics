@@ -23,4 +23,9 @@ func Route(api huma.API, db *gorm.DB) {
 		huma.Put(grp, "/{id}", collegeService.UpdateCollege)
 		huma.Delete(grp, "/{id}", collegeService.DeleteCollege)
 	}
+	{
+		grp := huma.NewGroup(api, "/api/v1/colleges")
+		huma.Get(grp, "/search", collegeService.FuzzySearchForCollege)
+	}
+
 }

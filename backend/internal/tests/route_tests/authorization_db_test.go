@@ -9,6 +9,7 @@ import (
 )
 
 func TestAuthorizationDBUserExists(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
@@ -37,6 +38,7 @@ func TestAuthorizationDBUserExists(t *testing.T) {
 }
 
 func TestAuthorizationDBUserHasPermission(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 

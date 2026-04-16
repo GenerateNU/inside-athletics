@@ -1,0 +1,6193 @@
+components:
+  schemas:
+    AssignRoleRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/AssignRoleRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        role_id:
+          description: ID of the role to assign
+          examples:
+            - "1"
+          type: string
+      required:
+        - role_id
+      type: object
+    AssignRoleResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/AssignRoleResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRoleResponse"
+          description: Assigned role
+        user_id:
+          description: ID of the user
+          examples:
+            - "1"
+          type: string
+      required:
+        - user_id
+        - role
+      type: object
+    College:
+      additionalProperties: false
+      properties:
+        academic_rank:
+          description: The academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: The city of the college
+          examples:
+            - Boston
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        deleted_at:
+          format: date-time
+          type:
+            - string
+            - "null"
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          enum:
+            - 1
+            - 2
+            - 3
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        id:
+          type: string
+        logo:
+          description: The S3 key for the logo of the college
+          type: string
+        name:
+          description: The name of a college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: The state of the college
+          examples:
+            - Massachusetts
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        website:
+          description: The website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - created_at
+        - updated_at
+        - deleted_at
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    CommentResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CommentResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          description: Content of the comment
+          examples:
+            - This is a helpful thread
+          maxLength: 1500
+          type: string
+        id:
+          description: ID of comment
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        is_anonymous:
+          description: True if posted as anonymous; frontend can show 'Anonymous' when user_id is omitted
+          type: boolean
+        is_liked:
+          description: If current user has liked this comment
+          examples:
+            - true
+          type: boolean
+        is_verified_athlete:
+          description: If commenter is a verified athlete
+          examples:
+            - true
+          type: boolean
+        like_count:
+          description: Number of total likes on comment
+          examples:
+            - 20000
+          format: int64
+          type: integer
+        parent_comment_id:
+          description: CommentID this comment is in response to
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        post_id:
+          description: PostID of the post this comment is under
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+          description: The user who commented; omitted for anonymous comments
+      required:
+        - id
+        - is_anonymous
+        - parent_comment_id
+        - post_id
+        - description
+        - like_count
+        - is_liked
+        - is_verified_athlete
+      type: object
+    ConfirmUploadRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ConfirmUploadRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        key:
+          description: S3 object key from upload-url response
+          type: string
+      required:
+        - key
+      type: object
+    ConfirmUploadResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ConfirmUploadResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        download_url:
+          type: string
+        key:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        size:
+          format: int64
+          type: integer
+      required:
+        - key
+        - download_url
+        - size
+      type: object
+    CreateCollegeFollowBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeFollowBody.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          description: ID of the College
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - college_id
+      type: object
+    CreateCollegeFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          description: ID of the College
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        id:
+          description: ID of the college follow created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - college_id
+        - user_id
+      type: object
+    CreateCollegeRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          maxLength: 100
+          minLength: 1
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          enum:
+            - 1
+            - 2
+            - 3
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          maxLength: 500
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          maxLength: 200
+          minLength: 1
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          maxLength: 100
+          minLength: 1
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          maxLength: 500
+          minLength: 1
+          type: string
+      required:
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    CreateCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          enum:
+            - 1
+            - 2
+            - 3
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        id:
+          description: ID of the college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    CreateCommentBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCommentBody.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          description: Content of the comment
+          examples:
+            - This is a helpful thread
+          maxLength: 300
+          type: string
+        is_anonymous:
+          description: If true, user_id is hidden from regular users; super user always sees it
+          type: boolean
+        parent_comment_id:
+          description: CommentID the comment belongs to
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        post_id:
+          description: PostID the comment belongs to
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+      required:
+        - is_anonymous
+        - post_id
+        - description
+      type: object
+    CreateCommentLikeBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCommentLikeBody.json
+          format: uri
+          readOnly: true
+          type: string
+        comment_id:
+          description: CommentID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - comment_id
+      type: object
+    CreateCommentLikeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCommentLikeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        liked:
+          description: Whether the requested user has liked the comment
+          examples:
+            - true
+          type: boolean
+        total:
+          description: Total number of likes on the comment
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - id
+        - total
+        - liked
+      type: object
+    CreateCommentResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateCommentResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          description: Content of the comment
+          examples:
+            - This is a helpful thread
+          maxLength: 1500
+          type: string
+        id:
+          description: ID of comment
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        is_anonymous:
+          description: True if posted as anonymous; frontend can show 'Anonymous' when user_id is omitted
+          type: boolean
+        parent_comment_id:
+          description: CommentID the comment belongs to
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        post_id:
+          description: PostID the comment belongs to
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        user:
+          description: The user who commented; omitted for anonymous comments
+          type: string
+      required:
+        - id
+        - is_anonymous
+        - parent_comment_id
+        - post_id
+        - description
+      type: object
+    CreatePermissionRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePermissionRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        action:
+          description: Action for the permission
+          examples:
+            - create
+          type: string
+        resource:
+          description: Resource for the permission
+          examples:
+            - user
+          type: string
+      required:
+        - action
+        - resource
+      type: object
+    CreatePostLikeBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePostLikeBody.json
+          format: uri
+          readOnly: true
+          type: string
+        post_id:
+          description: PostID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - post_id
+      type: object
+    CreatePostLikeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePostLikeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        liked:
+          description: Whether the requested user has liked the post
+          examples:
+            - true
+          type: boolean
+        total:
+          description: Total number of likes on the post
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - id
+        - total
+        - liked
+      type: object
+    CreatePostRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePostRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          type: string
+        content:
+          examples:
+            - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          type: string
+        is_anonymous:
+          type: boolean
+        sport_id:
+          type: string
+        tags:
+          items:
+            $ref: "#/components/schemas/TagRequest"
+          type:
+            - array
+            - "null"
+        title:
+          examples:
+            - Looking for thoughts on NEU Fencing!
+          type: string
+      required:
+        - title
+        - content
+        - is_anonymous
+      type: object
+    CreatePostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        author:
+          type: string
+        college:
+          type: string
+        content:
+          examples:
+            - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          type: string
+        id:
+          type: string
+        is_anonymous:
+          type: boolean
+        sport:
+          type: string
+        tag:
+          items:
+            $ref: "#/components/schemas/Tag"
+          type:
+            - array
+            - "null"
+        title:
+          examples:
+            - Looking for thoughts on NEU Fencing!
+          type: string
+      required:
+        - id
+        - author
+        - sport
+        - college
+        - tag
+        - title
+        - content
+        - is_anonymous
+      type: object
+    CreateRoleRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateRoleRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          description: Name of the role
+          examples:
+            - moderator
+          type: string
+        permissions:
+          description: Permissions to attach to the role
+          items:
+            $ref: "#/components/schemas/PermissionSpecInput"
+          type:
+            - array
+            - "null"
+      required:
+        - name
+      type: object
+    CreateSportFollowBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSportFollowBody.json
+          format: uri
+          readOnly: true
+          type: string
+        sport_id:
+          description: ID of the Sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - sport_id
+      type: object
+    CreateSportFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSportFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the sport follow created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        sport_id:
+          description: ID of the Sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - sport_id
+        - user_id
+      type: object
+    CreateSportRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateSportRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          examples:
+            - Women's Soccer
+          type: string
+        popularity:
+          examples:
+            - 20000
+          format: int32
+          type:
+            - integer
+            - "null"
+      required:
+        - name
+        - popularity
+      type: object
+    CreateStripeCheckoutSessionRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateStripeCheckoutSessionRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        cancel_url:
+          examples:
+            - https://example.com/cancel
+          type: string
+        price_id:
+          examples:
+            - price_12345
+          type: string
+        quantity:
+          examples:
+            - 1
+          format: int64
+          type: integer
+        success_url:
+          examples:
+            - https://example.com/success
+          type: string
+      required:
+        - price_id
+        - success_url
+        - cancel_url
+        - quantity
+      type: object
+    CreateStripePriceRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateStripePriceRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the product
+          examples:
+            - product_123
+          type: string
+        interval:
+          description: Interval between payments
+          examples:
+            - day
+          type: string
+        interval_count:
+          description: Number of intervals a billing cycle lasts
+          examples:
+            - 3
+          format: int64
+          type: integer
+        total:
+          description: Price per billing cycle.
+          examples:
+            - 2550
+          format: int64
+          type: integer
+      required:
+        - id
+        - total
+        - interval
+        - interval_count
+      type: object
+    CreateStripeProductRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateStripeProductRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          examples:
+            - Get premium content with this subscription
+          type: string
+        name:
+          examples:
+            - Premium Plan
+          type: string
+      required:
+        - name
+        - description
+      type: object
+    CreateTagBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagBody.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          description: The name of the tag to create
+          examples:
+            - Hockey
+          type: string
+      required:
+        - name
+      type: object
+    CreateTagFollowBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagFollowBody.json
+          format: uri
+          readOnly: true
+          type: string
+        tag_id:
+          description: ID of the Tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - tag_id
+      type: object
+    CreateTagFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tag follow created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: ID of the Tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - tag_id
+        - user_id
+      type: object
+    CreateTagPostBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagPostBody.json
+          format: uri
+          readOnly: true
+          type: string
+        post_id:
+          description: ID of the post
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: ID of the tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - post_id
+        - tag_id
+      type: object
+    CreateTagPostsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagPostsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tagpost item created
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        post_id:
+          description: ID of the post
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: ID of the tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - post_id
+        - tag_id
+      type: object
+    CreateTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tag created
+          examples:
+            - "1"
+          type: string
+        name:
+          description: The name of the tag created
+          examples:
+            - Hockey
+          type: string
+      required:
+        - id
+        - name
+      type: object
+    CreateUserBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateUserBody.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          description: The college of a user
+          type: string
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          description: The sport(s) the user is interested in
+          examples:
+            - "[\"hockey\",\"soccer\"]"
+          type: string
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      required:
+        - first_name
+        - last_name
+        - email
+        - username
+        - account_type
+        - verified_athlete_status
+      type: object
+    CreateUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreateUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the user
+          examples:
+            - "1"
+          type: string
+        name:
+          description: Name of the user
+          examples:
+            - Joe
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRoleResponse"
+          description: Default role assigned to the user
+      required:
+        - id
+        - name
+      type: object
+    DeleteCollegeFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteCollegeFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - College follow was deleted successfully
+          type: string
+      required:
+        - message
+      type: object
+    DeleteCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        message:
+          description: Success message
+          examples:
+            - College deleted successfully
+          type: string
+      required:
+        - message
+        - id
+      type: object
+    DeleteCommentLikeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteCommentLikeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        liked:
+          description: Whether the requested user has liked the comment
+          examples:
+            - true
+          type: boolean
+        message:
+          description: Message to display
+          examples:
+            - Like was deleted successfully
+          type: string
+        total:
+          description: Total number of likes on the comment
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - message
+        - total
+        - liked
+      type: object
+    DeleteContentResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteContentResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Success message
+          type: string
+      required:
+        - message
+      type: object
+    DeletePostLikeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeletePostLikeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        liked:
+          description: Whether the requested user has liked the post
+          examples:
+            - true
+          type: boolean
+        message:
+          description: Message to display
+          examples:
+            - Like was deleted successfully
+          type: string
+        total:
+          description: Total number of likes on the post
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - message
+        - total
+        - liked
+      type: object
+    DeletePostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeletePostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        message:
+          description: Success message
+          examples:
+            - College deleted successfully
+          type: string
+      required:
+        - message
+        - id
+      type: object
+    DeleteSportFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteSportFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - Sport follow was deleted successfully
+          type: string
+      required:
+        - message
+      type: object
+    DeleteStripeCustomerResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteStripeCustomerResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        deleted:
+          description: Object bool
+          examples:
+            - true
+          type: boolean
+        id:
+          description: Stripe customer ID
+          examples:
+            - cus_NffrFeUfNV2Hib
+          type: string
+        object:
+          description: Object type
+          examples:
+            - customer
+          type: string
+      required:
+        - id
+        - object
+        - deleted
+      type: object
+    DeleteTagFollowResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteTagFollowResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - Tag follow was deleted successfully
+          type: string
+      required:
+        - message
+      type: object
+    DeleteTagPostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteTagPostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted tagpost
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+      type: object
+    DeleteTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted tag
+          examples:
+            - "1"
+          type: string
+      required:
+        - id
+      type: object
+    DeleteUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeleteUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted user
+          examples:
+            - "1"
+          type: string
+      required:
+        - id
+      type: object
+    DeletedAt:
+      additionalProperties: false
+      properties:
+        Time:
+          format: date-time
+          type: string
+        Valid:
+          type: boolean
+      required:
+        - Time
+        - Valid
+      type: object
+    ErrorDetail:
+      additionalProperties: false
+      properties:
+        location:
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          type: string
+        message:
+          description: Error message text
+          type: string
+        value:
+          description: The value at the given location
+      type: object
+    ErrorModel:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ErrorModel.json
+          format: uri
+          readOnly: true
+          type: string
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem.
+          examples:
+            - Property foo is required but is missing.
+          type: string
+        errors:
+          description: Optional list of individual error details
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          type:
+            - array
+            - "null"
+        instance:
+          description: A URI reference that identifies the specific occurrence of the problem.
+          examples:
+            - https://example.com/error-log/abc123
+          format: uri
+          type: string
+        status:
+          description: HTTP status code
+          examples:
+            - 400
+          format: int64
+          type: integer
+        title:
+          description: A short, human-readable summary of the problem type. This value should not change between occurrences of the error.
+          examples:
+            - Bad Request
+          type: string
+        type:
+          default: about:blank
+          description: A URI reference to human-readable documentation for the error.
+          examples:
+            - https://example.com/errors/example
+          format: uri
+          type: string
+      type: object
+    GetAllPermissionsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllPermissionsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        permissions:
+          description: List of permissions
+          items:
+            $ref: "#/components/schemas/PermissionResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of permissions
+          format: int64
+          type: integer
+      required:
+        - permissions
+        - total
+      type: object
+    GetAllPostsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllPostsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of posts
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of posts
+          examples:
+            - 100
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetAllRolesResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllRolesResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        roles:
+          description: List of roles
+          items:
+            $ref: "#/components/schemas/RoleResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of roles
+          format: int64
+          type: integer
+      required:
+        - roles
+        - total
+      type: object
+    GetAllSportsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllSportsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        sports:
+          description: List of sports
+          items:
+            $ref: "#/components/schemas/SportResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of sports
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - sports
+        - total
+      type: object
+    GetCollegeFollowsByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCollegeFollowsByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        college_ids:
+          description: The colleges the given user follows
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - college_ids
+      type: object
+    GetCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          enum:
+            - 1
+            - 2
+            - 3
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        id:
+          description: ID of the college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    GetCommentLikeInfoResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCommentLikeInfoResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        liked:
+          description: Whether the requested user has liked the comment
+          examples:
+            - true
+          type: boolean
+        total:
+          description: Total number of likes on the comment
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - total
+        - liked
+      type: object
+    GetCommentLikeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetCommentLikeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        comment_id:
+          description: CommentID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: UserID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - comment_id
+      type: object
+    GetDownloadURLResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetDownloadURLResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        download_url:
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+      required:
+        - download_url
+        - expires_in
+      type: object
+    GetFollowingUsersByCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetFollowingUsersByCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          description: ID of the College
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_ids:
+          description: All users that follow this college
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      required:
+        - college_id
+        - user_ids
+      type: object
+    GetFollowingUsersBySportResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetFollowingUsersBySportResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        sport_id:
+          description: ID of the Sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_ids:
+          description: All users that follow this sport
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      required:
+        - sport_id
+        - user_ids
+      type: object
+    GetFollowingUsersByTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetFollowingUsersByTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        tag_id:
+          description: ID of the Tag
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_ids:
+          description: All users that follow this tag
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+      required:
+        - tag_id
+        - user_ids
+      type: object
+    GetPopularPostsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPopularPostsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of popular posts
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of posts considered
+          examples:
+            - 100
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetPostLikeInfoResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPostLikeInfoResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        liked:
+          description: Whether the requested user has liked the post
+          examples:
+            - true
+          type: boolean
+        total:
+          description: Total number of likes on the post
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - total
+        - liked
+      type: object
+    GetPostLikeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPostLikeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        post_id:
+          description: PostID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        user_id:
+          description: UserID of the like
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - post_id
+      type: object
+    GetPostsByAuthorIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPostsByAuthorIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of posts for the author
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of posts for this author
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetPostsBySportIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPostsBySportIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of posts for the sport
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of posts for this sport
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetPostsByTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPostsByTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        post_ids:
+          description: The post ids associated with a tag
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - post_ids
+      type: object
+    GetSportFollowsByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetSportFollowsByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        sport_ids:
+          description: The sports the given user follows
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - sport_ids
+      type: object
+    GetStripeCustomerByEmailResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetStripeCustomerByEmailResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        email:
+          description: Customer email
+          examples:
+            - jennyrosen@example.com
+          type: string
+        id:
+          description: Stripe customer ID
+          examples:
+            - cus_NffrFeUfNV2Hib
+          type: string
+      required:
+        - id
+        - email
+      type: object
+    GetStripeCustomerResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetStripeCustomerResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        address:
+          description: Customer address
+          type:
+            - string
+            - "null"
+        balance:
+          description: Customer balance in cents
+          examples:
+            - 0
+          format: int64
+          type: integer
+        created:
+          description: Unix timestamp of creation
+          examples:
+            - 1680893993
+          format: int64
+          type: integer
+        currency:
+          description: Default currency
+          type:
+            - string
+            - "null"
+        default_source:
+          description: Default payment source ID
+          type:
+            - string
+            - "null"
+        delinquent:
+          description: Whether customer is delinquent
+          examples:
+            - false
+          type: boolean
+        description:
+          description: Customer description
+          type:
+            - string
+            - "null"
+        email:
+          description: Customer email
+          examples:
+            - jennyrosen@example.com
+          type: string
+        id:
+          description: Stripe customer ID
+          examples:
+            - cus_NffrFeUfNV2Hib
+          type: string
+        invoice_prefix:
+          description: Invoice number prefix
+          examples:
+            - 0759376C
+          type: string
+        invoice_settings:
+          $ref: "#/components/schemas/InvoiceSettings"
+          description: Invoice settings
+        livemode:
+          description: Whether in live mode
+          examples:
+            - false
+          type: boolean
+        metadata:
+          additionalProperties:
+            type: string
+          description: Custom metadata
+          type: object
+        name:
+          description: Customer name
+          examples:
+            - Jenny Rosen
+          type:
+            - string
+            - "null"
+        next_invoice_sequence:
+          description: Next invoice sequence number
+          examples:
+            - 1
+          format: int64
+          type: integer
+        object:
+          description: Object type
+          examples:
+            - customer
+          type: string
+        phone:
+          description: Customer phone number
+          type:
+            - string
+            - "null"
+        preferred_locales:
+          description: Preferred locales
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        shipping:
+          description: Shipping information
+          type:
+            - string
+            - "null"
+        tax_exempt:
+          description: Tax exempt status
+          examples:
+            - none
+          type: string
+        test_clock:
+          description: Test clock ID
+          type:
+            - string
+            - "null"
+      required:
+        - id
+        - object
+        - address
+        - balance
+        - created
+        - currency
+        - default_source
+        - delinquent
+        - description
+        - email
+        - invoice_prefix
+        - invoice_settings
+        - livemode
+        - metadata
+        - name
+        - next_invoice_sequence
+        - phone
+        - preferred_locales
+        - shipping
+        - tax_exempt
+        - test_clock
+      type: object
+    GetTagFollowsByUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetTagFollowsByUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        tag_ids:
+          description: The tags the given user follows
+          examples:
+            - - 123e4567-e89b-12d3-a456-426614174000
+              - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user_id:
+          description: ID of the user
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - user_id
+        - tag_ids
+      type: object
+    GetTagPostByIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetTagPostByIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: the id of the item
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        post_ids:
+          description: The post id
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: the tag id
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - tag_id
+        - post_ids
+      type: object
+    GetTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tag
+          examples:
+            - "1"
+          type: string
+        name:
+          description: The name of the tag
+          examples:
+            - Hockey
+          type: string
+      required:
+        - id
+        - name
+      type: object
+    GetUploadURLRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUploadURLRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        fileName:
+          description: Optional; used as documentId in response (defaults to last segment of key)
+          type: string
+        fileType:
+          description: MIME type, e.g. image/jpeg, application/pdf
+          type: string
+        key:
+          description: Full S3 object key, e.g. premium/image/content-123/photo.jpg
+          type: string
+      required:
+        - key
+        - fileType
+        - fileName
+      type: object
+    GetUploadURLResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUploadURLResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        document_id:
+          type: string
+        expires_in:
+          format: int64
+          type: integer
+        key:
+          type: string
+        upload_url:
+          type: string
+      required:
+        - upload_url
+        - key
+        - document_id
+        - expires_in
+      type: object
+    GetUserResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUserResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          $ref: "#/components/schemas/College"
+          description: The college of a user
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        id:
+          description: ID of the user
+          examples:
+            - "1"
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        roles:
+          description: Roles assigned to the user
+          items:
+            $ref: "#/components/schemas/RoleResponse"
+          type: array
+        sport:
+          $ref: "#/components/schemas/Sport"
+          description: The sport(s) the user is interested in
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+        - username
+        - account_type
+        - verified_athlete_status
+      type: object
+    HealthResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/HealthResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        message:
+          description: Message to display
+          examples:
+            - Healthy!
+          type: string
+      required:
+        - message
+      type: object
+    InvoiceSettings:
+      additionalProperties: false
+      properties:
+        custom_fields:
+          type:
+            - string
+            - "null"
+        default_payment_method:
+          type:
+            - string
+            - "null"
+        footer:
+          type:
+            - string
+            - "null"
+        rendering_options:
+          type:
+            - string
+            - "null"
+      required:
+        - custom_fields
+        - default_payment_method
+        - footer
+        - rendering_options
+      type: object
+    PermissionResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/PermissionResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        action:
+          description: Action for the permission
+          examples:
+            - create
+          type: string
+        id:
+          description: ID of the permission
+          examples:
+            - "1"
+          type: string
+        resource:
+          description: Resource for the permission
+          examples:
+            - user
+          type: string
+      required:
+        - id
+        - action
+        - resource
+      type: object
+    PermissionSpecInput:
+      additionalProperties: false
+      properties:
+        action:
+          description: Permission action
+          examples:
+            - create
+          type: string
+        resource:
+          description: Permission resource
+          examples:
+            - sport
+          type: string
+      required:
+        - action
+        - resource
+      type: object
+    PostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/PostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        college:
+          $ref: "#/components/schemas/College"
+        comment_count:
+          examples:
+            - 20
+          format: int64
+          type: integer
+        content:
+          examples:
+            - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          type: string
+        id:
+          type: string
+        is_anonymous:
+          type: boolean
+        is_liked:
+          examples:
+            - true
+          type: boolean
+        is_verified_athlete:
+          type: boolean
+        like_count:
+          examples:
+            - 20000
+          format: int64
+          type: integer
+        popularity_score:
+          examples:
+            - 42.5
+          format: double
+          type: number
+        sport:
+          $ref: "#/components/schemas/Sport"
+        tags:
+          items:
+            $ref: "#/components/schemas/Tag"
+          type:
+            - array
+            - "null"
+        title:
+          examples:
+            - Looking for thoughts on NEU Fencing!
+          type: string
+      required:
+        - id
+        - author
+        - sport
+        - college
+        - tags
+        - title
+        - content
+        - is_anonymous
+        - is_verified_athlete
+      type: object
+    RegisterStripeCustomerBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RegisterStripeCustomerBody.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          description: A description of the user
+          examples:
+            - A verified athelete
+          type:
+            - string
+            - "null"
+        email:
+          description: The email of the user
+          examples:
+            - suli@northeastern.edu
+          type:
+            - string
+            - "null"
+        name:
+          description: The name of the user
+          examples:
+            - Suli
+          type:
+            - string
+            - "null"
+        phone:
+          description: The phone number of the user
+          examples:
+            - (111) 222-3333
+          type:
+            - string
+            - "null"
+      required:
+        - name
+        - email
+        - phone
+        - description
+      type: object
+    RegisterStripeCustomerResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RegisterStripeCustomerResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the user on stripe
+          examples:
+            - "1"
+          type: string
+      required:
+        - id
+      type: object
+    RoleResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/RoleResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the role
+          examples:
+            - "1"
+          type: string
+        name:
+          description: Name of the role
+          examples:
+            - admin
+          type: string
+        permissions:
+          description: Permissions attached to the role
+          items:
+            $ref: "#/components/schemas/PermissionResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - id
+        - name
+      type: object
+    Sport:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        deleted_at:
+          $ref: "#/components/schemas/DeletedAt"
+        id:
+          type: string
+        name:
+          examples:
+            - Women's Soccer
+          type: string
+        popularity:
+          examples:
+            - 20000
+          format: int32
+          type: integer
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - id
+        - created_at
+        - updated_at
+        - name
+      type: object
+    SportResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/SportResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the sport
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        name:
+          description: Name of the sport
+          examples:
+            - Women's Soccer
+          type: string
+        popularity:
+          description: Number of players
+          examples:
+            - 20000
+          format: int32
+          type: integer
+      required:
+        - id
+        - name
+      type: object
+    StripeCheckoutSessionResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/StripeCheckoutSessionResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        created:
+          examples:
+            - 1700000000
+          format: int64
+          type: integer
+        id:
+          examples:
+            - cs_test_12345
+          type: string
+        mode:
+          examples:
+            - subscription
+          type: string
+        status:
+          examples:
+            - open
+          type: string
+        subscription_id:
+          examples:
+            - sub_12345
+          type: string
+        url:
+          examples:
+            - https://checkout.stripe.com/c/pay/cs_test_12345
+          type: string
+      required:
+        - id
+        - url
+        - mode
+        - status
+        - created
+      type: object
+    StripePriceResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/StripePriceResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        active:
+          examples:
+            - true
+          type: boolean
+        created:
+          examples:
+            - 1700000000
+          format: int64
+          type: integer
+        currency:
+          examples:
+            - usd
+          type: string
+        id:
+          examples:
+            - price_12345
+          type: string
+        interval:
+          examples:
+            - month
+          type: string
+        interval_count:
+          examples:
+            - 1
+          format: int64
+          type: integer
+        product_id:
+          examples:
+            - prod_12345
+          type: string
+        unit_amount:
+          examples:
+            - 2000
+          format: int64
+          type: integer
+      required:
+        - id
+        - product_id
+        - unit_amount
+        - currency
+        - interval
+        - interval_count
+        - active
+        - created
+      type: object
+    StripeProductResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/StripeProductResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        active:
+          examples:
+            - true
+          type: boolean
+        created:
+          examples:
+            - 1700000000
+          format: int64
+          type: integer
+        description:
+          examples:
+            - Get premium content with this subscription
+          type: string
+        id:
+          examples:
+            - prod_12345
+          type: string
+        name:
+          examples:
+            - Premium Plan
+          type: string
+      required:
+        - id
+        - name
+        - description
+        - active
+        - created
+      type: object
+    Tag:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        deleted_at:
+          format: date-time
+          type:
+            - string
+            - "null"
+        id:
+          type: string
+        name:
+          description: The name of the tag
+          examples:
+            - Hockey
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - id
+        - created_at
+        - updated_at
+        - deleted_at
+        - name
+      type: object
+    TagRequest:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    UpdateCollegeRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateCollegeRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          maxLength: 100
+          type:
+            - string
+            - "null"
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          enum:
+            - 1
+            - 2
+            - 3
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type:
+            - integer
+            - "null"
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          maxLength: 500
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          maxLength: 200
+          type:
+            - string
+            - "null"
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          maxLength: 100
+          type:
+            - string
+            - "null"
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          maxLength: 500
+          type:
+            - string
+            - "null"
+      required:
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    UpdateCollegeResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateCollegeResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        academic_rank:
+          description: Academic rank of the college
+          examples:
+            - 53
+          format: int32
+          type:
+            - integer
+            - "null"
+        city:
+          description: City of the college
+          examples:
+            - Boston
+          type: string
+        division_rank:
+          description: NCAA division (1, 2, or 3)
+          enum:
+            - 1
+            - 2
+            - 3
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        id:
+          description: ID of the college
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        logo:
+          description: Logo of the college
+          examples:
+            - https://example.com/logo.png
+          type:
+            - string
+            - "null"
+        name:
+          description: Name of the college
+          examples:
+            - Northeastern University
+          type: string
+        state:
+          description: State of the college
+          examples:
+            - Massachusetts
+          type: string
+        website:
+          description: Website of the college
+          examples:
+            - https://www.northeastern.edu
+          type: string
+      required:
+        - id
+        - name
+        - state
+        - city
+        - website
+        - academic_rank
+        - division_rank
+        - logo
+      type: object
+    UpdateCommentBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateCommentBody.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          description: Updated comment text
+          examples:
+            - This is a helpful thread
+          maxLength: 300
+          type: string
+      required:
+        - description
+      type: object
+    UpdatePermissionRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdatePermissionRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        action:
+          description: Action for the permission
+          examples:
+            - update
+          type: string
+        resource:
+          description: Resource for the permission
+          examples:
+            - user
+          type: string
+      type: object
+    UpdatePostRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdatePostRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        content:
+          maxLength: 5000
+          minLength: 1
+          type: string
+        is_anonymous:
+          type: boolean
+        title:
+          maxLength: 100
+          minLength: 1
+          type: string
+      type: object
+    UpdateRoleRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateRoleRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          description: Name of the role
+          examples:
+            - moderator
+          type: string
+        permissions:
+          description: Permissions to attach to the role
+          items:
+            $ref: "#/components/schemas/PermissionSpecInput"
+          type: array
+      type: object
+    UpdateSportRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateSportRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          description: Name of the sport
+          examples:
+            - Women's Soccer
+          type:
+            - string
+            - "null"
+        popularity:
+          description: Number of players
+          examples:
+            - 20000
+          format: int32
+          type:
+            - integer
+            - "null"
+      required:
+        - name
+        - popularity
+      type: object
+    UpdateStripeCustomerBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateStripeCustomerBody.json
+          format: uri
+          readOnly: true
+          type: string
+        balance:
+          description: Current balance in cents (can be negative)
+          format: int64
+          type: integer
+        coupon:
+          description: Coupon ID to apply discount
+          type: string
+        default_source:
+          description: ID of default payment source
+          type: string
+        description:
+          description: Description of customer
+          type: string
+        email:
+          description: Customer email
+          examples:
+            - newemail@example.com
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          description: Set of key-value pairs for metadata
+          type: object
+        name:
+          description: Customer name
+          examples:
+            - Jane Doe
+          type: string
+        phone:
+          description: Customer phone number
+          examples:
+            - "+15555551234"
+          type: string
+        preferred_locales:
+          description: Customer's preferred languages
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        promotion_code:
+          description: Promotion code to apply
+          type: string
+        tax_exempt:
+          description: "Tax exemption status: none, exempt, or reverse"
+          examples:
+            - none
+          type: string
+      type: object
+    UpdateStripePriceRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateStripePriceRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        interval:
+          description: Interval between payments
+          examples:
+            - day
+          type:
+            - string
+            - "null"
+        interval_count:
+          description: Number of intervals a billing cycle lasts
+          examples:
+            - 3
+          format: int64
+          type:
+            - integer
+            - "null"
+        total:
+          description: Price per billing cycle.
+          examples:
+            - 2550
+          format: int64
+          type:
+            - integer
+            - "null"
+      required:
+        - total
+        - interval
+        - interval_count
+      type: object
+    UpdateStripeProductRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateStripeProductRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        description:
+          examples:
+            - Get premium content with this subscription
+          type:
+            - string
+            - "null"
+        name:
+          examples:
+            - Premium Plan
+          type:
+            - string
+            - "null"
+      required:
+        - name
+        - description
+      type: object
+    UpdateTagBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateTagBody.json
+          format: uri
+          readOnly: true
+          type: string
+        name:
+          description: The new name to update
+          examples:
+            - Hockey
+          type: string
+      required:
+        - name
+      type: object
+    UpdateTagPostBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateTagPostBody.json
+          format: uri
+          readOnly: true
+          type: string
+        post_id:
+          description: the post id to update to
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: the tag id to update to
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - post_id
+        - tag_id
+      type: object
+    UpdateTagPostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateTagPostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tagpost updated
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        post_id:
+          description: the updated post id
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        tag_id:
+          description: the updated tag id
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+      required:
+        - id
+        - post_id
+        - tag_id
+      type: object
+    UpdateTagResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateTagResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the tag updated
+          examples:
+            - "1"
+          type: string
+        name:
+          description: The updated name of the tag
+          examples:
+            - Northeastern Hockey
+          type: string
+      required:
+        - id
+        - name
+      type: object
+    UpdateUserBody:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdateUserBody.json
+          format: uri
+          readOnly: true
+          type: string
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The bio of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type: string
+        college:
+          description: The college of a user
+          type: string
+        division:
+          description: The division of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type: integer
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          description: The sport(s) the user is interested in
+          examples:
+            - "[\"hockey\",\"soccer\"]"
+          type: string
+        username:
+          description: The username of a user
+          examples:
+            - suliproathlete
+          type: string
+        verified_athlete_status:
+          description: Verification status for the athlete
+          examples:
+            - pending
+          type: string
+      type: object
+    User:
+      additionalProperties: false
+      properties:
+        account_type:
+          description: If the user has access to premium features
+          examples:
+            - true
+          type: boolean
+        bio:
+          description: The name of a user
+          examples:
+            - My name is Suli and I'm a pro athlete
+          type:
+            - string
+            - "null"
+        college:
+          description: The college of a user
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        deleted_at:
+          format: date-time
+          type:
+            - string
+            - "null"
+        division:
+          description: The divison of their college
+          examples:
+            - 1
+          format: int64
+          minimum: 0
+          type:
+            - integer
+            - "null"
+        email:
+          description: The email of a user
+          examples:
+            - suli123@email.com
+          type: string
+        expected_grad_year:
+          description: The user's grad year
+          examples:
+            - 2027
+          format: int64
+          minimum: 0
+          type: integer
+        first_name:
+          description: The first name of a user
+          examples:
+            - Suli
+          type: string
+        id:
+          type: string
+        last_name:
+          description: The last name of a user
+          examples:
+            - Suli
+          type: string
+        sport:
+          description: The sport the user plays
+          examples:
+            - hockey
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        username:
+          description: The username of a user
+          examples:
+            - suliproathelete
+          type: string
+        verified_athelete_status:
+          examples:
+            - pending
+          type: string
+      required:
+        - id
+        - created_at
+        - updated_at
+        - deleted_at
+        - first_name
+        - last_name
+        - email
+        - username
+        - bio
+        - account_type
+        - sport
+        - expected_grad_year
+        - verified_athelete_status
+        - college
+        - division
+      type: object
+    UserRoleResponse:
+      additionalProperties: false
+      properties:
+        id:
+          description: ID of the role
+          examples:
+            - "1"
+          type: string
+        name:
+          description: Name of the role
+          examples:
+            - user
+          type: string
+      required:
+        - id
+        - name
+      type: object
+  securitySchemes:
+    Authorization:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+info:
+  title: Inside Athletics API
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /api/v1/checkout/sessions/:
+    get:
+      operationId: list-api-v1-checkout-sessions
+      parameters:
+        - description: Filter by customer
+          explode: false
+          in: query
+          name: customer_id
+          schema:
+            description: Filter by customer
+            type: string
+        - description: Number of sessions to return
+          explode: false
+          in: query
+          name: limit
+          schema:
+            description: Number of sessions to return
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/StripeCheckoutSessionResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 checkout sessions
+    post:
+      operationId: post-api-v1-checkout-sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStripeCheckoutSessionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeCheckoutSessionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 checkout sessions
+  /api/v1/checkout/sessions/{id}:
+    delete:
+      operationId: delete-api-v1-checkout-sessions-by-id
+      parameters:
+        - description: ID of the checkout session
+          example: cs_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the checkout session
+            examples:
+              - cs_123
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeCheckoutSessionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 checkout sessions by ID
+    get:
+      operationId: get-api-v1-checkout-sessions-by-id
+      parameters:
+        - description: ID of the product
+          example: prod_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - prod_123
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeCheckoutSessionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 checkout sessions by ID
+  /api/v1/college:
+    post:
+      operationId: post-api-v1-college
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCollegeRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 college
+  /api/v1/college/{id}:
+    delete:
+      operationId: delete-api-v1-college-by-id
+      parameters:
+        - description: ID of the college
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college
+            examples:
+              - "1"
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 college by ID
+    get:
+      operationId: get-api-v1-college-by-id
+      parameters:
+        - description: ID of the college
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college
+            examples:
+              - "1"
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 college by ID
+    put:
+      operationId: put-api-v1-college-by-id
+      parameters:
+        - description: ID of the college
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college
+            examples:
+              - "1"
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCollegeRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Put API v1 college by ID
+  /api/v1/comment/:
+    post:
+      operationId: post-api-v1-comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 comment
+  /api/v1/comment/like:
+    post:
+      operationId: post-api-v1-comment-like
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentLikeBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommentLikeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 comment like
+  /api/v1/comment/like/{comment_id}/likes:
+    get:
+      operationId: get-api-v1-comment-like-by-comment-id-likes
+      parameters:
+        - description: Comment to get like info for
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: comment_id
+          required: true
+          schema:
+            description: Comment to get like info for
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommentLikeInfoResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 comment like by comment ID likes
+  /api/v1/comment/like/{id}:
+    delete:
+      operationId: delete-api-v1-comment-like-by-id
+      parameters:
+        - description: ID of the like
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the like
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCommentLikeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 comment like by ID
+    get:
+      operationId: get-api-v1-comment-like-by-id
+      parameters:
+        - description: ID of the like
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the like
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommentLikeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 comment like by ID
+  /api/v1/comment/{id}:
+    delete:
+      operationId: delete-api-v1-comment-by-id
+      parameters:
+        - description: ID of comment to delete
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of comment to delete
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 comment by ID
+    get:
+      operationId: get-api-v1-comment-by-id
+      parameters:
+        - description: ID of comment
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of comment
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 comment by ID
+    patch:
+      operationId: patch-api-v1-comment-by-id
+      parameters:
+        - description: ID of comment to update
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of comment to update
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommentBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 comment by ID
+  /api/v1/comment/{id}/replies:
+    get:
+      operationId: list-api-v1-comment-by-id-replies
+      parameters:
+        - description: ID of parent comment to get replies for
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of parent comment to get replies for
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/CommentResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 comment by ID replies
+  /api/v1/content:
+    delete:
+      operationId: delete-api-v1-content
+      parameters:
+        - description: S3 object key to delete
+          explode: false
+          in: query
+          name: key
+          required: true
+          schema:
+            description: S3 object key to delete
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteContentResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 content
+  /api/v1/content/confirm-upload:
+    post:
+      operationId: post-api-v1-content-confirm-upload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmUploadRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfirmUploadResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 content confirm upload
+  /api/v1/content/download-url:
+    get:
+      operationId: get-api-v1-content-download-url
+      parameters:
+        - description: S3 object key
+          explode: false
+          in: query
+          name: key
+          required: true
+          schema:
+            description: S3 object key
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDownloadURLResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 content download URL
+  /api/v1/content/upload-url:
+    post:
+      operationId: post-api-v1-content-upload-url
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUploadURLRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUploadURLResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 content upload URL
+  /api/v1/health/:
+    get:
+      operationId: get-api-v1-health
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 health
+  /api/v1/health/healthcheck:
+    get:
+      operationId: get-api-v1-health-healthcheck
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 health healthcheck
+  /api/v1/permission/:
+    post:
+      operationId: post-api-v1-permission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePermissionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 permission
+  /api/v1/permission/{id}:
+    delete:
+      operationId: delete-api-v1-permission-by-id
+      parameters:
+        - description: ID of the permission
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the permission
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 permission by ID
+    get:
+      operationId: get-api-v1-permission-by-id
+      parameters:
+        - description: ID of the permission
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the permission
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 permission by ID
+    patch:
+      operationId: patch-api-v1-permission-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePermissionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 permission by ID
+  /api/v1/permissions/:
+    get:
+      operationId: get-api-v1-permissions
+      parameters:
+        - description: Limit number of permissions
+          example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            description: Limit number of permissions
+            examples:
+              - 20
+            format: int64
+            type: integer
+        - description: Offset for pagination
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            description: Offset for pagination
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllPermissionsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 permissions
+  /api/v1/post/:
+    post:
+      operationId: post-api-v1-post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 post
+  /api/v1/post/like:
+    post:
+      operationId: post-api-v1-post-like
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostLikeBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostLikeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 post like
+  /api/v1/post/like/{id}:
+    delete:
+      operationId: delete-api-v1-post-like-by-id
+      parameters:
+        - description: PostID of the like
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: PostID of the like
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePostLikeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 post like by ID
+    get:
+      operationId: get-api-v1-post-like-by-id
+      parameters:
+        - description: ID of the like
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the like
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostLikeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 post like by ID
+  /api/v1/post/like/{post_id}/likes:
+    get:
+      operationId: get-api-v1-post-like-by-post-id-likes
+      parameters:
+        - description: Post to get like info for
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: post_id
+          required: true
+          schema:
+            description: Post to get like info for
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostLikeInfoResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 post like by post ID likes
+  /api/v1/post/tag/:
+    post:
+      operationId: post-api-v1-post-tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagPostBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTagPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 post tag
+  /api/v1/post/tag/{id}:
+    delete:
+      operationId: delete-api-v1-post-tag-by-id
+      parameters:
+        - description: ID of the TagsPosts item
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the TagsPosts item
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTagPostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 post tag by ID
+    get:
+      operationId: get-api-v1-post-tag-by-id
+      parameters:
+        - description: ID of the TagsPosts item
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the TagsPosts item
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagPostByIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 post tag by ID
+    patch:
+      operationId: patch-api-v1-post-tag-by-id
+      parameters:
+        - description: ID of the tagpost to update
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the tagpost to update
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagPostBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTagPostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 post tag by ID
+  /api/v1/post/{id}:
+    delete:
+      operationId: delete-api-v1-post-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 post by ID
+    get:
+      operationId: get-api-v1-post-by-id
+      parameters:
+        - description: ID of the post
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the post
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 post by ID
+    patch:
+      operationId: patch-api-v1-post-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePostRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 post by ID
+  /api/v1/post/{post_id}/comments:
+    get:
+      operationId: list-api-v1-post-by-post-id-comments
+      parameters:
+        - description: ID of the post
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: post_id
+          required: true
+          schema:
+            description: ID of the post
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/CommentResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 post by post ID comments
+  /api/v1/posts/:
+    get:
+      operationId: get-api-v1-posts
+      parameters:
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts
+  /api/v1/posts/by-author/{author_id}:
+    get:
+      operationId: get-api-v1-posts-by-author-by-author-id
+      parameters:
+        - description: ID of the author
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: author_id
+          required: true
+          schema:
+            description: ID of the author
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostsByAuthorIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts by author by author ID
+  /api/v1/posts/by-sport/{sport_id}:
+    get:
+      operationId: get-api-v1-posts-by-sport-by-sport-id
+      parameters:
+        - description: Sport ID to filter posts
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: sport_id
+          required: true
+          schema:
+            description: Sport ID to filter posts
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostsBySportIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts by sport by sport ID
+  /api/v1/posts/popular:
+    get:
+      operationId: get-api-v1-posts-popular
+      parameters:
+        - description: Number of posts to return
+          example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 20
+            description: Number of posts to return
+            examples:
+              - 20
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+        - description: Rolling window used for rapid-engagement scoring
+          example: 72
+          explode: false
+          in: query
+          name: window_hours
+          schema:
+            default: 72
+            description: Rolling window used for rapid-engagement scoring
+            examples:
+              - 72
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPopularPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts popular
+  /api/v1/role/:
+    post:
+      operationId: post-api-v1-role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 role
+  /api/v1/role/basic:
+    post:
+      operationId: post-api-v1-role-basic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 role basic
+  /api/v1/role/{id}:
+    delete:
+      operationId: delete-api-v1-role-by-id
+      parameters:
+        - description: ID of the role
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the role
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 role by ID
+    get:
+      operationId: get-api-v1-role-by-id
+      parameters:
+        - description: ID of the role
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the role
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 role by ID
+    patch:
+      operationId: patch-api-v1-role-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 role by ID
+  /api/v1/roles/:
+    get:
+      operationId: get-api-v1-roles
+      parameters:
+        - description: Limit number of roles
+          example: 20
+          explode: false
+          in: query
+          name: limit
+          schema:
+            description: Limit number of roles
+            examples:
+              - 20
+            format: int64
+            type: integer
+        - description: Offset for pagination
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            description: Offset for pagination
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllRolesResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 roles
+  /api/v1/sport/:
+    post:
+      operationId: post-api-v1-sport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 sport
+  /api/v1/sport/by-name/{name}:
+    get:
+      operationId: get-api-v1-sport-by-name-by-name
+      parameters:
+        - description: Name of the sport to retrieve
+          example: Women's Soccer
+          in: path
+          name: name
+          required: true
+          schema:
+            description: Name of the sport to retrieve
+            examples:
+              - Women's Soccer
+            maxLength: 100
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sport by name by name
+  /api/v1/sport/{id}:
+    delete:
+      operationId: delete-api-v1-sport-by-id
+      parameters:
+        - description: ID of the sport
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the sport
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 sport by ID
+    get:
+      operationId: get-api-v1-sport-by-id
+      parameters:
+        - description: ID of the sport
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the sport
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sport by ID
+    patch:
+      operationId: patch-api-v1-sport-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 sport by ID
+  /api/v1/sports/:
+    get:
+      operationId: get-api-v1-sports
+      parameters:
+        - description: Number of sports to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of sports to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of sports to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of sports to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllSportsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 sports
+  /api/v1/stripe_customers/:
+    post:
+      operationId: post-api-v1-stripe-customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterStripeCustomerBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterStripeCustomerResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 stripe customers
+  /api/v1/stripe_customers/email/{email}:
+    get:
+      operationId: get-api-v1-stripe-customers-email-by-email
+      parameters:
+        - description: email to identify the stripe user
+          example: suli@gmail.com
+          in: path
+          name: email
+          required: true
+          schema:
+            description: email to identify the stripe user
+            examples:
+              - suli@gmail.com
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStripeCustomerByEmailResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 stripe customers email by email
+  /api/v1/stripe_customers/{id}:
+    delete:
+      operationId: delete-api-v1-stripe-customers-by-id
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteStripeCustomerResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 stripe customers by ID
+    get:
+      operationId: get-api-v1-stripe-customers-by-id
+      parameters:
+        - description: ID to identify the stripe user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the stripe user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStripeCustomerResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 stripe customers by ID
+    patch:
+      operationId: patch-api-v1-stripe-customers-by-id
+      parameters:
+        - description: ID to identify the stripe user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the stripe user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStripeCustomerBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStripeCustomerResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 stripe customers by ID
+  /api/v1/stripe_price/:
+    post:
+      operationId: post-api-v1-stripe-price
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStripePriceRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripePriceResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 stripe price
+  /api/v1/stripe_price/{id}:
+    delete:
+      operationId: delete-api-v1-stripe-price-by-id
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripePriceResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 stripe price by ID
+    get:
+      operationId: get-api-v1-stripe-price-by-id
+      parameters:
+        - description: ID of the product
+          example: prod_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - prod_123
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripePriceResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 stripe price by ID
+    patch:
+      operationId: patch-api-v1-stripe-price-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStripePriceRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripePriceResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 stripe price by ID
+  /api/v1/stripe_prices/{id}:
+    get:
+      operationId: list-api-v1-stripe-prices-by-id
+      parameters:
+        - description: ID of the product
+          example: prod_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - prod_123
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/StripePriceResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 stripe prices by ID
+  /api/v1/stripe_product/:
+    post:
+      operationId: post-api-v1-stripe-product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStripeProductRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeProductResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 stripe product
+  /api/v1/stripe_product/{id}:
+    delete:
+      operationId: delete-api-v1-stripe-product-by-id
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeProductResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 stripe product by ID
+    get:
+      operationId: get-api-v1-stripe-product-by-id
+      parameters:
+        - description: ID of the product
+          example: prod_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - prod_123
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeProductResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 stripe product by ID
+    patch:
+      operationId: patch-api-v1-stripe-product-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStripeProductRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StripeProductResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 stripe product by ID
+  /api/v1/stripe_products/:
+    get:
+      operationId: list-api-v1-stripe-products
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/StripeProductResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 stripe products
+  /api/v1/tag/:
+    post:
+      operationId: post-api-v1-tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 tag
+  /api/v1/tag/name/{name}:
+    get:
+      operationId: get-api-v1-tag-name-by-name
+      parameters:
+        - description: Name to identify tag
+          example: Hockey
+          in: path
+          name: name
+          required: true
+          schema:
+            description: Name to identify tag
+            examples:
+              - Hockey
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 tag name by name
+  /api/v1/tag/{id}:
+    delete:
+      operationId: delete-api-v1-tag-by-id
+      parameters:
+        - description: ID to identify tag
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify tag
+            examples:
+              - "1"
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 tag by ID
+    get:
+      operationId: get-api-v1-tag-by-id
+      parameters:
+        - description: ID to identify tag
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify tag
+            examples:
+              - "1"
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 tag by ID
+    patch:
+      operationId: patch-api-v1-tag-by-id
+      parameters:
+        - description: ID of the tag to update
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the tag to update
+            examples:
+              - "1"
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 tag by ID
+  /api/v1/tag/{tag_id}/posts:
+    get:
+      operationId: get-api-v1-tag-by-tag-id-posts
+      parameters:
+        - description: ID of the Tag
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: tag_id
+          required: true
+          schema:
+            description: ID of the Tag
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostsByTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 tag by tag ID posts
+  /api/v1/user:
+    patch:
+      operationId: patch-api-v1-user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 user
+    post:
+      operationId: post-api-v1-user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user
+  /api/v1/user/college/:
+    post:
+      operationId: post-api-v1-user-college
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCollegeFollowBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCollegeFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user college
+  /api/v1/user/college/follows:
+    get:
+      operationId: get-api-v1-user-college-follows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCollegeFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user college follows
+  /api/v1/user/college/{college_id}/users:
+    get:
+      operationId: get-api-v1-user-college-by-college-id-users
+      parameters:
+        - description: ID of the College
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: college_id
+          required: true
+          schema:
+            description: ID of the College
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowingUsersByCollegeResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user college by college ID users
+  /api/v1/user/college/{id}:
+    delete:
+      operationId: delete-api-v1-user-college-by-id
+      parameters:
+        - description: ID of the college follow to be deleted
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the college follow to be deleted
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCollegeFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user college by ID
+  /api/v1/user/current:
+    get:
+      operationId: get-api-v1-user-current
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user current
+  /api/v1/user/sport/:
+    post:
+      operationId: post-api-v1-user-sport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSportFollowBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSportFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user sport
+  /api/v1/user/sport/follows:
+    get:
+      operationId: get-api-v1-user-sport-follows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetSportFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user sport follows
+  /api/v1/user/sport/{id}:
+    delete:
+      operationId: delete-api-v1-user-sport-by-id
+      parameters:
+        - description: ID of the sport follow to be deleted
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the sport follow to be deleted
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteSportFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user sport by ID
+  /api/v1/user/sport/{sport_id}/users:
+    get:
+      operationId: get-api-v1-user-sport-by-sport-id-users
+      parameters:
+        - description: ID of the Sport
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: sport_id
+          required: true
+          schema:
+            description: ID of the Sport
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowingUsersBySportResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user sport by sport ID users
+  /api/v1/user/tag/:
+    post:
+      operationId: post-api-v1-user-tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagFollowBody"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTagFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user tag
+  /api/v1/user/tag/follows:
+    get:
+      operationId: get-api-v1-user-tag-follows
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTagFollowsByUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user tag follows
+  /api/v1/user/tag/{id}:
+    delete:
+      operationId: delete-api-v1-user-tag-by-id
+      parameters:
+        - description: ID of the tag follow to be deleted
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the tag follow to be deleted
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTagFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user tag by ID
+  /api/v1/user/tag/{tag_id}/users:
+    get:
+      operationId: get-api-v1-user-tag-by-tag-id-users
+      parameters:
+        - description: ID of the Tag
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: tag_id
+          required: true
+          schema:
+            description: ID of the Tag
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowingUsersByTagResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user tag by tag ID users
+  /api/v1/user/{id}:
+    delete:
+      operationId: delete-api-v1-user-by-id
+      parameters:
+        - description: ID to identify the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user by ID
+    get:
+      operationId: get-api-v1-user-by-id
+      parameters:
+        - description: ID to identify the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID to identify the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user by ID
+  /api/v1/user/{id}/roles:
+    post:
+      operationId: post-api-v1-user-by-id-roles
+      parameters:
+        - description: ID of the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignRoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 user by ID roles
+security:
+  - Authorization: []

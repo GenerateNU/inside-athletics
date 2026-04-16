@@ -6,6 +6,7 @@ import (
 	"inside-athletics/internal/handlers/tagpost"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"net/url"
 )
 
 type TagService struct {
@@ -14,7 +15,10 @@ type TagService struct {
 }
 
 func (u *TagService) GetTagByName(ctx context.Context, input *GetTagByNameParams) (*utils.ResponseBody[GetTagResponse], error) {
-	name := input.Name
+	name, decodeErr := url.PathUnescape(input.Name)
+	if decodeErr != nil {
+		name = input.Name
+	}
 	tag, err := u.tagDB.GetTagByName(name)
 	respBody := &utils.ResponseBody[GetTagResponse]{}
 
@@ -130,4 +134,15 @@ func (u *TagService) DeleteTag(ctx context.Context, input *GetTagByIDParams) (*u
 	}
 
 	return respBody, nil
+}
+
+func (u *TagService) FuzzySearchFor(ctx context.Context, input *utils.SearchParam) (*utils.ResponseBody[utils.SearchResults[*GetTagResponse]], error) {
+	return utils.FuzzySearchService(input, models.Tag{}, GetTagResponse{}, "name", u.tagDB.db, getTagResponse)
+}
+
+func getTagResponse(tag *models.Tag) *GetTagResponse {
+	return &GetTagResponse{
+		ID:   tag.ID,
+		Name: tag.Name,
+	}
 }

@@ -2,8 +2,10 @@ package routeTests
 
 import (
 	"inside-athletics/internal/handlers/comment"
+	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/models"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/google/uuid"
@@ -52,6 +54,7 @@ func seedUserAndPost(t *testing.T, testDB *TestDatabase, unique string) (models.
 }
 
 func TestCreateComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -80,6 +83,7 @@ func TestCreateComment(t *testing.T) {
 
 // Asserts anonymous comments hide user_id when caller is not the user who made the comment.
 func TestCreateCommentAnonymous(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -106,6 +110,7 @@ func TestCreateCommentAnonymous(t *testing.T) {
 // testing get anonymous comment, when user is not user who made comment, will not return user id
 // also testing when user who made comment gets it, userId is shown
 func TestGetComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -130,6 +135,9 @@ func TestGetComment(t *testing.T) {
 		t.Errorf("expected nil UserId for Anonymous")
 	}
 
+	// Free-tier users must have accessed the post before viewing its comments.
+	_ = api.Get("/api/v1/post/"+post.ID.String(), "Authorization: Bearer "+user.ID.String())
+
 	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+user.ID.String())
 	if resp2.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp2.Code, resp2.Body.String())
@@ -146,6 +154,7 @@ func TestGetComment(t *testing.T) {
 }
 
 func TestGetCommentWithLikes(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -173,6 +182,9 @@ func TestGetCommentWithLikes(t *testing.T) {
 		t.Errorf("expected nil UserId for Anonymous")
 	}
 
+	// Free-tier users must have accessed the post before viewing its comments.
+	_ = api.Get("/api/v1/post/"+post.ID.String(), "Authorization: Bearer "+user.ID.String())
+
 	resp2 := api.Get("/api/v1/comment/"+created.ID.String(), "Authorization: Bearer "+user.ID.String())
 	if resp2.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp2.Code, resp2.Body.String())
@@ -197,6 +209,7 @@ func TestGetCommentWithLikes(t *testing.T) {
 }
 
 func TestGetCommentsByPost(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -223,6 +236,7 @@ func TestGetCommentsByPost(t *testing.T) {
 }
 
 func TestGetReplies(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -254,6 +268,7 @@ func TestGetReplies(t *testing.T) {
 }
 
 func TestUpdateComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -279,6 +294,7 @@ func TestUpdateComment(t *testing.T) {
 }
 
 func TestDeleteComment(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -302,6 +318,7 @@ func TestDeleteComment(t *testing.T) {
 }
 
 func TestCreateReplyToReplyReturns400(t *testing.T) {
+	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
@@ -327,5 +344,200 @@ func TestCreateReplyToReplyReturns400(t *testing.T) {
 	resp := api.Post("/api/v1/comment/", body, "Authorization: Bearer "+user.ID.String())
 	if resp.Code != http.StatusBadRequest {
 		t.Errorf("expected 400 for reply-to-reply (one layer only), got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestFreeUserGetCommentsByPostLimitedToFirstThreeViewedPosts(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	viewer := newCommentTestUser(uuid.New(), "viewer-comments-limit")
+	if err := testDB.DB.Create(&viewer).Error; err != nil {
+		t.Fatalf("failed to create viewer user: %v", err)
+	}
+
+	author := newCommentTestUser(uuid.New(), "author-comments-limit")
+	if err := testDB.DB.Create(&author).Error; err != nil {
+		t.Fatalf("failed to create author user: %v", err)
+	}
+
+	popularity := int32(100)
+	soccer := models.Sport{ID: SoccerID, Name: "Soccer", Popularity: &popularity}
+	if err := testDB.DB.FirstOrCreate(&soccer).Error; err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
+
+	postDB := post.NewPostDB(testDB.DB)
+	commentDB := comment.NewCommentDB(testDB.DB)
+	var postIDs []uuid.UUID
+	for i := 0; i < 4; i++ {
+		p, err := postDB.CreatePost(&models.Post{
+			AuthorID: author.ID,
+			SportID:  &SoccerID,
+			Title:    "Comments gate post " + strconv.Itoa(i),
+			Content:  "content",
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, p.ID)
+		if _, err := commentDB.CreateComment(&models.Comment{
+			UserID:      author.ID,
+			PostID:      p.ID,
+			Description: "comment " + strconv.Itoa(i),
+		}); err != nil {
+			t.Fatalf("failed to create comment for post %d: %v", i, err)
+		}
+	}
+
+	authHeader := "Authorization: Bearer " + viewer.ID.String()
+	// Record four viewed posts for the free user.
+	for i := range 4 {
+		_ = api.Get("/api/v1/post/"+postIDs[i].String(), authHeader)
+	}
+
+	for i := range 3 {
+		resp := api.Get("/api/v1/post/"+postIDs[i].String()+"/comments", authHeader)
+		if resp.Code != http.StatusOK {
+			t.Fatalf("expected 200 for post %d comments, got %d: %s", i, resp.Code, resp.Body.String())
+		}
+	}
+
+	resp := api.Get("/api/v1/post/"+postIDs[3].String()+"/comments", authHeader)
+	if resp.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for 4th viewed post comments, got %d: %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestFreeUserGetCommentBlockedOutsideFirstThreeViewedPosts(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	viewer := newCommentTestUser(uuid.New(), "viewer-comment-single")
+	if err := testDB.DB.Create(&viewer).Error; err != nil {
+		t.Fatalf("failed to create viewer user: %v", err)
+	}
+
+	author := newCommentTestUser(uuid.New(), "author-comment-single")
+	if err := testDB.DB.Create(&author).Error; err != nil {
+		t.Fatalf("failed to create author user: %v", err)
+	}
+
+	popularity := int32(100)
+	soccer := models.Sport{ID: SoccerID, Name: "Soccer", Popularity: &popularity}
+	if err := testDB.DB.FirstOrCreate(&soccer).Error; err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
+
+	postDB := post.NewPostDB(testDB.DB)
+	commentDB := comment.NewCommentDB(testDB.DB)
+	var comments []models.Comment
+	var postIDs []uuid.UUID
+	for i := 0; i < 4; i++ {
+		p, err := postDB.CreatePost(&models.Post{
+			AuthorID: author.ID,
+			SportID:  &SoccerID,
+			Title:    "Single comment gate post " + strconv.Itoa(i),
+			Content:  "content",
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, p.ID)
+		c, err := commentDB.CreateComment(&models.Comment{
+			UserID:      author.ID,
+			PostID:      p.ID,
+			Description: "comment " + strconv.Itoa(i),
+		})
+		if err != nil {
+			t.Fatalf("failed to create comment for post %d: %v", i, err)
+		}
+		comments = append(comments, *c)
+	}
+
+	authHeader := "Authorization: Bearer " + viewer.ID.String()
+	for i := 0; i < 4; i++ {
+		_ = api.Get("/api/v1/post/"+postIDs[i].String(), authHeader)
+	}
+
+	respAllowed := api.Get("/api/v1/comment/"+comments[0].ID.String(), authHeader)
+	if respAllowed.Code != http.StatusOK {
+		t.Fatalf("expected 200 for comment on first viewed post, got %d: %s", respAllowed.Code, respAllowed.Body.String())
+	}
+
+	respBlocked := api.Get("/api/v1/comment/"+comments[3].ID.String(), authHeader)
+	if respBlocked.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for comment on 4th viewed post, got %d: %s", respBlocked.Code, respBlocked.Body.String())
+	}
+}
+
+func TestPremiumUserCanViewCommentsOutsideFirstThreeViewedPosts(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	viewer := newCommentTestUser(uuid.New(), "viewer-premium-comments")
+	viewer.Account_Type = true
+	if err := testDB.DB.Create(&viewer).Error; err != nil {
+		t.Fatalf("failed to create premium viewer user: %v", err)
+	}
+
+	author := newCommentTestUser(uuid.New(), "author-premium-comments")
+	if err := testDB.DB.Create(&author).Error; err != nil {
+		t.Fatalf("failed to create author user: %v", err)
+	}
+
+	popularity := int32(100)
+	soccer := models.Sport{ID: SoccerID, Name: "Soccer", Popularity: &popularity}
+	if err := testDB.DB.FirstOrCreate(&soccer).Error; err != nil {
+		t.Fatalf("failed to create sport: %v", err)
+	}
+
+	postDB := post.NewPostDB(testDB.DB)
+	commentDB := comment.NewCommentDB(testDB.DB)
+	var comments []models.Comment
+	var postIDs []uuid.UUID
+	for i := 0; i < 4; i++ {
+		p, err := postDB.CreatePost(&models.Post{
+			AuthorID: author.ID,
+			SportID:  &SoccerID,
+			Title:    "Premium comments post " + strconv.Itoa(i),
+			Content:  "content",
+		}, []post.TagRequest{})
+		if err != nil {
+			t.Fatalf("failed to create post %d: %v", i, err)
+		}
+		postIDs = append(postIDs, p.ID)
+		c, err := commentDB.CreateComment(&models.Comment{
+			UserID:      author.ID,
+			PostID:      p.ID,
+			Description: "comment " + strconv.Itoa(i),
+		})
+		if err != nil {
+			t.Fatalf("failed to create comment for post %d: %v", i, err)
+		}
+		comments = append(comments, *c)
+	}
+
+	authHeader := "Authorization: Bearer " + viewer.ID.String()
+	// Even after viewing four posts, premium users should not be blocked.
+	for i := range 4 {
+		_ = api.Get("/api/v1/post/"+postIDs[i].String(), authHeader)
+	}
+
+	// Premium users should still be able to read comment lists and single comments on the 4th post.
+	respList := api.Get("/api/v1/post/"+postIDs[3].String()+"/comments", authHeader)
+	if respList.Code != http.StatusOK {
+		t.Fatalf("expected 200 for premium user comments on 4th viewed post, got %d: %s", respList.Code, respList.Body.String())
+	}
+
+	respSingle := api.Get("/api/v1/comment/"+comments[3].ID.String(), authHeader)
+	if respSingle.Code != http.StatusOK {
+		t.Fatalf("expected 200 for premium user single comment on 4th viewed post, got %d: %s", respSingle.Code, respSingle.Body.String())
 	}
 }
