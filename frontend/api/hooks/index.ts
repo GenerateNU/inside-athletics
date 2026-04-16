@@ -9,7 +9,6 @@ export type { DeleteApiV1PostByIdMutationKey } from "./useDeleteApiV1PostById.ts
 export type { DeleteApiV1PostLikeByIdMutationKey } from "./useDeleteApiV1PostLikeById.ts";
 export type { DeleteApiV1PostsPremiumByIdMutationKey } from "./useDeleteApiV1PostsPremiumById.ts";
 export type { DeleteApiV1PostTagByIdMutationKey } from "./useDeleteApiV1PostTagById.ts";
-export type { DeleteApiV1PostsPremiumByIdMutationKey } from "./useDeleteApiV1PostsPremiumById.ts";
 export type { DeleteApiV1RoleByIdMutationKey } from "./useDeleteApiV1RoleById.ts";
 export type { DeleteApiV1SportByIdMutationKey } from "./useDeleteApiV1SportById.ts";
 export type { DeleteApiV1StripeCustomersByIdMutationKey } from "./useDeleteApiV1StripeCustomersById.ts";
@@ -71,6 +70,10 @@ export type { GetApiV1PostsPremiumBySportBySportIdQueryKey } from "./useGetApiV1
 export type { GetApiV1PostsPremiumBySportBySportIdSuspenseQueryKey } from "./useGetApiV1PostsPremiumBySportBySportIdSuspense.ts";
 export type { GetApiV1PostsPremiumByTagByTagIdQueryKey } from "./useGetApiV1PostsPremiumByTagByTagId.ts";
 export type { GetApiV1PostsPremiumByTagByTagIdSuspenseQueryKey } from "./useGetApiV1PostsPremiumByTagByTagIdSuspense.ts";
+export type { GetApiV1PostsPremiumFilterQueryKey } from "./useGetApiV1PostsPremiumFilter.ts";
+export type { GetApiV1PostsPremiumFilterSuspenseQueryKey } from "./useGetApiV1PostsPremiumFilterSuspense.ts";
+export type { GetApiV1PostsPremiumSearchQueryKey } from "./useGetApiV1PostsPremiumSearch.ts";
+export type { GetApiV1PostsPremiumSearchSuspenseQueryKey } from "./useGetApiV1PostsPremiumSearchSuspense.ts";
 export type { GetApiV1PostsPremiumSuspenseQueryKey } from "./useGetApiV1PostsPremiumSuspense.ts";
 export type { GetApiV1PostsSearchQueryKey } from "./useGetApiV1PostsSearch.ts";
 export type { GetApiV1PostsSearchSuspenseQueryKey } from "./useGetApiV1PostsSearchSuspense.ts";
@@ -144,7 +147,6 @@ export type { PatchApiV1PermissionByIdMutationKey } from "./usePatchApiV1Permiss
 export type { PatchApiV1PostByIdMutationKey } from "./usePatchApiV1PostById.ts";
 export type { PatchApiV1PostsPremiumByIdMutationKey } from "./usePatchApiV1PostsPremiumById.ts";
 export type { PatchApiV1PostTagByIdMutationKey } from "./usePatchApiV1PostTagById.ts";
-export type { PatchApiV1PostsPremiumByIdMutationKey } from "./usePatchApiV1PostsPremiumById.ts";
 export type { PatchApiV1RoleByIdMutationKey } from "./usePatchApiV1RoleById.ts";
 export type { PatchApiV1SportByIdMutationKey } from "./usePatchApiV1SportById.ts";
 export type { PatchApiV1StripeCustomersByIdMutationKey } from "./usePatchApiV1StripeCustomersById.ts";
@@ -211,9 +213,6 @@ export { useDeleteApiV1PostsPremiumById } from "./useDeleteApiV1PostsPremiumById
 export { deleteApiV1PostTagByIdMutationKey } from "./useDeleteApiV1PostTagById.ts";
 export { deleteApiV1PostTagByIdMutationOptions } from "./useDeleteApiV1PostTagById.ts";
 export { useDeleteApiV1PostTagById } from "./useDeleteApiV1PostTagById.ts";
-export { deleteApiV1PostsPremiumByIdMutationKey } from "./useDeleteApiV1PostsPremiumById.ts";
-export { deleteApiV1PostsPremiumByIdMutationOptions } from "./useDeleteApiV1PostsPremiumById.ts";
-export { useDeleteApiV1PostsPremiumById } from "./useDeleteApiV1PostsPremiumById.ts";
 export { deleteApiV1RoleByIdMutationKey } from "./useDeleteApiV1RoleById.ts";
 export { deleteApiV1RoleByIdMutationOptions } from "./useDeleteApiV1RoleById.ts";
 export { useDeleteApiV1RoleById } from "./useDeleteApiV1RoleById.ts";
@@ -397,6 +396,18 @@ export { useGetApiV1PostsPremiumByTagByTagId } from "./useGetApiV1PostsPremiumBy
 export { getApiV1PostsPremiumByTagByTagIdSuspenseQueryKey } from "./useGetApiV1PostsPremiumByTagByTagIdSuspense.ts";
 export { getApiV1PostsPremiumByTagByTagIdSuspenseQueryOptions } from "./useGetApiV1PostsPremiumByTagByTagIdSuspense.ts";
 export { useGetApiV1PostsPremiumByTagByTagIdSuspense } from "./useGetApiV1PostsPremiumByTagByTagIdSuspense.ts";
+export { getApiV1PostsPremiumFilterQueryKey } from "./useGetApiV1PostsPremiumFilter.ts";
+export { getApiV1PostsPremiumFilterQueryOptions } from "./useGetApiV1PostsPremiumFilter.ts";
+export { useGetApiV1PostsPremiumFilter } from "./useGetApiV1PostsPremiumFilter.ts";
+export { getApiV1PostsPremiumFilterSuspenseQueryKey } from "./useGetApiV1PostsPremiumFilterSuspense.ts";
+export { getApiV1PostsPremiumFilterSuspenseQueryOptions } from "./useGetApiV1PostsPremiumFilterSuspense.ts";
+export { useGetApiV1PostsPremiumFilterSuspense } from "./useGetApiV1PostsPremiumFilterSuspense.ts";
+export { getApiV1PostsPremiumSearchQueryKey } from "./useGetApiV1PostsPremiumSearch.ts";
+export { getApiV1PostsPremiumSearchQueryOptions } from "./useGetApiV1PostsPremiumSearch.ts";
+export { useGetApiV1PostsPremiumSearch } from "./useGetApiV1PostsPremiumSearch.ts";
+export { getApiV1PostsPremiumSearchSuspenseQueryKey } from "./useGetApiV1PostsPremiumSearchSuspense.ts";
+export { getApiV1PostsPremiumSearchSuspenseQueryOptions } from "./useGetApiV1PostsPremiumSearchSuspense.ts";
+export { useGetApiV1PostsPremiumSearchSuspense } from "./useGetApiV1PostsPremiumSearchSuspense.ts";
 export { getApiV1PostsPremiumSuspenseQueryKey } from "./useGetApiV1PostsPremiumSuspense.ts";
 export { getApiV1PostsPremiumSuspenseQueryOptions } from "./useGetApiV1PostsPremiumSuspense.ts";
 export { useGetApiV1PostsPremiumSuspense } from "./useGetApiV1PostsPremiumSuspense.ts";
@@ -616,9 +627,6 @@ export { usePatchApiV1PostsPremiumById } from "./usePatchApiV1PostsPremiumById.t
 export { patchApiV1PostTagByIdMutationKey } from "./usePatchApiV1PostTagById.ts";
 export { patchApiV1PostTagByIdMutationOptions } from "./usePatchApiV1PostTagById.ts";
 export { usePatchApiV1PostTagById } from "./usePatchApiV1PostTagById.ts";
-export { patchApiV1PostsPremiumByIdMutationKey } from "./usePatchApiV1PostsPremiumById.ts";
-export { patchApiV1PostsPremiumByIdMutationOptions } from "./usePatchApiV1PostsPremiumById.ts";
-export { usePatchApiV1PostsPremiumById } from "./usePatchApiV1PostsPremiumById.ts";
 export { patchApiV1RoleByIdMutationKey } from "./usePatchApiV1RoleById.ts";
 export { patchApiV1RoleByIdMutationOptions } from "./usePatchApiV1RoleById.ts";
 export { usePatchApiV1RoleById } from "./usePatchApiV1RoleById.ts";

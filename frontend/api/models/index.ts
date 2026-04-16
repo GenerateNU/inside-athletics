@@ -404,6 +404,20 @@ export type {
   GetApiV1PostsPremiumByTagByTagIdQuery,
 } from "./GetApiV1PostsPremiumByTagByTagId.ts";
 export type {
+  GetApiV1PostsPremiumFilterQueryParams,
+  GetApiV1PostsPremiumFilter200,
+  GetApiV1PostsPremiumFilterError,
+  GetApiV1PostsPremiumFilterQueryResponse,
+  GetApiV1PostsPremiumFilterQuery,
+} from "./GetApiV1PostsPremiumFilter.ts";
+export type {
+  GetApiV1PostsPremiumSearchQueryParams,
+  GetApiV1PostsPremiumSearch200,
+  GetApiV1PostsPremiumSearchError,
+  GetApiV1PostsPremiumSearchQueryResponse,
+  GetApiV1PostsPremiumSearchQuery,
+} from "./GetApiV1PostsPremiumSearch.ts";
+export type {
   GetApiV1PostsSearchQueryParams,
   GetApiV1PostsSearch200,
   GetApiV1PostsSearchError,
@@ -586,8 +600,8 @@ export type {
 export type {
   GetApiV1UtilityAccessCheck200,
   GetApiV1UtilityAccessCheckError,
-  GetApiV1UtilityAccessCheckQuery,
   GetApiV1UtilityAccessCheckQueryResponse,
+  GetApiV1UtilityAccessCheckQuery,
 } from "./GetApiV1UtilityAccessCheck.ts";
 export type { GetCollegeFollowsByUserResponse } from "./GetCollegeFollowsByUserResponse.ts";
 export type {
@@ -597,6 +611,7 @@ export type {
 export type { GetCommentLikeInfoResponse } from "./GetCommentLikeInfoResponse.ts";
 export type { GetCommentLikeResponse } from "./GetCommentLikeResponse.ts";
 export type { GetDownloadURLResponse } from "./GetDownloadURLResponse.ts";
+export type { GetFilterPremiumPostsResponse } from "./GetFilterPremiumPostsResponse.ts";
 export type { GetFollowingUsersByCollegeResponse } from "./GetFollowingUsersByCollegeResponse.ts";
 export type { GetFollowingUsersBySportResponse } from "./GetFollowingUsersBySportResponse.ts";
 export type { GetFollowingUsersByTagResponse } from "./GetFollowingUsersByTagResponse.ts";
@@ -610,6 +625,7 @@ export type { GetPremiumPostsByAuthorIDResponse } from "./GetPremiumPostsByAutho
 export type { GetPremiumPostsByCollegeIDResponse } from "./GetPremiumPostsByCollegeIDResponse.ts";
 export type { GetPremiumPostsBySportIDResponse } from "./GetPremiumPostsBySportIDResponse.ts";
 export type { GetPremiumPostsByTagIDResponse } from "./GetPremiumPostsByTagIDResponse.ts";
+export type { GetSearchPremiumPostResponse } from "./GetSearchPremiumPostResponse.ts";
 export type { GetSearchResponse } from "./GetSearchResponse.ts";
 export type { GetSportFollowsByUserResponse } from "./GetSportFollowsByUserResponse.ts";
 export type { GetStripeCustomerByEmailResponse } from "./GetStripeCustomerByEmailResponse.ts";

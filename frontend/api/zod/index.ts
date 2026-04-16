@@ -338,11 +338,23 @@ export {
   getApiV1PostsPremiumByTagByTagIdQueryResponseSchema,
 } from "./getApiV1PostsPremiumByTagByTagIdSchema.ts";
 export {
+  getApiV1PostsPremiumFilterQueryParamsSchema,
+  getApiV1PostsPremiumFilter200Schema,
+  getApiV1PostsPremiumFilterErrorSchema,
+  getApiV1PostsPremiumFilterQueryResponseSchema,
+} from "./getApiV1PostsPremiumFilterSchema.ts";
+export {
   getApiV1PostsPremiumQueryParamsSchema,
   getApiV1PostsPremium200Schema,
   getApiV1PostsPremiumErrorSchema,
   getApiV1PostsPremiumQueryResponseSchema,
 } from "./getApiV1PostsPremiumSchema.ts";
+export {
+  getApiV1PostsPremiumSearchQueryParamsSchema,
+  getApiV1PostsPremiumSearch200Schema,
+  getApiV1PostsPremiumSearchErrorSchema,
+  getApiV1PostsPremiumSearchQueryResponseSchema,
+} from "./getApiV1PostsPremiumSearchSchema.ts";
 export {
   getApiV1PostsQueryParamsSchema,
   getApiV1Posts200Schema,
@@ -513,6 +525,7 @@ export { getCollegeResponseSchema } from "./getCollegeResponseSchema.ts";
 export { getCommentLikeInfoResponseSchema } from "./getCommentLikeInfoResponseSchema.ts";
 export { getCommentLikeResponseSchema } from "./getCommentLikeResponseSchema.ts";
 export { getDownloadURLResponseSchema } from "./getDownloadURLResponseSchema.ts";
+export { getFilterPremiumPostsResponseSchema } from "./getFilterPremiumPostsResponseSchema.ts";
 export { getFollowingUsersByCollegeResponseSchema } from "./getFollowingUsersByCollegeResponseSchema.ts";
 export { getFollowingUsersBySportResponseSchema } from "./getFollowingUsersBySportResponseSchema.ts";
 export { getFollowingUsersByTagResponseSchema } from "./getFollowingUsersByTagResponseSchema.ts";
@@ -526,6 +539,7 @@ export { getPremiumPostsByAuthorIDResponseSchema } from "./getPremiumPostsByAuth
 export { getPremiumPostsByCollegeIDResponseSchema } from "./getPremiumPostsByCollegeIDResponseSchema.ts";
 export { getPremiumPostsBySportIDResponseSchema } from "./getPremiumPostsBySportIDResponseSchema.ts";
 export { getPremiumPostsByTagIDResponseSchema } from "./getPremiumPostsByTagIDResponseSchema.ts";
+export { getSearchPremiumPostResponseSchema } from "./getSearchPremiumPostResponseSchema.ts";
 export { getSearchResponseSchema } from "./getSearchResponseSchema.ts";
 export { getSportFollowsByUserResponseSchema } from "./getSportFollowsByUserResponseSchema.ts";
 export { getStripeCustomerByEmailResponseSchema } from "./getStripeCustomerByEmailResponseSchema.ts";
