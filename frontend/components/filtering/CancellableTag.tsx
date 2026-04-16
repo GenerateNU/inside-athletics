@@ -11,7 +11,7 @@ export function CancellableTag({ label, onRemove, className }: CancellableTagPro
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-lg border border-[#D4E94B] bg-[#FCFDF1] px-3 py-1 text-xs text-zinc-800",
+        "inline-flex items-center gap-1.5 rounded-lg border border-[#A8C96A] bg-[#D4E896] px-3 py-1 text-xs text-zinc-800",
         className,
       )}
     >

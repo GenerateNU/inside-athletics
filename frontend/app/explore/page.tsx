@@ -1,5 +1,7 @@
 "use client";
 
+// Currently the popular tags are just replaced with user tag follows!
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
@@ -12,10 +14,10 @@ import { Tag } from "@/components/post/Tag";
 import { useQueries } from "@tanstack/react-query";
 import {
     useGetApiV1PostsFilter,
-    useGetApiV1Sports,
-    useGetApiV1CollegesSearch,
     useGetApiV1Posts,
     useGetApiV1UserTagFollows,
+    useGetApiV1UserCollegeFollows,
+    useGetApiV1UserSportFollows,
     useGetApiV1PostsSearch,
     useGetApiV1TagsSearch,
 
@@ -37,7 +39,15 @@ export default function ExplorePage() {
 
     const router = useRouter();
     const [query, setQuery] = useState("");
-    const [activeTag, setActiveTag] = useState<GetTagResponse | null>(null);
+    const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+
+    function toggleTag(tag: GetTagResponse) {
+        setActiveTags((prev) =>
+            prev.some((t) => t.id === tag.id)
+                ? prev.filter((t) => t.id !== tag.id)
+                : [...prev, tag],
+        );
+    }
 
     const { data: tagsfollowsData } = useGetApiV1UserTagFollows(
         { 
@@ -56,6 +66,8 @@ export default function ExplorePage() {
         .map((q) => q.data)
         .filter((t) => t !== undefined);
 
+    
+
     const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1Posts(
         { },
         { 
@@ -65,18 +77,17 @@ export default function ExplorePage() {
     console.log(allPostsData)
 
     const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
-        { tag_ids: activeTag?.id },
+        { tag_ids: activeTags.map((t) => t.id).join(",") },
         {
-            query: { enabled: !!activeTag },
+            query: { enabled: activeTags.length > 0 },
             client: { headers: authHeaders },
         },
     );
-    console.log(filteredPostsData)
-    
-    const posts = activeTag
+
+    const posts = activeTags.length > 0
         ? (filteredPostsData?.posts ?? [])
         : (allPostsData?.posts ?? []);
-    const isLoading = activeTag ? loadingFilteredPosts : loadingAllPosts;
+    const isLoading = activeTags.length > 0 ? loadingFilteredPosts : loadingAllPosts;
 
 
     return (
@@ -84,7 +95,7 @@ export default function ExplorePage() {
             <div className="flex min-h-screen">
                 <Navbar className="h-screen shrink-0" />
                 <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
-                    <div className="flex w-full max-w-5xl flex-col gap-10">
+                    <div className="flex w-full max-w-5xl flex-col gap-6">
                         <SearchBar
                             value={query}
                             onChange={setQuery}
@@ -99,20 +110,26 @@ export default function ExplorePage() {
                                 {followedTags.map((tag) => (
                                     <button
                                         key={tag.id}
-                                        onClick={() => setActiveTag(activeTag?.id === tag.id ? null : tag)}
+                                        onClick={() => toggleTag(tag)}
                                     >
-                                        <Tag label={tag.name} />
+                                        <Tag
+                                            label={tag.name}
+                                            className={activeTags.some((t) => t.id === tag.id) ? "border-[#A8C96A] bg-[#D4E896]" : undefined}
+                                        />
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 w-full">
+                        <div className="flex items-center gap-2 w-full flex-wrap">
                             <span className="font-semibold text-base">Explore</span>
-                            {activeTag && <CancellableTag
-                                label={activeTag.name}
-                                onRemove={() => setActiveTag(null)}
-                            />}
+                            {activeTags.map((tag) => (
+                                <CancellableTag
+                                    key={tag.id}
+                                    label={tag.name}
+                                    onRemove={() => toggleTag(tag)}
+                                />
+                            ))}
                         </div>
 
                         <div className="flex flex-col gap-4 w-full">
