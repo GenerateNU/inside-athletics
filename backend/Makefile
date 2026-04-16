@@ -117,7 +117,7 @@ generate-seed-data: generate-colleges-data generate-sports-data
 .PHONY: seed
 # Generates seed data and seeds the database with college and sports data
 seed: generate-seed-data
-	doppler run --command="go run scripts/seed/seed.go"
+	doppler run --command="go run scripts/seed/seed.go --colleges scripts/athlete_scraping/college_info.json"
 
 generate-college-info:
 	python3 -m pip install -r ./scripts/requirements.txt && \

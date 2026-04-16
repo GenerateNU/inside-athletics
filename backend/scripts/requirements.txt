@@ -2,3 +2,5 @@ jwcrypto
 pandas
 kagglehub
 beautifulsoup4
+aiohttp
+asyncio

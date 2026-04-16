@@ -32,14 +32,15 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	}
 
 	response := &GetCollegeResponse{
-		ID:           college.ID,
-		Name:         college.Name,
-		State:        college.State,
-		City:         college.City,
-		Website:      college.Website,
-		AcademicRank: college.AcademicRank,
-		DivisionRank: college.DivisionRank,
-		Logo:         StringPtrOrNil(college.Logo),
+		ID:               college.ID,
+		Name:             college.Name,
+		State:            college.State,
+		City:             college.City,
+		Website:          college.Website,
+		AthleticsWebsite: college.AthleticsWebsite,
+		AcademicRank:     college.AcademicRank,
+		DivisionRank:     college.DivisionRank,
+		Logo:             StringPtrOrNil(college.Logo),
 	}
 
 	return &utils.ResponseBody[GetCollegeResponse]{
@@ -69,14 +70,15 @@ func (u *CollegeService) CreateCollege(ctx context.Context, input *CreateCollege
 	}
 
 	response := &CreateCollegeResponse{
-		ID:           createdCollege.ID,
-		Name:         createdCollege.Name,
-		State:        createdCollege.State,
-		City:         createdCollege.City,
-		Website:      createdCollege.Website,
-		AcademicRank: createdCollege.AcademicRank,
-		DivisionRank: createdCollege.DivisionRank,
-		Logo:         StringPtrOrNil(createdCollege.Logo),
+		ID:               createdCollege.ID,
+		Name:             createdCollege.Name,
+		State:            createdCollege.State,
+		City:             createdCollege.City,
+		Website:          createdCollege.Website,
+		AthleticsWebsite: createdCollege.AthleticsWebsite,
+		AcademicRank:     createdCollege.AcademicRank,
+		DivisionRank:     createdCollege.DivisionRank,
+		Logo:             StringPtrOrNil(createdCollege.Logo),
 	}
 
 	return &utils.ResponseBody[CreateCollegeResponse]{
@@ -94,16 +96,17 @@ func (u *CollegeService) UpdateCollege(ctx context.Context, input *UpdateCollege
 	if err != nil {
 		return respBody, err
 	}
-	
+
 	response := &UpdateCollegeResponse{
-		ID:           college.ID,
-		Name:         college.Name,
-		State:        college.State,
-		City:         college.City,
-		Website:      college.Website,
-		AcademicRank: college.AcademicRank,
-		DivisionRank: college.DivisionRank,
-		Logo:         StringPtrOrNil(college.Logo),
+		ID:               college.ID,
+		Name:             college.Name,
+		State:            college.State,
+		City:             college.City,
+		Website:          college.Website,
+		AthleticsWebsite: college.AthleticsWebsite,
+		AcademicRank:     college.AcademicRank,
+		DivisionRank:     college.DivisionRank,
+		Logo:             StringPtrOrNil(college.Logo),
 	}
 
 	return &utils.ResponseBody[UpdateCollegeResponse]{
