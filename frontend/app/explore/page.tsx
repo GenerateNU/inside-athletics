@@ -153,7 +153,7 @@ export default function ExplorePage() {
             <div className="flex min-h-screen">
                 <Navbar className="h-screen shrink-0" />
                 <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
-                    <div className="flex w-full max-w-5xl flex-col items-center gap-10">
+                    <div className="flex w-full max-w-3xl flex-col gap-10">
                         <SearchBar
                             value={query}
                             onChange={setQuery}
