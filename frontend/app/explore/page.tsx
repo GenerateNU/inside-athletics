@@ -3,7 +3,6 @@
 // Currently the popular tags are just replaced with user tag follows!
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
 import { SearchBar } from "@/components/post/SearchBar";
@@ -16,10 +15,14 @@ import {
     useGetApiV1PostsFilter,
     useGetApiV1Posts,
     useGetApiV1UserTagFollows,
+    useGetApiV1UserCollegeFollows,
+    useGetApiV1UserSportFollows,
     getApiV1TagByIdQueryOptions,
+    getApiV1CollegeByIdQueryOptions,
+    getApiV1SportByIdQueryOptions,
 } from "@/api/hooks";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
-import { GetTagResponse } from "@/api";
+import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
 
 
 export default function ExplorePage() {
@@ -30,9 +33,10 @@ export default function ExplorePage() {
         ? { Authorization: `Bearer ${session.access_token}` }
         : undefined;
 
-    const router = useRouter();
     const [query, setQuery] = useState("");
     const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+    const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
+    const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
 
     function toggleTag(tag: GetTagResponse) {
         setActiveTags((prev) =>
@@ -41,11 +45,37 @@ export default function ExplorePage() {
                 : [...prev, tag],
         );
     }
+    function toggleCollege(tag: GetCollegeResponse) {
+        setActiveCollege((prev) =>
+            prev.some((c) => c.id === tag.id)
+                ? prev.filter((t) => t.id !== tag.id)
+                : [...prev, tag],
+        );
+    }
+    function toggleSport(tag: SportResponse) {
+        setActiveSports((prev) =>
+            prev.some((t) => t.id === tag.id)
+                ? prev.filter((t) => t.id !== tag.id)
+                : [...prev, tag],
+        );
+    }
 
     const { data: tagsfollowsData } = useGetApiV1UserTagFollows(
-        { 
+        {
             query: { enabled },
-            client: { headers: authHeaders } 
+            client: { headers: authHeaders }
+        },
+    );
+    const { data: collegefollowsData } = useGetApiV1UserCollegeFollows(
+        {
+            query: { enabled },
+            client: { headers: authHeaders }
+        },
+    );
+    const { data: sportfollowsData } = useGetApiV1UserSportFollows(
+        {
+            query: { enabled },
+            client: { headers: authHeaders }
         },
     );
 
@@ -55,27 +85,50 @@ export default function ExplorePage() {
             getApiV1TagByIdQueryOptions(id, { headers: authHeaders }),
         ),
     });
+    const collegeIds = collegefollowsData?.college_ids ?? [];
+    const collegeQueries = useQueries({
+        queries: collegeIds.map((id) =>
+            getApiV1CollegeByIdQueryOptions(id, { headers: authHeaders }),
+        ),
+    });
+    const sportIds = sportfollowsData?.sport_ids ?? [];
+    const sportQueries = useQueries({
+        queries: sportIds.map((id) =>
+            getApiV1SportByIdQueryOptions(id, { headers: authHeaders }),
+        ),
+    });
+
+
     const followedTags = tagQueries
         .map((q) => q.data)
         .filter((t) => t !== undefined);
+    const followedColleges = collegeQueries
+        .map((q) => q.data)
+        .filter((t) => t !== undefined);
+    const followedSports = sportQueries
+        .map((q) => q.data)
+        .filter((t) => t !== undefined);
 
-    
 
     const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1Posts(
         { },
-        { 
+        {
             query: { enabled },
             client: { headers: authHeaders } },
     );
-    console.log(allPostsData)
+    console.log("all posts: " + allPostsData)
 
     const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
-        { tag_ids: activeTags.map((t) => t.id).join(",") },
+        { tag_ids: activeTags.map((t) => t.id).join(","),
+          sport_ids: activeSports.map((t) => t.id).join(","),
+          college_ids: activeColleges.map((t) => t.id).join(","),
+        },
         {
             query: { enabled: activeTags.length > 0 },
             client: { headers: authHeaders },
         },
     );
+    console.log("filtered: " + filteredPostsData)
 
     const posts = activeTags.length > 0
         ? (filteredPostsData?.posts ?? [])
@@ -92,7 +145,6 @@ export default function ExplorePage() {
                         <SearchBar
                             value={query}
                             onChange={setQuery}
-                            onSubmit={() => query.trim() && router.push(`/search?q=${encodeURIComponent(query.trim())}`)}
                             placeholder="Search posts..."
                             className="w-full"
                         />
@@ -100,6 +152,28 @@ export default function ExplorePage() {
                         <div className="flex flex-col gap-3 w-full">
                             <h2 className="font-semibold text-base">Popular Tags</h2>
                             <div className="flex flex-wrap gap-2">
+                                {followedColleges.map((college) => (
+                                    <button
+                                        key={college.id}
+                                        onClick={() => toggleCollege(college)}
+                                    >
+                                        <Tag
+                                            label={college.name}
+                                            className={activeColleges.some((c) => c.id === college.id) ? "border-[#A8C96A] bg-[#D4E896]" : undefined}
+                                        />
+                                    </button>
+                                ))}
+                                {followedSports.map((sport) => (
+                                    <button
+                                        key={sport.id}
+                                        onClick={() => toggleSport(sport)}
+                                    >
+                                        <Tag
+                                            label={sport.name}
+                                            className={activeSports.some((s) => s.id === sport.id) ? "border-[#A8C96A] bg-[#D4E896]" : undefined}
+                                        />
+                                    </button>
+                                ))}
                                 {followedTags.map((tag) => (
                                     <button
                                         key={tag.id}
