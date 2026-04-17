@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart } from "lucide-react";
+import Link from "next/link";
 
 import type { CommentResponse } from "@/api/models";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -18,9 +19,18 @@ export function FeedCommentCard({ comment }: Props) {
           <AvatarFallback />
         </Avatar>
         <div className="mb-1 flex items-baseline gap-3">
-          <p className="text-sm font-semibold">
-            {comment.user?.username || "otherperson"}
-          </p>
+          {comment.user?.id ? (
+            <Link
+              href={`/profile/${comment.user.id}`}
+              className="text-sm font-semibold hover:underline"
+            >
+              {comment.user.username || "otherperson"}
+            </Link>
+          ) : (
+            <p className="text-sm font-semibold">
+              {comment.user?.username || "otherperson"}
+            </p>
+          )}
           <p className="text-sm leading-6 text-slate-700">
             {comment.description}
           </p>

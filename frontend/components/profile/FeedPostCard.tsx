@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart, Bookmark } from "lucide-react";
+import Link from "next/link";
 
 import type { PostResponse } from "@/api/models";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -20,19 +21,30 @@ export function FeedPostCard({ post, filledHeart }: Props) {
       </Avatar>
       <div>
         <div className="mb-1 flex items-baseline gap-3">
-          <p className="text-sm font-semibold">
-            {post.author.username || "username"}
-          </p>
+          {post.author?.id ? (
+            <Link
+              href={`/profile/${post.author.id}`}
+              className="text-sm font-semibold hover:underline"
+            >
+              {post.author.username || "anonymous"}
+            </Link>
+          ) : (
+            <p className="text-sm font-semibold">anonymous</p>
+          )}
           <p className="text-sm leading-6 text-slate-700">{post.content}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className="rounded-sm px-2 py-1 text-[11px]">
-            <Bookmark className="mr-1 h-3 w-3" />
-            {post.college.name}
-          </Badge>
-          <Badge variant="outline" className="rounded-sm px-2 py-1 text-[11px]">
-            {post.sport.name}
-          </Badge>
+          {post.college?.name ? (
+            <Badge variant="outline" className="rounded-sm px-2 py-1 text-[11px]">
+              <Bookmark className="mr-1 h-3 w-3" />
+              {post.college.name}
+            </Badge>
+          ) : null}
+          {post.sport?.name ? (
+            <Badge variant="outline" className="rounded-sm px-2 py-1 text-[11px]">
+              {post.sport.name}
+            </Badge>
+          ) : null}
         </div>
       </div>
       <button

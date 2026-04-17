@@ -16,6 +16,7 @@ import {
   usePatchApiV1User,
   usePostApiV1UserTag,
   useGetApiV1PostsByAuthorByAuthorId,
+  useGetApiV1UserById,
   useGetApiV1UserCurrent,
   useGetApiV1UserTagFollows,
 } from "@/api/hooks";
@@ -23,11 +24,16 @@ import type { CommentResponse } from "@/api/models/CommentResponse";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/utils/SessionContext";
 
-export function ProfilePageClient() {
+type Props = {
+  profileUserId?: string;
+};
+
+export function ProfilePageClient({ profileUserId }: Props) {
   const session = useSession();
   const enabled = !!session?.access_token;
+  const isViewingOwnProfile = !profileUserId;
 
-  // FIX 1: Memoize authHeaders so they don't trigger infinite loops in useEffect
+  // Memoize authHeaders so they don't trigger infinite loops in useEffect
   const authHeaders = React.useMemo(() => {
     return session?.access_token
       ? { Authorization: `Bearer ${session.access_token}` }
@@ -48,11 +54,17 @@ export function ProfilePageClient() {
     Array<{ id: string; name: string }>
   >([]);
 
-  const userQuery = useGetApiV1UserCurrent({
-    query: commonQueryConfig,
+  const currentUserQuery = useGetApiV1UserCurrent({
+    query: { ...commonQueryConfig, enabled: enabled && isViewingOwnProfile },
     client: { headers: authHeaders },
   });
 
+  const viewedUserQuery = useGetApiV1UserById(profileUserId ?? "", {
+    query: { ...commonQueryConfig, enabled: enabled && !isViewingOwnProfile },
+    client: { headers: authHeaders },
+  });
+
+  const userQuery = isViewingOwnProfile ? currentUserQuery : viewedUserQuery;
   const user = userQuery.data;
   const userId = user?.id;
 
@@ -70,9 +82,9 @@ export function ProfilePageClient() {
     }
   }, []);
 
-  // This effect no longer loops because authHeaders is now memoized
+  // THIS KEPT LOOPING BUT NOW IT DOESNT BECAUSE authHeaders is now memoized
   React.useEffect(() => {
-    if (!enabled || !authHeaders) return;
+    if (!enabled || !authHeaders || !isViewingOwnProfile) return;
     const controller = new AbortController();
 
     const loadTags = async () => {
@@ -96,7 +108,7 @@ export function ProfilePageClient() {
 
     void loadTags();
     return () => controller.abort();
-  }, [enabled, authHeaders]);
+  }, [enabled, authHeaders, isViewingOwnProfile]);
 
   const postsQuery = useGetApiV1PostsByAuthorByAuthorId(
     userId ?? "",
@@ -108,11 +120,11 @@ export function ProfilePageClient() {
   );
 
   const tagFollowsQuery = useGetApiV1UserTagFollows({
-    query: commonQueryConfig,
+    query: { ...commonQueryConfig, enabled: enabled && isViewingOwnProfile },
     client: { headers: authHeaders },
   });
 
-  const tagIds = tagFollowsQuery.data?.tag_ids ?? [];
+  const tagIds = isViewingOwnProfile ? (tagFollowsQuery.data?.tag_ids ?? []) : [];
 
   const tagResults = useQueries({
     queries: tagIds.slice(0, 8).map((id: string) => ({
@@ -138,7 +150,7 @@ export function ProfilePageClient() {
     enabled &&
     (userQuery.isLoading ||
       (!!userId && postsQuery.isLoading) ||
-      tagFollowsQuery.isLoading);
+      (isViewingOwnProfile && tagFollowsQuery.isLoading));
 
   if (!enabled) {
     return (
@@ -213,9 +225,18 @@ export function ProfilePageClient() {
     .filter(Boolean)
     .slice(0, 8) as CommentResponse[];
 
-  const interestNames = tagResults
-    .map((r) => r.data?.name)
-    .filter((name): name is string => Boolean(name));
+  const interestNames = isViewingOwnProfile
+    ? tagResults
+        .map((r) => r.data?.name)
+        .filter((name): name is string => Boolean(name))
+    : Array.from(
+        new Set(
+          posts
+            .flatMap((post) => post.tags ?? [])
+            .map((tag) => tag.name)
+            .filter(Boolean),
+        ),
+      );
 
   const roleNames = (user.roles ?? []).map((role) => role.name.toLowerCase());
   const isAthlete =
@@ -231,7 +252,7 @@ export function ProfilePageClient() {
     ),
   ) as string[];
 
-  const showSurveyPrompt = isAthlete;
+  const showSurveyPrompt = isViewingOwnProfile && isAthlete;
 
   const headerUser = {
     id: user.id,
@@ -255,7 +276,10 @@ export function ProfilePageClient() {
             <ProfileHeader
               user={headerUser}
               isAthlete={isAthlete}
-              onEdit={() => setShowEditModal(true)}
+              showEditButton={isViewingOwnProfile}
+              onEdit={
+                isViewingOwnProfile ? () => setShowEditModal(true) : undefined
+              }
             />
 
             <div className="mt-5 border-b border-slate-300">
@@ -292,53 +316,57 @@ export function ProfilePageClient() {
         </div>
       </div>
 
-      <EditProfileModal
-        open={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        isSaving={patchUserMutation.isPending}
-        user={{
-          firstName: user.first_name,
-          lastName: user.last_name,
-          pronouns,
-          about: user.bio || "",
-        }}
-        onSave={async (values) => {
-          await patchUserMutation.mutateAsync({
-            data: {
-              first_name: values.firstName,
-              last_name: values.lastName,
-              bio: values.about,
-            },
-          });
+      {isViewingOwnProfile ? (
+        <EditProfileModal
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          isSaving={patchUserMutation.isPending}
+          user={{
+            firstName: user.first_name,
+            lastName: user.last_name,
+            pronouns,
+            about: user.bio || "",
+          }}
+          onSave={async (values) => {
+            await patchUserMutation.mutateAsync({
+              data: {
+                first_name: values.firstName,
+                last_name: values.lastName,
+                bio: values.about,
+              },
+            });
 
-          const existingTagIds = new Set(tagIds);
-          const selectedTagIds = new Set(values.selectedTagIds);
-          const tagsToAdd = values.selectedTagIds.filter((id) => !existingTagIds.has(id));
-          const tagsToRemove = tagIds.filter((id) => !selectedTagIds.has(id));
+            const existingTagIds = new Set(tagIds);
+            const selectedTagIds = new Set(values.selectedTagIds);
+            const tagsToAdd = values.selectedTagIds.filter(
+              (id) => !existingTagIds.has(id),
+            );
+            const tagsToRemove = tagIds.filter((id) => !selectedTagIds.has(id));
 
-          await Promise.all(
-            tagsToAdd.map((tagId) =>
-              createTagFollowMutation.mutateAsync({ data: { tag_id: tagId } }),
-            ),
-          );
+            await Promise.all(
+              tagsToAdd.map((tagId) =>
+                createTagFollowMutation.mutateAsync({ data: { tag_id: tagId } }),
+              ),
+            );
 
-          await Promise.all(
-            tagsToRemove.map((tagId) =>
-              fetch(`/api/v1/user/tag/tag/${tagId}`, {
-                method: "DELETE",
-                headers: authHeaders,
-              }),
-            ),
-          );
+            await Promise.all(
+              tagsToRemove.map((tagId) =>
+                fetch(`/api/v1/user/tag/tag/${tagId}`, {
+                  method: "DELETE",
+                  headers: authHeaders,
+                }),
+              ),
+            );
 
-          setPronouns(values.pronouns);
-          window.localStorage.setItem("profile_pronouns", values.pronouns);
-          setShowEditModal(false);
-          await Promise.all([userQuery.refetch(), tagFollowsQuery.refetch()]);
-        }}
-        availableTags={availableTags}
-        selectedTagIds={tagIds}
-      />
+            setPronouns(values.pronouns);
+            window.localStorage.setItem("profile_pronouns", values.pronouns);
+            setShowEditModal(false);
+            await Promise.all([userQuery.refetch(), tagFollowsQuery.refetch()]);
+          }}
+          availableTags={availableTags}
+          selectedTagIds={tagIds}
+        />
+      ) : null}
     </div>
   );
 }

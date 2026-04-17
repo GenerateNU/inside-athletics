@@ -8,14 +8,20 @@ import type { ProfilePageData } from "@/components/profile/types";
 type Props = {
   user: ProfilePageData["user"];
   isAthlete: boolean;
-  onEdit: () => void;
+  onEdit?: () => void;
+  showEditButton?: boolean;
 };
 
 /** Figma: profile header tags (D1 / sport / school) */
 const headerTagClassName =
   "h-[30px] rounded-[12px] border border-[#7F8C2D] bg-[#D4E94B]/50 px-[8px] py-[5px] text-xs font-semibold text-slate-900 gap-[5px]";
 
-export function ProfileHeader({ user, isAthlete, onEdit }: Props) {
+export function ProfileHeader({
+  user,
+  isAthlete,
+  onEdit,
+  showEditButton = true,
+}: Props) {
   return (
     <>
       <div className="mb-5 flex items-start justify-between gap-4">
@@ -51,12 +57,14 @@ export function ProfileHeader({ user, isAthlete, onEdit }: Props) {
             ) : null}
           </div>
         </div>
-        <Button
-          className="rounded-lg bg-[#2d6ca6] px-4 py-2 text-white hover:bg-[#235a8a]"
-          onClick={onEdit}
-        >
-          Edit profile
-        </Button>
+        {showEditButton ? (
+          <Button
+            className="rounded-lg bg-[#2d6ca6] px-4 py-2 text-white hover:bg-[#235a8a]"
+            onClick={onEdit}
+          >
+            Edit profile
+          </Button>
+        ) : null}
       </div>
 
       <section>
