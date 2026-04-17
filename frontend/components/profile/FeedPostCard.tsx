@@ -14,11 +14,27 @@ type Props = {
 };
 
 export function FeedPostCard({ post, filledHeart }: Props) {
+  const avatar = (
+    <Avatar className="h-9 w-9 bg-slate-300">
+      <AvatarFallback />
+    </Avatar>
+  );
+
   return (
     <article className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
-      <Avatar className="h-9 w-9 bg-slate-300">
-        <AvatarFallback />
-      </Avatar>
+      {post.author?.id ? (
+        <Link
+          href={`/profile/${post.author.id}`}
+          className="shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={`View ${
+            post.author.username || "user"
+          }'s profile`}
+        >
+          {avatar}
+        </Link>
+      ) : (
+        avatar
+      )}
       <div>
         <div className="mb-1 flex items-baseline gap-3">
           {post.author?.id ? (

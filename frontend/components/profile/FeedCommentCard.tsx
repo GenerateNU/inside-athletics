@@ -12,12 +12,28 @@ type Props = {
 };
 
 export function FeedCommentCard({ comment }: Props) {
+  const avatar = (
+    <Avatar className="h-9 w-9 bg-slate-300">
+      <AvatarFallback />
+    </Avatar>
+  );
+
   return (
     <article className="space-y-2">
       <div className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
-        <Avatar className="h-9 w-9 bg-slate-300">
-          <AvatarFallback />
-        </Avatar>
+        {comment.user?.id ? (
+          <Link
+            href={`/profile/${comment.user.id}`}
+            className="shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`View ${
+              comment.user.username || "user"
+            }'s profile`}
+          >
+            {avatar}
+          </Link>
+        ) : (
+          avatar
+        )}
         <div className="mb-1 flex items-baseline gap-3">
           {comment.user?.id ? (
             <Link
