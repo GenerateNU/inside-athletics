@@ -21,6 +21,7 @@ export { deleteApiV1UserCollegeById } from "./deleteApiV1UserCollegeById.ts";
 export { deleteApiV1UserSportById } from "./deleteApiV1UserSportById.ts";
 export { deleteApiV1UserTagById } from "./deleteApiV1UserTagById.ts";
 export { getApiV1CheckoutSessionsById } from "./getApiV1CheckoutSessionsById.ts";
+export { getApiV1College } from "./getApiV1College.ts";
 export { getApiV1CollegeById } from "./getApiV1CollegeById.ts";
 export { getApiV1Colleges } from "./getApiV1Colleges.ts";
 export { getApiV1CollegesSearch } from "./getApiV1CollegesSearch.ts";

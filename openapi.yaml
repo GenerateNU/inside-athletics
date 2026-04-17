@@ -1754,25 +1754,6 @@ components:
           format: uri
           type: string
       type: object
-    GetAllCollegesResponse:
-      additionalProperties: false
-      properties:
-        $schema:
-          description: A URL to the JSON Schema for this object.
-          examples:
-            - https://example.com/schemas/GetAllCollegesResponse.json
-          format: uri
-          readOnly: true
-          type: string
-        colleges:
-          items:
-            $ref: "#/components/schemas/GetCollegeResponse"
-          type:
-            - array
-            - "null"
-      required:
-        - colleges
-      type: object
     GetAllPermissionsResponse:
       additionalProperties: false
       properties:
@@ -2926,6 +2907,31 @@ components:
         - default_payment_method
         - footer
         - rendering_options
+      type: object
+    ListCollegesResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ListCollegesResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        colleges:
+          description: List of colleges
+          items:
+            $ref: "#/components/schemas/GetCollegeResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of colleges returned
+          format: int64
+          type: integer
+      required:
+        - colleges
+        - total
       type: object
     Media:
       additionalProperties: false
@@ -4437,6 +4443,48 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 college
+  /api/v1/college/:
+    get:
+      operationId: get-api-v1-college
+      parameters:
+        - description: Maximum number of colleges to return
+          example: 200
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 200
+            description: Maximum number of colleges to return
+            examples:
+              - 200
+            format: int64
+            type: integer
+        - description: Number of colleges to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of colleges to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListCollegesResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 college
   /api/v1/college/{id}:
     delete:
       operationId: delete-api-v1-college-by-id
@@ -4528,12 +4576,37 @@ paths:
   /api/v1/colleges/:
     get:
       operationId: get-api-v1-colleges
+      parameters:
+        - description: Maximum number of colleges to return
+          example: 200
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 200
+            description: Maximum number of colleges to return
+            examples:
+              - 200
+            format: int64
+            type: integer
+        - description: Number of colleges to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of colleges to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetAllCollegesResponse"
+                $ref: "#/components/schemas/ListCollegesResponse"
           description: OK
         default:
           content:
