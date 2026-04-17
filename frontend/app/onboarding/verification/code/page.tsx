@@ -152,6 +152,10 @@ export default function OnboardingVerificationCodePage() {
         return;
       }
 
+      updateSection("verification", {
+        email: signupEmail,
+      });
+
       router.push(
         role
           ? `/onboarding/legal?role=${encodeURIComponent(role)}`

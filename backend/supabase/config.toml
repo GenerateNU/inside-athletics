@@ -228,18 +228,6 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 #
-# Use a numeric OTP in passwordless login emails so the app's code-entry flow
-# can verify the user instead of relying on a magic-link redirect.
-[auth.email.template.magic_link]
-subject = "Your login code"
-content_path = "./templates/magic_link.html"
-#
-# Use a numeric OTP in signup confirmation emails so the app's code-entry flow
-# can verify the user without sending them through a magic-link callback.
-[auth.email.template.confirmation]
-subject = "Confirm your signup"
-content_path = "./templates/confirmation.html"
-
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true
