@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 import { Session } from "@supabase/supabase-js";
-import { createBrowserClient } from "@supabase/ssr";
 import { getApiV1UtilityAccessCheck } from "@/api/clients/getApiV1UtilityAccessCheck";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 type SessionContextValue = {
   session: Session | null;
@@ -23,24 +23,13 @@ const SessionContext = createContext<SessionContextValue>({
   isAdmin: false,
 });
 
-function createSupabaseClient() {
-  return createBrowserClient(
-    process.env.NODE_ENV === "production"
-      ? process.env.NEXT_PUBLIC_SUPABASE_URL!
-      : process.env.NEXT_PUBLIC_DEV_SUPABASE_URL!,
-    process.env.NODE_ENV === "production"
-      ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-      : process.env.NEXT_PUBLIC_SUPABASE_DEV_PUBLISHABLE_KEY!,
-  );
-}
-
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [hasPremium, setHasPremium] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const supabase = createSupabaseClient();
+    const supabase = createSupabaseBrowserClient();
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
 
     const {

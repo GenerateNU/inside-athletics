@@ -7,6 +7,10 @@ import { deleteStripeCustomerResponseSchema } from "./deleteStripeCustomerRespon
 import { errorModelSchema } from "./errorModelSchema.ts";
 import { z } from "zod/v4";
 
+export const deleteApiV1StripeCustomersByIdPathParamsSchema = z.object({
+  id: z.string().max(36).describe("ID of the user on stripe"),
+});
+
 /**
  * @description OK
  */

@@ -5,14 +5,20 @@
 
 import type { GetCollegeResponse } from "./GetCollegeResponse.ts";
 
-export type GetAllCollegesResponse = {
+export type ListCollegesResponse = {
   /**
    * @description A URL to the JSON Schema for this object.
    * @type string | undefined, uri
    */
   readonly $schema?: string;
   /**
+   * @description List of colleges
    * @type array,null
    */
   colleges: GetCollegeResponse[] | null;
+  /**
+   * @description Total number of colleges returned
+   * @type integer, int64
+   */
+  total: number;
 };

@@ -4,14 +4,27 @@
  */
 
 import { errorModelSchema } from "./errorModelSchema.ts";
-import { getAllCollegesResponseSchema } from "./getAllCollegesResponseSchema.ts";
+import { listCollegesResponseSchema } from "./listCollegesResponseSchema.ts";
 import { z } from "zod/v4";
+
+export const getApiV1CollegesQueryParamsSchema = z.object({
+  limit: z.coerce
+    .number()
+    .int()
+    .default(200)
+    .describe("Maximum number of colleges to return"),
+  offset: z.coerce
+    .number()
+    .int()
+    .default(0)
+    .describe("Number of colleges to skip"),
+});
 
 /**
  * @description OK
  */
 export const getApiV1Colleges200Schema = z.lazy(
-  () => getAllCollegesResponseSchema,
+  () => listCollegesResponseSchema,
 );
 
 /**

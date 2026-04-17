@@ -4,7 +4,10 @@
  */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetApiV1CollegesQueryResponse } from "../models/GetApiV1Colleges.ts";
+import type {
+  GetApiV1CollegesQueryResponse,
+  GetApiV1CollegesQueryParams,
+} from "../models/GetApiV1Colleges.ts";
 import type {
   Client,
   RequestConfig,
@@ -21,6 +24,7 @@ function getGetApiV1CollegesUrl() {
  * {@link /api/v1/colleges/}
  */
 export async function getApiV1Colleges(
+  params?: GetApiV1CollegesQueryParams,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config;
@@ -32,6 +36,7 @@ export async function getApiV1Colleges(
   >({
     method: "GET",
     url: getGetApiV1CollegesUrl().url.toString(),
+    params,
     ...requestConfig,
   });
   return res.data;

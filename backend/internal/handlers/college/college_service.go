@@ -49,16 +49,17 @@ func (u *CollegeService) GetCollege(ctx context.Context, input *GetCollegeParams
 	}, err
 }
 
-func (u *CollegeService) GetAllColleges(ctx context.Context, input *struct{}) (*utils.ResponseBody[GetAllCollegesResponse], error) {
-	colleges, err := u.collegeDB.GetAllColleges()
+func (u *CollegeService) ListColleges(ctx context.Context, input *ListCollegesParams) (*utils.ResponseBody[ListCollegesResponse], error) {
+	colleges, err := u.collegeDB.ListColleges(input.Limit, input.Offset)
 
+	respBody := &utils.ResponseBody[ListCollegesResponse]{}
 	if err != nil {
-		return nil, err
+		return respBody, err
 	}
 
-	collegeResponses := make([]GetCollegeResponse, 0, len(colleges))
-	for _, college := range colleges {
-		collegeResponses = append(collegeResponses, GetCollegeResponse{
+	responseColleges := make([]GetCollegeResponse, 0, len(*colleges))
+	for _, college := range *colleges {
+		responseColleges = append(responseColleges, GetCollegeResponse{
 			ID:           college.ID,
 			Name:         college.Name,
 			State:        college.State,
@@ -70,9 +71,10 @@ func (u *CollegeService) GetAllColleges(ctx context.Context, input *struct{}) (*
 		})
 	}
 
-	return &utils.ResponseBody[GetAllCollegesResponse]{
-		Body: &GetAllCollegesResponse{
-			Colleges: collegeResponses,
+	return &utils.ResponseBody[ListCollegesResponse]{
+		Body: &ListCollegesResponse{
+			Colleges: responseColleges,
+			Total:    len(responseColleges),
 		},
 	}, nil
 }

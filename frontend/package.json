@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build-prod":"next build",
+    "start-prod":"next start",
     "dev": "doppler run --command=\"next dev\"",
     "build": "doppler run --command=\"next build\"",
     "start": "doppler run --command=\"next start\"",

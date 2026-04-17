@@ -31,10 +31,7 @@ func (s *Service) GetUploadURL(ctx context.Context, input GetUploadURLInput) (*G
 	if documentID == "" {
 		documentID = path.Base(key)
 	}
-	metadata := map[string]string{
-		"filename": documentID,
-	}
-	uploadURL, err := s.client.PresignedUploadURL(ctx, key, input.FileType, expiresIn, metadata)
+	uploadURL, err := s.client.PresignedUploadURL(ctx, key, input.FileType, expiresIn, nil)
 	if err != nil {
 		return nil, err
 	}

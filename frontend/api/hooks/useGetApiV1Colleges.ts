@@ -3,7 +3,10 @@
  * Do not edit manually.
  */
 
-import type { GetApiV1CollegesQueryResponse } from "../models/GetApiV1Colleges.ts";
+import type {
+  GetApiV1CollegesQueryResponse,
+  GetApiV1CollegesQueryParams,
+} from "../models/GetApiV1Colleges.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,17 +21,19 @@ import type {
 import { getApiV1Colleges } from "../clients/getApiV1Colleges.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-export const getApiV1CollegesQueryKey = () =>
-  [{ url: "/api/v1/colleges/" }] as const;
+export const getApiV1CollegesQueryKey = (
+  params?: GetApiV1CollegesQueryParams,
+) => [{ url: "/api/v1/colleges/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1CollegesQueryKey = ReturnType<
   typeof getApiV1CollegesQueryKey
 >;
 
 export function getApiV1CollegesQueryOptions(
+  params?: GetApiV1CollegesQueryParams,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = getApiV1CollegesQueryKey();
+  const queryKey = getApiV1CollegesQueryKey(params);
   return queryOptions<
     GetApiV1CollegesQueryResponse,
     ResponseErrorConfig<Error>,
@@ -37,7 +42,10 @@ export function getApiV1CollegesQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1Colleges({ ...config, signal: config.signal ?? signal });
+      return getApiV1Colleges(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -51,6 +59,7 @@ export function useGetApiV1Colleges<
   TQueryData = GetApiV1CollegesQueryResponse,
   TQueryKey extends QueryKey = GetApiV1CollegesQueryKey,
 >(
+  params?: GetApiV1CollegesQueryParams,
   options: {
     query?: Partial<
       QueryObserverOptions<
@@ -66,11 +75,12 @@ export function useGetApiV1Colleges<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
   const { client: queryClient, ...resolvedOptions } = queryConfig;
-  const queryKey = resolvedOptions?.queryKey ?? getApiV1CollegesQueryKey();
+  const queryKey =
+    resolvedOptions?.queryKey ?? getApiV1CollegesQueryKey(params);
 
   const query = useQuery(
     {
-      ...getApiV1CollegesQueryOptions(config),
+      ...getApiV1CollegesQueryOptions(params, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

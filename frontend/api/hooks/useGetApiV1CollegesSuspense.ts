@@ -3,7 +3,10 @@
  * Do not edit manually.
  */
 
-import type { GetApiV1CollegesQueryResponse } from "../models/GetApiV1Colleges.ts";
+import type {
+  GetApiV1CollegesQueryResponse,
+  GetApiV1CollegesQueryParams,
+} from "../models/GetApiV1Colleges.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,17 +21,19 @@ import type {
 import { getApiV1Colleges } from "../clients/getApiV1Colleges.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getApiV1CollegesSuspenseQueryKey = () =>
-  [{ url: "/api/v1/colleges/" }] as const;
+export const getApiV1CollegesSuspenseQueryKey = (
+  params?: GetApiV1CollegesQueryParams,
+) => [{ url: "/api/v1/colleges/" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1CollegesSuspenseQueryKey = ReturnType<
   typeof getApiV1CollegesSuspenseQueryKey
 >;
 
 export function getApiV1CollegesSuspenseQueryOptions(
+  params?: GetApiV1CollegesQueryParams,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = getApiV1CollegesSuspenseQueryKey();
+  const queryKey = getApiV1CollegesSuspenseQueryKey(params);
   return queryOptions<
     GetApiV1CollegesQueryResponse,
     ResponseErrorConfig<Error>,
@@ -37,7 +42,10 @@ export function getApiV1CollegesSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1Colleges({ ...config, signal: config.signal ?? signal });
+      return getApiV1Colleges(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -50,6 +58,7 @@ export function useGetApiV1CollegesSuspense<
   TData = GetApiV1CollegesQueryResponse,
   TQueryKey extends QueryKey = GetApiV1CollegesSuspenseQueryKey,
 >(
+  params?: GetApiV1CollegesQueryParams,
   options: {
     query?: Partial<
       UseSuspenseQueryOptions<
@@ -65,11 +74,11 @@ export function useGetApiV1CollegesSuspense<
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
   const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1CollegesSuspenseQueryKey();
+    resolvedOptions?.queryKey ?? getApiV1CollegesSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
-      ...getApiV1CollegesSuspenseQueryOptions(config),
+      ...getApiV1CollegesSuspenseQueryOptions(params, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,
