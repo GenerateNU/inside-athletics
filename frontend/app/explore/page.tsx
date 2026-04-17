@@ -118,22 +118,24 @@ export default function ExplorePage() {
     );
     console.log("all posts: " + allPostsData)
 
+    const hasActiveFilters = activeTags.length > 0 || activeColleges.length > 0 || activeSports.length > 0;
+
     const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
-        { tag_ids: activeTags.map((t) => t.id).join(","),
-          sport_ids: activeSports.map((t) => t.id).join(","),
+        { sport_ids: activeSports.map((t) => t.id).join(","),
+            tag_ids: activeTags.map((t) => t.id).join(","),
           college_ids: activeColleges.map((t) => t.id).join(","),
         },
         {
-            query: { enabled: activeTags.length > 0 },
+            query: { enabled: hasActiveFilters },
             client: { headers: authHeaders },
         },
     );
     console.log("filtered: " + filteredPostsData)
 
-    const posts = activeTags.length > 0
+    const posts = hasActiveFilters
         ? (filteredPostsData?.posts ?? [])
         : (allPostsData?.posts ?? []);
-    const isLoading = activeTags.length > 0 ? loadingFilteredPosts : loadingAllPosts;
+    const isLoading = hasActiveFilters ? loadingFilteredPosts : loadingAllPosts;
 
 
     return (
@@ -190,6 +192,20 @@ export default function ExplorePage() {
 
                         <div className="flex items-center gap-2 w-full flex-wrap">
                             <span className="font-semibold text-base">Explore</span>
+                            {activeSports.map((sport) => (
+                                <CancellableTag
+                                    key={sport.id}
+                                    label={sport.name}
+                                    onRemove={() => toggleSport(sport)}
+                                />
+                            ))}
+                            {activeColleges.map((college) => (
+                                <CancellableTag
+                                    key={college.id}
+                                    label={college.name}
+                                    onRemove={() => toggleCollege(college)}
+                                />
+                            ))}
                             {activeTags.map((tag) => (
                                 <CancellableTag
                                     key={tag.id}
