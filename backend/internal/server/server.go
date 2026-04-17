@@ -13,6 +13,7 @@ import (
 	"inside-athletics/internal/handlers/permission"
 	"inside-athletics/internal/handlers/post"
 	"inside-athletics/internal/handlers/post_like"
+	premiumpost "inside-athletics/internal/handlers/premium_post"
 	"inside-athletics/internal/handlers/role"
 	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/handlers/sportfollow"
@@ -76,8 +77,7 @@ func CreateApp(db *gorm.DB) *App {
 // CreateRoutes registers all route groups on the given Huma API.
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-
-	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, sport.Route, role.Route, permission.Route, collegefollow.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment_like.Route, post_like.Route, stripe.Route}
+	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, sport.Route, role.Route, permission.Route, collegefollow.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route, comment.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
@@ -92,9 +92,9 @@ func CreateRoutes(db *gorm.DB, api huma.API) {
 	college.Route(api, db, s3Svc)
 	user.Route(api, db, s3Svc)
 	post.Route(api, db, s3Svc)
-	comment.Route(api, db, s3Svc)
 	tag.Route(api, db, s3Svc)
 	content.Route(api, db, s3Svc)
+	premiumpost.Route(api, db, s3Svc)
 }
 
 // setupApp initializes the Fiber app with middleware and returns the configured instance.

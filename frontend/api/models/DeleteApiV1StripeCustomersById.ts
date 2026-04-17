@@ -6,6 +6,15 @@
 import type { DeleteStripeCustomerResponse } from "./DeleteStripeCustomerResponse.ts";
 import type { ErrorModel } from "./ErrorModel.ts";
 
+export type DeleteApiV1StripeCustomersByIdPathParams = {
+  /**
+   * @description ID of the user on stripe
+   * @maxLength 36
+   * @type string
+   */
+  id: string;
+};
+
 /**
  * @description OK
  */
@@ -21,5 +30,6 @@ export type DeleteApiV1StripeCustomersByIdMutationResponse =
 
 export type DeleteApiV1StripeCustomersByIdMutation = {
   Response: DeleteApiV1StripeCustomersById200;
+  PathParams: DeleteApiV1StripeCustomersByIdPathParams;
   Errors: any;
 };

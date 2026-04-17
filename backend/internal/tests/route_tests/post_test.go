@@ -159,7 +159,7 @@ func TestCreatePostWithTags(t *testing.T) {
 		},
 	}
 
-	resp := api.Post("/api/v1/post/", body, authHeader)
+	resp := api.Post("/api/v1/post/", authHeader, body)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -1151,6 +1151,10 @@ func TestFilterPosts(t *testing.T) {
 
 	DecodeTo(&filteredSports, filterSportsResp)
 
+	if filteredSports.Posts[0].College == nil {
+		t.Fatalf("Sport filter results in college data not loaded")
+	}
+
 	if filteredSports.Total != 1 {
 		t.Fatalf("Expected to get 1 filtered post got %d", filteredSports.Total)
 	}
@@ -1195,6 +1199,14 @@ func TestFilterPosts(t *testing.T) {
 		t.Fatalf("Expected 1 filtered posts but got %d", filteredTags.Total)
 	}
 
+	if filteredTags.Posts[0].College == nil {
+		t.Fatalf("College is not getting loaded %s", filteredTags.Posts[0].College.Name)
+	}
+
+	if filteredTags.Posts[0].College.Name != neu.Name {
+		t.Fatalf("Filter isn't returning college information when the info exists")
+	}
+
 	filterSportAndTagResp := api.Get(fmt.Sprintf("/api/v1/posts/filter?sport_ids=%s&tag_ids=%s", SoccerID.String(), tagIds[2]), authHeader)
 	if filterSportAndTagResp.Code != http.StatusOK {
 		t.Fatalf("Expected status code 200 but got %d", filterSportAndTagResp.Code)
@@ -1206,6 +1218,46 @@ func TestFilterPosts(t *testing.T) {
 
 	if filterSportAndTag.Total != 2 {
 		t.Fatalf("Expected filter to return 2 posts but got %d", filterSportAndTag.Total)
+	}
+}
+
+func TestModelsReturnedInFilter(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	_, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted north", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/filter", authHeader)
+	if resp.Code != 200 {
+		t.Fatalf("Expected response code 200 got %d", resp.Code)
+	}
+
+	var posts post.GetAllPostsResponse
+
+	DecodeTo(&posts, resp)
+
+	if posts.Total == 0 {
+		t.Fatalf("Expected one test, got %d", posts.Total)
+	}
+
+	if posts.Posts[0].Sport == nil {
+		t.Fatalf("SHIT IS BROKEN")
 	}
 }
 

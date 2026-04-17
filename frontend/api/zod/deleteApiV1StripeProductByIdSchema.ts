@@ -7,6 +7,10 @@ import { errorModelSchema } from "./errorModelSchema.ts";
 import { stripeProductResponseSchema } from "./stripeProductResponseSchema.ts";
 import { z } from "zod/v4";
 
+export const deleteApiV1StripeProductByIdPathParamsSchema = z.object({
+  id: z.string().describe("ID of the product"),
+});
+
 /**
  * @description OK
  */

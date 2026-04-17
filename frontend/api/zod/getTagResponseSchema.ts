@@ -11,4 +11,5 @@ export const getTagResponseSchema = z.object({
   ),
   id: z.string().describe("ID of the tag"),
   name: z.string().describe("The name of the tag"),
+  type: z.string().describe("The type of the tag"),
 });

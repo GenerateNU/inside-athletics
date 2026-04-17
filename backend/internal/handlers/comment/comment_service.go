@@ -2,7 +2,6 @@ package comment
 
 import (
 	"context"
-	"inside-athletics/internal/s3"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -12,14 +11,6 @@ import (
 
 type CommentService struct {
 	commentDB *CommentDB
-	s3        *s3.Service
-}
-
-// resolveCommentKeys resolves S3 keys in a comment's user to presigned URLs.
-func (s *CommentService) resolveCommentKeys(ctx context.Context, c *models.Comment) {
-	if url := s3.ResolveKey(ctx, s.s3, c.User.ProfilePicture); url != "" {
-		c.User.ProfilePicture = url
-	}
 }
 
 const (
@@ -103,7 +94,6 @@ func (s *CommentService) GetComment(ctx context.Context, input *GetCommentParams
 	}
 
 	// Convert the comment to a response
-	s.resolveCommentKeys(ctx, comment)
 	return &utils.ResponseBody[CommentResponse]{
 		Body: ToCommentResponse(comment, userID),
 	}, nil
@@ -129,7 +119,6 @@ func (s *CommentService) GetCommentsByPost(ctx context.Context, input *GetCommen
 	// Convert the comments to responses
 	responses := make([]CommentResponse, len(comments))
 	for i := range comments {
-		s.resolveCommentKeys(ctx, &comments[i])
 		responses[i] = *ToCommentResponse(&comments[i], userID)
 	}
 
@@ -161,7 +150,6 @@ func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) 
 	// Convert the replies to responses
 	responses := make([]CommentResponse, len(comments))
 	for i := range comments {
-		s.resolveCommentKeys(ctx, &comments[i])
 		responses[i] = *ToCommentResponse(&comments[i], userID)
 	}
 
@@ -181,7 +169,6 @@ func (s *CommentService) UpdateComment(ctx context.Context, input *UpdateComment
 	}
 
 	// Convert the comment to a response
-	s.resolveCommentKeys(ctx, updated)
 	return &utils.ResponseBody[CommentResponse]{
 		Body: ToCommentResponse(updated, userID),
 	}, nil
@@ -206,7 +193,6 @@ func (s *CommentService) DeleteComment(ctx context.Context, input *DeleteComment
 	}
 
 	// Convert the comment to a response
-	s.resolveCommentKeys(ctx, comment)
 	return &utils.ResponseBody[CommentResponse]{
 		Body: ToCommentResponse(comment, userID),
 	}, nil

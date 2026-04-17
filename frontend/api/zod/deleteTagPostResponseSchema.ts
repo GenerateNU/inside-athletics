@@ -9,5 +9,5 @@ export const deleteTagPostResponseSchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  id: z.string().describe("ID of the deleted tagpost"),
+  id: z.string(),
 });

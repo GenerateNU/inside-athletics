@@ -20,6 +20,8 @@ export { createPostLikeBodySchema } from "./createPostLikeBodySchema.ts";
 export { createPostLikeResponseSchema } from "./createPostLikeResponseSchema.ts";
 export { createPostRequestSchema } from "./createPostRequestSchema.ts";
 export { createPostResponseSchema } from "./createPostResponseSchema.ts";
+export { createPremiumPostParamsSchema } from "./createPremiumPostParamsSchema.ts";
+export { createPremiumPostResponseSchema } from "./createPremiumPostResponseSchema.ts";
 export { createRoleRequestSchema } from "./createRoleRequestSchema.ts";
 export { createSportFollowBodySchema } from "./createSportFollowBodySchema.ts";
 export { createSportFollowResponseSchema } from "./createSportFollowResponseSchema.ts";
@@ -97,6 +99,12 @@ export {
   deleteApiV1PostTagByIdPathParamsSchema,
 } from "./deleteApiV1PostTagByIdSchema.ts";
 export {
+  deleteApiV1PostsPremiumById200Schema,
+  deleteApiV1PostsPremiumByIdErrorSchema,
+  deleteApiV1PostsPremiumByIdMutationResponseSchema,
+  deleteApiV1PostsPremiumByIdPathParamsSchema,
+} from "./deleteApiV1PostsPremiumByIdSchema.ts";
+export {
   deleteApiV1RoleById200Schema,
   deleteApiV1RoleByIdErrorSchema,
   deleteApiV1RoleByIdMutationResponseSchema,
@@ -112,16 +120,19 @@ export {
   deleteApiV1StripeCustomersById200Schema,
   deleteApiV1StripeCustomersByIdErrorSchema,
   deleteApiV1StripeCustomersByIdMutationResponseSchema,
+  deleteApiV1StripeCustomersByIdPathParamsSchema,
 } from "./deleteApiV1StripeCustomersByIdSchema.ts";
 export {
   deleteApiV1StripePriceById200Schema,
   deleteApiV1StripePriceByIdErrorSchema,
   deleteApiV1StripePriceByIdMutationResponseSchema,
+  deleteApiV1StripePriceByIdPathParamsSchema,
 } from "./deleteApiV1StripePriceByIdSchema.ts";
 export {
   deleteApiV1StripeProductById200Schema,
   deleteApiV1StripeProductByIdErrorSchema,
   deleteApiV1StripeProductByIdMutationResponseSchema,
+  deleteApiV1StripeProductByIdPathParamsSchema,
 } from "./deleteApiV1StripeProductByIdSchema.ts";
 export {
   deleteApiV1SurveyById200Schema,
@@ -165,6 +176,7 @@ export { deleteCommentLikeResponseSchema } from "./deleteCommentLikeResponseSche
 export { deleteContentResponseSchema } from "./deleteContentResponseSchema.ts";
 export { deletePostLikeResponseSchema } from "./deletePostLikeResponseSchema.ts";
 export { deletePostResponseSchema } from "./deletePostResponseSchema.ts";
+export { deletePremiumPostRequestSchema } from "./deletePremiumPostRequestSchema.ts";
 export { deleteSportFollowResponseSchema } from "./deleteSportFollowResponseSchema.ts";
 export { deleteStripeCustomerResponseSchema } from "./deleteStripeCustomerResponseSchema.ts";
 export { deleteTagFollowResponseSchema } from "./deleteTagFollowResponseSchema.ts";
@@ -174,8 +186,10 @@ export { deleteUserResponseSchema } from "./deleteUserResponseSchema.ts";
 export { deletedAtSchema } from "./deletedAtSchema.ts";
 export { errorDetailSchema } from "./errorDetailSchema.ts";
 export { errorModelSchema } from "./errorModelSchema.ts";
+export { getAllCollegesResponseSchema } from "./getAllCollegesResponseSchema.ts";
 export { getAllPermissionsResponseSchema } from "./getAllPermissionsResponseSchema.ts";
 export { getAllPostsResponseSchema } from "./getAllPostsResponseSchema.ts";
+export { getAllPremiumPostsResponseSchema } from "./getAllPremiumPostsResponseSchema.ts";
 export { getAllRolesResponseSchema } from "./getAllRolesResponseSchema.ts";
 export { getAllSportsResponseSchema } from "./getAllSportsResponseSchema.ts";
 export {
@@ -190,6 +204,11 @@ export {
   getApiV1CollegeByIdPathParamsSchema,
   getApiV1CollegeByIdQueryResponseSchema,
 } from "./getApiV1CollegeByIdSchema.ts";
+export {
+  getApiV1Colleges200Schema,
+  getApiV1CollegesErrorSchema,
+  getApiV1CollegesQueryResponseSchema,
+} from "./getApiV1CollegesSchema.ts";
 export {
   getApiV1CollegesSearch200Schema,
   getApiV1CollegesSearchErrorSchema,
@@ -298,6 +317,40 @@ export {
   getApiV1PostsPopularQueryParamsSchema,
   getApiV1PostsPopularQueryResponseSchema,
 } from "./getApiV1PostsPopularSchema.ts";
+export {
+  getApiV1PostsPremiumByAuthorByAuthorId200Schema,
+  getApiV1PostsPremiumByAuthorByAuthorIdErrorSchema,
+  getApiV1PostsPremiumByAuthorByAuthorIdPathParamsSchema,
+  getApiV1PostsPremiumByAuthorByAuthorIdQueryParamsSchema,
+  getApiV1PostsPremiumByAuthorByAuthorIdQueryResponseSchema,
+} from "./getApiV1PostsPremiumByAuthorByAuthorIdSchema.ts";
+export {
+  getApiV1PostsPremiumByCollegeByCollegeId200Schema,
+  getApiV1PostsPremiumByCollegeByCollegeIdErrorSchema,
+  getApiV1PostsPremiumByCollegeByCollegeIdPathParamsSchema,
+  getApiV1PostsPremiumByCollegeByCollegeIdQueryParamsSchema,
+  getApiV1PostsPremiumByCollegeByCollegeIdQueryResponseSchema,
+} from "./getApiV1PostsPremiumByCollegeByCollegeIdSchema.ts";
+export {
+  getApiV1PostsPremiumBySportBySportId200Schema,
+  getApiV1PostsPremiumBySportBySportIdErrorSchema,
+  getApiV1PostsPremiumBySportBySportIdPathParamsSchema,
+  getApiV1PostsPremiumBySportBySportIdQueryParamsSchema,
+  getApiV1PostsPremiumBySportBySportIdQueryResponseSchema,
+} from "./getApiV1PostsPremiumBySportBySportIdSchema.ts";
+export {
+  getApiV1PostsPremiumByTagByTagId200Schema,
+  getApiV1PostsPremiumByTagByTagIdErrorSchema,
+  getApiV1PostsPremiumByTagByTagIdPathParamsSchema,
+  getApiV1PostsPremiumByTagByTagIdQueryParamsSchema,
+  getApiV1PostsPremiumByTagByTagIdQueryResponseSchema,
+} from "./getApiV1PostsPremiumByTagByTagIdSchema.ts";
+export {
+  getApiV1PostsPremium200Schema,
+  getApiV1PostsPremiumErrorSchema,
+  getApiV1PostsPremiumQueryParamsSchema,
+  getApiV1PostsPremiumQueryResponseSchema,
+} from "./getApiV1PostsPremiumSchema.ts";
 export {
   getApiV1Posts200Schema,
   getApiV1PostsErrorSchema,
@@ -466,6 +519,10 @@ export { getPostLikeResponseSchema } from "./getPostLikeResponseSchema.ts";
 export { getPostsByAuthorIDResponseSchema } from "./getPostsByAuthorIDResponseSchema.ts";
 export { getPostsBySportIDResponseSchema } from "./getPostsBySportIDResponseSchema.ts";
 export { getPostsByTagResponseSchema } from "./getPostsByTagResponseSchema.ts";
+export { getPremiumPostsByAuthorIDResponseSchema } from "./getPremiumPostsByAuthorIDResponseSchema.ts";
+export { getPremiumPostsByCollegeIDResponseSchema } from "./getPremiumPostsByCollegeIDResponseSchema.ts";
+export { getPremiumPostsBySportIDResponseSchema } from "./getPremiumPostsBySportIDResponseSchema.ts";
+export { getPremiumPostsByTagIDResponseSchema } from "./getPremiumPostsByTagIDResponseSchema.ts";
 export { getSearchResponseSchema } from "./getSearchResponseSchema.ts";
 export { getSportFollowsByUserResponseSchema } from "./getSportFollowsByUserResponseSchema.ts";
 export { getStripeCustomerByEmailResponseSchema } from "./getStripeCustomerByEmailResponseSchema.ts";
@@ -508,7 +565,14 @@ export {
   listApiV1StripeProductsErrorSchema,
   listApiV1StripeProductsQueryResponseSchema,
 } from "./listApiV1StripeProductsSchema.ts";
+export {
+  listApiV1TagTypeByType200Schema,
+  listApiV1TagTypeByTypeErrorSchema,
+  listApiV1TagTypeByTypePathParamsSchema,
+  listApiV1TagTypeByTypeQueryResponseSchema,
+} from "./listApiV1TagTypeByTypeSchema.ts";
 export { mediaResponseSchema } from "./mediaResponseSchema.ts";
+export { mediaSchema } from "./mediaSchema.ts";
 export {
   patchApiV1CommentById200Schema,
   patchApiV1CommentByIdErrorSchema,
@@ -537,6 +601,13 @@ export {
   patchApiV1PostTagByIdMutationResponseSchema,
   patchApiV1PostTagByIdPathParamsSchema,
 } from "./patchApiV1PostTagByIdSchema.ts";
+export {
+  patchApiV1PostsPremiumById200Schema,
+  patchApiV1PostsPremiumByIdErrorSchema,
+  patchApiV1PostsPremiumByIdMutationRequestSchema,
+  patchApiV1PostsPremiumByIdMutationResponseSchema,
+  patchApiV1PostsPremiumByIdPathParamsSchema,
+} from "./patchApiV1PostsPremiumByIdSchema.ts";
 export {
   patchApiV1RoleById200Schema,
   patchApiV1RoleByIdErrorSchema,
@@ -642,6 +713,12 @@ export {
   postApiV1PostLikeMutationResponseSchema,
 } from "./postApiV1PostLikeSchema.ts";
 export {
+  postApiV1PostPremium200Schema,
+  postApiV1PostPremiumErrorSchema,
+  postApiV1PostPremiumMutationRequestSchema,
+  postApiV1PostPremiumMutationResponseSchema,
+} from "./postApiV1PostPremiumSchema.ts";
+export {
   postApiV1Post200Schema,
   postApiV1PostErrorSchema,
   postApiV1PostMutationRequestSchema,
@@ -733,6 +810,7 @@ export {
   postApiV1UserTagMutationResponseSchema,
 } from "./postApiV1UserTagSchema.ts";
 export { postResponseSchema } from "./postResponseSchema.ts";
+export { premiumPostResponseSchema } from "./premiumPostResponseSchema.ts";
 export {
   putApiV1CollegeById200Schema,
   putApiV1CollegeByIdErrorSchema,
@@ -759,6 +837,7 @@ export { updateCollegeResponseSchema } from "./updateCollegeResponseSchema.ts";
 export { updateCommentBodySchema } from "./updateCommentBodySchema.ts";
 export { updatePermissionRequestSchema } from "./updatePermissionRequestSchema.ts";
 export { updatePostRequestSchema } from "./updatePostRequestSchema.ts";
+export { updatePremiumPostRequestSchema } from "./updatePremiumPostRequestSchema.ts";
 export { updateRoleRequestSchema } from "./updateRoleRequestSchema.ts";
 export { updateSportRequestSchema } from "./updateSportRequestSchema.ts";
 export { updateStripeCustomerBodySchema } from "./updateStripeCustomerBodySchema.ts";

@@ -722,6 +722,8 @@ components:
         content:
           examples:
             - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          maxLength: 5000
+          minLength: 1
           type: string
         is_anonymous:
           type: boolean
@@ -736,6 +738,8 @@ components:
         title:
           examples:
             - Looking for thoughts on NEU Fencing!
+          maxLength: 100
+          minLength: 1
           type: string
       required:
         - title
@@ -766,7 +770,7 @@ components:
           type: boolean
         sport:
           type: string
-        tag:
+        tags:
           items:
             $ref: "#/components/schemas/Tag"
           type:
@@ -781,10 +785,96 @@ components:
         - author
         - sport
         - college
-        - tag
+        - tags
         - title
         - content
         - is_anonymous
+      type: object
+    CreatePremiumPostParams:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePremiumPostParams.json
+          format: uri
+          readOnly: true
+          type: string
+        college_id:
+          type: string
+        content:
+          examples:
+            - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          type: string
+        media_id:
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        sport_id:
+          type: string
+        tag:
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        title:
+          examples:
+            - Looking for thoughts on NEU Fencing!
+          type: string
+      required:
+        - sport_id
+        - college_id
+        - tag
+        - title
+        - content
+      type: object
+    CreatePremiumPostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/CreatePremiumPostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        author:
+          type: string
+        college_id:
+          type: string
+        content:
+          examples:
+            - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          type: string
+        id:
+          type: string
+        media:
+          $ref: "#/components/schemas/Media"
+        media_id:
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        sport_id:
+          type: string
+        tag:
+          items:
+            $ref: "#/components/schemas/Tag"
+          type:
+            - array
+            - "null"
+        title:
+          examples:
+            - Looking for thoughts on NEU Fencing!
+          type: string
+      required:
+        - id
+        - author
+        - sport_id
+        - college_id
+        - tag
+        - title
+        - content
       type: object
     CreateRoleRequest:
       additionalProperties: false
@@ -1065,8 +1155,14 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - name
+        - type
       type: object
     CreateTagFollowBody:
       additionalProperties: false
@@ -1126,10 +1222,15 @@ components:
           format: uri
           readOnly: true
           type: string
-        post_id:
-          description: ID of the post
+        postable_id:
+          description: ID of the post or premium post
           examples:
             - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        postable_type:
+          description: "Type: post or premium_post"
+          examples:
+            - post
           type: string
         tag_id:
           description: ID of the tag
@@ -1137,7 +1238,8 @@ components:
             - 123e4567-e89b-12d3-a456-426614174000
           type: string
       required:
-        - post_id
+        - postable_id
+        - postable_type
         - tag_id
       type: object
     CreateTagPostsResponse:
@@ -1151,23 +1253,17 @@ components:
           readOnly: true
           type: string
         id:
-          description: ID of the tagpost item created
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
-        post_id:
-          description: ID of the post
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
+        postable_id:
+          type: string
+        postable_type:
           type: string
         tag_id:
-          description: ID of the tag
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
       required:
         - id
-        - post_id
+        - postable_id
+        - postable_type
         - tag_id
       type: object
     CreateTagResponse:
@@ -1190,9 +1286,15 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     CreateUserBody:
       additionalProperties: false
@@ -1440,6 +1542,30 @@ components:
         - message
         - id
       type: object
+    DeletePremiumPostRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/DeletePremiumPostRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        id:
+          description: ID of the deleted premium post
+          examples:
+            - 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        message:
+          description: Success message
+          examples:
+            - Premium post deleted successfully
+          type: string
+      required:
+        - message
+        - id
+      type: object
     DeleteSportFollowResponse:
       additionalProperties: false
       properties:
@@ -1517,9 +1643,6 @@ components:
           readOnly: true
           type: string
         id:
-          description: ID of the deleted tagpost
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
       required:
         - id
@@ -1631,6 +1754,25 @@ components:
           format: uri
           type: string
       type: object
+    GetAllCollegesResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllCollegesResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        colleges:
+          items:
+            $ref: "#/components/schemas/GetCollegeResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - colleges
+      type: object
     GetAllPermissionsResponse:
       additionalProperties: false
       properties:
@@ -1675,6 +1817,33 @@ components:
             - "null"
         total:
           description: Total number of posts
+          examples:
+            - 100
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetAllPremiumPostsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetAllPremiumPostsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of premium posts
+          items:
+            $ref: "#/components/schemas/PremiumPostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of premium posts
           examples:
             - 100
           format: int64
@@ -2140,6 +2309,114 @@ components:
       required:
         - post_ids
       type: object
+    GetPremiumPostsByAuthorIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPremiumPostsByAuthorIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of premium posts for the author
+          items:
+            $ref: "#/components/schemas/PremiumPostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of premium posts for this author
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetPremiumPostsByCollegeIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPremiumPostsByCollegeIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of premium posts for the college
+          items:
+            $ref: "#/components/schemas/PremiumPostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of premium posts for this college
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetPremiumPostsBySportIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPremiumPostsBySportIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of premium posts for the sport
+          items:
+            $ref: "#/components/schemas/PremiumPostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of premium posts for this sport
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
+    GetPremiumPostsByTagIDResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetPremiumPostsByTagIDResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of premium posts for the tag
+          items:
+            $ref: "#/components/schemas/PremiumPostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of premium posts for this tag
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
     GetSearchResponse:
       additionalProperties: false
       properties:
@@ -2428,24 +2705,18 @@ components:
           readOnly: true
           type: string
         id:
-          description: the id of the item
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
-        post_ids:
-          description: The post id
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
+        postable_id:
+          type: string
+        postable_type:
           type: string
         tag_id:
-          description: the tag id
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
       required:
         - id
         - tag_id
-        - post_ids
+        - postable_id
+        - postable_type
       type: object
     GetTagResponse:
       additionalProperties: false
@@ -2467,9 +2738,15 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     GetUploadURLRequest:
       additionalProperties: false
@@ -2577,6 +2854,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: Presigned download URL for the user's profile picture
+          type: string
         roles:
           description: Roles assigned to the user
           items:
@@ -2646,6 +2926,36 @@ components:
         - default_payment_method
         - footer
         - rendering_options
+      type: object
+    Media:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        media_type:
+          description: The media type of the object
+          examples:
+            - jpeg
+          type: string
+        s3key:
+          description: The S3 key of the media object
+          examples:
+            - "1"
+          type: string
+        title:
+          description: The title of the media
+          examples:
+            - Video of Athlete
+          type: string
+      required:
+        - id
+        - s3key
+        - title
+        - media_type
+        - created_at
       type: object
     MediaResponse:
       additionalProperties: false
@@ -2734,7 +3044,7 @@ components:
           readOnly: true
           type: string
         author:
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/schemas/GetUserResponse"
         college:
           $ref: "#/components/schemas/College"
         comment_count:
@@ -2788,6 +3098,53 @@ components:
         - content
         - is_anonymous
         - is_verified_athlete
+      type: object
+    PremiumPostResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/PremiumPostResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        college:
+          $ref: "#/components/schemas/College"
+        content:
+          examples:
+            - My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?
+          type: string
+        id:
+          type: string
+        media:
+          $ref: "#/components/schemas/Media"
+        media_id:
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        sport:
+          $ref: "#/components/schemas/Sport"
+        tags:
+          items:
+            $ref: "#/components/schemas/Tag"
+          type:
+            - array
+            - "null"
+        title:
+          examples:
+            - Looking for thoughts on NEU Fencing!
+          type: string
+      required:
+        - id
+        - author
+        - sport
+        - college
+        - tags
+        - title
+        - content
       type: object
     RegisterStripeCustomerBody:
       additionalProperties: false
@@ -3213,6 +3570,11 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
         updated_at:
           format: date-time
           type: string
@@ -3222,6 +3584,7 @@ components:
         - updated_at
         - deleted_at
         - name
+        - type
       type: object
     TagRequest:
       additionalProperties: false
@@ -3443,6 +3806,27 @@ components:
           minLength: 1
           type: string
       type: object
+    UpdatePremiumPostRequest:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/UpdatePremiumPostRequest.json
+          format: uri
+          readOnly: true
+          type: string
+        content:
+          maxLength: 5000
+          minLength: 1
+          type: string
+        media_id:
+          type: string
+        title:
+          maxLength: 100
+          minLength: 1
+          type: string
+      type: object
     UpdateRoleRequest:
       additionalProperties: false
       properties:
@@ -3631,8 +4015,14 @@ components:
           examples:
             - Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - name
+        - type
       type: object
     UpdateTagPostBody:
       additionalProperties: false
@@ -3644,10 +4034,15 @@ components:
           format: uri
           readOnly: true
           type: string
-        post_id:
-          description: the post id to update to
+        postable_id:
+          description: the postable id to update to
           examples:
             - 123e4567-e89b-12d3-a456-426614174000
+          type: string
+        postable_type:
+          description: "Type: post or premium_post"
+          examples:
+            - post
           type: string
         tag_id:
           description: the tag id to update to
@@ -3655,7 +4050,8 @@ components:
             - 123e4567-e89b-12d3-a456-426614174000
           type: string
       required:
-        - post_id
+        - postable_id
+        - postable_type
         - tag_id
       type: object
     UpdateTagPostResponse:
@@ -3669,23 +4065,17 @@ components:
           readOnly: true
           type: string
         id:
-          description: ID of the tagpost updated
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
-        post_id:
-          description: the updated post id
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
+        postable_id:
+          type: string
+        postable_type:
           type: string
         tag_id:
-          description: the updated tag id
-          examples:
-            - 123e4567-e89b-12d3-a456-426614174000
           type: string
       required:
         - id
-        - post_id
+        - postable_id
+        - postable_type
         - tag_id
       type: object
     UpdateTagResponse:
@@ -3708,9 +4098,15 @@ components:
           examples:
             - Northeastern Hockey
           type: string
+        type:
+          description: The type of the tag
+          examples:
+            - sports
+          type: string
       required:
         - id
         - name
+        - type
       type: object
     UpdateUserBody:
       additionalProperties: false
@@ -3839,6 +4235,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: The S3 key for the user's profile picture
+          type: string
         sport:
           description: The sport the user plays
           examples:
@@ -3866,6 +4265,7 @@ components:
         - email
         - username
         - bio
+        - profile_picture
         - account_type
         - sport
         - expected_grad_year
@@ -4125,6 +4525,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Put API v1 college by ID
+  /api/v1/colleges/:
+    get:
+      operationId: get-api-v1-colleges
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllCollegesResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 colleges
   /api/v1/colleges/search:
     get:
       operationId: get-api-v1-colleges-search
@@ -4894,6 +5311,29 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 post like by post ID likes
+  /api/v1/post/premium/:
+    post:
+      operationId: post-api-v1-post-premium
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePremiumPostParams"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePremiumPostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Post API v1 post premium
   /api/v1/post/tag/:
     post:
       operationId: post-api-v1-post-tag
@@ -5387,6 +5827,307 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 posts popular
+  /api/v1/posts/premium/:
+    get:
+      operationId: get-api-v1-posts-premium
+      parameters:
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllPremiumPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts premium
+  /api/v1/posts/premium/by-author/{author_id}:
+    get:
+      operationId: get-api-v1-posts-premium-by-author-by-author-id
+      parameters:
+        - description: Author ID to filter posts
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: author_id
+          required: true
+          schema:
+            description: Author ID to filter posts
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPremiumPostsByAuthorIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts premium by author by author ID
+  /api/v1/posts/premium/by-college/{college_id}:
+    get:
+      operationId: get-api-v1-posts-premium-by-college-by-college-id
+      parameters:
+        - description: College ID to filter posts
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: college_id
+          required: true
+          schema:
+            description: College ID to filter posts
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPremiumPostsByCollegeIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts premium by college by college ID
+  /api/v1/posts/premium/by-sport/{sport_id}:
+    get:
+      operationId: get-api-v1-posts-premium-by-sport-by-sport-id
+      parameters:
+        - description: Sport ID to filter posts
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: sport_id
+          required: true
+          schema:
+            description: Sport ID to filter posts
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPremiumPostsBySportIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts premium by sport by sport ID
+  /api/v1/posts/premium/by-tag/{tag_id}:
+    get:
+      operationId: get-api-v1-posts-premium-by-tag-by-tag-id
+      parameters:
+        - description: Tag ID to filter posts
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: tag_id
+          required: true
+          schema:
+            description: Tag ID to filter posts
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+        - description: Number of posts to return
+          example: 50
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 50
+            description: Number of posts to return
+            examples:
+              - 50
+            format: int64
+            type: integer
+        - description: Number of posts to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of posts to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPremiumPostsByTagIDResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 posts premium by tag by tag ID
+  /api/v1/posts/premium/{id}:
+    delete:
+      operationId: delete-api-v1-posts-premium-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePremiumPostRequest"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 posts premium by ID
+    patch:
+      operationId: patch-api-v1-posts-premium-by-id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePremiumPostRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PremiumPostResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Patch API v1 posts premium by ID
   /api/v1/posts/search:
     get:
       operationId: get-api-v1-posts-search
@@ -5878,6 +6619,18 @@ paths:
   /api/v1/stripe_customers/{id}:
     delete:
       operationId: delete-api-v1-stripe-customers-by-id
+      parameters:
+        - description: ID of the user on stripe
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the user on stripe
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
       responses:
         "200":
           content:
@@ -5980,6 +6733,17 @@ paths:
   /api/v1/stripe_price/{id}:
     delete:
       operationId: delete-api-v1-stripe-price-by-id
+      parameters:
+        - description: ID of the product
+          example: price_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - price_123
+            type: string
       responses:
         "200":
           content:
@@ -6107,6 +6871,17 @@ paths:
   /api/v1/stripe_product/{id}:
     delete:
       operationId: delete-api-v1-stripe-product-by-id
+      parameters:
+        - description: ID of the product
+          example: product_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - product_123
+            type: string
       responses:
         "200":
           content:
@@ -6380,6 +7155,38 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 tag name by name
+  /api/v1/tag/type/{type}:
+    get:
+      operationId: list-api-v1-tag-type-by-type
+      parameters:
+        - description: The type of the tag
+          example: sports
+          in: path
+          name: type
+          required: true
+          schema:
+            description: The type of the tag
+            examples:
+              - sports
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/GetTagResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 tag type by type
   /api/v1/tag/{id}:
     delete:
       operationId: delete-api-v1-tag-by-id

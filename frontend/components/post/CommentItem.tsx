@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   usePostApiV1CommentLike,
@@ -49,14 +49,24 @@ export function CommentItem({
       setLikeCount((c) => c - 1);
       unlikeComment(
         { id: comment.id },
-        { onError: () => { setIsLiked(true); setLikeCount((c) => c + 1); } },
+        {
+          onError: () => {
+            setIsLiked(true);
+            setLikeCount((c) => c + 1);
+          },
+        },
       );
     } else {
       setIsLiked(true);
       setLikeCount((c) => c + 1);
       likeComment(
         { data: { comment_id: comment.id } },
-        { onError: () => { setIsLiked(false); setLikeCount((c) => c - 1); } },
+        {
+          onError: () => {
+            setIsLiked(false);
+            setLikeCount((c) => c - 1);
+          },
+        },
       );
     }
   }
@@ -64,17 +74,22 @@ export function CommentItem({
   return (
     <div>
       <p className="mb-1 text-base font-semibold text-black">{authorName}</p>
-      <p className="text-base leading-relaxed text-black">{comment.description}</p>
+      <p className="text-base leading-relaxed text-black">
+        {comment.description}
+      </p>
       <div className="mt-2 flex items-center gap-4">
         <button
           type="button"
           onClick={handleLikeToggle}
-          className={cn(
-            "flex items-center gap-1 text-xs text-zinc-400 transition-colors hover:text-red-500",
-            isLiked && "text-red-500",
-          )}
+          className={
+            "flex items-center gap-1 text-xs text-black transition-colors"
+          }
         >
-          <Heart className={cn("size-3.5", isLiked && "fill-red-500")} />
+          <Heart
+            className={"size-3.5"}
+            stroke="url(#green-gradient)"
+            fill={isLiked ? "url(#green-gradient)" : "none"}
+          />
           {likeCount}
         </button>
 
@@ -82,8 +97,12 @@ export function CommentItem({
           <button
             type="button"
             onClick={onReply}
-            className="text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-700"
+            className="flex items-center gap-1 text-xs text-black"
           >
+            <MessageCircle
+              className={"size-3.5"}
+              stroke="url(#green-gradient)"
+            />
             Reply
           </button>
         )}

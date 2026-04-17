@@ -33,13 +33,13 @@ func (u *TagDB) GetPostsByTag(tag_id uuid.UUID, limit int, offset int, userID uu
             (SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count,
             (SELECT COUNT(*) > 0 FROM post_likes WHERE post_likes.post_id = posts.id AND post_likes.user_id = ?) AS is_liked`,
 			userID).
-		Joins("JOIN tag_posts tp ON tp.post_id = posts.id").
+		Joins("JOIN tag_posts tp ON tp.postable_id = posts.id AND tp.postable_type = 'post'").
 		Where("tp.tag_id = ?", tag_id).
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
-			return db.Table("tags t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id")
+			return db.Table("tags t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
 		Limit(limit).
 		Offset(offset).
@@ -62,6 +62,15 @@ func (u *TagDB) GetTagByID(id uuid.UUID) (*models.Tag, error) {
 func (u *TagDB) CreateTag(tag *models.Tag) (*models.Tag, error) {
 	dbResponse := u.db.Create(tag)
 	return utils.HandleDBError(tag, dbResponse.Error)
+}
+
+func (u *TagDB) GetTagsByType(tagType models.TagType) ([]*models.Tag, error) {
+	var tags []*models.Tag
+	dbResponse := u.db.Where("type = ?", tagType).Find(&tags)
+	if dbResponse.Error != nil {
+		return nil, dbResponse.Error
+	}
+	return tags, nil
 }
 
 func (u *TagDB) UpdateTag(id uuid.UUID, updates *UpdateTagBody) (*models.Tag, error) {

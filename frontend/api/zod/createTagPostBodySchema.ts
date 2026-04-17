@@ -9,6 +9,7 @@ export const createTagPostBodySchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  post_id: z.string().describe("ID of the post"),
+  postable_id: z.string().describe("ID of the post or premium post"),
+  postable_type: z.string().describe("Type: post or premium_post"),
   tag_id: z.string().describe("ID of the tag"),
 });

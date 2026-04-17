@@ -16,7 +16,7 @@ export const createPostResponseSchema = z.object({
   id: z.string(),
   is_anonymous: z.boolean(),
   sport: z.string(),
-  get tag() {
+  get tags() {
     return z.array(tagSchema).nullable();
   },
   title: z.string(),

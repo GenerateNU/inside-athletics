@@ -21,7 +21,6 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
-
 	if err := testDB.DB.Create(&user).Error; err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
@@ -32,7 +31,6 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 		Name:       "Soccer",
 		Popularity: &popularity,
 	}
-
 	if err := testDB.DB.Create(&soccer).Error; err != nil {
 		t.Fatalf("failed to create sport: %v", err)
 	}
@@ -45,7 +43,6 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 		Content:     "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?",
 		IsAnonymous: false,
 	}
-
 	if err := testDB.DB.Create(&post).Error; err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
@@ -54,7 +51,6 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 		ID:   HealthAndWellnessID,
 		Name: "Health And Wellness",
 	}
-
 	if err := testDB.DB.Create(&tag).Error; err != nil {
 		t.Fatalf("failed to create tag: %v", err)
 	}
@@ -71,13 +67,13 @@ func TestGetPostsByTag(t *testing.T) {
 	post := CreateUserAndSportAndTag(testDB, t)
 
 	tagpost := models.TagPost{
-		ID:     uuid.New(),
-		PostID: Post1ID,
-		TagID:  HealthAndWellnessID,
+		ID:           uuid.New(),
+		PostableID:   Post1ID,
+		PostableType: "post",
+		TagID:        HealthAndWellnessID,
 	}
 	tagpostResp := testDB.DB.Create(&tagpost)
 	_, err := utils.HandleDBError(&tagpost, tagpostResp.Error)
-
 	if err != nil {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
@@ -85,7 +81,6 @@ func TestGetPostsByTag(t *testing.T) {
 	resp := api.Get("/api/v1/tag/"+HealthAndWellnessID.String()+"/posts", "Authorization: Bearer "+mockUUID)
 
 	var response tagPackage.GetPostsByTagResponse
-
 	DecodeTo(&response, resp)
 
 	if len(response.Posts) != 1 || response.Posts[0].ID != post.ID {
@@ -102,13 +97,13 @@ func TestGetTagpostByID(t *testing.T) {
 	CreateUserAndSportAndTag(testDB, t)
 	newId := uuid.New()
 	tagpost := models.TagPost{
-		ID:     newId,
-		PostID: Post1ID,
-		TagID:  HealthAndWellnessID,
+		ID:           newId,
+		PostableID:   Post1ID,
+		PostableType: "post",
+		TagID:        HealthAndWellnessID,
 	}
 	tagpostResp := testDB.DB.Create(&tagpost)
 	_, err := utils.HandleDBError(&tagpost, tagpostResp.Error)
-
 	if err != nil {
 		t.Fatalf("Unable to add tag to table: %s", err.Error())
 	}
@@ -116,7 +111,6 @@ func TestGetTagpostByID(t *testing.T) {
 	resp := api.Get("/api/v1/post/tag/"+newId.String(), "Authorization: Bearer "+mockUUID)
 
 	var response tagpostPackage.GetTagPostByIDResponse
-
 	DecodeTo(&response, resp)
 
 	if response.ID.String() != newId.String() {
@@ -132,8 +126,9 @@ func TestCreateTagPost(t *testing.T) {
 
 	CreateUserAndSportAndTag(testDB, t)
 	payload := tagpostPackage.CreateTagPostBody{
-		TagID:  HealthAndWellnessID,
-		PostID: Post1ID,
+		TagID:        HealthAndWellnessID,
+		PostableID:   Post1ID,
+		PostableType: "post",
 	}
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
@@ -147,7 +142,7 @@ func TestCreateTagPost(t *testing.T) {
 	var response tagpostPackage.CreateTagPostsResponse
 	DecodeTo(&response, resp)
 
-	if response.PostID.String() != Post1ID.String() && response.TagID.String() != HealthAndWellnessID.String() {
+	if response.PostableID.String() != Post1ID.String() && response.TagID.String() != HealthAndWellnessID.String() {
 		t.Fatalf("Unexpected response: %+v", response)
 	}
 }
@@ -161,9 +156,10 @@ func TestUpdateTagPost(t *testing.T) {
 	CreateUserAndSportAndTag(testDB, t)
 	tagpostId := uuid.New()
 	tagpost := models.TagPost{
-		ID:     tagpostId,
-		PostID: Post1ID,
-		TagID:  HealthAndWellnessID,
+		ID:           tagpostId,
+		PostableID:   Post1ID,
+		PostableType: "post",
+		TagID:        HealthAndWellnessID,
 	}
 	tagpostResp := testDB.DB.Create(&tagpost)
 	_, err := utils.HandleDBError(&tagpost, tagpostResp.Error)
@@ -172,7 +168,8 @@ func TestUpdateTagPost(t *testing.T) {
 	}
 
 	update := tagpostPackage.UpdateTagPostBody{
-		PostID: Post1ID,
+		PostableID:   Post1ID,
+		PostableType: "post",
 	}
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
@@ -182,7 +179,7 @@ func TestUpdateTagPost(t *testing.T) {
 
 	var response tagpostPackage.UpdateTagPostResponse
 	DecodeTo(&response, resp)
-	if response.PostID.String() != Post1ID.String() {
+	if response.PostableID.String() != Post1ID.String() {
 		t.Fatalf("Unexpected response: %+v", response)
 	}
 }
@@ -195,11 +192,11 @@ func TestDeleteTagPost(t *testing.T) {
 
 	CreateUserAndSportAndTag(testDB, t)
 	tagpost := models.TagPost{
-		ID:     uuid.New(),
-		PostID: Post1ID,
-		TagID:  HealthAndWellnessID,
+		ID:           uuid.New(),
+		PostableID:   Post1ID,
+		PostableType: "post",
+		TagID:        HealthAndWellnessID,
 	}
-
 	tagResp := testDB.DB.Create(&tagpost)
 	_, err := utils.HandleDBError(&tagpost, tagResp.Error)
 	if err != nil {

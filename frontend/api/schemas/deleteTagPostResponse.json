@@ -8,11 +8,7 @@
       "readOnly": true,
       "type": "string"
     },
-    "id": {
-      "description": "ID of the deleted tagpost",
-      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
-      "type": "string"
-    }
+    "id": { "type": "string" }
   },
   "required": ["id"],
   "type": "object",

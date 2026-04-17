@@ -186,40 +186,54 @@ func TestTagSearch(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	newID1 := uuid.New()
 	tag1 := models.Tag{
-		ID:   uuid.New(),
-		Name: "Suli",
+		ID:   newID1,
+		Name: "Women's Basketball",
+		Type: models.TagTypeSports,
 	}
-	tagResp := testDB.DB.Create(&tag1)
-	_, err := utils.HandleDBError(&tag1, tagResp.Error)
+	tagResp1 := testDB.DB.Create(&tag1)
+	_, err := utils.HandleDBError(&tag1, tagResp1.Error)
 	if err != nil {
-		t.Fatalf("Unable to add tag to table: %s", err.Error())
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
+	newID2 := uuid.New()
 	tag2 := models.Tag{
-		ID:   uuid.New(),
-		Name: "Erm",
+		ID:   newID2,
+		Name: "D1",
+		Type: models.TagTypeDivisions,
 	}
 	tagResp2 := testDB.DB.Create(&tag2)
-	_, err2 := utils.HandleDBError(&tag2, tagResp2.Error)
-	if err2 != nil {
-		t.Fatalf("Unable to add tag to table: %s", err2.Error())
+	_, err = utils.HandleDBError(&tag2, tagResp2.Error)
+	if err != nil {
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
-	resp := api.Get("/api/v1/tags/search?search_str=Erm", "Authorization: Bearer "+mockUUID)
-	if resp.Code != http.StatusOK {
-		t.Fatalf("Expected code 200 but got %d", resp.Code)
+	newID3 := uuid.New()
+	tag3 := models.Tag{
+		ID:   newID3,
+		Name: "D2",
+		Type: models.TagTypeDivisions,
+	}
+	tagResp3 := testDB.DB.Create(&tag3)
+	_, err = utils.HandleDBError(&tag3, tagResp3.Error)
+	if err != nil {
+		t.Fatalf("unable to add tag to table: %s", err.Error())
 	}
 
-	var searchResults utils.SearchResults[*tagPackage.GetTagResponse]
-	DecodeTo(&searchResults, resp)
+	resp := api.Get("/api/v1/tag/type/sports", "Authorization: Bearer "+mockUUID)
 
-	n := len(searchResults.Results)
-	if n != 1 {
-		t.Fatalf("Expected only 1 search result got %d", n)
+	var response []tagPackage.GetTagResponse
+	DecodeTo(&response, resp)
+
+	if len(response) != 1 {
+		t.Fatalf("expected 1 tag, got %d", len(response))
 	}
-
-	if searchResults.Results[0].Name != tag2.Name {
-		t.Fatalf("Expected to get the erm tag but got %s", searchResults.Results[0].Name)
+	if response[0].Name != "Women's Basketball" {
+		t.Fatalf("unexpected response: %s", resp.Body.String())
+	}
+	if response[0].Type != models.TagTypeSports {
+		t.Fatalf("unexpected type: %s", response[0].Type)
 	}
 }
