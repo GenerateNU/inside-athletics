@@ -196,6 +196,101 @@ function AddPlanModal({ onClose, onAdd }: { onClose: () => void; onAdd: () => vo
   );
 }
 
+function AddModeratorModal({
+  onClose,
+  onAdd,
+  session,
+}: {
+  onClose: () => void;
+  onAdd: (mod: { id: string; name: string; username: string }) => void;
+  session: ReturnType<typeof useSession>;
+}) {
+  const [usernameInput, setUsernameInput] = useState("");
+  const [searchUsername, setSearchUsername] = useState("");
+  const [error, setError] = useState("");
+  const enabled = !!session?.access_token;
+  const authHeaders = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
+
+  const { data: rolesData } = useGetApiV1Roles({}, { query: { enabled }, client: { headers: authHeaders } });
+  const moderatorRole = (rolesData as any)?.roles?.find((r: any) => r.name === "moderator");
+
+  const { data: foundUser, isLoading: searching } = useGetApiV1UserUsernameByUsername(
+    searchUsername,
+    { query: { enabled: !!searchUsername }, client: { headers: authHeaders } }
+  );
+
+  const { mutate: assignRole } = usePostApiV1UserByIdRoles();
+
+  const handleAdd = () => {
+    if (!foundUser) { setError("User not found."); return; }
+    if (!moderatorRole) { setError("Moderator role not found."); return; }
+    assignRole(
+      { id: (foundUser as any).id, data: { role_id: moderatorRole.id } },
+      {
+        onSuccess: () => {
+          onAdd({
+            id: (foundUser as any).id,
+            name: `${(foundUser as any).first_name} ${(foundUser as any).last_name}`,
+            username: `@${(foundUser as any).username}`,
+          });
+          onClose();
+        },
+        onError: () => setError("Failed to assign moderator role."),
+      }
+    );
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-6 w-96 flex flex-col gap-4 shadow-lg">
+        <label className="text-lg font-bold text-black">Add Moderator</label>
+        <div className="flex gap-2 items-center">
+          <Input
+            placeholder="Search username"
+            value={usernameInput}
+            onChange={(e) => { setUsernameInput(e.target.value); setSearchUsername(""); setError(""); }}
+            className="flex-1"
+          />
+          <Button
+            variant="ghost"
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            onClick={() => { setSearchUsername(usernameInput); setError(""); }}
+          >
+            Search
+          </Button>
+        </div>
+        {searching && <p className="text-sm text-gray-400">Searching...</p>}
+        {foundUser && !searching && (
+          <div className="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3">
+            <div className="w-8 h-8 rounded-full bg-zinc-200 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-[#001225]">
+                {(foundUser as any).first_name} {(foundUser as any).last_name}
+              </p>
+              <p className="text-xs text-gray-400">@{(foundUser as any).username}</p>
+            </div>
+          </div>
+        )}
+        {searchUsername && !foundUser && !searching && (
+          <p className="text-sm text-gray-400">No user found.</p>
+        )}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <div className="flex gap-2 justify-end">
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button
+            variant="ghost"
+            className="bg-[#2C649A] text-white hover:bg-[#245580]"
+            onClick={handleAdd}
+            disabled={!foundUser || searching}
+          >
+            Add
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AddTagModal({ onClose, onAdd, tagType }: { onClose: () => void; onAdd: (name: string) => void; tagType: TagType }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -274,8 +369,7 @@ function StripeProductCard({ product }: { product: typeof DUMMY_PRODUCTS[0] }) {
 }
 
 function ModeratorAccessSection({ session }: { session: ReturnType<typeof useSession> }) {
-  const [usernameInput, setUsernameInput] = useState("");
-  const [searchUsername, setSearchUsername] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [moderators, setModerators] = useState(DUMMY_MODERATORS);
   const enabled = !!session?.access_token;
@@ -284,75 +378,38 @@ function ModeratorAccessSection({ session }: { session: ReturnType<typeof useSes
   const { data: rolesData } = useGetApiV1Roles({}, { query: { enabled }, client: { headers: authHeaders } });
   const moderatorRole = (rolesData as any)?.roles?.find((r: any) => r.name === "moderator");
 
-  const { data: foundUser, isLoading: searching } = useGetApiV1UserUsernameByUsername(
-    searchUsername,
-    { query: { enabled: !!searchUsername }, client: { headers: authHeaders } }
-  );
-
-  const { mutate: assignRole } = usePostApiV1UserByIdRoles();
   const { mutate: removeRole } = useDeleteApiV1UserByIdRoles();
 
-  const handleAdd = () => {
-    if (!foundUser) { setError("User not found."); return; }
+  const handleRemove = (mod: { id: string; name: string; username: string }) => {
     if (!moderatorRole) { setError("Moderator role not found."); return; }
-    assignRole(
-      { id: (foundUser as any).id, data: { role_id: moderatorRole.id } },
+    removeRole(
+      { id: mod.id, data: { role_id: moderatorRole.id } },
       {
-        onSuccess: () => {
-          setModerators((prev) => [...prev, {
-            id: (foundUser as any).id,
-            name: `${(foundUser as any).first_name} ${(foundUser as any).last_name}`,
-            username: `@${(foundUser as any).username}`,
-          }]);
-          setUsernameInput("");
-          setSearchUsername("");
-          setError("");
-        },
-        onError: () => setError("Failed to assign moderator role."),
+        onSuccess: () => setModerators((prev) => prev.filter((m) => m.id !== mod.id)),
+        onError: () => setError("Failed to remove moderator."),
       }
     );
   };
 
   return (
     <section className="bg-white rounded-2xl p-6 flex flex-col gap-4 border border-gray-200">
+      {showModal && (
+        <AddModeratorModal
+          onClose={() => setShowModal(false)}
+          onAdd={(mod) => setModerators((prev) => [...prev, mod])}
+          session={session}
+        />
+      )}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-bold text-[#001225]">Moderator Access</h2>
         <Button
           variant="ghost"
           className="bg-[#2C649A] text-white hover:bg-[#245580] rounded-full px-4 py-1 text-sm"
-          onClick={handleAdd}
-          disabled={!foundUser || searching}
+          onClick={() => setShowModal(true)}
         >
           Add New Moderator
         </Button>
       </div>
-      <div className="flex gap-2 items-center">
-        <Input
-          placeholder="Search username"
-          value={usernameInput}
-          onChange={(e) => setUsernameInput(e.target.value)}
-          className="max-w-xs"
-        />
-        <Button
-          variant="ghost"
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
-          onClick={() => { setSearchUsername(usernameInput); setError(""); }}
-        >
-          Search
-        </Button>
-      </div>
-      {searching && <p className="text-sm text-gray-400">Searching...</p>}
-      {foundUser && !searching && (
-        <div className="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3">
-          <div className="w-8 h-8 rounded-full bg-zinc-200 shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-[#001225]">
-              {(foundUser as any).first_name} {(foundUser as any).last_name}
-            </p>
-            <p className="text-xs text-gray-400">@{(foundUser as any).username}</p>
-          </div>
-        </div>
-      )}
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <div className="flex flex-col gap-2">
         {moderators.map((mod) => (
@@ -367,16 +424,7 @@ function ModeratorAccessSection({ session }: { session: ReturnType<typeof useSes
             <Button
               variant="ghost"
               className="text-sm text-red-400 hover:text-red-600"
-              onClick={() => {
-                if (!moderatorRole) return;
-                removeRole(
-                  { id: mod.id, data: { role_id: moderatorRole.id } },
-                  {
-                    onSuccess: () => setModerators((prev) => prev.filter((m) => m.id !== mod.id)),
-                    onError: () => setError("Failed to remove moderator."),
-                  }
-                );
-              }}
+              onClick={() => handleRemove(mod)}
             >
               Remove Moderator Status
             </Button>
