@@ -185,6 +185,28 @@ func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*ut
 	return respBody, nil
 }
 
+type GetUserByUsernameParams struct {
+	Username string `path:"username" doc:"Username of the user"`
+}
+
+func (u *UserService) GetUserByUsername(ctx context.Context, input *GetUserByUsernameParams) (*utils.ResponseBody[GetUserResponse], error) {
+	respBody := &utils.ResponseBody[GetUserResponse]{}
+
+	user, err := u.userDB.GetUserByUsername(input.Username)
+	if err != nil {
+		return respBody, err
+	}
+
+	roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils.ResponseBody[GetUserResponse]{
+		Body: u.toUserResponse(ctx, user, roleResponses),
+	}, nil
+}
+
 func (u *UserService) AssignRole(ctx context.Context, input *AssignRoleInput) (*utils.ResponseBody[AssignRoleResponse], error) {
 	if input.Body.RoleID == uuid.Nil {
 		return nil, huma.Error422UnprocessableEntity("role_id cannot be empty")
@@ -232,4 +254,34 @@ func (u *UserService) getCurrentUserID(ctx context.Context) (uuid.UUID, error) {
 	}
 
 	return parsedID, nil
+}
+
+func (u *UserService) RemoveRole(ctx context.Context, input *AssignRoleInput) (*utils.ResponseBody[AssignRoleResponse], error) {
+    if input.Body.RoleID == uuid.Nil {
+        return nil, huma.Error422UnprocessableEntity("role_id cannot be empty")
+    }
+
+    _, err := u.userDB.GetUser(input.ID)
+    if err != nil {
+        return nil, err
+    }
+
+    role, err := u.roleDB.GetRoleByID(input.Body.RoleID)
+    if err != nil {
+        return nil, err
+    }
+
+    if err := u.userDB.RemoveUserRole(input.ID, input.Body.RoleID); err != nil {
+        return nil, err
+    }
+
+    return &utils.ResponseBody[AssignRoleResponse]{
+        Body: &AssignRoleResponse{
+            UserID: input.ID,
+            Role: UserRoleResponse{
+                ID:   role.ID,
+                Name: role.Name,
+            },
+        },
+    }, nil
 }

@@ -61,6 +61,12 @@ func (u *UserDB) GetAllRolesForUser(userID uuid.UUID) (*[]models.Role, error) {
 	return &userRoles, nil
 }
 
+func (u *UserDB) GetUserByUsername(username string) (*models.User, error) {
+	var user models.User
+	dbResponse := u.db.Preload("College", "id IS NOT NULL").Preload("Sport", "id IS NOT NULL").Where("username = ?", username).First(&user)
+	return utils.HandleDBError(&user, dbResponse.Error)
+}
+
 type rolePermissionRow struct {
 	RoleID             uuid.UUID                `gorm:"column:role_id"`
 	RoleName           models.RoleName          `gorm:"column:role_name"`
@@ -157,4 +163,15 @@ func (u *UserDB) DeleteUser(id uuid.UUID) error {
 		return huma.Error404NotFound("Resource not found")
 	}
 	return nil
+}
+
+func (u *UserDB) RemoveUserRole(userID, roleID uuid.UUID) error {
+    dbResponse := u.db.Where("user_id = ? AND role_id = ?", userID, roleID).Delete(&models.UserRole{})
+    if dbResponse.Error != nil {
+        return huma.Error500InternalServerError("Failed to remove role from user", dbResponse.Error)
+    }
+    if dbResponse.RowsAffected == 0 {
+        return huma.Error404NotFound("Role assignment not found")
+    }
+    return nil
 }
