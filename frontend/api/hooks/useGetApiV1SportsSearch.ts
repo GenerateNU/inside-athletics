@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1SportsSearchQueryResponse,
   GetApiV1SportsSearchQueryParams,
@@ -23,7 +22,7 @@ import { getApiV1SportsSearch } from "../clients/getApiV1SportsSearch.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1SportsSearchQueryKey = (
-  params: GetApiV1SportsSearchQueryParams = {},
+  params?: GetApiV1SportsSearchQueryParams,
 ) => [{ url: "/api/v1/sports/search" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1SportsSearchQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1SportsSearchQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1SportsSearch(params, config);
+      return getApiV1SportsSearch(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -73,15 +74,15 @@ export function useGetApiV1SportsSearch<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1SportsSearchQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1SportsSearchQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1SportsSearchQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

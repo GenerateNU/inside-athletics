@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { DeleteApiV1StripeProductByIdMutationResponse } from "../models/DeleteApiV1StripeProductById.ts";
+import type {
+  DeleteApiV1StripeProductByIdMutationResponse,
+  DeleteApiV1StripeProductByIdPathParams,
+} from "../models/DeleteApiV1StripeProductById.ts";
 import type {
   Client,
   RequestConfig,
@@ -32,12 +34,12 @@ export function deleteApiV1StripeProductByIdMutationOptions<TContext = unknown>(
   return mutationOptions<
     DeleteApiV1StripeProductByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeProductByIdPathParams["id"] },
     TContext
   >({
     mutationKey,
-    mutationFn: async () => {
-      return deleteApiV1StripeProductById(config);
+    mutationFn: async ({ id }) => {
+      return deleteApiV1StripeProductById(id, config);
     },
   });
 }
@@ -51,7 +53,7 @@ export function useDeleteApiV1StripeProductById<TContext>(
     mutation?: UseMutationOptions<
       DeleteApiV1StripeProductByIdMutationResponse,
       ResponseErrorConfig<Error>,
-      void,
+      { id: DeleteApiV1StripeProductByIdPathParams["id"] },
       TContext
     > & { client?: QueryClient };
     client?: Partial<RequestConfig> & { client?: Client };
@@ -67,14 +69,14 @@ export function useDeleteApiV1StripeProductById<TContext>(
   ) as UseMutationOptions<
     DeleteApiV1StripeProductByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeProductByIdPathParams["id"] },
     TContext
   >;
 
   return useMutation<
     DeleteApiV1StripeProductByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeProductByIdPathParams["id"] },
     TContext
   >(
     {
@@ -86,7 +88,7 @@ export function useDeleteApiV1StripeProductById<TContext>(
   ) as UseMutationResult<
     DeleteApiV1StripeProductByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeProductByIdPathParams["id"] },
     TContext
   >;
 }

@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   ListApiV1TagTypeByTypeQueryResponse,
   ListApiV1TagTypeByTypePathParams,
@@ -44,8 +43,10 @@ export function listApiV1TagTypeByTypeQueryOptions(
     enabled: !!type,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return listApiV1TagTypeByType(type, config);
+      return listApiV1TagTypeByType(type, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,15 +75,15 @@ export function useListApiV1TagTypeByType<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? listApiV1TagTypeByTypeQueryKey(type);
+    resolvedOptions?.queryKey ?? listApiV1TagTypeByTypeQueryKey(type);
 
   const query = useQuery(
     {
       ...listApiV1TagTypeByTypeQueryOptions(type, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

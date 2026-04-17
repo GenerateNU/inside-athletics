@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsPremiumByCollegeByCollegeIdQueryResponse,
   GetApiV1PostsPremiumByCollegeByCollegeIdPathParams,
@@ -25,7 +24,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsPremiumByCollegeByCollegeIdQueryKey = (
   college_id: GetApiV1PostsPremiumByCollegeByCollegeIdPathParams["college_id"],
-  params: GetApiV1PostsPremiumByCollegeByCollegeIdQueryParams = {},
+  params?: GetApiV1PostsPremiumByCollegeByCollegeIdQueryParams,
 ) =>
   [
     {
@@ -57,12 +56,10 @@ export function getApiV1PostsPremiumByCollegeByCollegeIdQueryOptions(
     enabled: !!college_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsPremiumByCollegeByCollegeId(
-        college_id,
-        params,
-        config,
-      );
+      return getApiV1PostsPremiumByCollegeByCollegeId(college_id, params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -92,9 +89,9 @@ export function useGetApiV1PostsPremiumByCollegeByCollegeId<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1PostsPremiumByCollegeByCollegeIdQueryKey(college_id, params);
 
   const query = useQuery(
@@ -104,8 +101,8 @@ export function useGetApiV1PostsPremiumByCollegeByCollegeId<
         params,
         config,
       ),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

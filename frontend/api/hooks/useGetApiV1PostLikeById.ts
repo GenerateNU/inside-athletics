@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostLikeByIdQueryResponse,
   GetApiV1PostLikeByIdPathParams,
@@ -44,8 +43,10 @@ export function getApiV1PostLikeByIdQueryOptions(
     enabled: !!id,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostLikeById(id, config);
+      return getApiV1PostLikeById(id, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -74,14 +75,15 @@ export function useGetApiV1PostLikeById<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
-  const queryKey = queryOptions?.queryKey ?? getApiV1PostLikeByIdQueryKey(id);
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
+  const queryKey =
+    resolvedOptions?.queryKey ?? getApiV1PostLikeByIdQueryKey(id);
 
   const query = useQuery(
     {
       ...getApiV1PostLikeByIdQueryOptions(id, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {
