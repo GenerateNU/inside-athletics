@@ -1,125 +1,195 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "@/utils/SessionContext";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/ui/navbar";
-import CreatePostPopup from "@/components/ui/create-post-popup";
-import { RatingPanel } from "@/components/ui/rating-panel";
-import { CiUser } from "react-icons/ci";
+import { SearchBar } from "@/components/post/SearchBar";
 import SmallPost from "@/components/post/SmallPost";
-import type { PostResponse } from "@/api/models/PostResponse";
+import { Navbar } from "@/components/ui/navbar";
 
-const examplePost: PostResponse = {
-  id: "example-post-1",
-  title: "My Experience on the Track Team",
-  content: "Being on the track team has been one of the best decisions I've made at Northeastern. The coaches are incredibly supportive and the team culture is amazing.",
-  is_anonymous: false,
-  is_verified_athlete: true,
-  like_count: 24,
-  comment_count: 7,
-  sport: {
-    id: "sport-1",
-    name: "Track & Field",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  college: {
-    id: "college-1",
-    name: "Northeastern University",
-    city: "Boston",
-    state: "MA",
-    academic_rank: 49,
-    division_rank: 1,
-    logo: "",
-    website: "https://northeastern.edu",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    deleted_at: null,
-  },
-  author: {
-    id: "ac26eeb9-2877-425f-a1cd-887a9c979578",
-    first_name: "Zainab",
-    last_name: "Imadulla",
-    profile_picture: "IMG_1363.JPG",
-    username: "nubslovesdubs",
-    email: "Zainab.imadulla@icloud.com",
-    bio: null,
-    college: "",
-    sport: "",
-    account_type: true,
-    division: null,
-    expected_grad_year: 0,
-    verified_athelete_status: "False",
-    created_at: "",
-    updated_at: "",
-    deleted_at: null,
-  },
-  tags: null,
-};
+import { useQueries } from "@tanstack/react-query";
+import {
+  useGetApiV1PostsFilter,
+  useGetApiV1PostsPopular,
+  useGetApiV1PostsSearch,
+} from "@/api/hooks";
+import { CancellableTag } from "@/components/filtering/CancellableTag";
+import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
+import SearchPopup from "@/components/ui/search-popup";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 
-const northeasternCollegeId = "014d2c09-4023-445d-9779-66aff4824245";
 
-export default function Page() {
-  const [selectedCollegeId, setSelectedCollegeId] = useState(
-    northeasternCollegeId,
-  );
+function HomePageContent() {
   const searchParams = useSearchParams();
-  const showCreatePost = searchParams.get("createPost") === "true";
+  const initialQuery = searchParams.get("q") ?? "";
+
+  const session = useSession();
+  const enabled = !!session?.access_token;
+
+  const authHeaders = session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : undefined;
+
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+  const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
+  const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+
+  function toggleTag(tag: GetTagResponse) {
+    setActiveTags((prev) =>
+      prev.some((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+  function toggleCollege(tag: GetCollegeResponse) {
+    setActiveCollege((prev) =>
+      prev.some((c) => c.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+  function toggleSport(tag: SportResponse) {
+    setActiveSports((prev) =>
+      prev.some((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+
+  const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1PostsPopular(
+    {},
+    {
+      query: { enabled },
+      client: { headers: authHeaders }
+    },
+  );
+
+  const { data: searchedPosts, isLoading: loadignSearchedPosts } = useGetApiV1PostsSearch(
+    { search_str: debouncedQuery },
+    {
+      query: { enabled },
+      client: { headers: authHeaders }
+    },
+  )
+
+  const hasActiveFilters = activeTags.length > 0 || activeColleges.length > 0 || activeSports.length > 0;
+
+  const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
+    {
+      sport_ids: activeTags.filter((t) => t.type === "sports").map((t) => t.id).join(","),
+      tag_ids: activeTags.filter((t) => t.type !== "sports").map((t) => t.id).join(","),
+      college_ids: activeColleges.map((t) => t.id).join(","),
+    },
+    {
+      query: { enabled: hasActiveFilters },
+      client: { headers: authHeaders },
+    },
+  );
+  console.log("filtered: " + filteredPostsData)
+
+
+  // post are EITHER : all posts (default), filteredPosts (if active tags), or searchedPosts (if query is searched)
+  const posts = activeTags.length > 0
+    ? (filteredPostsData?.posts ?? [])
+    : debouncedQuery !== ""
+      ? (searchedPosts?.posts ?? [])
+      : (allPostsData?.posts ?? []);
+  const isLoading = activeTags.length > 0 ? loadingFilteredPosts : loadingAllPosts;
+
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      {showCreatePost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <CreatePostPopup />
+
+      {showFilterPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowFilterPopup(false)}
+          />
+          <div className="relative z-10">
+            <SearchPopup
+              activeTags={activeTags}
+              setActiveTagsAction={setActiveTags}
+              onBackAction={() => setShowFilterPopup(false)}
+            />
+          </div>
         </div>
       )}
+
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
-        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-scroll max-h-screen">
-          <div className="flex w-full max-w-5xl flex-col items-center gap-10">
-            <div className="flex flex-col items-center gap-4 text-center">
-              <p className="text-6xl">🐸</p>
-              <h1 className="text-4xl font-bold">Welcome to Inside Athletics</h1>
-              <p className="text-muted-foreground">
-                Under Construction! but here are some components:
-              </p>
+        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
+          <div className="flex w-full max-w-5xl flex-col gap-6">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search posts..."
+              className="w-full"
+            />
 
-              <div className="flex flex-row gap-5">
-                <Avatar />
-                <Avatar>
-                  <AvatarFallback>
-                    <CiUser strokeWidth={1.3} />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="flex flex-row gap-5">
-                <Button variant="outline"> Click here</Button>
-              </div>
+
+            {/* show either the search result label OR the filter button + active tags */}
+            <div className="flex items-center gap-2 w-full flex-wrap">
+              {debouncedQuery ? (
+                <p className="text-sm text-zinc-500">
+                  Showing Search Results for &ldquo;<span className="font-medium text-zinc-800">{debouncedQuery}</span>&rdquo;
+                </p>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowFilterPopup(true)}
+                    className="inline-flex items-center rounded-lg border-1 border-[#D4E94B] bg-[#FCFDF1] px-3 py-1 text-xs text-zinc-800"
+                  >
+                    <ChevronDown size={16} />
+                    Filter
+                  </Button>
+
+                  {activeTags.map((tag) => (
+                    <CancellableTag
+                      key={tag.id}
+                      label={tag.name}
+                      onRemove={() => toggleTag(tag)}
+                    />
+                  ))}
+                </>
+              )}
             </div>
-            <div className="flex w-full max-w-3xl flex-col items-start gap-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <Button
-                  type="button"
-                  onClick={() => setSelectedCollegeId(northeasternCollegeId)}
-                >
-                  Use Northeastern Ratings
-                </Button>
-              </div>
-              <p className="text-sm text-zinc-600">
-                Active college: Northeastern
-              </p>
-            </div>
-            <RatingPanel collegeId={selectedCollegeId} />
-            <div className="flex w-full max-w-3xl flex-col gap-3">
-              <h2 className="text-lg font-semibold">SmallPost Example</h2>
-              <SmallPost post={examplePost} />
+
+
+            <div className="flex flex-col gap-4 w-full">
+              {isLoading ? (
+                <p className="text-sm text-zinc-400">Loading posts...</p>
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <SmallPost key={post.id} post={post} />
+                ))
+              ) : (
+                <p className="text-sm text-zinc-400">No posts found.</p>
+              )}
             </div>
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense>
+      <HomePageContent />
+    </Suspense>
   );
 }
