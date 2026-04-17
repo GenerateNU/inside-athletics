@@ -194,6 +194,17 @@ func (s *PremiumPostDB) FuzzySearchForPremiumPost(searchStr string, limit, offse
 
 	selectQuery, whereQuery, orderQuery := utils.FuzzySearchByQueries("title", searchStr)
 
+	if err := s.db.Model(&models.PremiumPost{}).
+		Select("premium_posts.*, "+selectQuery).
+		Where(whereQuery).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if total == 0 {
+		return []models.PremiumPost{}, 0, nil
+	}
+
 	if err := s.db.
 		Model(&models.PremiumPost{}).
 		Select("premium_posts.*, "+selectQuery).
@@ -206,15 +217,10 @@ func (s *PremiumPostDB) FuzzySearchForPremiumPost(searchStr string, limit, offse
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
 		Order(orderQuery).
-		Count(&total).
 		Limit(limit).
 		Offset(offset).
-		Scan(&posts).Error; err != nil {
+		Find(&posts).Error; err != nil {
 		return nil, 0, err
-	}
-
-	if total == 0 {
-		return []models.PremiumPost{}, 0, nil
 	}
 
 	return posts, total, nil
@@ -252,6 +258,15 @@ func (s *PremiumPostDB) FilterPremiumPosts(colleges []uuid.UUID, sports []uuid.U
 		Joins("JOIN tag_posts ON premium_posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'premium_post'").
 		Where(whereQuery).
 		Group("premium_posts.id").
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := s.db.
+		Model(&models.PremiumPost{}).
+		Joins("JOIN tag_posts ON premium_posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'premium_post'").
+		Where(whereQuery).
+		Group("premium_posts.id").
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
@@ -259,11 +274,10 @@ func (s *PremiumPostDB) FilterPremiumPosts(colleges []uuid.UUID, sports []uuid.U
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
 		}).
-		Count(&total).
 		Limit(limit).
 		Offset(offset).
 		Order("premium_posts.created_at DESC").
-		Scan(&posts).Error; err != nil {
+		Find(&posts).Error; err != nil {
 		return posts, 0, err
 	}
 

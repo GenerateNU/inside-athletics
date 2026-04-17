@@ -15,8 +15,8 @@ export function SearchBar({
   className,
 }: SearchBarProps) {
   return (
-    <div className="flex flex-row justify-between items-center w-full">
-      <Search className="flex-none pointer-events-none absolute size-5 text-zinc-400" />
+    <div className="relative flex flex-row justify-between items-center">
+      <Search className="flex-none pointer-events-none absolute size-5 text-zinc-400 ml-2" />
       <Input
         type="search"
         value={value}
