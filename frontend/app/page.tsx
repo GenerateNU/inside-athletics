@@ -15,7 +15,7 @@ import {
   useGetApiV1PostsSearch,
 } from "@/api/hooks";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
-import { GetTagResponse } from "@/api";
+import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
 import SearchPopup from "@/components/ui/search-popup";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
@@ -35,6 +35,8 @@ function HomePageContent() {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+  const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
+  const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
 
   useEffect(() => {
@@ -45,6 +47,20 @@ function HomePageContent() {
 
   function toggleTag(tag: GetTagResponse) {
     setActiveTags((prev) =>
+      prev.some((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+  function toggleCollege(tag: GetCollegeResponse) {
+    setActiveCollege((prev) =>
+      prev.some((c) => c.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+  function toggleSport(tag: SportResponse) {
+    setActiveSports((prev) =>
       prev.some((t) => t.id === tag.id)
         ? prev.filter((t) => t.id !== tag.id)
         : [...prev, tag],
@@ -66,16 +82,21 @@ function HomePageContent() {
       client: { headers: authHeaders }
     },
   )
-  console.log(debouncedQuery)
-  console.log(searchedPosts)
+
+  const hasActiveFilters = activeTags.length > 0 || activeColleges.length > 0 || activeSports.length > 0;
 
   const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
-    { tag_ids: activeTags.map((t) => t.id).join(",") },
     {
-      query: { enabled: activeTags.length > 0 },
+      sport_ids: activeTags.filter((t) => t.type === "sports").map((t) => t.id).join(","),
+      tag_ids: activeTags.filter((t) => t.type !== "sports").map((t) => t.id).join(","),
+      college_ids: activeColleges.map((t) => t.id).join(","),
+    },
+    {
+      query: { enabled: hasActiveFilters },
       client: { headers: authHeaders },
     },
   );
+  console.log("filtered: " + filteredPostsData)
 
 
   // post are EITHER : all posts (default), filteredPosts (if active tags), or searchedPosts (if query is searched)
