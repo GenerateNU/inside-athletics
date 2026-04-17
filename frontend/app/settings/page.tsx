@@ -117,7 +117,6 @@ function AddPlanModal({ onClose, onAdd }: { onClose: () => void; onAdd: () => vo
 
   const { mutate: createProduct } = usePostApiV1StripeProduct();
   const { mutate: createPrice } = usePostApiV1StripePrice();
-  const { mutate: removeRole } = useDeleteApiV1UserByIdRoles();
 
   const handleSubmit = () => {
     if (!name.trim() || !description.trim() || !amount.trim()) {
@@ -291,6 +290,7 @@ function ModeratorAccessSection({ session }: { session: ReturnType<typeof useSes
   );
 
   const { mutate: assignRole } = usePostApiV1UserByIdRoles();
+  const { mutate: removeRole } = useDeleteApiV1UserByIdRoles();
 
   const handleAdd = () => {
     if (!foundUser) { setError("User not found."); return; }
