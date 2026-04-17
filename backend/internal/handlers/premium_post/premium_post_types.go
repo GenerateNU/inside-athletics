@@ -86,8 +86,8 @@ type GetPremiumPostsByTagIDResponse struct {
 }
 
 type CreatePremiumPostParams struct {
-	SportID        *uuid.UUID             `json:"sport_id" gorm:"type:uuid;default:null"`
-	CollegeID      *uuid.UUID             `json:"college_id" gorm:"type:uuid;default:null"`
+	SportID        *uuid.UUID             `json:"sport_id,omitempty" gorm:"type:uuid;default:null"`
+	CollegeID      *uuid.UUID             `json:"college_id,omitempty" gorm:"type:uuid;default:null"`
 	Tags           []uuid.UUID            `json:"tag" type:"tag"`
 	Title          string                 `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content        string                 `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`

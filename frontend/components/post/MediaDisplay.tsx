@@ -56,7 +56,7 @@ export default function MediaDisplay({ media, className, ...props }: MediaDispla
                         </VideoPlayerControlBar>
                     </VideoPlayer>
                 </div>
-            : (media.media_type == "jpeg" || media.media_type == "png" ) ?
+            : (media.media_type == "image/jpeg" || media.media_type == "image/png" ) ?
                 <Image src={media.s3key} width={200} height={300} alt={"Premium Content Image"} />
             :
                 <PDFViewer src={media.s3key} />

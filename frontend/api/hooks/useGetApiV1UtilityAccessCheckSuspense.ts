@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetApiV1UtilityAccessCheckQueryResponse } from "../models/GetApiV1UtilityAccessCheck.ts";
 import type {
   Client,
@@ -38,8 +37,10 @@ export function getApiV1UtilityAccessCheckSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1UtilityAccessCheck(config);
+      return getApiV1UtilityAccessCheck({
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -65,15 +66,15 @@ export function useGetApiV1UtilityAccessCheckSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1UtilityAccessCheckSuspenseQueryKey();
+    resolvedOptions?.queryKey ?? getApiV1UtilityAccessCheckSuspenseQueryKey();
 
   const query = useSuspenseQuery(
     {
       ...getApiV1UtilityAccessCheckSuspenseQueryOptions(config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

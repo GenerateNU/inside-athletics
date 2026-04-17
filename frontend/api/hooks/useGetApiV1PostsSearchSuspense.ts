@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsSearchQueryResponse,
   GetApiV1PostsSearchQueryParams,
@@ -23,7 +22,7 @@ import { getApiV1PostsSearch } from "../clients/getApiV1PostsSearch.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsSearchSuspenseQueryKey = (
-  params: GetApiV1PostsSearchQueryParams = {},
+  params?: GetApiV1PostsSearchQueryParams,
 ) => [{ url: "/api/v1/posts/search" }, ...(params ? [params] : [])] as const;
 
 export type GetApiV1PostsSearchSuspenseQueryKey = ReturnType<
@@ -43,8 +42,10 @@ export function getApiV1PostsSearchSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsSearch(params, config);
+      return getApiV1PostsSearch(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -71,15 +72,15 @@ export function useGetApiV1PostsSearchSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostsSearchSuspenseQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1PostsSearchSuspenseQueryKey(params);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1PostsSearchSuspenseQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {

@@ -15,6 +15,7 @@ import {
   usePostApiV1Media,
 } from "@/api/hooks";
 import { Tag, TagButton } from "./tag-button.tsx";
+import { errorModelSchema } from "@/api/zod/errorModelSchema";
 
 interface CreatePremiumPostPopupProps {
   onClose: () => void;
@@ -58,6 +59,10 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
   const handleSubmit = async () => {
     setError(null);
 
+    const schoolTag = activeTags.find((t) => t.type === "schools");
+    const sportTag = activeTags.find((t) => t.type === "sports");
+    const otherTags = activeTags.filter((t) => t.type !== "schools" && t.type !== "sports");
+
     if (!title.trim()) {
       setError("Please enter a title for your post.");
       return;
@@ -66,10 +71,10 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
       setError("Please enter a message for your post.");
       return;
     }
-
-    const schoolTag = activeTags.find((t) => t.type === "schools");
-    const sportTag = activeTags.find((t) => t.type === "sports");
-    const otherTags = activeTags.filter((t) => t.type !== "schools" && t.type !== "sports");
+    if (!schoolTag && !sportTag && otherTags.length === 0) {
+      setError("Please add at least one school, sport, or tag.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -77,21 +82,29 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
 
       if (file) {
         const s3Key = `premium/content/${Date.now()}/${file.name}`;
+        const fileType = file.type || "application/octet-stream";
 
         const uploadUrlData = await getUploadUrl({
-          data: { key: s3Key, fileType: file.type, fileName: file.name },
+          data: { key: s3Key, fileType, fileName: file.name },
         });
 
-        await fetch(uploadUrlData.upload_url, {
+        const s3PutResponse = await fetch(uploadUrlData.upload_url, {
           method: "PUT",
           body: file,
-          headers: { "Content-Type": file.type },
+          headers: {
+            "Content-Type": fileType,
+            "x-amz-meta-filename": uploadUrlData.document_id,
+          },
         });
+
+        if (!s3PutResponse.ok) {
+          throw new Error("Failed to upload file to storage.");
+        }
 
         await confirmUpload({ data: { key: uploadUrlData.key } });
 
         const mediaData = await createMedia({
-          data: { s3key: uploadUrlData.key, media_type: file.type, title: file.name },
+          data: { s3key: uploadUrlData.key, media_type: fileType, title: file.name },
         });
 
         mediaId = mediaData.id;
@@ -101,18 +114,25 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
         data: {
           title,
           content,
-          college_id: schoolTag?.id ?? "",
-          sport_id: sportTag?.id ?? "",
-          tag: otherTags.length > 0 ? otherTags.map((t) => t.id) : null,
-          media_id: mediaId,
-        },
+          tag: otherTags.map((t) => t.id),
+          ...(schoolTag ? { college_id: schoolTag.id } : {}),
+          ...(sportTag ? { sport_id: sportTag.id } : {}),
+          ...(mediaId ? { media_id: mediaId } : {}),
+        } as any,
       });
 
       onClose();
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string; title?: string } } })
-        ?.response?.data;
-      setError(detail?.detail ?? detail?.title ?? "Failed to create post. Please try again.");
+      const responseData = (err as { response?: { data?: unknown } })?.response?.data;
+      const apiError = errorModelSchema.safeParse(responseData);
+      if (apiError.success) {
+        const firstDetail = apiError.data.errors?.[0]?.message;
+        setError(firstDetail ?? apiError.data.detail ?? apiError.data.title ?? "Failed to create post.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to create post. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

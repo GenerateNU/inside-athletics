@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1PostsPremiumSearchQueryResponse,
   GetApiV1PostsPremiumSearchQueryParams,
@@ -23,7 +22,7 @@ import { getApiV1PostsPremiumSearch } from "../clients/getApiV1PostsPremiumSearc
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getApiV1PostsPremiumSearchQueryKey = (
-  params: GetApiV1PostsPremiumSearchQueryParams = {},
+  params?: GetApiV1PostsPremiumSearchQueryParams,
 ) =>
   [
     { url: "/api/v1/posts/premium/search" },
@@ -47,8 +46,10 @@ export function getApiV1PostsPremiumSearchQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1PostsPremiumSearch(params, config);
+      return getApiV1PostsPremiumSearch(params, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -77,15 +78,15 @@ export function useGetApiV1PostsPremiumSearch<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ?? getApiV1PostsPremiumSearchQueryKey(params);
+    resolvedOptions?.queryKey ?? getApiV1PostsPremiumSearchQueryKey(params);
 
   const query = useQuery(
     {
       ...getApiV1PostsPremiumSearchQueryOptions(params, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & {

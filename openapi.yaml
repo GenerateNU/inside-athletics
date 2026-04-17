@@ -843,8 +843,6 @@ components:
             - Looking for thoughts on NEU Fencing!
           type: string
       required:
-        - sport_id
-        - college_id
         - tag
         - title
         - content
