@@ -178,6 +178,14 @@ export type {
   DeleteApiV1UserByIdPathParams,
 } from "./DeleteApiV1UserById.ts";
 export type {
+  DeleteApiV1UserByIdRoles200,
+  DeleteApiV1UserByIdRolesError,
+  DeleteApiV1UserByIdRolesMutation,
+  DeleteApiV1UserByIdRolesMutationRequest,
+  DeleteApiV1UserByIdRolesMutationResponse,
+  DeleteApiV1UserByIdRolesPathParams,
+} from "./DeleteApiV1UserByIdRoles.ts";
+export type {
   DeleteApiV1UserCollegeById200,
   DeleteApiV1UserCollegeByIdError,
   DeleteApiV1UserCollegeByIdMutation,
@@ -591,6 +599,13 @@ export type {
   GetApiV1UserTagFollowsQuery,
   GetApiV1UserTagFollowsQueryResponse,
 } from "./GetApiV1UserTagFollows.ts";
+export type {
+  GetApiV1UserUsernameByUsername200,
+  GetApiV1UserUsernameByUsernameError,
+  GetApiV1UserUsernameByUsernamePathParams,
+  GetApiV1UserUsernameByUsernameQuery,
+  GetApiV1UserUsernameByUsernameQueryResponse,
+} from "./GetApiV1UserUsernameByUsername.ts";
 export type { GetCollegeFollowsByUserResponse } from "./GetCollegeFollowsByUserResponse.ts";
 export type {
   GetCollegeResponse,

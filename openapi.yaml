@@ -7730,6 +7730,31 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 user tag by tag ID users
+  /api/v1/user/username/{username}:
+    get:
+      operationId: get-api-v1-user-username-by-username
+      parameters:
+        - description: Username of the user
+          in: path
+          name: username
+          required: true
+          schema:
+            description: Username of the user
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user username by username
   /api/v1/user/{id}:
     delete:
       operationId: delete-api-v1-user-by-id
@@ -7788,6 +7813,40 @@ paths:
           description: Error
       summary: Get API v1 user by ID
   /api/v1/user/{id}/roles:
+    delete:
+      operationId: delete-api-v1-user-by-id-roles
+      parameters:
+        - description: ID of the user
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the user
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignRoleResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user by ID roles
     post:
       operationId: post-api-v1-user-by-id-roles
       parameters:

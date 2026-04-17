@@ -17,6 +17,7 @@ export { deleteApiV1StripeProductById } from "./deleteApiV1StripeProductById.ts"
 export { deleteApiV1SurveyById } from "./deleteApiV1SurveyById.ts";
 export { deleteApiV1TagById } from "./deleteApiV1TagById.ts";
 export { deleteApiV1UserById } from "./deleteApiV1UserById.ts";
+export { deleteApiV1UserByIdRoles } from "./deleteApiV1UserByIdRoles.ts";
 export { deleteApiV1UserCollegeById } from "./deleteApiV1UserCollegeById.ts";
 export { deleteApiV1UserSportById } from "./deleteApiV1UserSportById.ts";
 export { deleteApiV1UserTagById } from "./deleteApiV1UserTagById.ts";
@@ -73,6 +74,7 @@ export { getApiV1UserSportBySportIdUsers } from "./getApiV1UserSportBySportIdUse
 export { getApiV1UserSportFollows } from "./getApiV1UserSportFollows.ts";
 export { getApiV1UserTagByTagIdUsers } from "./getApiV1UserTagByTagIdUsers.ts";
 export { getApiV1UserTagFollows } from "./getApiV1UserTagFollows.ts";
+export { getApiV1UserUsernameByUsername } from "./getApiV1UserUsernameByUsername.ts";
 export { listApiV1CheckoutSessions } from "./listApiV1CheckoutSessions.ts";
 export { listApiV1CommentByIdReplies } from "./listApiV1CommentByIdReplies.ts";
 export { listApiV1PostByPostIdComments } from "./listApiV1PostByPostIdComments.ts";

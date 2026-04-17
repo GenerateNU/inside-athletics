@@ -147,6 +147,13 @@ export {
   deleteApiV1TagByIdPathParamsSchema,
 } from "./deleteApiV1TagByIdSchema.ts";
 export {
+  deleteApiV1UserByIdRoles200Schema,
+  deleteApiV1UserByIdRolesErrorSchema,
+  deleteApiV1UserByIdRolesMutationRequestSchema,
+  deleteApiV1UserByIdRolesMutationResponseSchema,
+  deleteApiV1UserByIdRolesPathParamsSchema,
+} from "./deleteApiV1UserByIdRolesSchema.ts";
+export {
   deleteApiV1UserById200Schema,
   deleteApiV1UserByIdErrorSchema,
   deleteApiV1UserByIdMutationResponseSchema,
@@ -510,6 +517,12 @@ export {
   getApiV1UserTagFollowsErrorSchema,
   getApiV1UserTagFollowsQueryResponseSchema,
 } from "./getApiV1UserTagFollowsSchema.ts";
+export {
+  getApiV1UserUsernameByUsername200Schema,
+  getApiV1UserUsernameByUsernameErrorSchema,
+  getApiV1UserUsernameByUsernamePathParamsSchema,
+  getApiV1UserUsernameByUsernameQueryResponseSchema,
+} from "./getApiV1UserUsernameByUsernameSchema.ts";
 export { getCollegeFollowsByUserResponseSchema } from "./getCollegeFollowsByUserResponseSchema.ts";
 export { getCollegeResponseSchema } from "./getCollegeResponseSchema.ts";
 export { getCommentLikeInfoResponseSchema } from "./getCommentLikeInfoResponseSchema.ts";

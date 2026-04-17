@@ -17,6 +17,7 @@ export type { DeleteApiV1StripeProductByIdMutationKey } from "./hooks/useDeleteA
 export type { DeleteApiV1SurveyByIdMutationKey } from "./hooks/useDeleteApiV1SurveyById.ts";
 export type { DeleteApiV1TagByIdMutationKey } from "./hooks/useDeleteApiV1TagById.ts";
 export type { DeleteApiV1UserByIdMutationKey } from "./hooks/useDeleteApiV1UserById.ts";
+export type { DeleteApiV1UserByIdRolesMutationKey } from "./hooks/useDeleteApiV1UserByIdRoles.ts";
 export type { DeleteApiV1UserCollegeByIdMutationKey } from "./hooks/useDeleteApiV1UserCollegeById.ts";
 export type { DeleteApiV1UserSportByIdMutationKey } from "./hooks/useDeleteApiV1UserSportById.ts";
 export type { DeleteApiV1UserTagByIdMutationKey } from "./hooks/useDeleteApiV1UserTagById.ts";
@@ -126,6 +127,8 @@ export type { GetApiV1UserTagByTagIdUsersQueryKey } from "./hooks/useGetApiV1Use
 export type { GetApiV1UserTagByTagIdUsersSuspenseQueryKey } from "./hooks/useGetApiV1UserTagByTagIdUsersSuspense.ts";
 export type { GetApiV1UserTagFollowsQueryKey } from "./hooks/useGetApiV1UserTagFollows.ts";
 export type { GetApiV1UserTagFollowsSuspenseQueryKey } from "./hooks/useGetApiV1UserTagFollowsSuspense.ts";
+export type { GetApiV1UserUsernameByUsernameQueryKey } from "./hooks/useGetApiV1UserUsernameByUsername.ts";
+export type { GetApiV1UserUsernameByUsernameSuspenseQueryKey } from "./hooks/useGetApiV1UserUsernameByUsernameSuspense.ts";
 export type { ListApiV1CheckoutSessionsQueryKey } from "./hooks/useListApiV1CheckoutSessions.ts";
 export type { ListApiV1CheckoutSessionsSuspenseQueryKey } from "./hooks/useListApiV1CheckoutSessionsSuspense.ts";
 export type { ListApiV1CommentByIdRepliesQueryKey } from "./hooks/useListApiV1CommentByIdReplies.ts";
@@ -355,6 +358,14 @@ export type {
   DeleteApiV1UserByIdMutationResponse,
   DeleteApiV1UserByIdPathParams,
 } from "./models/DeleteApiV1UserById.ts";
+export type {
+  DeleteApiV1UserByIdRoles200,
+  DeleteApiV1UserByIdRolesError,
+  DeleteApiV1UserByIdRolesMutation,
+  DeleteApiV1UserByIdRolesMutationRequest,
+  DeleteApiV1UserByIdRolesMutationResponse,
+  DeleteApiV1UserByIdRolesPathParams,
+} from "./models/DeleteApiV1UserByIdRoles.ts";
 export type {
   DeleteApiV1UserCollegeById200,
   DeleteApiV1UserCollegeByIdError,
@@ -769,6 +780,13 @@ export type {
   GetApiV1UserTagFollowsQuery,
   GetApiV1UserTagFollowsQueryResponse,
 } from "./models/GetApiV1UserTagFollows.ts";
+export type {
+  GetApiV1UserUsernameByUsername200,
+  GetApiV1UserUsernameByUsernameError,
+  GetApiV1UserUsernameByUsernamePathParams,
+  GetApiV1UserUsernameByUsernameQuery,
+  GetApiV1UserUsernameByUsernameQueryResponse,
+} from "./models/GetApiV1UserUsernameByUsername.ts";
 export type { GetCollegeFollowsByUserResponse } from "./models/GetCollegeFollowsByUserResponse.ts";
 export type {
   GetCollegeResponse,
@@ -1186,6 +1204,7 @@ export { deleteApiV1StripeProductById } from "./clients/deleteApiV1StripeProduct
 export { deleteApiV1SurveyById } from "./clients/deleteApiV1SurveyById.ts";
 export { deleteApiV1TagById } from "./clients/deleteApiV1TagById.ts";
 export { deleteApiV1UserById } from "./clients/deleteApiV1UserById.ts";
+export { deleteApiV1UserByIdRoles } from "./clients/deleteApiV1UserByIdRoles.ts";
 export { deleteApiV1UserCollegeById } from "./clients/deleteApiV1UserCollegeById.ts";
 export { deleteApiV1UserSportById } from "./clients/deleteApiV1UserSportById.ts";
 export { deleteApiV1UserTagById } from "./clients/deleteApiV1UserTagById.ts";
@@ -1242,6 +1261,7 @@ export { getApiV1UserSportBySportIdUsers } from "./clients/getApiV1UserSportBySp
 export { getApiV1UserSportFollows } from "./clients/getApiV1UserSportFollows.ts";
 export { getApiV1UserTagByTagIdUsers } from "./clients/getApiV1UserTagByTagIdUsers.ts";
 export { getApiV1UserTagFollows } from "./clients/getApiV1UserTagFollows.ts";
+export { getApiV1UserUsernameByUsername } from "./clients/getApiV1UserUsernameByUsername.ts";
 export { listApiV1CheckoutSessions } from "./clients/listApiV1CheckoutSessions.ts";
 export { listApiV1CommentByIdReplies } from "./clients/listApiV1CommentByIdReplies.ts";
 export { listApiV1PostByPostIdComments } from "./clients/listApiV1PostByPostIdComments.ts";
@@ -1343,6 +1363,9 @@ export { useDeleteApiV1TagById } from "./hooks/useDeleteApiV1TagById.ts";
 export { deleteApiV1UserByIdMutationKey } from "./hooks/useDeleteApiV1UserById.ts";
 export { deleteApiV1UserByIdMutationOptions } from "./hooks/useDeleteApiV1UserById.ts";
 export { useDeleteApiV1UserById } from "./hooks/useDeleteApiV1UserById.ts";
+export { deleteApiV1UserByIdRolesMutationKey } from "./hooks/useDeleteApiV1UserByIdRoles.ts";
+export { deleteApiV1UserByIdRolesMutationOptions } from "./hooks/useDeleteApiV1UserByIdRoles.ts";
+export { useDeleteApiV1UserByIdRoles } from "./hooks/useDeleteApiV1UserByIdRoles.ts";
 export { deleteApiV1UserCollegeByIdMutationKey } from "./hooks/useDeleteApiV1UserCollegeById.ts";
 export { deleteApiV1UserCollegeByIdMutationOptions } from "./hooks/useDeleteApiV1UserCollegeById.ts";
 export { useDeleteApiV1UserCollegeById } from "./hooks/useDeleteApiV1UserCollegeById.ts";
@@ -1670,6 +1693,12 @@ export { useGetApiV1UserTagFollows } from "./hooks/useGetApiV1UserTagFollows.ts"
 export { getApiV1UserTagFollowsSuspenseQueryKey } from "./hooks/useGetApiV1UserTagFollowsSuspense.ts";
 export { getApiV1UserTagFollowsSuspenseQueryOptions } from "./hooks/useGetApiV1UserTagFollowsSuspense.ts";
 export { useGetApiV1UserTagFollowsSuspense } from "./hooks/useGetApiV1UserTagFollowsSuspense.ts";
+export { getApiV1UserUsernameByUsernameQueryKey } from "./hooks/useGetApiV1UserUsernameByUsername.ts";
+export { getApiV1UserUsernameByUsernameQueryOptions } from "./hooks/useGetApiV1UserUsernameByUsername.ts";
+export { useGetApiV1UserUsernameByUsername } from "./hooks/useGetApiV1UserUsernameByUsername.ts";
+export { getApiV1UserUsernameByUsernameSuspenseQueryKey } from "./hooks/useGetApiV1UserUsernameByUsernameSuspense.ts";
+export { getApiV1UserUsernameByUsernameSuspenseQueryOptions } from "./hooks/useGetApiV1UserUsernameByUsernameSuspense.ts";
+export { useGetApiV1UserUsernameByUsernameSuspense } from "./hooks/useGetApiV1UserUsernameByUsernameSuspense.ts";
 export { listApiV1CheckoutSessionsQueryKey } from "./hooks/useListApiV1CheckoutSessions.ts";
 export { listApiV1CheckoutSessionsQueryOptions } from "./hooks/useListApiV1CheckoutSessions.ts";
 export { useListApiV1CheckoutSessions } from "./hooks/useListApiV1CheckoutSessions.ts";
@@ -1974,6 +2003,13 @@ export {
   deleteApiV1TagByIdMutationResponseSchema,
   deleteApiV1TagByIdPathParamsSchema,
 } from "./zod/deleteApiV1TagByIdSchema.ts";
+export {
+  deleteApiV1UserByIdRoles200Schema,
+  deleteApiV1UserByIdRolesErrorSchema,
+  deleteApiV1UserByIdRolesMutationRequestSchema,
+  deleteApiV1UserByIdRolesMutationResponseSchema,
+  deleteApiV1UserByIdRolesPathParamsSchema,
+} from "./zod/deleteApiV1UserByIdRolesSchema.ts";
 export {
   deleteApiV1UserById200Schema,
   deleteApiV1UserByIdErrorSchema,
@@ -2338,6 +2374,12 @@ export {
   getApiV1UserTagFollowsErrorSchema,
   getApiV1UserTagFollowsQueryResponseSchema,
 } from "./zod/getApiV1UserTagFollowsSchema.ts";
+export {
+  getApiV1UserUsernameByUsername200Schema,
+  getApiV1UserUsernameByUsernameErrorSchema,
+  getApiV1UserUsernameByUsernamePathParamsSchema,
+  getApiV1UserUsernameByUsernameQueryResponseSchema,
+} from "./zod/getApiV1UserUsernameByUsernameSchema.ts";
 export { getCollegeFollowsByUserResponseSchema } from "./zod/getCollegeFollowsByUserResponseSchema.ts";
 export { getCollegeResponseSchema } from "./zod/getCollegeResponseSchema.ts";
 export { getCommentLikeInfoResponseSchema } from "./zod/getCommentLikeInfoResponseSchema.ts";
