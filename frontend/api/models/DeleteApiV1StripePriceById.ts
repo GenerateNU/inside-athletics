@@ -6,6 +6,14 @@
 import type { ErrorModel } from "./ErrorModel.ts";
 import type { StripePriceResponse } from "./StripePriceResponse.ts";
 
+export type DeleteApiV1StripePriceByIdPathParams = {
+  /**
+   * @description ID of the product
+   * @type string
+   */
+  id: string;
+};
+
 /**
  * @description OK
  */
@@ -21,5 +29,6 @@ export type DeleteApiV1StripePriceByIdMutationResponse =
 
 export type DeleteApiV1StripePriceByIdMutation = {
   Response: DeleteApiV1StripePriceById200;
+  PathParams: DeleteApiV1StripePriceByIdPathParams;
   Errors: any;
 };

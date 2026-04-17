@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   PatchApiV1PermissionByIdMutationRequest,
   PatchApiV1PermissionByIdMutationResponse,
@@ -40,7 +39,7 @@ export function patchApiV1PermissionByIdMutationOptions<TContext = unknown>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >({
@@ -62,7 +61,7 @@ export function usePatchApiV1PermissionById<TContext>(
       ResponseErrorConfig<Error>,
       {
         id: PatchApiV1PermissionByIdPathParams["id"];
-        data?: PatchApiV1PermissionByIdMutationRequest;
+        data: PatchApiV1PermissionByIdMutationRequest;
       },
       TContext
     > & { client?: QueryClient };
@@ -83,7 +82,7 @@ export function usePatchApiV1PermissionById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >;
@@ -93,7 +92,7 @@ export function usePatchApiV1PermissionById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >(
@@ -108,7 +107,7 @@ export function usePatchApiV1PermissionById<TContext>(
     ResponseErrorConfig<Error>,
     {
       id: PatchApiV1PermissionByIdPathParams["id"];
-      data?: PatchApiV1PermissionByIdMutationRequest;
+      data: PatchApiV1PermissionByIdMutationRequest;
     },
     TContext
   >;

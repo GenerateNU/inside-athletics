@@ -6619,6 +6619,18 @@ paths:
   /api/v1/stripe_customers/{id}:
     delete:
       operationId: delete-api-v1-stripe-customers-by-id
+      parameters:
+        - description: ID of the user on stripe
+          example: "1"
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the user on stripe
+            examples:
+              - "1"
+            maxLength: 36
+            type: string
       responses:
         "200":
           content:
@@ -6721,6 +6733,17 @@ paths:
   /api/v1/stripe_price/{id}:
     delete:
       operationId: delete-api-v1-stripe-price-by-id
+      parameters:
+        - description: ID of the product
+          example: price_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - price_123
+            type: string
       responses:
         "200":
           content:
@@ -6848,6 +6871,17 @@ paths:
   /api/v1/stripe_product/{id}:
     delete:
       operationId: delete-api-v1-stripe-product-by-id
+      parameters:
+        - description: ID of the product
+          example: product_123
+          in: path
+          name: id
+          required: true
+          schema:
+            description: ID of the product
+            examples:
+              - product_123
+            type: string
       responses:
         "200":
           content:
