@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -71,9 +72,23 @@ export function CommentItem({
     }
   }
 
+  const profileHref =
+    !comment.is_anonymous && comment.user?.id
+      ? `/profile/${comment.user.id}`
+      : null;
+
   return (
     <div>
-      <p className="mb-1 text-base font-semibold text-black">{authorName}</p>
+      {profileHref ? (
+        <Link
+          href={profileHref}
+          className="mb-1 block text-base font-semibold text-black hover:underline"
+        >
+          {authorName}
+        </Link>
+      ) : (
+        <p className="mb-1 text-base font-semibold text-black">{authorName}</p>
+      )}
       <p className="text-base leading-relaxed text-black">
         {comment.description}
       </p>

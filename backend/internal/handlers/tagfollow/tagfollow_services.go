@@ -122,3 +122,22 @@ func (u *TagFollowService) DeleteTagFollow(ctx context.Context, input *DeleteTag
 
 	return respBody, nil
 }
+
+// Soft deletes tag follow by tag id for current user.
+func (u *TagFollowService) DeleteTagFollowByTag(ctx context.Context, input *DeleteTagFollowByTagParams) (*utils.ResponseBody[DeleteTagFollowResponse], error) {
+	respBody := &utils.ResponseBody[DeleteTagFollowResponse]{}
+	userID, err := u.getCurrentUserID(ctx)
+	if err != nil {
+		return respBody, err
+	}
+
+	err = u.tagfollowDB.DeleteTagFollowByUserAndTag(userID, input.TagID)
+	if err != nil {
+		return respBody, err
+	}
+
+	respBody.Body = &DeleteTagFollowResponse{
+		Message: "Tag follow was deleted successfully",
+	}
+	return respBody, nil
+}

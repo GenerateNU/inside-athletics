@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Briefcase, Crown, Home, Plus, Search } from "lucide-react";
+import { BookOpen, Briefcase, Crown, Home, Plus, Search, User } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -22,16 +22,11 @@ import {
   useGetApiV1UserSportFollows,
   useGetApiV1UserTagFollows,
 } from "@/api/hooks";
-import type { GetCollegeFollowsByUserResponse } from "@/api/models/GetCollegeFollowsByUserResponse";
-import type { GetCollegeResponse } from "@/api/models/GetCollegeResponse";
-import type { GetSportFollowsByUserResponse } from "@/api/models/GetSportFollowsByUserResponse";
-import type { GetTagFollowsByUserResponse } from "@/api/models/GetTagFollowsByUserResponse";
-import type { GetTagResponse } from "@/api/models/GetTagResponse";
-import type { SportResponse } from "@/api/models/SportResponse";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Explore", icon: Search, href: "/explore" },
+  { label: "Profile", icon: User, href: "/profile"}
 ];
 
 function unwrapBody<T>(value: unknown): T | undefined {
@@ -97,13 +92,9 @@ export function Navbar({ className, ...props }: NavbarProps) {
     client: { headers: authHeaders },
   });
 
-  const tagIds =
-    unwrapBody<GetTagFollowsByUserResponse>(tagFollows)?.tag_ids ?? [];
-  const sportIds =
-    unwrapBody<GetSportFollowsByUserResponse>(sportFollows)?.sport_ids ?? [];
-  const collegeIds =
-    unwrapBody<GetCollegeFollowsByUserResponse>(collegeFollows)?.college_ids ??
-    [];
+  const tagIds = tagFollows?.tag_ids ?? [];
+  const sportIds = sportFollows?.sport_ids ?? [];
+  const collegeIds = collegeFollows?.college_ids ?? [];
 
   // Fetch each individual item using useQueries (parallel, no waterfalls)
   const tagResults = useQueries({
@@ -131,36 +122,39 @@ export function Navbar({ className, ...props }: NavbarProps) {
     collegeResults.some((r) => r.isLoading);
 
   const followingItems = [
-    ...sportResults.flatMap((r) =>
-      unwrapBody<SportResponse>(r.data)
+    ...sportResults.flatMap((r) => {
+      const sport = r.data;
+      return sport
         ? [
             {
-              label: unwrapBody<SportResponse>(r.data)!.name,
+              label: sport.name,
               type: "sport" as const,
             },
           ]
-        : [],
-    ),
-    ...tagResults.flatMap((r) =>
-      unwrapBody<GetTagResponse>(r.data)
+        : [];
+    }),
+    ...tagResults.flatMap((r) => {
+      const tag = r.data;
+      return tag
         ? [
             {
-              label: unwrapBody<GetTagResponse>(r.data)!.name,
+              label: tag.name,
               type: "tag" as const,
             },
           ]
-        : [],
-    ),
-    ...collegeResults.flatMap((r) =>
-      unwrapBody<GetCollegeResponse>(r.data)
+        : [];
+    }),
+    ...collegeResults.flatMap((r) => {
+      const college = r.data;
+      return college
         ? [
             {
-              label: unwrapBody<GetCollegeResponse>(r.data)!.name,
+              label: college.name,
               type: "school" as const,
             },
           ]
-        : [],
-    ),
+        : [];
+    }),
   ];
 
   return (
@@ -273,6 +267,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
         </Button>
       </nav>
 
+      {/* Following section — same JSX, driven by new data */}
       <div
         className={cn(
           "mt-[clamp(1rem,2vw,1.5rem)] space-y-[clamp(0.5rem,1vw,0.75rem)]",

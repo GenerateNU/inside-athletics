@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { use, useState, useEffect } from "react";
 import { ArrowLeft, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
@@ -44,8 +43,6 @@ export default function PostPage({
       query: { enabled },
       client: { headers: authHeaders },
     });
-
-  console.log(post?.author.profile_picture)
 
   const queryClient = useQueryClient();
   const [isLiked, setIsLiked] = useState(false);
@@ -174,19 +171,44 @@ export default function PostPage({
             {/* Post body */}
             <div className="px-15 py-5">
               {/* Author */}
-              <div className="mb-3 flex items-center gap-2">
-                <Avatar size="lg">
-            {!post.is_anonymous && post.author.profile_picture && (
-              <AvatarImage src={post.author.profile_picture} alt={authorName} />
-            )}
-            <AvatarFallback className="bg-zinc-100 text-[10px] font-medium text-zinc-600">
-              {authorInitials}
-            </AvatarFallback>
-          </Avatar>
-                <span className="text-lg font-semibold text-black">
-                  {authorName}
-                </span>
-              </div>
+              {!post.is_anonymous && post.author?.id ? (
+                <Link
+                  href={`/profile/${post.author.id}`}
+                  className="mb-3 inline-flex items-center gap-2 rounded-md outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Avatar size="lg">
+                    {post.author.profile_picture ? (
+                      <AvatarImage
+                        src={post.author.profile_picture}
+                        alt=""
+                      />
+                    ) : null}
+                    <AvatarFallback className="bg-zinc-100 text-[10px] font-medium text-zinc-600">
+                      {authorInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-lg font-semibold text-black">
+                    {authorName}
+                  </span>
+                </Link>
+              ) : (
+                <div className="mb-3 flex items-center gap-2">
+                  <Avatar size="lg">
+                    {!post.is_anonymous && post.author.profile_picture && (
+                      <AvatarImage
+                        src={post.author.profile_picture}
+                        alt={authorName}
+                      />
+                    )}
+                    <AvatarFallback className="bg-zinc-100 text-[10px] font-medium text-zinc-600">
+                      {authorInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-lg font-semibold text-black">
+                    {authorName}
+                  </span>
+                </div>
+              )}
 
               {/* Content */}
               <p className="text-md leading-relaxed text-black">

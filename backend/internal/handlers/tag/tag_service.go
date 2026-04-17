@@ -16,6 +16,27 @@ type TagService struct {
 	s3        *s3.Service
 }
 
+func (u *TagService) ListTags(ctx context.Context, input *ListTagsParams) (*utils.ResponseBody[ListTagsResponse], error) {
+	tags, err := u.tagDB.ListTags(input.Limit, input.Offset)
+	respBody := &utils.ResponseBody[ListTagsResponse]{}
+	if err != nil {
+		return respBody, err
+	}
+
+	response := &ListTagsResponse{
+		Tags: make([]GetTagResponse, 0, len(*tags)),
+	}
+	for _, tag := range *tags {
+		response.Tags = append(response.Tags, GetTagResponse{
+			ID:   tag.ID,
+			Name: tag.Name,
+		})
+	}
+
+	respBody.Body = response
+	return respBody, nil
+}
+
 func (u *TagService) GetTagByName(ctx context.Context, input *GetTagByNameParams) (*utils.ResponseBody[GetTagResponse], error) {
 	name := input.Name
 	tag, err := u.tagDB.GetTagByName(name)

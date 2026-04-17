@@ -62,6 +62,24 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 			next(ctx)
 			return
 		}
+		// PATCH/PUT /api/v1/user updates the authenticated user's own profile.
+		// Allow this even when role_permissions does not explicitly seed user:update_own.
+		if resource == "user" && action == models.PermissionUpdateOwn {
+			next(ctx)
+			return
+		}
+
+		// DELETE /api/v1/user/tag/tag/{tag_id} unfollows by tag id (not tag_follow row id).
+		// Ownership is enforced in the handler via current user + tag_id; require delete_own on tagfollow.
+		if resource == "tagfollow" && action == models.PermissionDelete && strings.Contains(path, "/user/tag/tag/") {
+			allowed, status, msg := authorizeByPermission(db, parsedUserID, models.PermissionDeleteOwn, resource)
+			if !allowed {
+				_ = huma.WriteErr(api, ctx, status, msg)
+				return
+			}
+			next(ctx)
+			return
+		}
 
 		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
 			(resource == "post" || resource == "comment" || resource == "tagfollow" || resource == "premiumpost" || resource == "sportfollow" || resource == "collegefollow") &&
@@ -178,7 +196,12 @@ func resolveResourceAndAction(method, path, userID, pathID string) (models.Permi
 	}
 
 	// Special-case: if the user is acting on their own resource, use the *_own permissions.
+	// PATCH/PUT /api/v1/user has no path id and always refers to the authenticated user.
 	if resource == "user" && (method == http.MethodPut || method == http.MethodPatch || method == http.MethodDelete) {
+		if (method == http.MethodPut || method == http.MethodPatch) && pathID == "" {
+			action = models.PermissionUpdateOwn
+			return action, resource
+		}
 		if userID != "" && pathID != "" && pathID == userID {
 			if method == http.MethodDelete {
 				action = models.PermissionDeleteOwn

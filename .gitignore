@@ -33,3 +33,7 @@ backend/scripts/seed/data/*.json
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Supabase CLI local state (root supabase/)
+supabase/.branches/
+supabase/.temp/

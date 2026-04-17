@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart, MessageSquareText, UserRound } from "lucide-react";
 import { Badge } from "@/components/post/Badge"
 import { Tag } from "@/components/post/Tag"
@@ -12,6 +13,8 @@ type SmallPostProps = React.ComponentProps<"div"> & {
 };
 
 export default function SmallPost({ post, className, ...props }: SmallPostProps) {
+    const router = useRouter();
+
     const authorName = post.is_anonymous
         ? "Anonymous"
         : `${post.author.first_name} ${post.author.last_name}`;
@@ -23,9 +26,22 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
     const sportEnable = post.sport != null 
     const collegeEnable = post.college != null
 
+    const profileId = !post.is_anonymous && post.author?.id ? post.author.id : null;
+
     return (
-        <Link href={`/posts/${post.id}`} className="block w-full">
-            <div className={cn("bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm hover:shadow-md transition-shadow cursor-pointer", className)} {...props}>
+        <div
+            className={cn("bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm hover:shadow-md transition-shadow cursor-pointer", className)}
+            onClick={() => router.push(`/posts/${post.id}`)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    router.push(`/posts/${post.id}`);
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            {...props}
+        >
                 <h2 className="font-bold text-gray-900 text-base mb-3 text-left">{post.title}</h2>
 
                 <div className="flex gap-2 mb-3">
@@ -50,23 +66,40 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        {post.is_anonymous
-                            ? <div className="w-7 h-7 rounded-full bg-zinc-200 flex items-center justify-center shrink-0">
-                                <UserRound size={16} className="text-zinc-500" />
-                              </div>
-                            : pfpURL
-                                ? <img
-                                    src={pfpURL}
-                                    alt={authorName}
-                                    className="w-7 h-7 rounded-full object-cover shrink-0"
-                                  />
-                                : <div className="w-7 h-7 rounded-full bg-zinc-200 shrink-0" />
+                    {profileId ? (
+                        <Link
+                            href={`/profile/${profileId}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2 rounded-md outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                        {pfpURL
+                            ? <img
+                                src={pfpURL}
+                                alt=""
+                                className="w-7 h-7 rounded-full object-cover shrink-0"
+                              />
+                            : <div className="w-7 h-7 rounded-full bg-zinc-200 shrink-0" />
                         }
                         <span className="text-sm font-semibold text-gray-800">{authorName}</span>
-                    </div>
+                        </Link>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            {post.is_anonymous
+                                ? <div className="w-7 h-7 rounded-full bg-zinc-200 flex items-center justify-center shrink-0">
+                                    <UserRound size={16} className="text-zinc-500" />
+                                  </div>
+                                : pfpURL
+                                    ? <img
+                                        src={pfpURL}
+                                        alt=""
+                                        className="w-7 h-7 rounded-full object-cover shrink-0"
+                                      />
+                                    : <div className="w-7 h-7 rounded-full bg-zinc-200 shrink-0" />
+                            }
+                            <span className="text-sm font-semibold text-gray-800">{authorName}</span>
+                        </div>
+                    )}
                 </div>
-            </div>
-        </Link>
+        </div>
     );
 }
