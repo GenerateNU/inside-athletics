@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/utils/SessionContext";
 import { useOnboarding } from "@/utils/onboarding";
-import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,17 +12,17 @@ export default function SignUpPage() {
   const router = useRouter();
   const session = useSession();
   const { data, hydrated, updateSection } = useOnboarding();
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
 
-    setName(data.account.name);
+    const parts = data.account.name.trim().split(/\s+/);
+    setFirstName(parts[0] ?? "");
+    setLastName(parts.slice(1).join(" "));
     setEmail(data.verification.email);
     setUsername(data.account.username);
   }, [
@@ -33,47 +32,16 @@ export default function SignUpPage() {
     hydrated,
   ]);
 
-  const canContinue = Boolean(
-    name.trim() && email.trim() && username.trim() && password,
-  );
+  const canContinue = Boolean(firstName.trim() && email.trim() && username.trim());
 
-  const handleSignup = async () => {
-    if (!canContinue || isSubmitting) {
-      return;
-    }
+  const handleContinue = () => {
+    if (!canContinue) return;
 
-    setIsSubmitting(true);
-    setError("");
+    const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
+    updateSection("account", { name: fullName, username });
+    updateSection("verification", { name: fullName, email });
 
-    updateSection("account", { name, username });
-    updateSection("verification", { name, email });
-
-    if (session?.user) {
-      router.push("/onboarding/role");
-      return;
-    }
-
-    try {
-      const supabase = createSupabaseBrowserClient();
-      const { error: signupError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: {},
-        },
-      });
-
-      if (signupError) {
-        setError(signupError.message || "Unable to sign up.");
-        return;
-      }
-
-      router.push(
-        `/onboarding/verification/code?source=signup&email=${encodeURIComponent(email.trim())}`,
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    router.push("/onboarding/role");
   };
 
   return (
@@ -97,16 +65,27 @@ export default function SignUpPage() {
           </div>
           <div className="space-y-6 rounded-md">
             <div className="flex w-full flex-col space-y-4">
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                className="border-[#3E7DBB] bg-[#F0F4F8]"
-                value={name}
-                placeholder="Name"
-                required
-                onChange={(e) => setName(e.target.value)}
-              />
+              <div className="flex gap-4">
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  className="border-[#3E7DBB] bg-[#F0F4F8]"
+                  value={firstName}
+                  placeholder="First Name"
+                  required
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  className="border-[#3E7DBB] bg-[#F0F4F8]"
+                  value={lastName}
+                  placeholder="Last Name"
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
               <Input
                 id="email"
                 name="email"
@@ -127,36 +106,17 @@ export default function SignUpPage() {
                 required
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                className="border-[#3E7DBB] bg-[#F0F4F8]"
-                value={password}
-                placeholder="Password"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-              />
             </div>
-            {error ? (
-              <p className="text-sm text-red-600" role="alert">
-                {error}
-              </p>
-            ) : null}
 
             <div className="flex w-full flex-col items-center gap-2">
               <Button
                 type="button"
                 variant="default"
                 className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
-                onClick={handleSignup}
-                disabled={!canContinue || isSubmitting}
+                onClick={handleContinue}
+                disabled={!canContinue}
               >
-                {isSubmitting
-                  ? "Signing Up..."
-                  : session?.user
-                    ? "Continue"
-                    : "Sign Up"}
+                {session?.user ? "Continue" : "Sign Up"}
               </Button>
             </div>
           </div>

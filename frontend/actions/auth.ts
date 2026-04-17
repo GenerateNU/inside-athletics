@@ -18,27 +18,26 @@ type signupInitialState = {
 export async function login(prevState: loginInitialState, formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const email = (formData.get("email") as string | null)?.trim() ?? "";
+  const password = (formData.get("password") as string | null) ?? "";
 
-  if (!email) {
+  if (!email || !password) {
     return {
       success: false,
-      message: "Email is required.",
+      message: "Email and password are required.",
     };
   }
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-  });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return {
       success: false,
-      message: error.message || "Unable to send login code.",
+      message: error.message || "Invalid email or password.",
     };
   }
 
   revalidatePath("/", "layout");
-  redirect(`/login/verify?email=${encodeURIComponent(email)}`);
+  redirect("/");
 }
 
 export async function signup(

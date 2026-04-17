@@ -37,9 +37,6 @@ export default function LoginPage() {
               className="h-auto w-full max-w-[10rem]"
             />
           </div>
-          <p className="text-sm text-gray-600">
-            Enter your email and we&apos;ll send you an 8-digit login code.
-          </p>
         </div>
 
         <form className="space-y-6">
@@ -49,6 +46,14 @@ export default function LoginPage() {
               name="email"
               type="email"
               placeholder="Email"
+              className="border-[#3E7DBB] bg-[#F0F4F8]"
+              required
+            />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Password"
               className="border-[#3E7DBB] bg-[#F0F4F8]"
               required
             />
@@ -66,7 +71,7 @@ export default function LoginPage() {
               disabled={status.pending}
               className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
             >
-              {status.pending ? "Sending..." : "Send Code"}
+              {status.pending ? "Logging In..." : "Log In"}
             </Button>
             <Button
               type="button"
