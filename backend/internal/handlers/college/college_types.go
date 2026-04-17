@@ -16,14 +16,15 @@ type ListCollegesParams struct {
 }
 
 type GetCollegeResponse struct {
-	ID           uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
-	Name         string          `json:"name" example:"Northeastern University" doc:"Name of the college"`
-	State        string          `json:"state" example:"Massachusetts" doc:"State of the college"`
-	City         string          `json:"city"  example:"Boston" doc:"City of the college"`
-	Website      string          `json:"website" example:"https://www.northeastern.edu" doc:"Website of the college"`
-	AcademicRank *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
-	DivisionRank models.Division `json:"division_rank" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
-	Logo         *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
+	ID               uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
+	Name             string          `json:"name" example:"Northeastern University" doc:"Name of the college"`
+	State            string          `json:"state" example:"Massachusetts" doc:"State of the college"`
+	City             string          `json:"city"  example:"Boston" doc:"City of the college"`
+	Website          string          `json:"website" example:"https://www.northeastern.edu" doc:"Website of the college"`
+	AthleticsWebsite string          `json:"athletics_website" example:"https://www.northeastern.edu" doc:"Website of the colleges athletics information"`
+	AcademicRank     *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
+	DivisionRank     models.Division `json:"division_rank" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
+	Logo             *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
 }
 
 type ListCollegesResponse struct {
@@ -32,24 +33,26 @@ type ListCollegesResponse struct {
 }
 
 type CreateCollegeRequest struct {
-	Name         string          `json:"name" required:"true" minLength:"1" maxLength:"200" example:"Northeastern University" doc:"Name of the college"`
-	State        string          `json:"state" required:"true" minLength:"1" maxLength:"100" example:"Massachusetts" doc:"State of the college"`
-	City         string          `json:"city" required:"true" minLength:"1" maxLength:"100" example:"Boston" doc:"City of the college"`
-	Website      string          `json:"website" required:"true" minLength:"1" maxLength:"500" example:"https://www.northeastern.edu" doc:"Website of the college"`
-	AcademicRank *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
-	DivisionRank models.Division `json:"division_rank" required:"true" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
-	Logo         *string         `json:"logo" maxLength:"500" example:"https://example.com/logo.png" doc:"Logo of the college"`
+	Name             string          `json:"name" required:"true" minLength:"1" maxLength:"200" example:"Northeastern University" doc:"Name of the college"`
+	State            string          `json:"state" required:"true" minLength:"1" maxLength:"100" example:"Massachusetts" doc:"State of the college"`
+	City             string          `json:"city" required:"true" minLength:"1" maxLength:"100" example:"Boston" doc:"City of the college"`
+	Website          string          `json:"website" required:"true" minLength:"1" maxLength:"500" example:"https://www.northeastern.edu" doc:"Website of the college"`
+	AthleticsWebsite string          `json:"athletics_website" required:"true" example:"https://www.northeastern.edu" doc:"Website of the colleges athletics information"`
+	AcademicRank     *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
+	DivisionRank     models.Division `json:"division_rank" required:"true" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
+	Logo             *string         `json:"logo" maxLength:"500" example:"https://example.com/logo.png" doc:"Logo of the college"`
 }
 
 type CreateCollegeResponse struct {
-	ID           uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
-	Name         string          `json:"name" example:"Northeastern University" doc:"Name of the college"`
-	State        string          `json:"state" example:"Massachusetts" doc:"State of the college"`
-	City         string          `json:"city" example:"Boston" doc:"City of the college"`
-	Website      string          `json:"website" example:"https://www.northeastern.edu" doc:"Website of the college"`
-	AcademicRank *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
-	DivisionRank models.Division `json:"division_rank" example:"1" enum:"1,2,3" doc:"NCAA division (1, 2, or 3)"`
-	Logo         *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
+	ID               uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
+	Name             string          `json:"name" example:"Northeastern University" doc:"Name of the college"`
+	State            string          `json:"state" example:"Massachusetts" doc:"State of the college"`
+	City             string          `json:"city" example:"Boston" doc:"City of the college"`
+	AthleticsWebsite string          `json:"athletics_website" example:"https://www.northeastern.edu" doc:"Website of the colleges athletics information"`
+	Website          string          `json:"website" example:"https://www.northeastern.edu" doc:"Website of the college"`
+	AcademicRank     *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
+	DivisionRank     models.Division `json:"division_rank" example:"1" enum:"1,2,3" doc:"NCAA division (1, 2, or 3)"`
+	Logo             *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
 }
 
 type CreateCollegeInput struct {
@@ -57,13 +60,14 @@ type CreateCollegeInput struct {
 }
 
 type UpdateCollegeRequest struct {
-	Name         *string          `json:"name" maxLength:"200" example:"Northeastern University" doc:"Name of the college"`
-	State        *string          `json:"state" maxLength:"100" example:"Massachusetts" doc:"State of the college"`
-	City         *string          `json:"city" maxLength:"100" example:"Boston" doc:"City of the college"`
-	Website      *string          `json:"website" maxLength:"500" example:"https://www.northeastern.edu" doc:"Website of the college"`
-	AcademicRank *int16           `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
-	DivisionRank *models.Division `json:"division_rank" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
-	Logo         *string          `json:"logo" maxLength:"500" example:"https://example.com/logo.png" doc:"Logo of the college"`
+	Name             *string          `json:"name" maxLength:"200" example:"Northeastern University" doc:"Name of the college"`
+	State            *string          `json:"state" maxLength:"100" example:"Massachusetts" doc:"State of the college"`
+	City             *string          `json:"city" maxLength:"100" example:"Boston" doc:"City of the college"`
+	Website          *string          `json:"website" maxLength:"500" example:"https://www.northeastern.edu" doc:"Website of the college"`
+	AthleticsWebsite *string          `json:"athletics_website" maxLength:"500" example:"https://www.northeastern.edu" doc:"Website of the colleges athletics information"`
+	AcademicRank     *int16           `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
+	DivisionRank     *models.Division `json:"division_rank" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
+	Logo             *string          `json:"logo" maxLength:"500" example:"https://example.com/logo.png" doc:"Logo of the college"`
 }
 
 // Combined input for Update (path params + body)
@@ -73,14 +77,15 @@ type UpdateCollegeInput struct {
 }
 
 type UpdateCollegeResponse struct {
-	ID           uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
-	Name         string          `json:"name" required:"true" example:"Northeastern University" doc:"Name of the college"`
-	State        string          `json:"state" required:"true" example:"Massachusetts" doc:"State of the college"`
-	City         string          `json:"city" required:"true" example:"Boston" doc:"City of the college"`
-	Website      string          `json:"website" required:"true" example:"https://www.northeastern.edu" doc:"Website of the college"`
-	AcademicRank *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
-	DivisionRank models.Division `json:"division_rank" required:"true" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
-	Logo         *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
+	ID               uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
+	Name             string          `json:"name" required:"true" example:"Northeastern University" doc:"Name of the college"`
+	State            string          `json:"state" required:"true" example:"Massachusetts" doc:"State of the college"`
+	City             string          `json:"city" required:"true" example:"Boston" doc:"City of the college"`
+	Website          string          `json:"website" required:"true" example:"https://www.northeastern.edu" doc:"Website of the college"`
+	AthleticsWebsite string          `json:"athletics_website" required:"true" maxLength:"500" example:"https://www.northeastern.edu" doc:"Website of the colleges athletics information"`
+	AcademicRank     *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
+	DivisionRank     models.Division `json:"division_rank" required:"true" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
+	Logo             *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
 }
 
 type DeleteCollegeParams struct {
@@ -93,5 +98,5 @@ type DeleteCollegeResponse struct {
 }
 
 type GetAllCollegesResponse struct {
-    Colleges []GetCollegeResponse `json:"colleges"`
+	Colleges []GetCollegeResponse `json:"colleges"`
 }
