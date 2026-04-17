@@ -340,7 +340,7 @@ func (s *PostService) FilterPosts(ctx context.Context, input *GetFilterPostsPara
 	postResponses := make([]PostResponse, 0, len(posts))
 	for i := range posts {
 		s.resolvePostKeys(ctx, &posts[i])
-		postResponses = append(postResponses, *ToPostResponse(&posts[i], userID))
+		postResponses = append(postResponses, *ToPostResponse(&posts[i], posts[i].ID))
 	}
 	return &utils.ResponseBody[GetAllPostsResponse]{
 		Body: &GetAllPostsResponse{
