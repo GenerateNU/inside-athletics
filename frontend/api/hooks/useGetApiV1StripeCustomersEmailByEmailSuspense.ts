@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
 import type {
   GetApiV1StripeCustomersEmailByEmailQueryResponse,
   GetApiV1StripeCustomersEmailByEmailPathParams,
@@ -47,8 +46,10 @@ export function getApiV1StripeCustomersEmailByEmailSuspenseQueryOptions(
     enabled: !!email,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal;
-      return getApiV1StripeCustomersEmailByEmail(email, config);
+      return getApiV1StripeCustomersEmailByEmail(email, {
+        ...config,
+        signal: config.signal ?? signal,
+      });
     },
   });
 }
@@ -76,16 +77,16 @@ export function useGetApiV1StripeCustomersEmailByEmailSuspense<
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
-  const { client: queryClient, ...queryOptions } = queryConfig;
+  const { client: queryClient, ...resolvedOptions } = queryConfig;
   const queryKey =
-    queryOptions?.queryKey ??
+    resolvedOptions?.queryKey ??
     getApiV1StripeCustomersEmailByEmailSuspenseQueryKey(email);
 
   const query = useSuspenseQuery(
     {
       ...getApiV1StripeCustomersEmailByEmailSuspenseQueryOptions(email, config),
+      ...resolvedOptions,
       queryKey,
-      ...queryOptions,
     } as unknown as UseSuspenseQueryOptions,
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & {
