@@ -15,8 +15,8 @@ export function SearchBar({
   className,
 }: SearchBarProps) {
   return (
-    <div className="border-n">
-      <Search className="pointer-events-none absolute left-9 top-1/2 size-5 -translate-y-1/2 text-zinc-400" />
+    <div className="flex flex-row justify-between items-center w-full">
+      <Search className="flex-none pointer-events-none absolute size-5 text-zinc-400" />
       <Input
         type="search"
         value={value}
