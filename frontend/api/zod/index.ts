@@ -370,6 +370,11 @@ export {
   getApiV1RoleByIdQueryResponseSchema,
 } from "./getApiV1RoleByIdSchema.ts";
 export {
+  getApiV1RoleRoles200Schema,
+  getApiV1RoleRolesErrorSchema,
+  getApiV1RoleRolesQueryResponseSchema,
+} from "./getApiV1RoleRolesSchema.ts";
+export {
   getApiV1Roles200Schema,
   getApiV1RolesErrorSchema,
   getApiV1RolesQueryParamsSchema,

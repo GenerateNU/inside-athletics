@@ -427,6 +427,12 @@ export type {
   GetApiV1RoleByIdQueryResponse,
 } from "./GetApiV1RoleById.ts";
 export type {
+  GetApiV1RoleRoles200,
+  GetApiV1RoleRolesError,
+  GetApiV1RoleRolesQuery,
+  GetApiV1RoleRolesQueryResponse,
+} from "./GetApiV1RoleRoles.ts";
+export type {
   GetApiV1Roles200,
   GetApiV1RolesError,
   GetApiV1RolesQuery,

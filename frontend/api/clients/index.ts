@@ -49,6 +49,7 @@ export { getApiV1PostsPremiumBySportBySportId } from "./getApiV1PostsPremiumBySp
 export { getApiV1PostsPremiumByTagByTagId } from "./getApiV1PostsPremiumByTagByTagId.ts";
 export { getApiV1PostsSearch } from "./getApiV1PostsSearch.ts";
 export { getApiV1RoleById } from "./getApiV1RoleById.ts";
+export { getApiV1RoleRoles } from "./getApiV1RoleRoles.ts";
 export { getApiV1Roles } from "./getApiV1Roles.ts";
 export { getApiV1SportById } from "./getApiV1SportById.ts";
 export { getApiV1SportByNameByName } from "./getApiV1SportByNameByName.ts";
