@@ -5,11 +5,21 @@ import (
 	"fmt"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+
+	"gorm.io/gorm"
 )
 
 // Contains business logic for colleges
 type CollegeService struct {
 	collegeDB *CollegeDB
+}
+
+func NewCollegeService(db *gorm.DB) *CollegeService {
+	return &CollegeService{
+		collegeDB: &CollegeDB{
+			db: db,
+		},
+	}
 }
 
 // Convert empty string to nil pointer

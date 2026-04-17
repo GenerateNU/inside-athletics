@@ -17,15 +17,11 @@ func NewAthleteDB(db *gorm.DB) *AthleteDB {
 	}
 }
 
-func (a *AthleteDB) AthleteExists(name string, collegeID *uuid.UUID, sportID *uuid.UUID) (bool, error) {
+func (a *AthleteDB) GetAthlete(name string, collegeID *uuid.UUID, sportID *uuid.UUID) (*models.Athlete, bool, error) {
 	var athlete models.Athlete
 	result := a.db.Where("name = ? AND sport_id = ? AND college_id = ?", name, sportID, collegeID).Limit(1).Find(&athlete)
 	if err := result.Error; err != nil {
-		return false, err
+		return nil, false, err
 	}
-	return result.RowsAffected > 0, nil
-}
-
-func (a *AthleteDB) ManualVerificationData() {
-
+	return &athlete, result.RowsAffected > 0, nil
 }
