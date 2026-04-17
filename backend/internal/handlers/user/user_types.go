@@ -19,7 +19,6 @@ type GetUserResponse struct {
 	Username              string                       `json:"username" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                      `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
 	ProfilePicture        *string                      `json:"profile_picture,omitempty" doc:"Presigned download URL for the user's profile picture"`
-	AccountType           bool                         `json:"account_type" example:"true" doc:"If the user has access to premium features"`
 	Sport                 *models.Sport                `json:"sport,omitempty" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear      uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
@@ -43,7 +42,6 @@ type CreateUserBody struct {
 	Email                 string                       `json:"email" example:"suli123@email.com" doc:"The email of a user"`
 	Username              string                       `json:"username" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                      `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
-	AccountType           bool                         `json:"account_type" example:"true" doc:"If the user has access to premium features"`
 	SportID               *uuid.UUID                   `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in"`
 	ExpectedGradYear      uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus models.VerifiedAthleteStatus `json:"verified_athlete_status" example:"pending" doc:"Verification status for the athlete"`
@@ -67,7 +65,6 @@ type UpdateUserBody struct {
 	Email                 *string                       `json:"email,omitempty" example:"suli123@email.com" doc:"The email of a user"`
 	Username              *string                       `json:"username,omitempty" example:"suliproathlete" doc:"The username of a user"`
 	Bio                   *string                       `json:"bio,omitempty" example:"My name is Suli and I'm a pro athlete" doc:"The bio of a user"`
-	AccountType           *bool                         `json:"account_type,omitempty" example:"true" doc:"If the user has access to premium features"`
 	SportID               *uuid.UUID                    `json:"sport,omitempty" example:"[\"hockey\",\"soccer\"]" doc:"The sport(s) the user is interested in" gorm:"type:jsonb;serializer:json"`
 	ExpectedGradYear      *uint                         `json:"expected_grad_year,omitempty" example:"2027" doc:"The user's grad year"`
 	VerifiedAthleteStatus *models.VerifiedAthleteStatus `json:"verified_athlete_status,omitempty" example:"pending" doc:"Verification status for the athlete"`

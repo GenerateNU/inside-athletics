@@ -21,7 +21,6 @@ func seedUserAndTag(t *testing.T, testDB *TestDatabase, unique string) (models.U
 		LastName:                "User",
 		Email:                   "test-" + unique + "@example.com",
 		Username:                "testuser-" + unique,
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 

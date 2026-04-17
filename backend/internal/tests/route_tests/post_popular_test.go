@@ -23,7 +23,6 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 		LastName:                "User",
 		Email:                   "current@example.com",
 		Username:                "current-user",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&currentUser).Error; err != nil {
@@ -119,7 +118,6 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 			LastName:                "User",
 			Email:                   fmt.Sprintf("commenter-%d@example.com", i),
 			Username:                fmt.Sprintf("commenter-%d", i),
-			Account_Type:            false,
 			Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 		}
 		if err := testDB.DB.Create(&user).Error; err != nil {
@@ -146,7 +144,6 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 			LastName:                "User",
 			Email:                   fmt.Sprintf("liker-%d@example.com", i),
 			Username:                fmt.Sprintf("liker-%d", i),
-			Account_Type:            false,
 			Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 		}
 		if err := testDB.DB.Create(&user).Error; err != nil {
@@ -170,7 +167,6 @@ func TestGetPopularPostsOrdersByEngagementRecencyAndRelevance(t *testing.T) {
 		LastName:                "Liker",
 		Email:                   "old-liker@example.com",
 		Username:                "old-liker",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&oldLiker).Error; err != nil {

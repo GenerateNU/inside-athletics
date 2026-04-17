@@ -149,7 +149,6 @@ func ToPostResponse(post *models.Post, id uuid.UUID) *PostResponse {
 			Username:              post.Author.Username,
 			Bio:                   post.Author.Bio,
 			ProfilePicture:        profilePicture,
-			AccountType:           post.Author.Account_Type,
 			ExpectedGradYear:      post.Author.Expected_Grad_Year,
 			VerifiedAthleteStatus: post.Author.Verified_Athlete_Status,
 			Division:              post.Author.Division,

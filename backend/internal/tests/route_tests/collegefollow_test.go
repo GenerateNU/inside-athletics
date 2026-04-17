@@ -20,7 +20,6 @@ func seedUserAndCollege(t *testing.T, testDB *TestDatabase, unique string) (mode
 		LastName:                "User",
 		Email:                   "test-" + unique + "@example.com",
 		Username:                "testuser-" + unique,
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 

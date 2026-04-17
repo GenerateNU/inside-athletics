@@ -18,7 +18,6 @@ func CreateUserAndSportAndTag(testDB *TestDatabase, t *testing.T) models.Post {
 		LastName:                "User",
 		Email:                   "test-john@example.com",
 		Username:                "testuser-john",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {

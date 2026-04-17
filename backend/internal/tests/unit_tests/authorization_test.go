@@ -28,7 +28,6 @@ func TestIsOwnerOfPostOrComment(t *testing.T) {
 		LastName:                "User",
 		Email:                   "owner@example.com",
 		Username:                "owner",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {
@@ -42,7 +41,6 @@ func TestIsOwnerOfPostOrComment(t *testing.T) {
 		LastName:                "User",
 		Email:                   "other@example.com",
 		Username:                "other",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&otherUser).Error; err != nil {

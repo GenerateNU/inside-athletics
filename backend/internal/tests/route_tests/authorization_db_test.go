@@ -21,7 +21,6 @@ func TestAuthorizationDBUserExists(t *testing.T) {
 		LastName:                "User",
 		Email:                   "test@example.com",
 		Username:                "testuser",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {
@@ -50,7 +49,6 @@ func TestAuthorizationDBUserHasPermission(t *testing.T) {
 		LastName:                "User",
 		Email:                   "perm@example.com",
 		Username:                "permuser",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {

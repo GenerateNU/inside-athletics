@@ -23,13 +23,13 @@ func CreateUserAndSport(testDB *TestDatabase, t *testing.T) {
 		LastName:                "User",
 		Email:                   "test-john@example.com",
 		Username:                "testuser-john",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 
 	if err := testDB.DB.Create(&user).Error; err != nil {
 		t.Fatalf("failed to create user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, JohnID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	popularity := int32(100)
 	soccer := models.Sport{
@@ -770,12 +770,12 @@ func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 		LastName:                "User",
 		Email:                   "free@example.com",
 		Username:                "freeuser",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&freeUser).Error; err != nil {
 		t.Fatalf("failed to create free user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, freeUserID, getRoleID(t, testDB.DB, models.RoleUser))
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
 	}, freeUserID)
@@ -825,12 +825,12 @@ func TestFreeUserConcurrentDistinctPostViewsEnforceLimit(t *testing.T) {
 		LastName:                "User",
 		Email:                   "free-concurrent@example.com",
 		Username:                "freeuser-concurrent",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&freeUser).Error; err != nil {
 		t.Fatalf("failed to create free user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, freeUserID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	postIDs := make([]uuid.UUID, 0, post.FreeUserMaxPostViews+1)
 	for i := 0; i < post.FreeUserMaxPostViews+1; i++ {
@@ -903,9 +903,10 @@ func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
-	if err := testDB.DB.Model(&models.User{}).Where("id = ?", JohnID).Update("Account_Type", true).Error; err != nil {
-		t.Fatalf("failed to set premium: %v", err)
+	if err := testDB.DB.Where("user_id = ? AND role_id = ?", JohnID, getRoleID(t, testDB.DB, models.RoleUser)).Delete(&models.UserRole{}).Error; err != nil {
+		t.Fatalf("failed to remove user role: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, JohnID, getRoleID(t, testDB.DB, models.RolePremiumUser))
 
 	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},

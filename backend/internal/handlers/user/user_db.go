@@ -147,6 +147,18 @@ func (u *UserDB) UpdateUser(id uuid.UUID, updates UpdateUserBody) (*models.User,
 	return &updatedUser, nil
 }
 
+func (u *UserDB) HasRole(userID uuid.UUID, roleName models.RoleName) (bool, error) {
+	var count int64
+	err := u.db.Table("user_roles").
+		Joins("JOIN roles ON roles.id = user_roles.role_id").
+		Where("user_roles.user_id = ? AND roles.name = ?", userID, roleName).
+		Count(&count).Error
+	if err != nil {
+		return false, huma.Error500InternalServerError("Failed to check user role", err)
+	}
+	return count > 0, nil
+}
+
 func (u *UserDB) DeleteUser(id uuid.UUID) error {
 	dbResponse := u.db.Delete(&models.User{}, "id = ?", id)
 	if dbResponse.Error != nil {
