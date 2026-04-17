@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
 import { SearchBar } from "@/components/post/SearchBar";
@@ -20,7 +21,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 
 
-export default function ExplorePage() {
+function HomePageContent() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
+
   const session = useSession();
   const enabled = !!session?.access_token;
 
@@ -28,8 +32,8 @@ export default function ExplorePage() {
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
 
@@ -158,5 +162,13 @@ export default function ExplorePage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense>
+      <HomePageContent />
+    </Suspense>
   );
 }

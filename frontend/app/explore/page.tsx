@@ -2,7 +2,8 @@
 
 // Currently the popular tags are just replaced with user tag follows!
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
 import { SearchBar } from "@/components/post/SearchBar";
@@ -33,8 +34,17 @@ export default function ExplorePage() {
         ? { Authorization: `Bearer ${session.access_token}` }
         : undefined;
 
+    const router = useRouter();
     const [query, setQuery] = useState("");
     const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+
+    useEffect(() => {
+        if (!query.trim()) return;
+        const t = setTimeout(() => {
+            router.push(`/?q=${encodeURIComponent(query.trim())}`);
+        }, 300);
+        return () => clearTimeout(t);
+    }, [query, router]);
     const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
     const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
 
