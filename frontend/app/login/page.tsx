@@ -22,46 +22,56 @@ export default function LoginPage() {
   const status = useFormStatus();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone">
-      <div className="max-w-lg w-full space-y-8">
-        <div className="flex justify-center">
-          <label className="block text-4xl text-black font-bold">Log In</label>
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
+      <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
+        <div className="space-y-2 text-center">
+          <h1 className="text-4xl font-bold text-[#001F3E]">Log In</h1>
+          <p className="text-sm text-gray-600">
+            Enter your email and we&apos;ll send you an 8-digit login code.
+          </p>
         </div>
-        <form className="mt-8 space-y-6 bg-white p-8">
-          <div className="w-full flex flex-col items-center space-y-4">
-            <p className="text-center text-sm text-gray-600">
-              Enter your email and we&apos;ll send you an 8-digit login code.
-            </p>
+
+        <form className="space-y-6">
+          <div className="flex w-full flex-col space-y-4">
             <Input
               id="email"
               name="email"
               type="email"
               placeholder="Email"
+              className="border-[#3E7DBB] bg-[#F0F4F8]"
               required
             />
-            {!state?.success && (
-              <p className="text-red-500 text-sm"> {state.message}</p>
-            )}
+            {!state?.success && state.message ? (
+              <p className="text-sm text-red-600" role="alert">
+                {state.message}
+              </p>
+            ) : null}
           </div>
 
-          <div className="w-full flex flex-col gap-2 items-center">
+          <div className="flex w-full flex-col gap-2">
             <Button
               formAction={loginAction}
-              variant="secondary"
-              disabled={status.pending}
               type="submit"
+              disabled={status.pending}
+              className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
             >
-              SEND CODE
+              {status.pending ? "Sending..." : "Send Code"}
             </Button>
             <Button
               type="button"
-              variant="default"
+              variant="outline"
               onClick={() => router.push("/signup")}
               disabled={status.pending}
+              className="h-10 w-full rounded-xl border-[#2C649A] text-sm font-semibold text-[#2C649A]"
             >
               Sign Up
             </Button>
-            <p> Forgot Password?</p>
+            <button
+              type="button"
+              className="text-sm text-[#2C649A] underline-offset-2 hover:underline"
+            >
+              Forgot Password?
+            </button>
           </div>
         </form>
       </div>
