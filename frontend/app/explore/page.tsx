@@ -37,6 +37,8 @@ export default function ExplorePage() {
     const router = useRouter();
     const [query, setQuery] = useState("");
     const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+    const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
+    const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
 
     useEffect(() => {
         if (!query.trim()) return;
@@ -45,9 +47,7 @@ export default function ExplorePage() {
         }, 300);
         return () => clearTimeout(t);
     }, [query, router]);
-    const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
-    const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
-
+    
     function toggleTag(tag: GetTagResponse) {
         setActiveTags((prev) =>
             prev.some((t) => t.id === tag.id)
