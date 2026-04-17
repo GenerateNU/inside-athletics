@@ -9,8 +9,10 @@ import PremiumSmallPost from "@/components/post/PremiumSmallPost";
 import { Navbar } from "@/components/ui/navbar";
 import { useSession, usePermissions } from "@/utils/SessionContext";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, ChevronDown } from "lucide-react";
 import CreatePremiumPostPopup from "@/components/ui/create-premium-post-popup";
+import PremiumPaymentPopup from "@/components/ui/premium-payment-popup";
 import { SearchBar } from "@/components/post/SearchBar";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
 import SearchPopup from "@/components/ui/search-popup";
@@ -18,9 +20,10 @@ import { Button } from "@/components/ui/button";
 import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
 
 export default function InsiderContentPage() {
+    const router = useRouter();
     const session = useSession();
-    const { isAdmin } = usePermissions();
-    const enabled = !!session?.access_token;
+    const { isAdmin, hasPremium } = usePermissions();
+    const enabled = !!session?.access_token && hasPremium;
     const authHeaders = session?.access_token
         ? { Authorization: `Bearer ${session.access_token}` }
         : undefined;
@@ -169,6 +172,10 @@ export default function InsiderContentPage() {
                         }}
                     />
                 </div>
+            )}
+
+            {!hasPremium && session && (
+                <PremiumPaymentPopup onClose={() => router.push("/")} />
             )}
         </div>
     );

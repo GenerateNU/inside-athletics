@@ -1324,11 +1324,6 @@ components:
           format: uri
           readOnly: true
           type: string
-        account_type:
-          description: If the user has access to premium features
-          examples:
-            - true
-          type: boolean
         bio:
           description: The bio of a user
           examples:
@@ -1386,7 +1381,6 @@ components:
         - last_name
         - email
         - username
-        - account_type
         - verified_athlete_status
       type: object
     CreateUserResponse:
@@ -2860,11 +2854,6 @@ components:
           format: uri
           readOnly: true
           type: string
-        account_type:
-          description: If the user has access to premium features
-          examples:
-            - true
-          type: boolean
         bio:
           description: The bio of a user
           examples:
@@ -2934,7 +2923,6 @@ components:
         - last_name
         - email
         - username
-        - account_type
         - verified_athlete_status
       type: object
     HealthResponse:
@@ -4196,11 +4184,6 @@ components:
           format: uri
           readOnly: true
           type: string
-        account_type:
-          description: If the user has access to premium features
-          examples:
-            - true
-          type: boolean
         bio:
           description: The bio of a user
           examples:
@@ -4257,11 +4240,6 @@ components:
     User:
       additionalProperties: false
       properties:
-        account_type:
-          description: If the user has access to premium features
-          examples:
-            - true
-          type: boolean
         bio:
           description: The name of a user
           examples:
@@ -4344,7 +4322,6 @@ components:
         - username
         - bio
         - profile_picture
-        - account_type
         - sport
         - expected_grad_year
         - verified_athelete_status

@@ -9,9 +9,6 @@ export const createUserBodySchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  account_type: z
-    .boolean()
-    .describe("If the user has access to premium features"),
   bio: z.optional(z.string().describe("The bio of a user")),
   college: z.optional(z.string().describe("The college of a user")),
   division: z.optional(

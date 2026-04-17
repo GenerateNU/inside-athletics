@@ -5,11 +5,6 @@
 
 export type User = {
   /**
-   * @description If the user has access to premium features
-   * @type boolean
-   */
-  account_type: boolean;
-  /**
    * @description The name of a user
    * @type string,null
    */

@@ -38,7 +38,7 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
 
-  const { data: collegesData } = useGetApiV1Colleges({
+  const { data: collegesData } = useGetApiV1Colleges(undefined, {
     query: { enabled },
     client: { headers: authHeaders },
   });

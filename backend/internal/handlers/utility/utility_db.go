@@ -17,9 +17,10 @@ func NewUtilityDB(db *gorm.DB) *UtilityDB {
 
 func (u *UtilityDB) UserHasPremium(userID uuid.UUID) (bool, error) {
 	var count int64
+	privilegedRoles := []models.RoleName{models.RolePremiumUser, models.RoleAdmin, models.RoleModerator}
 	err := u.db.Table("user_roles").
 		Joins("JOIN roles ON roles.id = user_roles.role_id").
-		Where("user_roles.user_id = ? AND roles.name = ?", userID, models.RolePremiumUser).
+		Where("user_roles.user_id = ? AND roles.name IN ?", userID, privilegedRoles).
 		Count(&count).Error
 	return count > 0, err
 }
