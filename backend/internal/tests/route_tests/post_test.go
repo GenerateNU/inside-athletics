@@ -1221,6 +1221,46 @@ func TestFilterPosts(t *testing.T) {
 	}
 }
 
+func TestModelsReturnedInFilter(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	_, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted north", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/filter", authHeader)
+	if resp.Code != 200 {
+		t.Fatalf("Expected response code 200 got %d", resp.Code)
+	}
+
+	var posts post.GetAllPostsResponse
+
+	DecodeTo(&posts, resp)
+
+	if posts.Total == 0 {
+		t.Fatalf("Expected one test, got %d", posts.Total)
+	}
+
+	if posts.Posts[0].Sport == nil {
+		t.Fatalf("SHIT IS BROKEN")
+	}
+}
+
 func uuidDereference(v *uuid.UUID) uuid.UUID {
 	return *v
 }

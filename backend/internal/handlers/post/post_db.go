@@ -523,15 +523,29 @@ func (p *PostDB) FilterPosts(userId uuid.UUID, colleges []uuid.UUID, sports []uu
 	whereQuery := strings.Join(filters, " OR ")
 
 	// get the count
-	p.db.Model(&models.Post{}).Where(whereQuery).
-		Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'").
+	countResult := p.db.Model(&models.Post{}).Where(whereQuery)
+
+	if len(tags) > 0 {
+		countResult = countResult.Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'")
+	}
+
+	countResult = countResult.
 		Group("posts.id").
 		Count(&total)
 
-	if err := p.db.
+	if countResult.Error != nil {
+		return nil, 0, countResult.Error
+	}
+
+	results := p.db.
 		Table("posts").
-		Select(POST_SELECT_QUERY, userId).
-		Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'").
+		Select(POST_SELECT_QUERY, userId)
+
+	if len(tags) > 0 {
+		results = results.Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'")
+	}
+
+	if err := results.
 		Where(whereQuery).
 		Group("posts.id").
 		Preload("Author", "id IS NOT NULL").
