@@ -18,14 +18,22 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
 
     const pfpURL = post.author?.profile_picture
 
+    const tags = post.tags
+    const tagsEnable = tags != null
+    const sportEnable = post.sport != null 
+    const collegeEnable = post.college != null
+
     return (
         <Link href={`/posts/${post.id}`} className="block w-full">
             <div className={cn("bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm hover:shadow-md transition-shadow cursor-pointer", className)} {...props}>
                 <h2 className="font-bold text-gray-900 text-base mb-3 text-left">{post.title}</h2>
 
                 <div className="flex gap-2 mb-3">
-                    <Tag label={post.sport.name} />
-                    <Tag label={post.college.name} />
+                    {sportEnable && <Tag label={post.sport.name} />}
+                    {collegeEnable && <Tag label={post.college.name} />}
+                    {tagsEnable && tags?.map((tag) => (
+                        <Tag key={tag.id} label={tag.name} />
+                    ))}
                 </div>
 
                 <p className="text-gray-700 text-sm leading-relaxed mb-4 text-left">{post.content}</p>
