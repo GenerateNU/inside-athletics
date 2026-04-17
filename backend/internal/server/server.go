@@ -77,23 +77,15 @@ func CreateApp(db *gorm.DB) *App {
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	// Create all the routing groups:
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-	var s3Service *s3.Service
-	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
-		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
-			s3Service = s3.NewService(client, s3Cfg)
-		}
-	}
-
-	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route}
+	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, user.Route, post.Route, sport.Route, role.Route, permission.Route, college.Route, collegefollow.Route, tag.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}
-
-	user.Route(api, db, s3Service)
-
 	// S3 content routes when backend/.env has S3_BUCKET and AWS_REGION.
-	if s3Service != nil {
-		content.Route(api, db, s3Service)
+	if s3Cfg, ok := s3.LoadConfigFromEnv(); ok {
+		if client, err := s3.NewClient(context.Background(), s3Cfg); err == nil {
+			content.Route(api, db, s3.NewService(client, s3Cfg))
+		}
 	}
 }
 
