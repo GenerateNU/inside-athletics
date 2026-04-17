@@ -170,7 +170,7 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
   }
 
   return (
-    <div className="flex w-[60vw] bg-white rounded-2xl justify-center items-center py-10 px-10 max-h-[80vh] overflow-scroll">
+    <div className="flex w-[60vw] bg-white rounded-2xl justify-center items-center py-10 px-10 overflow-scroll">
       <div className="w-full flex flex-col justify-between space-y-3 overflow-y-auto max-h-[90vh]">
         <div className="flex justify-between">
           <label className="block text-3xl text-[#001225] font-bold">
