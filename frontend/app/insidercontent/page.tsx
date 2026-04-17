@@ -28,10 +28,10 @@ export default function InsiderContentPage() {
     const posts = data?.posts ?? [];
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60 w-full">
-            <div className="flex min-h-screen">
+        <div className="h-screen bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60 w-full">
+            <div className="flex h-screen">
                 <Navbar className="h-screen shrink-0" />
-                <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
+                <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-y-auto">
                     <div className="w-full">
                         <div className="flex items-center justify-between mb-6">
                             <h1 className="text-4xl font-bold text-gray-900">Insider Content</h1>
