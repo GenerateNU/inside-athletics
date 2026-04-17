@@ -125,23 +125,13 @@ export function Navbar({ className, ...props }: NavbarProps) {
     ...sportResults.flatMap((r) => {
       const sport = r.data;
       return sport
-        ? [
-            {
-              label: sport.name,
-              type: "sport" as const,
-            },
-          ]
+        ? [{ label: sport.name, type: "sport" as const, id: undefined }]
         : [];
     }),
     ...tagResults.flatMap((r) => {
       const tag = r.data;
       return tag
-        ? [
-            {
-              label: tag.name,
-              type: "tag" as const,
-            },
-          ]
+        ? [{ label: tag.name, type: "tag" as const, id: undefined }]
         : [];
     }),
     ...collegeResults.flatMap((r) => {
@@ -151,6 +141,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
             {
               label: college.name,
               type: "school" as const,
+              id: college.id,
             },
           ]
         : [];
@@ -299,7 +290,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
               No follows yet
             </span>
           )}
-          {followingItems.map(({ label, type }) => (
+          {followingItems.map(({ label, type, id }) => (
             <button
               key={`${type}-${label}`}
               type="button"
@@ -311,6 +302,7 @@ export function Navbar({ className, ...props }: NavbarProps) {
               )}
               aria-label={label}
               title={label}
+              onClick={type === "school" && id ? () => router.push(`/college/${id}`) : undefined}
             >
               {type === "school" ? (
                 <BookOpen className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0 text-zinc-700" />
