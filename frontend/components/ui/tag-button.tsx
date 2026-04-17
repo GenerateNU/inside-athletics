@@ -1,5 +1,5 @@
 import { Button } from "./button";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Trash2 } from "lucide-react";
 
 export type Tag = {
   id: string;
@@ -10,10 +10,12 @@ export type Tag = {
 export function TagButton({
   tag,
   active,
+  showAdminView,
   onClick,
 }: {
   tag: Tag;
   active: boolean;
+  showAdminView: boolean;
   onClick: () => void;
 }) {
   return (
@@ -23,7 +25,7 @@ export function TagButton({
         onClick={onClick}
         className={`rounded-lg border border-[#7F8C2D] flex items-center gap-2 w-full h-full px-1 py-1 font-light ${active ? "bg-[#D4E94B80]" : "bg-[#FCFDF1]"}`}
       >
-        {active ? <X size={16} /> : <Plus size={16} />}
+        {showAdminView ? <Trash2 size={16} /> : active ? <X size={16} /> : <Plus size={16} />}
         {tag.name}
       </Button>
     </div>
