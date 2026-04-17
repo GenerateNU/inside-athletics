@@ -26,9 +26,20 @@ import { useSession } from "@/utils/SessionContext";
 export function ProfilePageClient() {
   const session = useSession();
   const enabled = !!session?.access_token;
-  const authHeaders = session?.access_token
-    ? { Authorization: `Bearer ${session.access_token}` }
-    : undefined;
+
+  // FIX 1: Memoize authHeaders so they don't trigger infinite loops in useEffect
+  const authHeaders = React.useMemo(() => {
+    return session?.access_token
+      ? { Authorization: `Bearer ${session.access_token}` }
+      : undefined;
+  }, [session?.access_token]);
+
+  // Shared configuration to keep the page stable
+  const commonQueryConfig = {
+    enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes: data won't be "stale" immediately
+    refetchOnWindowFocus: false, // Prevents refreshing when you click back onto the tab
+  };
 
   const [activeView, setActiveView] = React.useState<FeedView>("posts");
   const [showEditModal, setShowEditModal] = React.useState(false);
@@ -38,12 +49,13 @@ export function ProfilePageClient() {
   >([]);
 
   const userQuery = useGetApiV1UserCurrent({
-    query: { enabled },
+    query: commonQueryConfig,
     client: { headers: authHeaders },
   });
 
   const user = userQuery.data;
   const userId = user?.id;
+
   const patchUserMutation = usePatchApiV1User({
     client: { headers: authHeaders },
   });
@@ -58,21 +70,28 @@ export function ProfilePageClient() {
     }
   }, []);
 
+  // This effect no longer loops because authHeaders is now memoized
   React.useEffect(() => {
     if (!enabled || !authHeaders) return;
     const controller = new AbortController();
 
     const loadTags = async () => {
-      const response = await fetch("/api/v1/tag?limit=200&offset=0", {
-        method: "GET",
-        headers: authHeaders,
-        signal: controller.signal,
-      });
-      if (!response.ok) return;
-      const data = (await response.json()) as {
-        tags?: Array<{ id: string; name: string }>;
-      };
-      setAvailableTags(data.tags ?? []);
+      try {
+        const response = await fetch("/api/v1/tag?limit=200&offset=0", {
+          method: "GET",
+          headers: authHeaders,
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          tags?: Array<{ id: string; name: string }>;
+        };
+        setAvailableTags(data.tags ?? []);
+      } catch (err) {
+        if (err instanceof Error && err.name !== "AbortError") {
+          console.error("Failed to load tags:", err);
+        }
+      }
     };
 
     void loadTags();
@@ -83,13 +102,13 @@ export function ProfilePageClient() {
     userId ?? "",
     { limit: 20, offset: 0 },
     {
-      query: { enabled: enabled && !!userId },
+      query: { ...commonQueryConfig, enabled: enabled && !!userId },
       client: { headers: authHeaders },
     },
   );
 
   const tagFollowsQuery = useGetApiV1UserTagFollows({
-    query: { enabled },
+    query: commonQueryConfig,
     client: { headers: authHeaders },
   });
 
@@ -98,12 +117,11 @@ export function ProfilePageClient() {
   const tagResults = useQueries({
     queries: tagIds.slice(0, 8).map((id: string) => ({
       ...getApiV1TagByIdQueryOptions(id, { headers: authHeaders }),
-      enabled,
+      ...commonQueryConfig,
     })),
   });
 
   const posts = postsQuery.data?.posts ?? [];
-
   const commentPostIds = posts.slice(0, 6).map((p) => p.id);
 
   const commentResults = useQueries({
@@ -111,6 +129,7 @@ export function ProfilePageClient() {
       ...listApiV1PostByPostIdCommentsQueryOptions(postId, {
         headers: authHeaders,
       }),
+      ...commonQueryConfig,
       enabled: enabled && !!postId,
     })),
   });
@@ -186,6 +205,7 @@ export function ProfilePageClient() {
     );
   }
 
+  // Data preparation logic
   const likedPosts = posts.filter((post) => Boolean(post.is_liked));
 
   const comments = commentResults

@@ -9,6 +9,7 @@ import {
   Home,
   Plus,
   Search,
+  User
 } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
@@ -32,6 +33,7 @@ const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Explore", icon: Search, href: "/explore" },
   { label: "Post", icon: Plus, href: "/post" },
+  { label: "Profile", icon: User, href: "/profile"}
 ];
 
 function unwrapBody<T>(value: unknown): T | undefined {
