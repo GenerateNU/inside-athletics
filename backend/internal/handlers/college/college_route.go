@@ -20,6 +20,7 @@ func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
 	var collegeService = &CollegeService{collegeDB, s3Svc} // create object with college functionality
 	{
 		grp := huma.NewGroup(api, "/api/v1/college")
+		huma.Get(grp, "/", collegeService.ListColleges)
 		huma.Get(grp, "/{id}", collegeService.GetCollege)
 		huma.Post(grp, "", collegeService.CreateCollege)
 		huma.Put(grp, "/{id}", collegeService.UpdateCollege)
@@ -27,7 +28,7 @@ func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
 	}
 	{
 		grp := huma.NewGroup(api, "/api/v1/colleges")
-		huma.Get(grp, "/", collegeService.GetAllColleges) // Read colleges
+		huma.Get(grp, "/", collegeService.ListColleges) // Read colleges
 		huma.Get(grp, "/search", collegeService.FuzzySearchForCollege)
 	}
 

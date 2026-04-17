@@ -35,7 +35,6 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	authHeader := c.Get("Authorization")
-	log.Print(authHeader)
 	if authHeader == "" {
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Authorization header not in request",
@@ -43,7 +42,6 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	headerComponents := strings.Split(authHeader, " ")
-	log.Print(headerComponents)
 	if len(headerComponents) != 2 || headerComponents[0] != "Bearer" {
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Bearer not included in Authorization header",
@@ -75,7 +73,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	c.Locals("user_id", userID)
-    ctx := context.WithValue(c.UserContext(), contextKey("user_id"), userID)
+	ctx := context.WithValue(c.UserContext(), contextKey("user_id"), userID)
 	c.SetUserContext(ctx)
 	return c.Next()
 }

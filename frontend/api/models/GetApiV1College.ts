@@ -6,7 +6,7 @@
 import type { ErrorModel } from "./ErrorModel.ts";
 import type { ListCollegesResponse } from "./ListCollegesResponse.ts";
 
-export type GetApiV1CollegesQueryParams = {
+export type GetApiV1CollegeQueryParams = {
   /**
    * @description Maximum number of colleges to return
    * @default 200
@@ -24,17 +24,17 @@ export type GetApiV1CollegesQueryParams = {
 /**
  * @description OK
  */
-export type GetApiV1Colleges200 = ListCollegesResponse;
+export type GetApiV1College200 = ListCollegesResponse;
 
 /**
  * @description Error
  */
-export type GetApiV1CollegesError = ErrorModel;
+export type GetApiV1CollegeError = ErrorModel;
 
-export type GetApiV1CollegesQueryResponse = GetApiV1Colleges200;
+export type GetApiV1CollegeQueryResponse = GetApiV1College200;
 
-export type GetApiV1CollegesQuery = {
-  Response: GetApiV1Colleges200;
-  QueryParams: GetApiV1CollegesQueryParams;
+export type GetApiV1CollegeQuery = {
+  Response: GetApiV1College200;
+  QueryParams: GetApiV1CollegeQueryParams;
   Errors: any;
 };

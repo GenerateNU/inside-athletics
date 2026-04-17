@@ -4,9 +4,9 @@
  */
 
 import type {
-  GetApiV1CollegesQueryResponse,
-  GetApiV1CollegesQueryParams,
-} from "../models/GetApiV1Colleges.ts";
+  GetApiV1CollegeQueryResponse,
+  GetApiV1CollegeQueryParams,
+} from "../models/GetApiV1College.ts";
 import type {
   Client,
   RequestConfig,
@@ -18,31 +18,30 @@ import type {
   QueryObserverOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { getApiV1Colleges } from "../clients/getApiV1Colleges.ts";
+import { getApiV1College } from "../clients/getApiV1College.ts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-export const getApiV1CollegesQueryKey = (
-  params?: GetApiV1CollegesQueryParams,
-) => [{ url: "/api/v1/colleges/" }, ...(params ? [params] : [])] as const;
+export const getApiV1CollegeQueryKey = (params?: GetApiV1CollegeQueryParams) =>
+  [{ url: "/api/v1/college/" }, ...(params ? [params] : [])] as const;
 
-export type GetApiV1CollegesQueryKey = ReturnType<
-  typeof getApiV1CollegesQueryKey
+export type GetApiV1CollegeQueryKey = ReturnType<
+  typeof getApiV1CollegeQueryKey
 >;
 
-export function getApiV1CollegesQueryOptions(
-  params?: GetApiV1CollegesQueryParams,
+export function getApiV1CollegeQueryOptions(
+  params?: GetApiV1CollegeQueryParams,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = getApiV1CollegesQueryKey(params);
+  const queryKey = getApiV1CollegeQueryKey(params);
   return queryOptions<
-    GetApiV1CollegesQueryResponse,
+    GetApiV1CollegeQueryResponse,
     ResponseErrorConfig<Error>,
-    GetApiV1CollegesQueryResponse,
+    GetApiV1CollegeQueryResponse,
     typeof queryKey
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getApiV1Colleges(params, {
+      return getApiV1College(params, {
         ...config,
         signal: config.signal ?? signal,
       });
@@ -51,19 +50,19 @@ export function getApiV1CollegesQueryOptions(
 }
 
 /**
- * @summary Get API v1 colleges
- * {@link /api/v1/colleges/}
+ * @summary Get API v1 college
+ * {@link /api/v1/college/}
  */
-export function useGetApiV1Colleges<
-  TData = GetApiV1CollegesQueryResponse,
-  TQueryData = GetApiV1CollegesQueryResponse,
-  TQueryKey extends QueryKey = GetApiV1CollegesQueryKey,
+export function useGetApiV1College<
+  TData = GetApiV1CollegeQueryResponse,
+  TQueryData = GetApiV1CollegeQueryResponse,
+  TQueryKey extends QueryKey = GetApiV1CollegeQueryKey,
 >(
-  params?: GetApiV1CollegesQueryParams,
+  params?: GetApiV1CollegeQueryParams,
   options: {
     query?: Partial<
       QueryObserverOptions<
-        GetApiV1CollegesQueryResponse,
+        GetApiV1CollegeQueryResponse,
         ResponseErrorConfig<Error>,
         TData,
         TQueryData,
@@ -75,12 +74,11 @@ export function useGetApiV1Colleges<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {};
   const { client: queryClient, ...resolvedOptions } = queryConfig;
-  const queryKey =
-    resolvedOptions?.queryKey ?? getApiV1CollegesQueryKey(params);
+  const queryKey = resolvedOptions?.queryKey ?? getApiV1CollegeQueryKey(params);
 
   const query = useQuery(
     {
-      ...getApiV1CollegesQueryOptions(params, config),
+      ...getApiV1CollegeQueryOptions(params, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

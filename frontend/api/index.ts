@@ -22,8 +22,10 @@ export type { DeleteApiV1UserSportByIdMutationKey } from "./hooks/useDeleteApiV1
 export type { DeleteApiV1UserTagByIdMutationKey } from "./hooks/useDeleteApiV1UserTagById.ts";
 export type { GetApiV1CheckoutSessionsByIdQueryKey } from "./hooks/useGetApiV1CheckoutSessionsById.ts";
 export type { GetApiV1CheckoutSessionsByIdSuspenseQueryKey } from "./hooks/useGetApiV1CheckoutSessionsByIdSuspense.ts";
+export type { GetApiV1CollegeQueryKey } from "./hooks/useGetApiV1College.ts";
 export type { GetApiV1CollegeByIdQueryKey } from "./hooks/useGetApiV1CollegeById.ts";
 export type { GetApiV1CollegeByIdSuspenseQueryKey } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
+export type { GetApiV1CollegeSuspenseQueryKey } from "./hooks/useGetApiV1CollegeSuspense.ts";
 export type { GetApiV1CollegesQueryKey } from "./hooks/useGetApiV1Colleges.ts";
 export type { GetApiV1CollegesSearchQueryKey } from "./hooks/useGetApiV1CollegesSearch.ts";
 export type { GetApiV1CollegesSearchSuspenseQueryKey } from "./hooks/useGetApiV1CollegesSearchSuspense.ts";
@@ -390,7 +392,6 @@ export type { DeleteUserResponse } from "./models/DeleteUserResponse.ts";
 export type { DeletedAt } from "./models/DeletedAt.ts";
 export type { ErrorDetail } from "./models/ErrorDetail.ts";
 export type { ErrorModel } from "./models/ErrorModel.ts";
-export type { GetAllCollegesResponse } from "./models/GetAllCollegesResponse.ts";
 export type { GetAllPermissionsResponse } from "./models/GetAllPermissionsResponse.ts";
 export type { GetAllPostsResponse } from "./models/GetAllPostsResponse.ts";
 export type { GetAllPremiumPostsResponse } from "./models/GetAllPremiumPostsResponse.ts";
@@ -404,6 +405,13 @@ export type {
   GetApiV1CheckoutSessionsByIdQueryResponse,
 } from "./models/GetApiV1CheckoutSessionsById.ts";
 export type {
+  GetApiV1College200,
+  GetApiV1CollegeError,
+  GetApiV1CollegeQuery,
+  GetApiV1CollegeQueryParams,
+  GetApiV1CollegeQueryResponse,
+} from "./models/GetApiV1College.ts";
+export type {
   GetApiV1CollegeById200,
   GetApiV1CollegeByIdError,
   GetApiV1CollegeByIdPathParams,
@@ -414,6 +422,7 @@ export type {
   GetApiV1Colleges200,
   GetApiV1CollegesError,
   GetApiV1CollegesQuery,
+  GetApiV1CollegesQueryParams,
   GetApiV1CollegesQueryResponse,
 } from "./models/GetApiV1Colleges.ts";
 export type {
@@ -836,6 +845,7 @@ export type {
   ListApiV1TagTypeByTypeQuery,
   ListApiV1TagTypeByTypeQueryResponse,
 } from "./models/ListApiV1TagTypeByType.ts";
+export type { ListCollegesResponse } from "./models/ListCollegesResponse.ts";
 export type { Media } from "./models/Media.ts";
 export type { MediaResponse } from "./models/MediaResponse.ts";
 export type {
@@ -1182,6 +1192,7 @@ export { deleteApiV1UserCollegeById } from "./clients/deleteApiV1UserCollegeById
 export { deleteApiV1UserSportById } from "./clients/deleteApiV1UserSportById.ts";
 export { deleteApiV1UserTagById } from "./clients/deleteApiV1UserTagById.ts";
 export { getApiV1CheckoutSessionsById } from "./clients/getApiV1CheckoutSessionsById.ts";
+export { getApiV1College } from "./clients/getApiV1College.ts";
 export { getApiV1CollegeById } from "./clients/getApiV1CollegeById.ts";
 export { getApiV1Colleges } from "./clients/getApiV1Colleges.ts";
 export { getApiV1CollegesSearch } from "./clients/getApiV1CollegesSearch.ts";
@@ -1349,12 +1360,18 @@ export { useGetApiV1CheckoutSessionsById } from "./hooks/useGetApiV1CheckoutSess
 export { getApiV1CheckoutSessionsByIdSuspenseQueryKey } from "./hooks/useGetApiV1CheckoutSessionsByIdSuspense.ts";
 export { getApiV1CheckoutSessionsByIdSuspenseQueryOptions } from "./hooks/useGetApiV1CheckoutSessionsByIdSuspense.ts";
 export { useGetApiV1CheckoutSessionsByIdSuspense } from "./hooks/useGetApiV1CheckoutSessionsByIdSuspense.ts";
+export { getApiV1CollegeQueryKey } from "./hooks/useGetApiV1College.ts";
+export { getApiV1CollegeQueryOptions } from "./hooks/useGetApiV1College.ts";
+export { useGetApiV1College } from "./hooks/useGetApiV1College.ts";
 export { getApiV1CollegeByIdQueryKey } from "./hooks/useGetApiV1CollegeById.ts";
 export { getApiV1CollegeByIdQueryOptions } from "./hooks/useGetApiV1CollegeById.ts";
 export { useGetApiV1CollegeById } from "./hooks/useGetApiV1CollegeById.ts";
 export { getApiV1CollegeByIdSuspenseQueryKey } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
 export { getApiV1CollegeByIdSuspenseQueryOptions } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
 export { useGetApiV1CollegeByIdSuspense } from "./hooks/useGetApiV1CollegeByIdSuspense.ts";
+export { getApiV1CollegeSuspenseQueryKey } from "./hooks/useGetApiV1CollegeSuspense.ts";
+export { getApiV1CollegeSuspenseQueryOptions } from "./hooks/useGetApiV1CollegeSuspense.ts";
+export { useGetApiV1CollegeSuspense } from "./hooks/useGetApiV1CollegeSuspense.ts";
 export { getApiV1CollegesQueryKey } from "./hooks/useGetApiV1Colleges.ts";
 export { getApiV1CollegesQueryOptions } from "./hooks/useGetApiV1Colleges.ts";
 export { useGetApiV1Colleges } from "./hooks/useGetApiV1Colleges.ts";
@@ -1999,7 +2016,6 @@ export { deleteUserResponseSchema } from "./zod/deleteUserResponseSchema.ts";
 export { deletedAtSchema } from "./zod/deletedAtSchema.ts";
 export { errorDetailSchema } from "./zod/errorDetailSchema.ts";
 export { errorModelSchema } from "./zod/errorModelSchema.ts";
-export { getAllCollegesResponseSchema } from "./zod/getAllCollegesResponseSchema.ts";
 export { getAllPermissionsResponseSchema } from "./zod/getAllPermissionsResponseSchema.ts";
 export { getAllPostsResponseSchema } from "./zod/getAllPostsResponseSchema.ts";
 export { getAllPremiumPostsResponseSchema } from "./zod/getAllPremiumPostsResponseSchema.ts";
@@ -2018,8 +2034,15 @@ export {
   getApiV1CollegeByIdQueryResponseSchema,
 } from "./zod/getApiV1CollegeByIdSchema.ts";
 export {
+  getApiV1College200Schema,
+  getApiV1CollegeErrorSchema,
+  getApiV1CollegeQueryParamsSchema,
+  getApiV1CollegeQueryResponseSchema,
+} from "./zod/getApiV1CollegeSchema.ts";
+export {
   getApiV1Colleges200Schema,
   getApiV1CollegesErrorSchema,
+  getApiV1CollegesQueryParamsSchema,
   getApiV1CollegesQueryResponseSchema,
 } from "./zod/getApiV1CollegesSchema.ts";
 export {
@@ -2384,6 +2407,7 @@ export {
   listApiV1TagTypeByTypePathParamsSchema,
   listApiV1TagTypeByTypeQueryResponseSchema,
 } from "./zod/listApiV1TagTypeByTypeSchema.ts";
+export { listCollegesResponseSchema } from "./zod/listCollegesResponseSchema.ts";
 export { mediaResponseSchema } from "./zod/mediaResponseSchema.ts";
 export { mediaSchema } from "./zod/mediaSchema.ts";
 export {

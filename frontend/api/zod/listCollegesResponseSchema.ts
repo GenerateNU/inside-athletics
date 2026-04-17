@@ -6,11 +6,15 @@
 import { getCollegeResponseSchema } from "./getCollegeResponseSchema.ts";
 import { z } from "zod/v4";
 
-export const getAllCollegesResponseSchema = z.object({
+export const listCollegesResponseSchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   get colleges() {
-    return z.array(getCollegeResponseSchema).nullable();
+    return z
+      .array(getCollegeResponseSchema)
+      .describe("List of colleges")
+      .nullable();
   },
+  total: z.int().describe("Total number of colleges returned"),
 });

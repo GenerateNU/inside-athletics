@@ -7,7 +7,7 @@ import { errorModelSchema } from "./errorModelSchema.ts";
 import { listCollegesResponseSchema } from "./listCollegesResponseSchema.ts";
 import { z } from "zod/v4";
 
-export const getApiV1CollegesQueryParamsSchema = z.object({
+export const getApiV1CollegeQueryParamsSchema = z.object({
   limit: z.coerce
     .number()
     .int()
@@ -23,15 +23,15 @@ export const getApiV1CollegesQueryParamsSchema = z.object({
 /**
  * @description OK
  */
-export const getApiV1Colleges200Schema = z.lazy(
+export const getApiV1College200Schema = z.lazy(
   () => listCollegesResponseSchema,
 );
 
 /**
  * @description Error
  */
-export const getApiV1CollegesErrorSchema = z.lazy(() => errorModelSchema);
+export const getApiV1CollegeErrorSchema = z.lazy(() => errorModelSchema);
 
-export const getApiV1CollegesQueryResponseSchema = z.lazy(
-  () => getApiV1Colleges200Schema,
+export const getApiV1CollegeQueryResponseSchema = z.lazy(
+  () => getApiV1College200Schema,
 );

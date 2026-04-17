@@ -5,37 +5,37 @@
 
 import fetch from "@kubb/plugin-client/clients/axios";
 import type {
-  GetApiV1CollegesQueryResponse,
-  GetApiV1CollegesQueryParams,
-} from "../models/GetApiV1Colleges.ts";
+  GetApiV1CollegeQueryResponse,
+  GetApiV1CollegeQueryParams,
+} from "../models/GetApiV1College.ts";
 import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
 
-function getGetApiV1CollegesUrl() {
-  const res = { method: "GET", url: `/api/v1/colleges/` as const };
+function getGetApiV1CollegeUrl() {
+  const res = { method: "GET", url: `/api/v1/college/` as const };
   return res;
 }
 
 /**
- * @summary Get API v1 colleges
- * {@link /api/v1/colleges/}
+ * @summary Get API v1 college
+ * {@link /api/v1/college/}
  */
-export async function getApiV1Colleges(
-  params?: GetApiV1CollegesQueryParams,
+export async function getApiV1College(
+  params?: GetApiV1CollegeQueryParams,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config;
 
   const res = await request<
-    GetApiV1CollegesQueryResponse,
+    GetApiV1CollegeQueryResponse,
     ResponseErrorConfig<Error>,
     unknown
   >({
     method: "GET",
-    url: getGetApiV1CollegesUrl().url.toString(),
+    url: getGetApiV1CollegeUrl().url.toString(),
     params,
     ...requestConfig,
   });

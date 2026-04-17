@@ -1,4 +1,3 @@
-
 package college
 
 import (
@@ -25,10 +24,15 @@ func (c *CollegeDB) GetCollege(id uuid.UUID) (*models.College, error) {
 	return utils.HandleDBError(&college, dbResponse.Error) // helper function that maps GORM errors to Huma errors
 }
 
-func (c *CollegeDB) GetAllColleges() ([]models.College, error) {
+func (c *CollegeDB) ListColleges(limit, offset int) (*[]models.College, error) {
 	var colleges []models.College
-	dbResponse := c.db.Find(&colleges)
-	return colleges, dbResponse.Error
+	dbResponse := c.db.
+		Order("name ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&colleges)
+
+	return utils.HandleDBError(&colleges, dbResponse.Error)
 }
 
 // Creates a new college in the database
