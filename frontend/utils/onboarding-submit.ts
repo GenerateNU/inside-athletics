@@ -1,11 +1,13 @@
 "use client";
 
 import type { OnboardingData } from "@/utils/onboarding";
-
-type TagPayload = {
-  id: string;
-  name: string;
-};
+import { getApiV1UserCurrent } from "@/api/clients/getApiV1UserCurrent";
+import { postApiV1User } from "@/api/clients/postApiV1User";
+import { getApiV1Roles } from "@/api/clients/getApiV1Roles";
+import { postApiV1UserByIdRoles } from "@/api/clients/postApiV1UserByIdRoles";
+import { getApiV1TagNameByName } from "@/api/clients/getApiV1TagNameByName";
+import { postApiV1Tag } from "@/api/clients/postApiV1Tag";
+import { postApiV1UserTag } from "@/api/clients/postApiV1UserTag";
 
 const CURRENT_USER_SYNC_RETRIES = 8;
 const CURRENT_USER_SYNC_DELAY_MS = 250;
@@ -48,30 +50,6 @@ function buildCreateUserPayload(data: OnboardingData, sessionEmail?: string) {
   };
 }
 
-function unwrapBody<T>(value: unknown): T | undefined {
-  let current = value;
-
-  for (let depth = 0; depth < 5; depth += 1) {
-    if (!current || typeof current !== "object") {
-      return current as T | undefined;
-    }
-
-    if ("body" in current && current.body !== undefined) {
-      current = current.body;
-      continue;
-    }
-
-    if ("Body" in current && current.Body !== undefined) {
-      current = current.Body;
-      continue;
-    }
-
-    return current as T | undefined;
-  }
-
-  return current as T | undefined;
-}
-
 function delay(ms: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
@@ -80,20 +58,17 @@ function delay(ms: number) {
 
 async function waitForCurrentUser(headers: Record<string, string>) {
   for (let attempt = 0; attempt < CURRENT_USER_SYNC_RETRIES; attempt += 1) {
-    const currentUserResponse = await fetch("/api/v1/user/current", {
-      headers,
-    });
-
-    if (currentUserResponse.ok) {
+    try {
+      await getApiV1UserCurrent({ headers });
       return;
-    }
+    } catch (error: any) {
+      if (error?.response?.status !== 404) {
+        throw new Error("Unable to verify current user.");
+      }
 
-    if (currentUserResponse.status !== 404) {
-      throw new Error("Unable to verify current user.");
-    }
-
-    if (attempt < CURRENT_USER_SYNC_RETRIES - 1) {
-      await delay(CURRENT_USER_SYNC_DELAY_MS);
+      if (attempt < CURRENT_USER_SYNC_RETRIES - 1) {
+        await delay(CURRENT_USER_SYNC_DELAY_MS);
+      }
     }
   }
 
@@ -103,47 +78,26 @@ async function waitForCurrentUser(headers: Record<string, string>) {
 async function getOrCreateTagId(
   tagName: string,
   headers: Record<string, string>,
-) {
-  const encodedName = encodeURIComponent(tagName);
-  const existingTagResponse = await fetch(`/api/v1/tag/name/${encodedName}`, {
-    headers,
-  });
-
-  if (existingTagResponse.ok) {
-    const existingTag = unwrapBody<TagPayload>(
-      await existingTagResponse.json(),
-    );
-
-    if (existingTag?.id) {
-      return existingTag.id;
+): Promise<string | null> {
+  try {
+    const tag = await getApiV1TagNameByName(tagName, { headers });
+    if (tag?.id) return tag.id;
+  } catch (error: any) {
+    if (error?.response?.status !== 404) {
+      throw new Error(`Unable to look up tag "${tagName}".`);
     }
-  } else if (existingTagResponse.status !== 404) {
-    throw new Error(`Unable to look up tag "${tagName}".`);
   }
 
-  const createTagResponse = await fetch("/api/v1/tag/", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      name: tagName,
-    }),
-  });
-
-  if (createTagResponse.status === 409) {
-    return getOrCreateTagId(tagName, headers);
-  }
-
-  if (!createTagResponse.ok) {
+  try {
+    const created = await postApiV1Tag({ name: tagName, type: "topic" }, { headers });
+    if (created?.id) return created.id;
+    return null;
+  } catch (error: any) {
+    if (error?.response?.status === 409) {
+      return getOrCreateTagId(tagName, headers);
+    }
     throw new Error(`Unable to create tag "${tagName}".`);
   }
-
-  const createdTag = unwrapBody<TagPayload>(await createTagResponse.json());
-
-  if (!createdTag?.id) {
-    throw new Error(`Unable to read tag "${tagName}" from response.`);
-  }
-
-  return createdTag.id;
 }
 
 async function syncSelectedTagFollows(
@@ -161,19 +115,15 @@ async function syncSelectedTagFollows(
   await Promise.all(
     selectedTags.map(async (tagName) => {
       const tagId = await getOrCreateTagId(tagName, headers);
-      const followResponse = await fetch("/api/v1/user/tag/", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          tag_id: tagId,
-        }),
-      });
+      if (!tagId) return;
 
-      if (followResponse.ok || followResponse.status === 409) {
-        return;
+      try {
+        await postApiV1UserTag({ tag_id: tagId }, { headers });
+      } catch (error: any) {
+        if (error?.response?.status !== 409) {
+          throw new Error(`Unable to follow tag "${tagName}".`);
+        }
       }
-
-      throw new Error(`Unable to follow tag "${tagName}".`);
     }),
   );
 }
@@ -194,26 +144,34 @@ export async function submitOnboardingUser(
     "Content-Type": "application/json",
   };
 
-  const currentUserResponse = await fetch("/api/v1/user/current", {
-    headers,
-  });
-
-  if (!currentUserResponse.ok) {
-    if (currentUserResponse.status !== 404) {
+  try {
+    await getApiV1UserCurrent({ headers });
+  } catch (error: any) {
+    if (error?.response?.status !== 404) {
       throw new Error("Unable to verify current user.");
     }
 
-    const createUserResponse = await fetch("/api/v1/user", {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-
-    if (!createUserResponse.ok) {
+    let userId: string;
+    try {
+      const created = await postApiV1User(payload, { headers });
+      userId = created.id;
+    } catch {
       throw new Error("Unable to create user.");
     }
 
     await waitForCurrentUser(headers);
+
+    const rolesData = await getApiV1Roles(undefined, { headers });
+    const userRole = (rolesData?.roles ?? []).find((r) => r.name === "user");
+    if (userRole) {
+      try {
+        await postApiV1UserByIdRoles(userId, { role_id: userRole.id }, { headers });
+      } catch (e: any) {
+        if (e?.response?.status !== 409) {
+          throw new Error("Unable to assign user role.");
+        }
+      }
+    }
   }
 
   await syncSelectedTagFollows(data, headers);

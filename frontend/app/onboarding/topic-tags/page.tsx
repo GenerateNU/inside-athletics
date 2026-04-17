@@ -6,6 +6,8 @@ import { XIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useOnboarding } from "@/utils/onboarding";
+import { submitOnboardingUser } from "@/utils/onboarding-submit";
+import { useSession } from "@/utils/SessionContext";
 
 const topicCategories = [
   {
@@ -28,8 +30,11 @@ const topicCategories = [
 
 export default function OnboardingTopicTagsPage() {
   const router = useRouter();
-  const { data, hydrated, updateSection } = useOnboarding();
+  const session = useSession();
+  const { data, hydrated, updateSection, reset } = useOnboarding();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!hydrated) {
@@ -47,7 +52,7 @@ export default function OnboardingTopicTagsPage() {
     );
   };
 
-  const canContinue = selectedTags.length > 0;
+  const canContinue = selectedTags.length > 0 && !isSubmitting;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
@@ -113,18 +118,51 @@ export default function OnboardingTopicTagsPage() {
           ))}
         </div>
 
+        {error ? (
+          <p className="text-center text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        ) : null}
         <Button
           type="button"
           className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
-          onClick={() => {
-            updateSection("topicTags", {
-              selectedTags,
-            });
-            router.push("/onboarding/athletic-program-survey");
+          onClick={async () => {
+            updateSection("topicTags", { selectedTags });
+
+            if (data.role.role !== "prospective-athlete") {
+              router.push("/onboarding/athletic-program-survey");
+              return;
+            }
+
+            if (!session?.access_token) {
+              setError("You need an active session before finishing onboarding.");
+              return;
+            }
+
+            setIsSubmitting(true);
+            setError("");
+
+            try {
+              await submitOnboardingUser(
+                { ...data, topicTags: { selectedTags } },
+                session.access_token,
+                session.user.email,
+              );
+              reset();
+              router.push("/");
+            } catch (submissionError) {
+              setError(
+                submissionError instanceof Error
+                  ? submissionError.message
+                  : "Unable to finish onboarding.",
+              );
+            } finally {
+              setIsSubmitting(false);
+            }
           }}
           disabled={!canContinue}
         >
-          Continue
+          {isSubmitting ? "Finishing..." : "Continue"}
         </Button>
       </div>
     </div>

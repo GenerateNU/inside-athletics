@@ -2,6 +2,7 @@
 import { signup } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
@@ -28,6 +29,16 @@ export default function SignUpPage() {
       <div className="w-full max-w-lg space-y-6 rounded-md bg-white p-8 shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-4xl font-bold text-[#001F3E]">Sign Up</h1>
+          <div className="flex w-full items-center justify-center px-6 py-4">
+            <Image
+              src="/ia mark.svg"
+              alt="Inside Athletics"
+              width={240}
+              height={240}
+              priority
+              className="h-auto w-full max-w-[10rem]"
+            />
+          </div>
         </div>
 
         <form className="space-y-6">
@@ -49,7 +60,7 @@ export default function SignUpPage() {
               required
             />
             {!state?.success && state.message ? (
-              <p className="text-sm text-red-600" role="alert">
+              <p className="text-center text-sm text-red-600" role="alert">
                 {state.message}
               </p>
             ) : null}
