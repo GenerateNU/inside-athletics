@@ -20,6 +20,8 @@ func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
 		huma.Get(grp, "/by-sport/{sport_id}", premiumPostService.GetPremiumPostsBySportID)       // Get all premium posts tagged to this sport
 		huma.Get(grp, "/by-college/{college_id}", premiumPostService.GetPremiumPostsByCollegeID) // Get all premium posts tagged to this college
 		huma.Get(grp, "/by-tag/{tag_id}", premiumPostService.GetPremiumPostsByTagID)             // Get all premium posts tagged to this tag
+		huma.Get(grp, "/search", premiumPostService.FuzzySearchForPremiumPost)                   // Fuzzy search premium posts by title
+		huma.Get(grp, "/filter", premiumPostService.FilterPremiumPosts)                          // Filter premium posts by college, sport, and tags
 		huma.Patch(grp, "/{id}", premiumPostService.UpdatePremiumPost)                           // Update post
 		huma.Delete(grp, "/{id}", premiumPostService.DeletePremiumPost)                          // Delete post
 	}

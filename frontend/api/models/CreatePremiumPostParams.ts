@@ -10,9 +10,9 @@ export type CreatePremiumPostParams = {
    */
   readonly $schema?: string;
   /**
-   * @type string
+   * @type string | undefined
    */
-  college_id: string;
+  college_id?: string;
   /**
    * @type string
    */
@@ -22,9 +22,9 @@ export type CreatePremiumPostParams = {
    */
   media_id?: string;
   /**
-   * @type string
+   * @type string | undefined
    */
-  sport_id: string;
+  sport_id?: string;
   /**
    * @type array,null
    */

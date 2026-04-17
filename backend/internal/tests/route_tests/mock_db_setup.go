@@ -140,6 +140,7 @@ func (td *TestDatabase) SeedDefaultRoles(t *testing.T) {
 		models.RoleUser,
 		models.RoleAdmin,
 		models.RoleModerator,
+		models.RolePremiumUser,
 		models.RoleName("coach"),
 	}
 

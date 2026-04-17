@@ -1,3 +1,4 @@
+export { accessCheckResponseSchema } from "./accessCheckResponseSchema.ts";
 export { assignRoleRequestSchema } from "./assignRoleRequestSchema.ts";
 export { assignRoleResponseSchema } from "./assignRoleResponseSchema.ts";
 export { averageRatingsResponseSchema } from "./averageRatingsResponseSchema.ts";
@@ -352,11 +353,23 @@ export {
   getApiV1PostsPremiumByTagByTagIdQueryResponseSchema,
 } from "./getApiV1PostsPremiumByTagByTagIdSchema.ts";
 export {
+  getApiV1PostsPremiumFilter200Schema,
+  getApiV1PostsPremiumFilterErrorSchema,
+  getApiV1PostsPremiumFilterQueryParamsSchema,
+  getApiV1PostsPremiumFilterQueryResponseSchema,
+} from "./getApiV1PostsPremiumFilterSchema.ts";
+export {
   getApiV1PostsPremium200Schema,
   getApiV1PostsPremiumErrorSchema,
   getApiV1PostsPremiumQueryParamsSchema,
   getApiV1PostsPremiumQueryResponseSchema,
 } from "./getApiV1PostsPremiumSchema.ts";
+export {
+  getApiV1PostsPremiumSearch200Schema,
+  getApiV1PostsPremiumSearchErrorSchema,
+  getApiV1PostsPremiumSearchQueryParamsSchema,
+  getApiV1PostsPremiumSearchQueryResponseSchema,
+} from "./getApiV1PostsPremiumSearchSchema.ts";
 export {
   getApiV1Posts200Schema,
   getApiV1PostsErrorSchema,
@@ -511,11 +524,17 @@ export {
   getApiV1UserTagFollowsErrorSchema,
   getApiV1UserTagFollowsQueryResponseSchema,
 } from "./getApiV1UserTagFollowsSchema.ts";
+export {
+  getApiV1UtilityAccessCheck200Schema,
+  getApiV1UtilityAccessCheckErrorSchema,
+  getApiV1UtilityAccessCheckQueryResponseSchema,
+} from "./getApiV1UtilityAccessCheckSchema.ts";
 export { getCollegeFollowsByUserResponseSchema } from "./getCollegeFollowsByUserResponseSchema.ts";
 export { getCollegeResponseSchema } from "./getCollegeResponseSchema.ts";
 export { getCommentLikeInfoResponseSchema } from "./getCommentLikeInfoResponseSchema.ts";
 export { getCommentLikeResponseSchema } from "./getCommentLikeResponseSchema.ts";
 export { getDownloadURLResponseSchema } from "./getDownloadURLResponseSchema.ts";
+export { getFilterPremiumPostsResponseSchema } from "./getFilterPremiumPostsResponseSchema.ts";
 export { getFollowingUsersByCollegeResponseSchema } from "./getFollowingUsersByCollegeResponseSchema.ts";
 export { getFollowingUsersBySportResponseSchema } from "./getFollowingUsersBySportResponseSchema.ts";
 export { getFollowingUsersByTagResponseSchema } from "./getFollowingUsersByTagResponseSchema.ts";
@@ -529,6 +548,7 @@ export { getPremiumPostsByAuthorIDResponseSchema } from "./getPremiumPostsByAuth
 export { getPremiumPostsByCollegeIDResponseSchema } from "./getPremiumPostsByCollegeIDResponseSchema.ts";
 export { getPremiumPostsBySportIDResponseSchema } from "./getPremiumPostsBySportIDResponseSchema.ts";
 export { getPremiumPostsByTagIDResponseSchema } from "./getPremiumPostsByTagIDResponseSchema.ts";
+export { getSearchPremiumPostResponseSchema } from "./getSearchPremiumPostResponseSchema.ts";
 export { getSearchResponseSchema } from "./getSearchResponseSchema.ts";
 export { getSportFollowsByUserResponseSchema } from "./getSportFollowsByUserResponseSchema.ts";
 export { getStripeCustomerByEmailResponseSchema } from "./getStripeCustomerByEmailResponseSchema.ts";

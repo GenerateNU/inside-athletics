@@ -8,12 +8,25 @@ import {
   useState,
 } from "react";
 import { Session } from "@supabase/supabase-js";
+import { getApiV1UtilityAccessCheck } from "@/api/clients/getApiV1UtilityAccessCheck";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
-const SessionContext = createContext<Session | null>(null);
+type SessionContextValue = {
+  session: Session | null;
+  hasPremium: boolean;
+  isAdmin: boolean;
+};
+
+const SessionContext = createContext<SessionContextValue>({
+  session: null,
+  hasPremium: false,
+  isAdmin: false,
+});
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [hasPremium, setHasPremium] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -28,9 +41,38 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  return <SessionContext value={session}>{children}</SessionContext>;
+  useEffect(() => {
+    if (!session?.access_token) {
+      setHasPremium(false);
+      setIsAdmin(false);
+      return;
+    }
+
+    getApiV1UtilityAccessCheck({
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+      .then((data) => {
+        setHasPremium(data.has_premium ?? false);
+        setIsAdmin(data.is_admin ?? false);
+      })
+      .catch(() => {
+        setHasPremium(false);
+        setIsAdmin(false);
+      });
+  }, [session?.access_token]);
+
+  return (
+    <SessionContext value={{ session, hasPremium, isAdmin }}>
+      {children}
+    </SessionContext>
+  );
 }
 
 export function useSession() {
-  return useContext(SessionContext);
+  return useContext(SessionContext).session;
+}
+
+export function usePermissions() {
+  const { hasPremium, isAdmin } = useContext(SessionContext);
+  return { hasPremium, isAdmin };
 }

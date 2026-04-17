@@ -19,7 +19,6 @@ func newCommentTestUser(id uuid.UUID, unique string) models.User {
 		LastName:                "User",
 		Email:                   "test-" + unique + "@example.com",
 		Username:                "testuser-" + unique,
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 }
@@ -544,6 +543,7 @@ func TestFreeUserGetCommentsByPostLimitedToFirstThreeViewedPosts(t *testing.T) {
 	if err := testDB.DB.Create(&viewer).Error; err != nil {
 		t.Fatalf("failed to create viewer user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, viewer.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	author := newCommentTestUser(uuid.New(), "author-comments-limit")
 	if err := testDB.DB.Create(&author).Error; err != nil {
@@ -608,6 +608,7 @@ func TestFreeUserGetCommentBlockedOutsideFirstThreeViewedPosts(t *testing.T) {
 	if err := testDB.DB.Create(&viewer).Error; err != nil {
 		t.Fatalf("failed to create viewer user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, viewer.ID, getRoleID(t, testDB.DB, models.RoleUser))
 
 	author := newCommentTestUser(uuid.New(), "author-comment-single")
 	if err := testDB.DB.Create(&author).Error; err != nil {
@@ -669,10 +670,10 @@ func TestPremiumUserCanViewCommentsOutsideFirstThreeViewedPosts(t *testing.T) {
 	api := testDB.API
 
 	viewer := newCommentTestUser(uuid.New(), "viewer-premium-comments")
-	viewer.Account_Type = true
 	if err := testDB.DB.Create(&viewer).Error; err != nil {
 		t.Fatalf("failed to create premium viewer user: %v", err)
 	}
+	assignRoleToUser(t, testDB.DB, viewer.ID, getRoleID(t, testDB.DB, models.RolePremiumUser))
 
 	author := newCommentTestUser(uuid.New(), "author-premium-comments")
 	if err := testDB.DB.Create(&author).Error; err != nil {

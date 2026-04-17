@@ -27,7 +27,6 @@ func seedUserWithRoleAndPermissions(t *testing.T, db *gorm.DB, roleName models.R
 		LastName:                "User",
 		Email:                   "testuser@example.com",
 		Username:                "testuser",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := db.Create(&user).Error; err != nil {

@@ -23,7 +23,6 @@ func TestPermissionCRUD(t *testing.T) {
 		LastName:                "User",
 		Email:                   "admin@example.com",
 		Username:                "admin",
-		Account_Type:            true,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&adminUser).Error; err != nil {

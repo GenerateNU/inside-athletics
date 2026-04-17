@@ -45,7 +45,6 @@ function buildCreateUserPayload(data: OnboardingData, sessionEmail?: string) {
     last_name: lastName || firstName,
     email,
     username: data.account.username,
-    account_type: data.plan.selectedPlan === "premium",
     verified_athlete_status: data.role.role === "athlete" ? "pending" : "none",
   };
 }
@@ -162,10 +161,11 @@ export async function submitOnboardingUser(
     await waitForCurrentUser(headers);
 
     const rolesData = await getApiV1Roles(undefined, { headers });
-    const userRole = (rolesData?.roles ?? []).find((r) => r.name === "user");
-    if (userRole) {
+    const roleName = data.plan.selectedPlan === "premium" ? "premium_user" : "user";
+    const role = (rolesData?.roles ?? []).find((r) => r.name === roleName);
+    if (role) {
       try {
-        await postApiV1UserByIdRoles(userId, { role_id: userRole.id }, { headers });
+        await postApiV1UserByIdRoles(userId, { role_id: role.id }, { headers });
       } catch (e: any) {
         if (e?.response?.status !== 409) {
           throw new Error("Unable to assign user role.");

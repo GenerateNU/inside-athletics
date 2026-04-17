@@ -9,10 +9,10 @@ export const createPremiumPostParamsSchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  college_id: z.string(),
+  college_id: z.optional(z.string()),
   content: z.string(),
   media_id: z.optional(z.string()),
-  sport_id: z.string(),
+  sport_id: z.optional(z.string()),
   tag: z.nullable(z.array(z.string())),
   title: z.string(),
 });

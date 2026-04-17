@@ -86,8 +86,8 @@ type GetPremiumPostsByTagIDResponse struct {
 }
 
 type CreatePremiumPostParams struct {
-	SportID        *uuid.UUID             `json:"sport_id" gorm:"type:uuid;default:null"`
-	CollegeID      *uuid.UUID             `json:"college_id" gorm:"type:uuid;default:null"`
+	SportID        *uuid.UUID             `json:"sport_id,omitempty" gorm:"type:uuid;default:null"`
+	CollegeID      *uuid.UUID             `json:"college_id,omitempty" gorm:"type:uuid;default:null"`
 	Tags           []uuid.UUID            `json:"tag" type:"tag"`
 	Title          string                 `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content        string                 `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
@@ -138,6 +138,30 @@ func ToPremiumPostResponse(post *models.PremiumPost) *PremiumPostResponse {
 		MediaID: post.MediaID,
 		Media:   post.Media,
 	}
+}
+
+type GetSearchPremiumPostParam struct {
+	SearchStr string `query:"search_str" binding:"required" example:"Northeastern University" doc:"String to fuzzy search premium posts on"`
+	Limit     int    `query:"limit" default:"20" example:"10" doc:"Cap on the number of posts to return"`
+	Offset    int    `query:"offset" default:"0" example:"8" doc:"Number of entries to skip for pagination"`
+}
+
+type GetSearchPremiumPostResponse struct {
+	Posts []PremiumPostResponse `json:"posts" doc:"List of premium post responses found for given search"`
+	Count int64                 `json:"count" example:"5" doc:"Count of search results found for given search"`
+}
+
+type GetFilterPremiumPostsParams struct {
+	CollegeIds string `query:"college_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of college_ids to filter by"`
+	SportIds   string `query:"sport_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of sport_ids to filter by"`
+	TagIds     string `query:"tag_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of tag_ids to filter by"`
+	Limit      int    `query:"limit" default:"20" example:"20" doc:"Number of posts to return when filtering"`
+	Offset     int    `query:"offset" default:"0" example:"8" doc:"Number of entries in the database to offset by"`
+}
+
+type GetFilterPremiumPostsResponse struct {
+	Posts []PremiumPostResponse `json:"posts" doc:"List of filtered premium posts"`
+	Total int                   `json:"total" example:"100" doc:"Total number of matching premium posts"`
 }
 
 type UpdatePremiumPostRequest struct {

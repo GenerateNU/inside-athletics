@@ -48,6 +48,8 @@ export { getApiV1PostsPremiumByAuthorByAuthorId } from "./getApiV1PostsPremiumBy
 export { getApiV1PostsPremiumByCollegeByCollegeId } from "./getApiV1PostsPremiumByCollegeByCollegeId.ts";
 export { getApiV1PostsPremiumBySportBySportId } from "./getApiV1PostsPremiumBySportBySportId.ts";
 export { getApiV1PostsPremiumByTagByTagId } from "./getApiV1PostsPremiumByTagByTagId.ts";
+export { getApiV1PostsPremiumFilter } from "./getApiV1PostsPremiumFilter.ts";
+export { getApiV1PostsPremiumSearch } from "./getApiV1PostsPremiumSearch.ts";
 export { getApiV1PostsSearch } from "./getApiV1PostsSearch.ts";
 export { getApiV1RoleById } from "./getApiV1RoleById.ts";
 export { getApiV1Roles } from "./getApiV1Roles.ts";
@@ -73,6 +75,7 @@ export { getApiV1UserSportBySportIdUsers } from "./getApiV1UserSportBySportIdUse
 export { getApiV1UserSportFollows } from "./getApiV1UserSportFollows.ts";
 export { getApiV1UserTagByTagIdUsers } from "./getApiV1UserTagByTagIdUsers.ts";
 export { getApiV1UserTagFollows } from "./getApiV1UserTagFollows.ts";
+export { getApiV1UtilityAccessCheck } from "./getApiV1UtilityAccessCheck.ts";
 export { listApiV1CheckoutSessions } from "./listApiV1CheckoutSessions.ts";
 export { listApiV1CommentByIdReplies } from "./listApiV1CommentByIdReplies.ts";
 export { listApiV1PostByPostIdComments } from "./listApiV1PostByPostIdComments.ts";

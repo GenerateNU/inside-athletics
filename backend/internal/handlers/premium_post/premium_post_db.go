@@ -1,8 +1,10 @@
 package premiumpost
 
 import (
+	"fmt"
 	"inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
@@ -180,6 +182,103 @@ func (s *PremiumPostDB) GetPremiumPostsByTagID(limit, offset int, tagID uuid.UUI
 		Offset(offset).
 		Find(&posts).Error; err != nil {
 		return nil, 0, err
+	}
+
+	return posts, total, nil
+}
+
+// FuzzySearchForPremiumPost returns premium posts whose title fuzzy-matches the given search string
+func (s *PremiumPostDB) FuzzySearchForPremiumPost(searchStr string, limit, offset int) ([]models.PremiumPost, int64, error) {
+	var posts []models.PremiumPost
+	var total int64
+
+	selectQuery, whereQuery, orderQuery := utils.FuzzySearchByQueries("title", searchStr)
+
+	if err := s.db.Model(&models.PremiumPost{}).
+		Select("premium_posts.*, "+selectQuery).
+		Where(whereQuery).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if total == 0 {
+		return []models.PremiumPost{}, 0, nil
+	}
+
+	if err := s.db.
+		Model(&models.PremiumPost{}).
+		Select("premium_posts.*, "+selectQuery).
+		Where(whereQuery).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Media").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
+		Order(orderQuery).
+		Limit(limit).
+		Offset(offset).
+		Find(&posts).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return posts, total, nil
+}
+
+// FilterPremiumPosts returns premium posts filtered by the given college, sport, and tag IDs
+func (s *PremiumPostDB) FilterPremiumPosts(colleges []uuid.UUID, sports []uuid.UUID, tags []uuid.UUID, limit, offset int) ([]models.PremiumPost, int64, error) {
+	var posts []models.PremiumPost
+	var total int64
+
+	filters := make([]string, 0)
+	if len(colleges) > 0 {
+		mappedColleges := utils.MapList(colleges, func(c uuid.UUID) string {
+			return fmt.Sprintf("premium_posts.college_id = '%s'", c.String())
+		})
+		filters = append(filters, strings.Join(mappedColleges, " OR "))
+	}
+	if len(sports) > 0 {
+		mappedSports := utils.MapList(sports, func(c uuid.UUID) string {
+			return fmt.Sprintf("premium_posts.sport_id = '%s'", c.String())
+		})
+		filters = append(filters, strings.Join(mappedSports, " OR "))
+	}
+	if len(tags) > 0 {
+		mappedTags := utils.MapList(tags, func(c uuid.UUID) string {
+			return fmt.Sprintf("tag_posts.tag_id = '%s'", c.String())
+		})
+		filters = append(filters, strings.Join(mappedTags, " OR "))
+	}
+
+	whereQuery := strings.Join(filters, " OR ")
+
+	if err := s.db.
+		Model(&models.PremiumPost{}).
+		Joins("JOIN tag_posts ON premium_posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'premium_post'").
+		Where(whereQuery).
+		Group("premium_posts.id").
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := s.db.
+		Model(&models.PremiumPost{}).
+		Joins("JOIN tag_posts ON premium_posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'premium_post'").
+		Where(whereQuery).
+		Group("premium_posts.id").
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Media").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'premium_post'")
+		}).
+		Limit(limit).
+		Offset(offset).
+		Order("premium_posts.created_at DESC").
+		Find(&posts).Error; err != nil {
+		return posts, 0, err
 	}
 
 	return posts, total, nil

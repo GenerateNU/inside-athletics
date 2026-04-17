@@ -4,7 +4,9 @@ INSERT INTO "public"."permissions" ("action", "resource") VALUES
   ('delete', 'premiumpost'),
   ('delete_own', 'premiumpost'),
   ('update_own', 'premiumpost'),
-  ('update', 'premiumpost')
+  ('update', 'premiumpost'),
+  ('get', 'premiumpost')
+
 ON CONFLICT DO NOTHING;
 
 -- Assign all premium post permissions to moderators and admins

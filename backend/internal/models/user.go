@@ -19,7 +19,6 @@ type User struct {
 	Username                string                `json:"username" example:"suliproathelete" doc:"The username of a user" gorm:"type:varchar(100);not null"`
 	Bio                     *string               `json:"bio" example:"My name is Suli and I'm a pro athlete" doc:"The name of a user" gorm:"type:varchar(100);"` //nullable
 	ProfilePicture          string                `json:"profile_picture" doc:"The S3 key for the user's profile picture" gorm:"type:varchar(500)"`
-	Account_Type            bool                  `json:"account_type" example:"true" doc:"If the user has access to premium features" gorm:"type:bool;not null"`
 	SportID                 *uuid.UUID            `json:"sport" example:"hockey" doc:"The sport the user plays" gorm:"type:uuid;"` //nullable
 	Sport                   *Sport                `json:"-" gorm:"foreignKey:SportID;references:ID"`
 	Expected_Grad_Year      uint                  `json:"expected_grad_year" example:"2027" doc:"The user's grad year" gorm:"type:uint;"` //nullable

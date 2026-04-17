@@ -22,7 +22,6 @@ func TestPermissionMiddleware_DeniesWithoutRolePermission(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {
@@ -63,7 +62,6 @@ func TestPermissionMiddleware_AllowsWithRolePermission(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {

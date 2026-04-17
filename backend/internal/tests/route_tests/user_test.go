@@ -46,7 +46,6 @@ func TestGetUser(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusVerified,
 		CollegeID:               &college.ID,
 		SportID:                 &sport.ID,
@@ -74,7 +73,6 @@ func TestGetUser(t *testing.T) {
 		u.LastName != "Test" ||
 		u.Email != "suli@example.com" ||
 		u.Username != "suli" ||
-		u.AccountType != false ||
 		u.College == nil ||
 		u.College.Name != "Northeastern University" ||
 		u.Sport == nil ||
@@ -98,7 +96,6 @@ func TestGetUserWithCollegeAndSport(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusVerified,
 		CollegeID:               &college.ID,
 		SportID:                 &sport.ID,
@@ -154,7 +151,6 @@ func TestGetCurrentUserID(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusNone,
 	}
 	userResp := testDB.DB.Create(&user)
@@ -174,7 +170,6 @@ func TestGetCurrentUserID(t *testing.T) {
 		u.LastName != "Test" ||
 		u.Email != "suli@example.com" ||
 		u.Username != "suli" ||
-		u.AccountType != false ||
 		u.VerifiedAthleteStatus != models.VerifiedAthleteStatusNone {
 		t.Fatalf("Unexpected response: %+v", u)
 	}
@@ -195,7 +190,6 @@ func TestCreateUser(t *testing.T) {
 		Email:                 "suli@example.com",
 		Username:              "suli",
 		Bio:                   strPtr("My bio"),
-		AccountType:           true,
 		SportID:               &sport.ID,
 		ExpectedGradYear:      2027,
 		VerifiedAthleteStatus: models.VerifiedAthleteStatusVerified,
@@ -225,7 +219,6 @@ func TestCreateUserWithNoneStatus(t *testing.T) {
 		Email:                 "suli@example.com",
 		Username:              "suli",
 		Bio:                   strPtr("My bio"),
-		AccountType:           true,
 		ExpectedGradYear:      2027,
 		VerifiedAthleteStatus: models.VerifiedAthleteStatusNone,
 	}
@@ -251,7 +244,6 @@ func TestUpdateUser(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	userResp := testDB.DB.Create(&user)
@@ -292,7 +284,6 @@ func TestDeleteUser(t *testing.T) {
 		LastName:                "Test",
 		Email:                   "suli@example.com",
 		Username:                "suli",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	userResp := testDB.DB.Create(&user)
@@ -330,7 +321,6 @@ func TestAssignRoleToUser(t *testing.T) {
 		LastName:                "User",
 		Email:                   "admin@example.com",
 		Username:                "admin",
-		Account_Type:            true,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&adminUser).Error; err != nil {
@@ -346,7 +336,6 @@ func TestAssignRoleToUser(t *testing.T) {
 		LastName:                "User",
 		Email:                   "target@example.com",
 		Username:                "target",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&targetUser).Error; err != nil {

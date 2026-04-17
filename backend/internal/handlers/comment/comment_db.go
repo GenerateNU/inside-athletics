@@ -1,7 +1,6 @@
 package comment
 
 import (
-	"errors"
 	models "inside-athletics/internal/models"
 	"inside-athletics/internal/utils"
 
@@ -113,18 +112,17 @@ func (c *CommentDB) DeleteComment(id uuid.UUID) error {
 	return nil
 }
 
-// IsUserPremium returns true when the user has premium access.
-// If the user record is missing, we do not apply free-tier restrictions.
+// IsUserPremium returns true when the user does not have the free "user" role.
 func (c *CommentDB) IsUserPremium(userID uuid.UUID) (bool, error) {
-	var user models.User
-	err := c.db.Select("account_type").Where("id = ?", userID).First(&user).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return true, nil
-	}
+	var count int64
+	err := c.db.Table("user_roles").
+		Joins("JOIN roles ON roles.id = user_roles.role_id").
+		Where("user_roles.user_id = ? AND roles.name = ?", userID, models.RoleUser).
+		Count(&count).Error
 	if err != nil {
 		return false, err
 	}
-	return user.Account_Type, nil
+	return count == 0, nil
 }
 
 // IsPostWithinFirstViewedPosts returns true when the post is in the user's first N viewed posts.

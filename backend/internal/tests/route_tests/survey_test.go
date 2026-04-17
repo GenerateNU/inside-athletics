@@ -19,7 +19,6 @@ func seedUser(t *testing.T, testDB *TestDatabase) *models.User {
 		LastName:                "User",
 		Email:                   uuid.NewString() + "@example.com",
 		Username:                "testuser-" + uuid.NewString(),
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {
@@ -95,7 +94,6 @@ func TestCreateSurvey(t *testing.T) {
 		LastName:                "User",
 		Email:                   "test@example.com",
 		Username:                "testuser-mock",
-		Account_Type:            false,
 		Verified_Athlete_Status: models.VerifiedAthleteStatusPending,
 	}
 	if err := testDB.DB.Create(&user).Error; err != nil {

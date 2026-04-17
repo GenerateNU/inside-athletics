@@ -1,3 +1,4 @@
+export type { AccessCheckResponse } from "./AccessCheckResponse.ts";
 export type { AssignRoleRequest } from "./AssignRoleRequest.ts";
 export type { AssignRoleResponse } from "./AssignRoleResponse.ts";
 export type { AverageRatingsResponse } from "./AverageRatingsResponse.ts";
@@ -420,6 +421,20 @@ export type {
   GetApiV1PostsPremiumByTagByTagIdQueryResponse,
 } from "./GetApiV1PostsPremiumByTagByTagId.ts";
 export type {
+  GetApiV1PostsPremiumFilter200,
+  GetApiV1PostsPremiumFilterError,
+  GetApiV1PostsPremiumFilterQuery,
+  GetApiV1PostsPremiumFilterQueryParams,
+  GetApiV1PostsPremiumFilterQueryResponse,
+} from "./GetApiV1PostsPremiumFilter.ts";
+export type {
+  GetApiV1PostsPremiumSearch200,
+  GetApiV1PostsPremiumSearchError,
+  GetApiV1PostsPremiumSearchQuery,
+  GetApiV1PostsPremiumSearchQueryParams,
+  GetApiV1PostsPremiumSearchQueryResponse,
+} from "./GetApiV1PostsPremiumSearch.ts";
+export type {
   GetApiV1PostsSearch200,
   GetApiV1PostsSearchError,
   GetApiV1PostsSearchQuery,
@@ -592,6 +607,12 @@ export type {
   GetApiV1UserTagFollowsQuery,
   GetApiV1UserTagFollowsQueryResponse,
 } from "./GetApiV1UserTagFollows.ts";
+export type {
+  GetApiV1UtilityAccessCheck200,
+  GetApiV1UtilityAccessCheckError,
+  GetApiV1UtilityAccessCheckQuery,
+  GetApiV1UtilityAccessCheckQueryResponse,
+} from "./GetApiV1UtilityAccessCheck.ts";
 export type { GetCollegeFollowsByUserResponse } from "./GetCollegeFollowsByUserResponse.ts";
 export type {
   GetCollegeResponse,
@@ -600,6 +621,7 @@ export type {
 export type { GetCommentLikeInfoResponse } from "./GetCommentLikeInfoResponse.ts";
 export type { GetCommentLikeResponse } from "./GetCommentLikeResponse.ts";
 export type { GetDownloadURLResponse } from "./GetDownloadURLResponse.ts";
+export type { GetFilterPremiumPostsResponse } from "./GetFilterPremiumPostsResponse.ts";
 export type { GetFollowingUsersByCollegeResponse } from "./GetFollowingUsersByCollegeResponse.ts";
 export type { GetFollowingUsersBySportResponse } from "./GetFollowingUsersBySportResponse.ts";
 export type { GetFollowingUsersByTagResponse } from "./GetFollowingUsersByTagResponse.ts";
@@ -613,6 +635,7 @@ export type { GetPremiumPostsByAuthorIDResponse } from "./GetPremiumPostsByAutho
 export type { GetPremiumPostsByCollegeIDResponse } from "./GetPremiumPostsByCollegeIDResponse.ts";
 export type { GetPremiumPostsBySportIDResponse } from "./GetPremiumPostsBySportIDResponse.ts";
 export type { GetPremiumPostsByTagIDResponse } from "./GetPremiumPostsByTagIDResponse.ts";
+export type { GetSearchPremiumPostResponse } from "./GetSearchPremiumPostResponse.ts";
 export type { GetSearchResponse } from "./GetSearchResponse.ts";
 export type { GetSportFollowsByUserResponse } from "./GetSportFollowsByUserResponse.ts";
 export type { GetStripeCustomerByEmailResponse } from "./GetStripeCustomerByEmailResponse.ts";

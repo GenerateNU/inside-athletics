@@ -8,11 +8,6 @@
       "readOnly": true,
       "type": "string"
     },
-    "account_type": {
-      "description": "If the user has access to premium features",
-      "examples": [true],
-      "type": "boolean"
-    },
     "bio": {
       "description": "The bio of a user",
       "examples": ["My name is Suli and I'm a pro athlete"],
@@ -69,7 +64,6 @@
     "last_name",
     "email",
     "username",
-    "account_type",
     "verified_athlete_status"
   ],
   "type": "object",

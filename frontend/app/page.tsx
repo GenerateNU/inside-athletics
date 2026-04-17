@@ -111,7 +111,7 @@ function HomePageContent() {
   const showCreatePost = searchParams.get("createPost") === "true";
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60 w-full">
 
       {showFilterPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -137,7 +137,7 @@ function HomePageContent() {
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
         <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-scroll max-h-screen">
-          <div className="flex w-full max-w-5xl flex-col gap-6">
+          <div className="flex w-full w-full flex-col gap-6">
             <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}

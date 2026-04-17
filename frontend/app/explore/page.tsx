@@ -149,11 +149,11 @@ export default function ExplorePage() {
 
 
     return (
-        <div className="min-h-screen bg-zinc-50">
+        <div className="min-h-screen bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60 w-full ">
             <div className="flex min-h-screen">
                 <Navbar className="h-screen shrink-0" />
                 <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
-                    <div className="flex w-full max-w-5xl flex-col gap-6">
+                    <div className="flex w-full w-full flex-col gap-6">
                         <SearchBar
                             value={query}
                             onChange={setQuery}
@@ -162,7 +162,7 @@ export default function ExplorePage() {
                         />
 
                         <div className="flex flex-col gap-3 w-full">
-                            <h2 className="font-semibold text-base">Popular Tags</h2>
+                            <h2 className="font-semibold text-lg">Popular Tags</h2>
                             <div className="flex flex-wrap gap-2">
                                 {followedColleges.map((college) => (
                                     <button
@@ -201,7 +201,7 @@ export default function ExplorePage() {
                         </div>
 
                         <div className="flex items-center gap-2 w-full flex-wrap">
-                            <span className="font-semibold text-base">Explore</span>
+                            <span className="font-semibold text-2xl">Explore</span>
                             {activeSports.map((sport) => (
                                 <CancellableTag
                                     key={sport.id}

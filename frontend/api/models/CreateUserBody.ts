@@ -10,11 +10,6 @@ export type CreateUserBody = {
    */
   readonly $schema?: string;
   /**
-   * @description If the user has access to premium features
-   * @type boolean
-   */
-  account_type: boolean;
-  /**
    * @description The bio of a user
    * @type string | undefined
    */

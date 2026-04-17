@@ -6,9 +6,6 @@
 import { z } from "zod/v4";
 
 export const userSchema = z.object({
-  account_type: z
-    .boolean()
-    .describe("If the user has access to premium features"),
   bio: z.nullable(z.string().describe("The name of a user")),
   college: z.string().describe("The college of a user"),
   created_at: z.iso.datetime(),

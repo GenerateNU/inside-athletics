@@ -17,7 +17,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Free-tier limits for users without premium (Account_Type == false).
+// Free-tier limits for users with the "user" role.
 const (
 	FreeUserMaxPostViews = 5
 	FreeUserMaxPosts     = 1
@@ -56,11 +56,11 @@ func (s *PostService) CreatePost(ctx context.Context, input *struct{ Body Create
 		return nil, err
 	}
 
-	u, err := s.userDB.GetUser(id)
+	isFree, err := s.userDB.HasRole(id, models.RoleUser)
 	if err != nil {
 		return nil, err
 	}
-	if !u.Account_Type {
+	if isFree {
 		return s.createPost(id, input, true)
 	}
 
@@ -183,11 +183,11 @@ func (s *PostService) GetPostByID(ctx context.Context, input *GetPostByIDParams)
 		return nil, err
 	}
 
-	u, err := s.userDB.GetUser(userID)
+	isFree, err := s.userDB.HasRole(userID, models.RoleUser)
 	if err != nil {
 		return nil, err
 	}
-	if !u.Account_Type {
+	if isFree {
 		if err := s.postDB.RecordPostViewIfAllowed(userID, input.ID, FreeUserMaxPostViews); err != nil {
 			if errors.Is(err, ErrFreePostViewLimitReached) {
 				return nil, huma.Error403Forbidden(freePostViewLimitMessage)
