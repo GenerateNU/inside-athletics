@@ -175,3 +175,18 @@ func (u *UserDB) RemoveUserRole(userID, roleID uuid.UUID) error {
     }
     return nil
 }
+
+func (u *UserDB) GetUsersByRole(roleName models.RoleName) (*[]models.User, error) {
+    var users []models.User
+    err := u.db.
+        Preload("College", "id IS NOT NULL").
+        Preload("Sport", "id IS NOT NULL").
+        Joins("JOIN user_roles ON user_roles.user_id = users.id").
+        Joins("JOIN roles ON roles.id = user_roles.role_id").
+        Where("roles.name = ?", roleName).
+        Find(&users).Error
+    if err != nil {
+        return nil, huma.Error500InternalServerError("Failed to get users by role", err)
+    }
+    return &users, nil
+}

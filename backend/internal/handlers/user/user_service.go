@@ -185,10 +185,6 @@ func (u *UserService) DeleteUser(ctx context.Context, input *GetUserParams) (*ut
 	return respBody, nil
 }
 
-type GetUserByUsernameParams struct {
-	Username string `path:"username" doc:"Username of the user"`
-}
-
 func (u *UserService) GetUserByUsername(ctx context.Context, input *GetUserByUsernameParams) (*utils.ResponseBody[GetUserResponse], error) {
 	respBody := &utils.ResponseBody[GetUserResponse]{}
 
@@ -283,5 +279,27 @@ func (u *UserService) RemoveRole(ctx context.Context, input *AssignRoleInput) (*
                 Name: role.Name,
             },
         },
+    }, nil
+}
+
+func (u *UserService) GetUsersByRole(ctx context.Context, input *GetUsersByRoleParams) (*utils.ResponseBody[GetUsersByRoleResponse], error) {
+    respBody := &utils.ResponseBody[GetUsersByRoleResponse]{}
+
+    users, err := u.userDB.GetUsersByRole(models.RoleName(input.Role))
+    if err != nil {
+        return respBody, err
+    }
+
+    var userResponses []GetUserResponse
+    for _, user := range *users {
+        roleResponses, err := u.userDB.GetRolesWithPermissionsForUser(user.ID)
+        if err != nil {
+            return nil, err
+        }
+        userResponses = append(userResponses, *u.toUserResponse(ctx, &user, roleResponses))
+    }
+
+    return &utils.ResponseBody[GetUsersByRoleResponse]{
+        Body: &GetUsersByRoleResponse{Users: userResponses},
     }, nil
 }

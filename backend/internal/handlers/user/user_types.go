@@ -28,6 +28,10 @@ type GetUserResponse struct {
 	Roles                 *[]role.RoleResponse         `json:"roles,omitempty" doc:"Roles assigned to the user"`
 }
 
+type GetUserByUsernameParams struct {
+	Username string `path:"username" doc:"Username of the user"`
+}
+
 type UserRoleResponse struct {
 	ID   uuid.UUID       `json:"id" example:"1" doc:"ID of the role"`
 	Name models.RoleName `json:"name" example:"user" doc:"Name of the role"`
@@ -93,4 +97,12 @@ type AssignRoleRequest struct {
 type AssignRoleResponse struct {
 	UserID uuid.UUID        `json:"user_id" example:"1" doc:"ID of the user"`
 	Role   UserRoleResponse `json:"role" doc:"Assigned role"`
+}
+
+type GetUsersByRoleParams struct {
+    Role string `query:"role" doc:"Role name to filter users by"`
+}
+
+type GetUsersByRoleResponse struct {
+    Users []GetUserResponse `json:"users"`
 }

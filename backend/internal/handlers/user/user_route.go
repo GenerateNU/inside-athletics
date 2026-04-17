@@ -30,5 +30,6 @@ func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
 		huma.Delete(grp, "/{id}", userService.DeleteUser)
 		huma.Post(grp, "/{id}/roles", userService.AssignRole)
 		huma.Delete(grp, "/{id}/roles", userService.RemoveRole)
+		huma.Get(grp, "/role", userService.GetUsersByRole)
 	}
 }
