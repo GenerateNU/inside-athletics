@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
 import CreatePostPopup from "@/components/ui/create-post-popup";
@@ -109,7 +108,6 @@ function HomePageContent() {
       : (allPostsData?.posts ?? []);
   const isLoading = activeTags.length > 0 ? loadingFilteredPosts : loadingAllPosts;
 
-  const searchParams = useSearchParams();
   const showCreatePost = searchParams.get("createPost") === "true";
 
   return (
