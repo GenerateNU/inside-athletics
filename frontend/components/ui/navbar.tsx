@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Briefcase, Crown, Home, Plus, Search } from "lucide-react";
+import { BookOpen, Briefcase, Crown, Home, Plus, Search, Settings } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 import { useSession } from "@/utils/SessionContext";
 import { useRouter } from "next/navigation";
 
-// Generated hooks from Kubb
 import {
   getApiV1CollegeByIdQueryOptions,
   getApiV1SportByIdQueryOptions,
@@ -62,6 +61,7 @@ type NavbarProps = React.ComponentProps<"aside">;
 
 export function Navbar({ className, ...props }: NavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const session = useSession();
@@ -70,7 +70,6 @@ export function Navbar({ className, ...props }: NavbarProps) {
     ? { Authorization: `Bearer ${session.access_token}` }
     : undefined;
 
-  // Collapse to an icon rail when the viewport gets narrow enough.
   useEffect(() => {
     const updateCollapsed = () => {
       setIsCollapsed(window.innerWidth < 900);
@@ -81,7 +80,16 @@ export function Navbar({ className, ...props }: NavbarProps) {
     return () => window.removeEventListener("resize", updateCollapsed);
   }, []);
 
-  // Fetch the followed IDs for all three types in parallel
+  useEffect(() => {
+    fetch("/api/v1/role/roles", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setIsAdmin(data.roles.some((r: { name: string }) => r.name === "admin"));
+      });
+  }, []);
+
   const { data: tagFollows } = useGetApiV1UserTagFollows({
     query: { enabled },
     client: { headers: authHeaders },
@@ -102,10 +110,8 @@ export function Navbar({ className, ...props }: NavbarProps) {
   const sportIds =
     unwrapBody<GetSportFollowsByUserResponse>(sportFollows)?.sport_ids ?? [];
   const collegeIds =
-    unwrapBody<GetCollegeFollowsByUserResponse>(collegeFollows)?.college_ids ??
-    [];
+    unwrapBody<GetCollegeFollowsByUserResponse>(collegeFollows)?.college_ids ?? [];
 
-  // Fetch each individual item using useQueries (parallel, no waterfalls)
   const tagResults = useQueries({
     queries: tagIds.map((id: string) =>
       getApiV1TagByIdQueryOptions(id, { headers: authHeaders }),
@@ -124,7 +130,6 @@ export function Navbar({ className, ...props }: NavbarProps) {
     ),
   });
 
-  // Derive loading state and following items from query results
   const isLoadingFollowing =
     tagResults.some((r) => r.isLoading) ||
     sportResults.some((r) => r.isLoading) ||
@@ -133,32 +138,17 @@ export function Navbar({ className, ...props }: NavbarProps) {
   const followingItems = [
     ...sportResults.flatMap((r) =>
       unwrapBody<SportResponse>(r.data)
-        ? [
-            {
-              label: unwrapBody<SportResponse>(r.data)!.name,
-              type: "sport" as const,
-            },
-          ]
+        ? [{ label: unwrapBody<SportResponse>(r.data)!.name, type: "sport" as const }]
         : [],
     ),
     ...tagResults.flatMap((r) =>
       unwrapBody<GetTagResponse>(r.data)
-        ? [
-            {
-              label: unwrapBody<GetTagResponse>(r.data)!.name,
-              type: "tag" as const,
-            },
-          ]
+        ? [{ label: unwrapBody<GetTagResponse>(r.data)!.name, type: "tag" as const }]
         : [],
     ),
     ...collegeResults.flatMap((r) =>
       unwrapBody<GetCollegeResponse>(r.data)
-        ? [
-            {
-              label: unwrapBody<GetCollegeResponse>(r.data)!.name,
-              type: "school" as const,
-            },
-          ]
+        ? [{ label: unwrapBody<GetCollegeResponse>(r.data)!.name, type: "school" as const }]
         : [],
     ),
   ];
@@ -175,7 +165,6 @@ export function Navbar({ className, ...props }: NavbarProps) {
       )}
       {...props}
     >
-      {/* Logo */}
       <div
         className={cn(
           "flex min-w-0 items-center gap-[clamp(0.5rem,1vw,0.75rem)]",
@@ -202,7 +191,6 @@ export function Navbar({ className, ...props }: NavbarProps) {
         </div>
       </div>
 
-      {/* Search */}
       {!isCollapsed && (
         <div className="pt-[clamp(0.75rem,1.2vw,1rem)]">
           <Input
@@ -216,7 +204,6 @@ export function Navbar({ className, ...props }: NavbarProps) {
 
       <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
 
-      {/* Nav items */}
       <nav
         aria-label="Primary"
         className={cn(
@@ -353,6 +340,27 @@ export function Navbar({ className, ...props }: NavbarProps) {
         <Crown className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0" />
         {!isCollapsed && <span className="truncate">Insider Content</span>}
       </Button>
+
+      {isAdmin && (
+        <Button
+          variant="ghost"
+          size="lg"
+          className={cn(
+            "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium hover:bg-zinc-100 hover:text-zinc-900",
+            pathname === "/settings" ? "bg-zinc-100 text-zinc-900" : "text-zinc-700",
+            isCollapsed
+              ? "w-12 justify-center px-0"
+              : "justify-start gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+          )}
+          aria-label="Settings"
+          title="Settings"
+          nativeButton={false}
+          render={<Link href="/settings" />}
+        >
+          <Settings className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0" />
+          {!isCollapsed && <span className="truncate">Settings</span>}
+        </Button>
+      )}
     </aside>
   );
 }
