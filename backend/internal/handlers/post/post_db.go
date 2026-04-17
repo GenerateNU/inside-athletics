@@ -58,7 +58,9 @@ func (s *PostDB) CreatePost(post *models.Post, tags []TagRequest) (*models.Post,
 	}
 
 	// reload post with tags
-	if err := s.db.First(post, "id = ?", post.ID).Error; err != nil {
+	if err := s.db.Preload("Tags", func(db *gorm.DB) *gorm.DB {
+		return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+	}).First(post, "id = ?", post.ID).Error; err != nil {
 		return utils.HandleDBError(post, err)
 	}
 
@@ -88,7 +90,9 @@ func (s *PostDB) CreatePostWithAuthorLimit(post *models.Post, tags []TagRequest,
 	}
 
 	// reload post with tags
-	if err := s.db.First(post, "id = ?", post.ID).Error; err != nil {
+	if err := s.db.Preload("Tags", func(db *gorm.DB) *gorm.DB {
+		return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+	}).First(post, "id = ?", post.ID).Error; err != nil {
 		return utils.HandleDBError(post, err)
 	}
 
@@ -197,6 +201,9 @@ func (s *PostDB) GetPostByID(id uuid.UUID, userID uuid.UUID) (*models.Post, erro
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		First(&post, "posts.id = ?", id)
 
 	return utils.HandleDBError(&post, dbResponse.Error)
@@ -222,6 +229,9 @@ func (s *PostDB) GetPostsBySportID(limit, offset int, sportID uuid.UUID, userID 
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Where("sport_id = ?", sportID).
 		Limit(limit).
 		Offset(offset).
@@ -252,6 +262,9 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userI
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Where("author_id = ?", authorID).
 		Limit(limit).
 		Offset(offset).
@@ -293,6 +306,9 @@ func (p *PostDB) GetAllPosts(limit int, offset int, userID uuid.UUID) ([]models.
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Limit(limit).
 		Offset(offset).
 		Find(&posts)
@@ -399,6 +415,9 @@ func (p *PostDB) GetPopularPosts(limit int, offset int, windowHours int, userID 
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Order("popularity_score DESC").
 		Order("comment_count DESC").
 		Order("like_count DESC").
@@ -434,6 +453,9 @@ func (p *PostDB) UpdatePost(id uuid.UUID, updates UpdatePostRequest, userID uuid
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Where("id = ?", id).
 		Updates(updates).
 		Scan(&updatedPost)
@@ -457,6 +479,9 @@ func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit in
 		Preload("Author").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Order(orderQuery).
 		Count(&total).
 		Limit(limit).
@@ -526,6 +551,9 @@ func (p *PostDB) FilterPosts(userId uuid.UUID, colleges []uuid.UUID, sports []uu
 		Preload("Author", "id IS NOT NULL").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
 		Limit(limit).
 		Offset(offset).
 		Order("posts.created_at DESC").
