@@ -486,7 +486,7 @@ func (p *PostDB) FuzzySearchForPost(userID uuid.UUID, searchStr string, limit in
 		Count(&total).
 		Limit(limit).
 		Offset(offset).
-		Scan(&posts).Error; err != nil {
+		Find(&posts).Error; err != nil {
 		return posts, 0, err
 	}
 
@@ -522,23 +522,42 @@ func (p *PostDB) FilterPosts(userId uuid.UUID, colleges []uuid.UUID, sports []uu
 
 	whereQuery := strings.Join(filters, " OR ")
 
-	if err := p.db.
-		Model(&models.Post{}).
-		Select(POST_SELECT_QUERY, userId).
-		Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'").
+	// get the count
+	countResult := p.db.Model(&models.Post{}).Where(whereQuery)
+
+	if len(tags) > 0 {
+		countResult = countResult.Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'")
+	}
+
+	countResult = countResult.
+		Group("posts.id").
+		Count(&total)
+
+	if countResult.Error != nil {
+		return nil, 0, countResult.Error
+	}
+
+	results := p.db.
+		Table("posts").
+		Select(POST_SELECT_QUERY, userId)
+
+	if len(tags) > 0 {
+		results = results.Joins("JOIN tag_posts ON posts.id = tag_posts.postable_id AND tag_posts.postable_type = 'post'")
+	}
+
+	if err := results.
 		Where(whereQuery).
 		Group("posts.id").
-		Preload("Author").
+		Preload("Author", "id IS NOT NULL").
 		Preload("Sport", "id IS NOT NULL").
 		Preload("College", "id IS NOT NULL").
 		Preload("Tags", func(db *gorm.DB) *gorm.DB {
 			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
 		}).
-		Count(&total).
 		Limit(limit).
 		Offset(offset).
 		Order("posts.created_at DESC").
-		Scan(&posts).Error; err != nil {
+		Find(&posts).Error; err != nil {
 		return posts, 0, err
 	}
 
