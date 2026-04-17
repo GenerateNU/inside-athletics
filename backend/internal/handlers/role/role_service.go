@@ -149,3 +149,27 @@ func toRoleResponse(role *models.Role) *RoleResponse {
 		Name: role.Name,
 	}
 }
+
+func (r *RoleService) GetCurrentUserRoles(ctx context.Context, input *struct{}) (*utils.ResponseBody[GetAllRolesResponse], error) {
+    userID, err := utils.GetCurrentUserID(ctx)
+    if err != nil {
+        return nil, err
+    }
+
+    roles, err := r.roleDB.GetRolesByUserID(userID)
+    if err != nil {
+        return nil, err
+    }
+
+    responses := make([]RoleResponse, 0, len(roles))
+    for i := range roles {
+        responses = append(responses, *toRoleResponse(&roles[i]))
+    }
+
+    return &utils.ResponseBody[GetAllRolesResponse]{
+        Body: &GetAllRolesResponse{
+            Roles: responses,
+            Total: len(responses),
+        },
+    }, nil
+}

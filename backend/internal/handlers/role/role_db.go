@@ -192,3 +192,15 @@ func (r *RoleDB) DeleteRole(id uuid.UUID) error {
 	}
 	return nil
 }
+
+func (r *RoleDB) GetRolesByUserID(userID uuid.UUID) ([]models.Role, error) {
+    var roles []models.Role
+    err := r.db.
+        Joins("JOIN user_roles ON user_roles.role_id = roles.id").
+        Where("user_roles.user_id = ?", userID).
+        Find(&roles).Error
+    if err != nil {
+        return nil, huma.Error404NotFound("roles not found")
+    }
+    return roles, nil
+}
