@@ -6226,6 +6226,23 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 role basic
+  /api/v1/role/roles:
+    get:
+      operationId: get-api-v1-role-roles
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAllRolesResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 role roles
   /api/v1/role/{id}:
     delete:
       operationId: delete-api-v1-role-by-id

@@ -78,6 +78,8 @@ export type { GetApiV1PostsSearchSuspenseQueryKey } from "./hooks/useGetApiV1Pos
 export type { GetApiV1PostsSuspenseQueryKey } from "./hooks/useGetApiV1PostsSuspense.ts";
 export type { GetApiV1RoleByIdQueryKey } from "./hooks/useGetApiV1RoleById.ts";
 export type { GetApiV1RoleByIdSuspenseQueryKey } from "./hooks/useGetApiV1RoleByIdSuspense.ts";
+export type { GetApiV1RoleRolesQueryKey } from "./hooks/useGetApiV1RoleRoles.ts";
+export type { GetApiV1RoleRolesSuspenseQueryKey } from "./hooks/useGetApiV1RoleRolesSuspense.ts";
 export type { GetApiV1RolesQueryKey } from "./hooks/useGetApiV1Roles.ts";
 export type { GetApiV1RolesSuspenseQueryKey } from "./hooks/useGetApiV1RolesSuspense.ts";
 export type { GetApiV1SportByIdQueryKey } from "./hooks/useGetApiV1SportById.ts";
@@ -602,6 +604,12 @@ export type {
   GetApiV1RoleByIdQuery,
   GetApiV1RoleByIdQueryResponse,
 } from "./models/GetApiV1RoleById.ts";
+export type {
+  GetApiV1RoleRoles200,
+  GetApiV1RoleRolesError,
+  GetApiV1RoleRolesQuery,
+  GetApiV1RoleRolesQueryResponse,
+} from "./models/GetApiV1RoleRoles.ts";
 export type {
   GetApiV1Roles200,
   GetApiV1RolesError,
@@ -1210,6 +1218,7 @@ export { getApiV1PostsPremiumBySportBySportId } from "./clients/getApiV1PostsPre
 export { getApiV1PostsPremiumByTagByTagId } from "./clients/getApiV1PostsPremiumByTagByTagId.ts";
 export { getApiV1PostsSearch } from "./clients/getApiV1PostsSearch.ts";
 export { getApiV1RoleById } from "./clients/getApiV1RoleById.ts";
+export { getApiV1RoleRoles } from "./clients/getApiV1RoleRoles.ts";
 export { getApiV1Roles } from "./clients/getApiV1Roles.ts";
 export { getApiV1SportById } from "./clients/getApiV1SportById.ts";
 export { getApiV1SportByNameByName } from "./clients/getApiV1SportByNameByName.ts";
@@ -1517,6 +1526,12 @@ export { useGetApiV1RoleById } from "./hooks/useGetApiV1RoleById.ts";
 export { getApiV1RoleByIdSuspenseQueryKey } from "./hooks/useGetApiV1RoleByIdSuspense.ts";
 export { getApiV1RoleByIdSuspenseQueryOptions } from "./hooks/useGetApiV1RoleByIdSuspense.ts";
 export { useGetApiV1RoleByIdSuspense } from "./hooks/useGetApiV1RoleByIdSuspense.ts";
+export { getApiV1RoleRolesQueryKey } from "./hooks/useGetApiV1RoleRoles.ts";
+export { getApiV1RoleRolesQueryOptions } from "./hooks/useGetApiV1RoleRoles.ts";
+export { useGetApiV1RoleRoles } from "./hooks/useGetApiV1RoleRoles.ts";
+export { getApiV1RoleRolesSuspenseQueryKey } from "./hooks/useGetApiV1RoleRolesSuspense.ts";
+export { getApiV1RoleRolesSuspenseQueryOptions } from "./hooks/useGetApiV1RoleRolesSuspense.ts";
+export { useGetApiV1RoleRolesSuspense } from "./hooks/useGetApiV1RoleRolesSuspense.ts";
 export { getApiV1RolesQueryKey } from "./hooks/useGetApiV1Roles.ts";
 export { getApiV1RolesQueryOptions } from "./hooks/useGetApiV1Roles.ts";
 export { useGetApiV1Roles } from "./hooks/useGetApiV1Roles.ts";
@@ -2182,6 +2197,11 @@ export {
   getApiV1RoleByIdPathParamsSchema,
   getApiV1RoleByIdQueryResponseSchema,
 } from "./zod/getApiV1RoleByIdSchema.ts";
+export {
+  getApiV1RoleRoles200Schema,
+  getApiV1RoleRolesErrorSchema,
+  getApiV1RoleRolesQueryResponseSchema,
+} from "./zod/getApiV1RoleRolesSchema.ts";
 export {
   getApiV1Roles200Schema,
   getApiV1RolesErrorSchema,
