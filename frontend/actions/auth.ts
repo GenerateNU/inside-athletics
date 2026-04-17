@@ -17,18 +17,25 @@ type signupInitialState = {
 
 export async function login(prevState: loginInitialState, formData: FormData) {
   const supabase = await createSupabaseServerClient();
-  const payload = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
-  const { error } = await supabase.auth.signInWithPassword(payload);
-  console.log(error);
+  const email = (formData.get("email") as string | null)?.trim() ?? "";
+  const password = (formData.get("password") as string | null) ?? "";
+
+  if (!email || !password) {
+    return {
+      success: false,
+      message: "Email and password are required.",
+    };
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
   if (error) {
     return {
       success: false,
-      message: error.message || "Login failed",
+      message: error.message || "Invalid email or password.",
     };
   }
+
   revalidatePath("/", "layout");
   redirect("/");
 }
@@ -38,8 +45,9 @@ export async function signup(
   formData: FormData,
 ) {
   const supabase = await createSupabaseServerClient();
+  const email = (formData.get("email") as string | null)?.trim() ?? "";
   const payload = {
-    email: formData.get("email") as string,
+    email,
     password: formData.get("password") as string,
     options: {
       data: {},
@@ -53,9 +61,8 @@ export async function signup(
     };
   }
 
-  return {
-    success: true,
-    message: "Form submitted successfully!",
-    email: payload.email,
-  };
+  revalidatePath("/", "layout");
+  redirect(
+    `/onboarding/verification/code?source=signup&email=${encodeURIComponent(email)}`,
+  );
 }

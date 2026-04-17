@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/query-provider";
 import { SessionProvider } from "@/utils/SessionContext";
+import { OnboardingProvider } from "@/utils/onboarding";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -32,7 +33,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <OnboardingProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </OnboardingProvider>
         </SessionProvider>
       </body>
     </html>

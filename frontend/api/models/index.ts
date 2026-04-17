@@ -214,7 +214,6 @@ export type { DeleteUserResponse } from "./DeleteUserResponse.ts";
 export type { DeletedAt } from "./DeletedAt.ts";
 export type { ErrorDetail } from "./ErrorDetail.ts";
 export type { ErrorModel } from "./ErrorModel.ts";
-export type { GetAllCollegesResponse } from "./GetAllCollegesResponse.ts";
 export type { GetAllPermissionsResponse } from "./GetAllPermissionsResponse.ts";
 export type { GetAllPostsResponse } from "./GetAllPostsResponse.ts";
 export type { GetAllPremiumPostsResponse } from "./GetAllPremiumPostsResponse.ts";
@@ -228,6 +227,13 @@ export type {
   GetApiV1CheckoutSessionsByIdQueryResponse,
 } from "./GetApiV1CheckoutSessionsById.ts";
 export type {
+  GetApiV1College200,
+  GetApiV1CollegeError,
+  GetApiV1CollegeQuery,
+  GetApiV1CollegeQueryParams,
+  GetApiV1CollegeQueryResponse,
+} from "./GetApiV1College.ts";
+export type {
   GetApiV1CollegeById200,
   GetApiV1CollegeByIdError,
   GetApiV1CollegeByIdPathParams,
@@ -238,6 +244,7 @@ export type {
   GetApiV1Colleges200,
   GetApiV1CollegesError,
   GetApiV1CollegesQuery,
+  GetApiV1CollegesQueryParams,
   GetApiV1CollegesQueryResponse,
 } from "./GetApiV1Colleges.ts";
 export type {
@@ -660,6 +667,7 @@ export type {
   ListApiV1TagTypeByTypeQuery,
   ListApiV1TagTypeByTypeQueryResponse,
 } from "./ListApiV1TagTypeByType.ts";
+export type { ListCollegesResponse } from "./ListCollegesResponse.ts";
 export type { Media } from "./Media.ts";
 export type { MediaResponse } from "./MediaResponse.ts";
 export type {

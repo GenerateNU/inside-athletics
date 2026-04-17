@@ -186,7 +186,6 @@ export { deleteUserResponseSchema } from "./deleteUserResponseSchema.ts";
 export { deletedAtSchema } from "./deletedAtSchema.ts";
 export { errorDetailSchema } from "./errorDetailSchema.ts";
 export { errorModelSchema } from "./errorModelSchema.ts";
-export { getAllCollegesResponseSchema } from "./getAllCollegesResponseSchema.ts";
 export { getAllPermissionsResponseSchema } from "./getAllPermissionsResponseSchema.ts";
 export { getAllPostsResponseSchema } from "./getAllPostsResponseSchema.ts";
 export { getAllPremiumPostsResponseSchema } from "./getAllPremiumPostsResponseSchema.ts";
@@ -205,8 +204,15 @@ export {
   getApiV1CollegeByIdQueryResponseSchema,
 } from "./getApiV1CollegeByIdSchema.ts";
 export {
+  getApiV1College200Schema,
+  getApiV1CollegeErrorSchema,
+  getApiV1CollegeQueryParamsSchema,
+  getApiV1CollegeQueryResponseSchema,
+} from "./getApiV1CollegeSchema.ts";
+export {
   getApiV1Colleges200Schema,
   getApiV1CollegesErrorSchema,
+  getApiV1CollegesQueryParamsSchema,
   getApiV1CollegesQueryResponseSchema,
 } from "./getApiV1CollegesSchema.ts";
 export {
@@ -571,6 +577,7 @@ export {
   listApiV1TagTypeByTypePathParamsSchema,
   listApiV1TagTypeByTypeQueryResponseSchema,
 } from "./listApiV1TagTypeByTypeSchema.ts";
+export { listCollegesResponseSchema } from "./listCollegesResponseSchema.ts";
 export { mediaResponseSchema } from "./mediaResponseSchema.ts";
 export { mediaSchema } from "./mediaSchema.ts";
 export {

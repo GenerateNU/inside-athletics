@@ -10,6 +10,11 @@ type GetCollegeParams struct {
 	ID uuid.UUID `path:"id" example:"1" doc:"ID of the college"`
 }
 
+type ListCollegesParams struct {
+	Limit  int `query:"limit" default:"200" example:"200" doc:"Maximum number of colleges to return"`
+	Offset int `query:"offset" default:"0" example:"0" doc:"Number of colleges to skip"`
+}
+
 type GetCollegeResponse struct {
 	ID           uuid.UUID       `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the college"`
 	Name         string          `json:"name" example:"Northeastern University" doc:"Name of the college"`
@@ -19,6 +24,11 @@ type GetCollegeResponse struct {
 	AcademicRank *int16          `json:"academic_rank" example:"53" doc:"Academic rank of the college"`
 	DivisionRank models.Division `json:"division_rank" enum:"1,2,3" example:"1" doc:"NCAA division (1, 2, or 3)"`
 	Logo         *string         `json:"logo" example:"https://example.com/logo.png" doc:"Logo of the college"`
+}
+
+type ListCollegesResponse struct {
+	Colleges []GetCollegeResponse `json:"colleges" doc:"List of colleges"`
+	Total    int                  `json:"total" doc:"Total number of colleges returned"`
 }
 
 type CreateCollegeRequest struct {
