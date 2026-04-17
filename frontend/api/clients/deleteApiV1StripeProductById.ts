@@ -6,14 +6,19 @@
 // @ts-nocheck
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { DeleteApiV1StripeProductByIdMutationResponse } from "../models/DeleteApiV1StripeProductById.ts";
+import type {
+  DeleteApiV1StripeProductByIdMutationResponse,
+  DeleteApiV1StripeProductByIdPathParams,
+} from "../models/DeleteApiV1StripeProductById.ts";
 import type {
   Client,
   RequestConfig,
   ResponseErrorConfig,
 } from "@kubb/plugin-client/clients/axios";
 
-function getDeleteApiV1StripeProductByIdUrl() {
+function getDeleteApiV1StripeProductByIdUrl(
+  id: DeleteApiV1StripeProductByIdPathParams["id"],
+) {
   const res = {
     method: "DELETE",
     url: `/api/v1/stripe_product/${id}` as const,
@@ -26,6 +31,7 @@ function getDeleteApiV1StripeProductByIdUrl() {
  * {@link /api/v1/stripe_product/:id}
  */
 export async function deleteApiV1StripeProductById(
+  id: DeleteApiV1StripeProductByIdPathParams["id"],
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config;
@@ -36,7 +42,7 @@ export async function deleteApiV1StripeProductById(
     unknown
   >({
     method: "DELETE",
-    url: getDeleteApiV1StripeProductByIdUrl().url.toString(),
+    url: getDeleteApiV1StripeProductByIdUrl(id).url.toString(),
     ...requestConfig,
   });
   return res.data;

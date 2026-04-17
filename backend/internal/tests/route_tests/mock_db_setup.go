@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"inside-athletics/internal/models"
-
 	"fmt"
 	"inside-athletics/internal/handlers/content"
 	"inside-athletics/internal/s3"

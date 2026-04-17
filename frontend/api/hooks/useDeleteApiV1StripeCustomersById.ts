@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { DeleteApiV1StripeCustomersByIdMutationResponse } from "../models/DeleteApiV1StripeCustomersById.ts";
+import type {
+  DeleteApiV1StripeCustomersByIdMutationResponse,
+  DeleteApiV1StripeCustomersByIdPathParams,
+} from "../models/DeleteApiV1StripeCustomersById.ts";
 import type {
   Client,
   RequestConfig,
@@ -32,12 +34,12 @@ export function deleteApiV1StripeCustomersByIdMutationOptions<
   return mutationOptions<
     DeleteApiV1StripeCustomersByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeCustomersByIdPathParams["id"] },
     TContext
   >({
     mutationKey,
-    mutationFn: async () => {
-      return deleteApiV1StripeCustomersById(config);
+    mutationFn: async ({ id }) => {
+      return deleteApiV1StripeCustomersById(id, config);
     },
   });
 }
@@ -51,7 +53,7 @@ export function useDeleteApiV1StripeCustomersById<TContext>(
     mutation?: UseMutationOptions<
       DeleteApiV1StripeCustomersByIdMutationResponse,
       ResponseErrorConfig<Error>,
-      void,
+      { id: DeleteApiV1StripeCustomersByIdPathParams["id"] },
       TContext
     > & { client?: QueryClient };
     client?: Partial<RequestConfig> & { client?: Client };
@@ -67,14 +69,14 @@ export function useDeleteApiV1StripeCustomersById<TContext>(
   ) as UseMutationOptions<
     DeleteApiV1StripeCustomersByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeCustomersByIdPathParams["id"] },
     TContext
   >;
 
   return useMutation<
     DeleteApiV1StripeCustomersByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeCustomersByIdPathParams["id"] },
     TContext
   >(
     {
@@ -86,7 +88,7 @@ export function useDeleteApiV1StripeCustomersById<TContext>(
   ) as UseMutationResult<
     DeleteApiV1StripeCustomersByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripeCustomersByIdPathParams["id"] },
     TContext
   >;
 }

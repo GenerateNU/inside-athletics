@@ -10,4 +10,5 @@ export const createTagBodySchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   name: z.string().describe("The name of the tag to create"),
+  type: z.string().describe("The type of the tag"),
 });

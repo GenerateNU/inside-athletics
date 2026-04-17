@@ -1,0 +1,90 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": ["https://example.com/schemas/GetSurveysByUserResponse.json"],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "surveys": {
+      "description": "List of survey responses",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "$schema": {
+            "description": "A URL to the JSON Schema for this object.",
+            "examples": ["https://example.com/schemas/SurveyResponse.json"],
+            "format": "uri",
+            "readOnly": true,
+            "type": "string"
+          },
+          "academic_career_resources": {
+            "description": "Academic/career resources rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "academics_athletics_priority": {
+            "description": "Academics vs athletics priority rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "college_id": { "description": "College ID", "type": "string" },
+          "culture": {
+            "description": "Culture rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "environment": {
+            "description": "Environment rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "id": { "description": "Survey ID", "type": "string" },
+          "mental_health_priority": {
+            "description": "Mental health priority rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "player_dev": {
+            "description": "Player development rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "sport_id": { "description": "Sport ID", "type": "string" },
+          "transparency": {
+            "description": "Transparency rating",
+            "format": "int32",
+            "type": "integer"
+          },
+          "user_id": { "description": "User ID", "type": "string" }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "college_id",
+          "sport_id",
+          "player_dev",
+          "academics_athletics_priority",
+          "academic_career_resources",
+          "mental_health_priority",
+          "environment",
+          "culture",
+          "transparency"
+        ],
+        "type": "object",
+        "x-readme-ref-name": "SurveyResponse"
+      },
+      "type": ["array", "null"]
+    },
+    "total": {
+      "description": "Total number of surveys submitted by this user",
+      "format": "int64",
+      "type": "integer"
+    }
+  },
+  "required": ["surveys", "total"],
+  "type": "object",
+  "x-readme-ref-name": "GetSurveysByUserResponse"
+}

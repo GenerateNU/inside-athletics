@@ -1,35 +1,202 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/ui/navbar";
-import { CiUser } from "react-icons/ci";
+"use client";
 
-export default function Page() {
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { useSession } from "@/utils/SessionContext";
+
+import CreatePostPopup from "@/components/ui/create-post-popup";
+import { SearchBar } from "@/components/post/SearchBar";
+import SmallPost from "@/components/post/SmallPost";
+import { Navbar } from "@/components/ui/navbar";
+
+import { useQueries } from "@tanstack/react-query";
+import {
+  useGetApiV1PostsFilter,
+  useGetApiV1PostsPopular,
+  useGetApiV1PostsSearch,
+} from "@/api/hooks";
+import { CancellableTag } from "@/components/filtering/CancellableTag";
+import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
+import SearchPopup from "@/components/ui/search-popup";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+
+
+function HomePageContent() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
+
+  const session = useSession();
+  const enabled = !!session?.access_token;
+
+  const authHeaders = session?.access_token
+    ? { Authorization: `Bearer ${session.access_token}` }
+    : undefined;
+
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [activeTags, setActiveTags] = useState<GetTagResponse[]>([]);
+  const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
+  const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+
+  function toggleTag(tag: GetTagResponse) {
+    setActiveTags((prev) =>
+      prev.some((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+  function toggleCollege(tag: GetCollegeResponse) {
+    setActiveCollege((prev) =>
+      prev.some((c) => c.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+  function toggleSport(tag: SportResponse) {
+    setActiveSports((prev) =>
+      prev.some((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag],
+    );
+  }
+
+  const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1PostsPopular(
+    {},
+    {
+      query: { enabled },
+      client: { headers: authHeaders }
+    },
+  );
+
+  const { data: searchedPosts, isLoading: loadignSearchedPosts } = useGetApiV1PostsSearch(
+    { search_str: debouncedQuery },
+    {
+      query: { enabled },
+      client: { headers: authHeaders }
+    },
+  )
+
+  const hasActiveFilters = activeTags.length > 0 || activeColleges.length > 0 || activeSports.length > 0;
+
+  const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
+    {
+      sport_ids: activeTags.filter((t) => t.type === "sports").map((t) => t.id).join(","),
+      tag_ids: activeTags.filter((t) => t.type !== "sports").map((t) => t.id).join(","),
+      college_ids: activeColleges.map((t) => t.id).join(","),
+    },
+    {
+      query: { enabled: hasActiveFilters },
+      client: { headers: authHeaders },
+    },
+  );
+  console.log("filtered: " + filteredPostsData)
+
+
+  // post are EITHER : all posts (default), filteredPosts (if active tags), or searchedPosts (if query is searched)
+  const posts = activeTags.length > 0
+    ? (filteredPostsData?.posts ?? [])
+    : debouncedQuery !== ""
+      ? (searchedPosts?.posts ?? [])
+      : (allPostsData?.posts ?? []);
+  const isLoading = activeTags.length > 0 ? loadingFilteredPosts : loadingAllPosts;
+
+  const showCreatePost = searchParams.get("createPost") === "true";
+
   return (
     <div className="min-h-screen bg-zinc-50">
+
+      {showFilterPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowFilterPopup(false)}
+          />
+          <div className="relative z-10">
+            <SearchPopup
+              activeTags={activeTags}
+              setActiveTagsAction={setActiveTags}
+              onBackAction={() => setShowFilterPopup(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showCreatePost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <CreatePostPopup />
+        </div>
+      )}
       <div className="flex min-h-screen">
         <Navbar className="h-screen shrink-0" />
-        <main className="flex min-w-0 flex-1 items-center justify-center p-6">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-6xl">🐸</p>
-            <h1 className="text-4xl font-bold">Welcome to Inside Athletics</h1>
-            <p className="text-muted-foreground">
-              Under Construction! but here are some components:
-            </p>
+        <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-scroll max-h-screen">
+          <div className="flex w-full max-w-5xl flex-col gap-6">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search posts..."
+              className="w-full"
+            />
 
-            <div className="flex flex-row gap-5">
-              <Avatar> </Avatar>
-              <Avatar>
-                <AvatarFallback>
-                  <CiUser strokeWidth={1.3} />
-                </AvatarFallback>
-              </Avatar>
+
+            {/* show either the search result label OR the filter button + active tags */}
+            <div className="flex items-center gap-2 w-full flex-wrap">
+              {debouncedQuery ? (
+                <p className="text-sm text-zinc-500">
+                  Showing Search Results for &ldquo;<span className="font-medium text-zinc-800">{debouncedQuery}</span>&rdquo;
+                </p>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowFilterPopup(true)}
+                    className="inline-flex items-center rounded-lg border-1 border-[#D4E94B] bg-[#FCFDF1] px-3 py-1 text-xs text-zinc-800"
+                  >
+                    <ChevronDown size={16} />
+                    Filter
+                  </Button>
+
+                  {activeTags.map((tag) => (
+                    <CancellableTag
+                      key={tag.id}
+                      label={tag.name}
+                      onRemove={() => toggleTag(tag)}
+                    />
+                  ))}
+                </>
+              )}
             </div>
-            <div className="flex flex-row gap-5">
-              <Button variant="outline"> Click here</Button>
+
+
+            <div className="flex flex-col gap-4 w-full">
+              {isLoading ? (
+                <p className="text-sm text-zinc-400">Loading posts...</p>
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <SmallPost key={post.id} post={post} />
+                ))
+              ) : (
+                <p className="text-sm text-zinc-400">No posts found.</p>
+              )}
             </div>
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense>
+      <HomePageContent />
+    </Suspense>
   );
 }

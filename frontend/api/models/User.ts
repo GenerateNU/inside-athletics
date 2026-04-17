@@ -59,6 +59,11 @@ export type User = {
    */
   last_name: string;
   /**
+   * @description The S3 key for the user\'s profile picture
+   * @type string
+   */
+  profile_picture: string;
+  /**
    * @description The sport the user plays
    * @type string
    */

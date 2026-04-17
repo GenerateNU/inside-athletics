@@ -1,6 +1,9 @@
 package post
 
 import (
+	"strings"
+
+	"inside-athletics/internal/handlers/user"
 	models "inside-athletics/internal/models"
 
 	"github.com/google/uuid"
@@ -11,8 +14,8 @@ type CreatePostRequest struct {
 	SportId     *uuid.UUID   `json:"sport_id,omitempty"`
 	CollegeId   *uuid.UUID   `json:"college_id,omitempty"`
 	Tags        []TagRequest `json:"tags,omitempty"`
-	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
-	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
+	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" minLength:"1" maxLength:"100"`
+	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" minLength:"1" maxLength:"5000"`
 	IsAnonymous bool         `json:"is_anonymous"`
 }
 
@@ -26,7 +29,7 @@ type CreatePostResponse struct {
 	AuthorID    *uuid.UUID   `json:"author" type:"uuid"`
 	SportID     *uuid.UUID   `json:"sport" type:"uuid"`
 	CollegeID   *uuid.UUID   `json:"college" type:"uuid"`
-	Tags        []models.Tag `json:"tag" type:"tag"`
+	Tags        []models.Tag `json:"tags" type:"tag"`
 	Title       string       `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
 	Content     string       `json:"content" example:"My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?" gorm:"type:varchar(5000);not null" validate:"required,min=1,max=5000"`
 	IsAnonymous bool         `json:"is_anonymous"`
@@ -34,9 +37,9 @@ type CreatePostResponse struct {
 
 // PostResponse defines the response structure for a post
 type PostResponse struct {
-	ID                uuid.UUID       `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Author            *models.User    `json:"author" type:"user"`
-	Sport             *models.Sport   `json:"sport" type:"sport"`
+	ID                uuid.UUID            `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Author            *user.GetUserResponse `json:"author"`
+	Sport             *models.Sport        `json:"sport" type:"sport"`
 	College           *models.College `json:"college" type:"college"`
 	Tags              []models.Tag    `json:"tags" type:"tag"`
 	Title             string          `json:"title" example:"Looking for thoughts on NEU Fencing!" gorm:"type:varchar(100);not null" validate:"required,min=1,max=100"`
@@ -131,10 +134,26 @@ type UpdatePostRequest struct {
 
 // ToPostResponse converts a Post model to a postResponse
 func ToPostResponse(post *models.Post, id uuid.UUID) *PostResponse {
-	var author *models.User
+	var author *user.GetUserResponse
 	if !post.IsAnonymous || id == post.AuthorID {
-		a := post.Author
-		author = &a
+		var profilePicture *string
+		if strings.HasPrefix(post.Author.ProfilePicture, "https://") {
+			pfp := post.Author.ProfilePicture
+			profilePicture = &pfp
+		}
+		author = &user.GetUserResponse{
+			ID:                    post.Author.ID,
+			FirstName:             post.Author.FirstName,
+			LastName:              post.Author.LastName,
+			Email:                 post.Author.Email,
+			Username:              post.Author.Username,
+			Bio:                   post.Author.Bio,
+			ProfilePicture:        profilePicture,
+			AccountType:           post.Author.Account_Type,
+			ExpectedGradYear:      post.Author.Expected_Grad_Year,
+			VerifiedAthleteStatus: post.Author.Verified_Athlete_Status,
+			Division:              post.Author.Division,
+		}
 	}
 	return &PostResponse{
 		ID:                post.ID,
@@ -175,4 +194,23 @@ func ToCreatePostResponse(post *models.Post, id uuid.UUID) *CreatePostResponse {
 type DeletePostResponse struct {
 	Message string    `json:"message" example:"College deleted successfully" doc:"Success message"`
 	ID      uuid.UUID `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the deleted college"`
+}
+
+type GetSearchParam struct {
+	SearchStr string `query:"search_str" binding:"required" example:"Northeastern University" doc:"String to fuzzy search posts/tags/colleges/sports on"`
+	Limit     int    `query:"limit" default:"20" example:"10" doc:"Cap on the number of posts to return"`
+	Offset    int    `query:"offset" default:"0" example:"8" doc:"Number of entries to skip for pagination"`
+}
+
+type GetSearchResponse struct {
+	Posts []PostResponse `json:"posts" doc:"List of post responses found for given search"`
+	Count int64          `json:"count" example:"5" doc:"Count of search results found for given search"`
+}
+
+type GetFilterPostsParams struct {
+	CollegeIds string `query:"college_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of college_ids to filter by"`
+	SportIds   string `query:"sport_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of sport_ids to filter by"`
+	TagIds     string `query:"tag_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of tag_ids to filter by"`
+	Limit      int    `query:"limit" default:"20" example:"20" doc:"Number of posts to return when filtering"`
+	Offset     int    `query:"offset" default:"0" example:"8" doc:"Number of entries in the database to offset by"`
 }

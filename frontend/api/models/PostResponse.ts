@@ -4,9 +4,9 @@
  */
 
 import type { College } from "./College.ts";
+import type { GetUserResponse } from "./GetUserResponse.ts";
 import type { Sport } from "./Sport.ts";
 import type { Tag } from "./Tag.ts";
-import type { User } from "./User.ts";
 
 export type PostResponse = {
   /**
@@ -17,7 +17,7 @@ export type PostResponse = {
   /**
    * @type object
    */
-  author: User;
+  author: GetUserResponse;
   /**
    * @type object
    */

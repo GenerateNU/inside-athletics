@@ -10,17 +10,18 @@ export type GetTagPostByIDResponse = {
    */
   readonly $schema?: string;
   /**
-   * @description the id of the item
    * @type string
    */
   id: string;
   /**
-   * @description The post id
    * @type string
    */
-  post_ids: string;
+  postable_id: string;
   /**
-   * @description the tag id
+   * @type string
+   */
+  postable_type: string;
+  /**
    * @type string
    */
   tag_id: string;

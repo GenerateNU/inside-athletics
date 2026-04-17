@@ -92,11 +92,11 @@ type GetAllStripeSessionsRequest struct {
 }
 
 type ArchiveStripeProductRequest struct {
-	ID string `json:"id" example:"product_123" doc:"ID of the product"`
+	ID string `path:"id" example:"product_123" doc:"ID of the product"`
 }
 
 type ArchiveStripePriceRequest struct {
-	ID string `json:"id" example:"price_123" doc:"ID of the product"`
+	ID string `path:"id" example:"price_123" doc:"ID of the product"`
 }
 
 type DeleteCheckoutSessionRequest struct {
@@ -187,7 +187,7 @@ type CustomField struct {
 }
 
 type DeleteStripeCustomerInput struct {
-	ID string `json:"path" maxLength:"36" example:"1" doc:"ID of the user on stripe"`
+	ID string `path:"id" maxLength:"36" example:"1" doc:"ID of the user on stripe"`
 }
 
 type DeleteStripeCustomerResponse struct {

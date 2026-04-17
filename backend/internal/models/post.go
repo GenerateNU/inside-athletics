@@ -16,7 +16,7 @@ type Post struct {
 	Sport       *Sport         `json:"-" gorm:"foreignKey:SportID;references:ID;constraint:OnDelete:SET NULL;"`
 	CollegeID   *uuid.UUID     `json:"college_id" gorm:"type:uuid;default:null"`
 	College     *College       `json:"-" gorm:"foreignKey:CollegeID;references:ID;constraint:OnDelete:SET NULL;"`
-	Tags        []Tag          `json:"tags" gorm:"many2many:tag_posts;"`
+	Tags        []Tag          `json:"tags" gorm:"many2many:tag_posts;foreignKey:ID;joinForeignKey:PostableID;joinReferences:TagID"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`

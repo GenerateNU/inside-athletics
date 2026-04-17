@@ -9,7 +9,8 @@ export const updateTagPostResponseSchema = z.object({
   $schema: z.optional(
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
-  id: z.string().describe("ID of the tagpost updated"),
-  post_id: z.string().describe("the updated post id"),
-  tag_id: z.string().describe("the updated tag id"),
+  id: z.string(),
+  postable_id: z.string(),
+  postable_type: z.string(),
+  tag_id: z.string(),
 });

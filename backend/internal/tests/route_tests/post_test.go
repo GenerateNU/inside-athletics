@@ -2,8 +2,11 @@ package routeTests
 
 import (
 	"errors"
+	"fmt"
 	"inside-athletics/internal/handlers/post"
+	"inside-athletics/internal/handlers/sport"
 	"inside-athletics/internal/models"
+	"inside-athletics/internal/utils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -44,7 +47,7 @@ func TestCreatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -98,7 +101,7 @@ func TestCreatePostWithoutTagsThrowsError(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -128,7 +131,7 @@ func TestCreatePostWithTags(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -156,7 +159,7 @@ func TestCreatePostWithTags(t *testing.T) {
 		},
 	}
 
-	resp := api.Post("/api/v1/post/", body, authHeader)
+	resp := api.Post("/api/v1/post/", authHeader, body)
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
 	}
@@ -174,7 +177,7 @@ func TestGetPostById(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -233,7 +236,7 @@ func TestGetPostByIdWithLikes(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -330,7 +333,7 @@ func TestGetPostByIdNotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
@@ -350,7 +353,7 @@ func TestBadValidation(t *testing.T) {
 		t.Fatalf("failed to migrate posts table: %v", err)
 	}
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, nil)
@@ -376,7 +379,7 @@ func TestGetPostByAuthorId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -439,7 +442,7 @@ func TestGetPostsBySportId(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -487,7 +490,7 @@ func TestGetAllPosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -535,7 +538,7 @@ func TestUpdatePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -585,7 +588,7 @@ func TestUpdatePostNotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
@@ -604,7 +607,7 @@ func TestDeletePost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -639,7 +642,7 @@ func TestDeletePostNotFound(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
@@ -658,7 +661,7 @@ func TestFreeUserCannotCreateSecondPost(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -754,7 +757,7 @@ func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 	postDB := post.NewPostDB(testDB.DB)
 
@@ -896,7 +899,7 @@ func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 
-	post.Route(testDB.API, testDB.DB)
+	post.Route(testDB.API, testDB.DB, nil)
 	api := testDB.API
 
 	CreateUserAndSport(testDB, t)
@@ -920,6 +923,341 @@ func TestPremiumUserCanCreateMultiplePosts(t *testing.T) {
 	resp2 := api.Post("/api/v1/post/", body, authHeader)
 	if resp2.Code != http.StatusOK {
 		t.Fatalf("second post (premium) expected 200, got %d: %s", resp2.Code, resp2.Body.String())
+	}
+}
+
+func TestPostSearch(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	post1, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northwestern University Soccer Is LIT!", Content: "Wow I love NWU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	// Test searching for substring of title, expecting post1 to have higher similarity score
+	resp := api.Get("/api/v1/posts/search?search_str=NorthE", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
+	}
+	var searchResp post.GetSearchResponse
+	DecodeTo(&searchResp, resp)
+
+	if searchResp.Count != 2 {
+		t.Errorf("Expected 2 entries but got %d", searchResp.Count)
+	}
+	if searchResp.Posts[0].Title != post1.Title {
+		t.Error("Expected post1 to have higher similarity score to search string")
+	}
+}
+
+func TestTypoStillReturns(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	post1, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/search?search_str=northeusternTest", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
+	}
+	var searchResp post.GetSearchResponse
+	DecodeTo(&searchResp, resp)
+
+	if searchResp.Count != 1 {
+		t.Errorf("Expected 1 entries but got %d", searchResp.Count)
+	}
+	if searchResp.Posts[0].Title != post1.Title {
+		t.Error("Expected to retrieve post 1")
+	}
+}
+
+func TestSearchLimit(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	_, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted north", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/search?search_str=northTest&limit=1", authHeader)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected 204 got %d %s", resp.Code, resp.Body.String())
+	}
+	var searchResp post.GetSearchResponse
+	DecodeTo(&searchResp, resp)
+
+	if searchResp.Count != 2 {
+		t.Errorf("Expected 2 total entries but got %d", searchResp.Count)
+	}
+	if len(searchResp.Posts) != 1 {
+		t.Errorf("Expected only 1 entry to be returned")
+	}
+}
+
+func TestFilterPosts(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	collegeId := uuid.New()
+	neu := models.College{
+		ID:           collegeId,
+		Name:         "Northeastern University",
+		State:        "Massachusetts",
+		City:         "Boston",
+		Website:      "https://www.northeastern.edu",
+		DivisionRank: models.DivisionI,
+	}
+	collegeResp := testDB.DB.Create(&neu)
+	_, errCollege := utils.HandleDBError(&neu, collegeResp.Error)
+
+	if errCollege != nil {
+		t.Fatalf("Unable to add college to table: %s", errCollege.Error())
+	}
+
+	sportDB := sport.NewSportDB(testDB.DB)
+	popularity := int32(1)
+	ermSport, errSport := sportDB.CreateSport("Erm Sport", &popularity)
+	if errSport != nil {
+		t.Fatal("Unable to create sport erm sport")
+	}
+
+	tags := make([]models.Tag, 0)
+	for i := range 3 {
+		tagId := uuid.New()
+		tag := models.Tag{
+			ID:   tagId,
+			Name: fmt.Sprintf("Tag%d", i),
+		}
+		tags = append(tags, tag)
+		testDB.DB.Create(&tag)
+	}
+
+	mapTagRequests := func(t models.Tag) post.TagRequest { return post.TagRequest{ID: t.ID} }
+
+	_, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID, CollegeID: &collegeId,
+		Title: "Northeastern University Soccer Is LIT!", Content: "Wow I love NEU Soccer", IsAnonymous: false,
+	}, utils.MapList(tags[0:2], mapTagRequests))
+
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	_, err1 := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &ermSport.ID, CollegeID: &collegeId,
+		Title: "I farted north", Content: "Wow it smells", IsAnonymous: false,
+	}, utils.MapList(tags[1:3], mapTagRequests))
+	if err1 != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	filterCollegesResp := api.Get("/api/v1/posts/filter?college_ids="+collegeId.String(), authHeader)
+	if filterCollegesResp.Code != http.StatusOK {
+		t.Fatalf("Expected a 200 but got %d", filterCollegesResp.Code)
+	}
+
+	var filteredColleges post.GetAllPostsResponse
+
+	DecodeTo(&filteredColleges, filterCollegesResp)
+
+	if filteredColleges.Total != 2 {
+		t.Fatalf("Expected 2 posts in response for college filter got %d", filteredColleges.Total)
+	}
+
+	filterSportsResp := api.Get("/api/v1/posts/filter?sport_ids="+ermSport.ID.String(), authHeader)
+	if filterSportsResp.Code != http.StatusOK {
+		t.Fatalf("Expected to get status code 200 but got %d", filterSportsResp.Code)
+	}
+
+	var filteredSports post.GetAllPostsResponse
+
+	DecodeTo(&filteredSports, filterSportsResp)
+
+	if filteredSports.Posts[0].College == nil {
+		t.Fatalf("Sport filter results in college data not loaded")
+	}
+
+	if filteredSports.Total != 1 {
+		t.Fatalf("Expected to get 1 filtered post got %d", filteredSports.Total)
+	}
+
+	filterSportsResp = api.Get("/api/v1/posts/filter?sport_ids="+ermSport.ID.String()+","+SoccerID.String(), authHeader)
+	if filterSportsResp.Code != http.StatusOK {
+		t.Fatalf("Expected to get status code 200 but got %d", filterSportsResp.Code)
+	}
+
+	DecodeTo(&filteredSports, filterSportsResp)
+
+	if filteredSports.Total != 2 {
+		t.Fatalf("Expected to get 2 filtered posts based on 2 sports got %d", filteredSports.Total)
+	}
+
+	tagIds := utils.MapList(tags, func(t models.Tag) string {
+		return t.ID.String()
+	})
+
+	// test tag filtering
+	filterTagsResp := api.Get("/api/v1/posts/filter?tag_ids="+strings.Join(tagIds, ","), authHeader)
+	if filterCollegesResp.Code != http.StatusOK {
+		t.Fatalf("Expected status code 200 but got %d", filterTagsResp.Code)
+	}
+
+	var filteredTags post.GetAllPostsResponse
+
+	DecodeTo(&filteredTags, filterTagsResp)
+
+	if filteredTags.Total != 2 {
+		t.Fatalf("Expected 2 filtered posts but got %d", filteredTags.Total)
+	}
+
+	filterTagsResp = api.Get("/api/v1/posts/filter?tag_ids="+tagIds[0], authHeader)
+	if filterCollegesResp.Code != http.StatusOK {
+		t.Fatalf("Expected status code 200 but got %d", filterTagsResp.Code)
+	}
+
+	DecodeTo(&filteredTags, filterTagsResp)
+
+	if filteredTags.Total != 1 {
+		t.Fatalf("Expected 1 filtered posts but got %d", filteredTags.Total)
+	}
+
+	if filteredTags.Posts[0].College == nil {
+		t.Fatalf("College is not getting loaded %s", filteredTags.Posts[0].College.Name)
+	}
+
+	if filteredTags.Posts[0].College.Name != neu.Name {
+		t.Fatalf("Filter isn't returning college information when the info exists")
+	}
+
+	filterSportAndTagResp := api.Get(fmt.Sprintf("/api/v1/posts/filter?sport_ids=%s&tag_ids=%s", SoccerID.String(), tagIds[2]), authHeader)
+	if filterSportAndTagResp.Code != http.StatusOK {
+		t.Fatalf("Expected status code 200 but got %d", filterSportAndTagResp.Code)
+	}
+
+	var filterSportAndTag post.GetAllPostsResponse
+
+	DecodeTo(&filterSportAndTag, filterSportAndTagResp)
+
+	if filterSportAndTag.Total != 2 {
+		t.Fatalf("Expected filter to return 2 posts but got %d", filterSportAndTag.Total)
+	}
+}
+
+func TestModelsReturnedInFilter(t *testing.T) {
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+
+	api := testDB.API
+
+	postDB := post.NewPostDB(testDB.DB)
+
+	authHeader := authHeaderWithPermissions(t, testDB.DB, []permissionSpec{
+		{Action: models.PermissionCreate, Resource: "post"},
+	})
+
+	CreateUserAndSport(testDB, t)
+
+	_, err := postDB.CreatePost(&models.Post{
+		AuthorID: JohnID, SportID: &SoccerID,
+		Title: "I farted north", Content: "Wow it smells", IsAnonymous: false,
+	}, []post.TagRequest{})
+	if err != nil {
+		t.Fatalf("failed to create post: %v", err)
+	}
+
+	resp := api.Get("/api/v1/posts/filter", authHeader)
+	if resp.Code != 200 {
+		t.Fatalf("Expected response code 200 got %d", resp.Code)
+	}
+
+	var posts post.GetAllPostsResponse
+
+	DecodeTo(&posts, resp)
+
+	if posts.Total == 0 {
+		t.Fatalf("Expected one test, got %d", posts.Total)
+	}
+
+	if posts.Posts[0].Sport == nil {
+		t.Fatalf("SHIT IS BROKEN")
 	}
 }
 

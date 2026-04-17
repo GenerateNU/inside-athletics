@@ -1,0 +1,100 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "A URL to the JSON Schema for this object.",
+      "examples": [
+        "https://example.com/schemas/CreatePremiumPostResponse.json"
+      ],
+      "format": "uri",
+      "readOnly": true,
+      "type": "string"
+    },
+    "author": { "type": "string" },
+    "college_id": { "type": "string" },
+    "content": {
+      "examples": [
+        "My name is Bob Joe and I am a rising senior who just got into NEU. What is the fencing program like? Are they competitive?"
+      ],
+      "type": "string"
+    },
+    "id": { "type": "string" },
+    "media": {
+      "additionalProperties": false,
+      "properties": {
+        "created_at": { "format": "date-time", "type": "string" },
+        "id": { "type": "string" },
+        "media_type": {
+          "description": "The media type of the object",
+          "examples": ["jpeg"],
+          "type": "string"
+        },
+        "s3key": {
+          "description": "The S3 key of the media object",
+          "examples": ["1"],
+          "type": "string"
+        },
+        "title": {
+          "description": "The title of the media",
+          "examples": ["Video of Athlete"],
+          "type": "string"
+        }
+      },
+      "required": ["id", "s3key", "title", "media_type", "created_at"],
+      "type": "object",
+      "x-readme-ref-name": "Media"
+    },
+    "media_id": {
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
+      "type": "string"
+    },
+    "sport_id": { "type": "string" },
+    "tag": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": ["string", "null"] },
+          "id": { "type": "string" },
+          "name": {
+            "description": "The name of the tag",
+            "examples": ["Hockey"],
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of the tag",
+            "examples": ["sports"],
+            "type": "string"
+          },
+          "updated_at": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "deleted_at",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "x-readme-ref-name": "Tag"
+      },
+      "type": ["array", "null"]
+    },
+    "title": {
+      "examples": ["Looking for thoughts on NEU Fencing!"],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "author",
+    "sport_id",
+    "college_id",
+    "tag",
+    "title",
+    "content"
+  ],
+  "type": "object",
+  "x-readme-ref-name": "CreatePremiumPostResponse"
+}

@@ -11,4 +11,5 @@ export const createTagResponseSchema = z.object({
   ),
   id: z.string().describe("ID of the tag created"),
   name: z.string().describe("The name of the tag created"),
+  type: z.string().describe("The type of the tag"),
 });

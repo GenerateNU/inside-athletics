@@ -4,9 +4,9 @@
  */
 
 import { collegeSchema } from "./collegeSchema.ts";
+import { getUserResponseSchema } from "./getUserResponseSchema.ts";
 import { sportSchema } from "./sportSchema.ts";
 import { tagSchema } from "./tagSchema.ts";
-import { userSchema } from "./userSchema.ts";
 import { z } from "zod/v4";
 
 export const postResponseSchema = z.object({
@@ -14,7 +14,7 @@ export const postResponseSchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   get author() {
-    return userSchema;
+    return getUserResponseSchema;
   },
   get college() {
     return collegeSchema;

@@ -10,4 +10,5 @@ export const updateTagBodySchema = z.object({
     z.url().describe("A URL to the JSON Schema for this object."),
   ),
   name: z.string().describe("The new name to update"),
+  type: z.string().describe("The type of the tag"),
 });

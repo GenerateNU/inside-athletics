@@ -8,9 +8,14 @@
       "readOnly": true,
       "type": "string"
     },
-    "post_id": {
-      "description": "ID of the post",
+    "postable_id": {
+      "description": "ID of the post or premium post",
       "examples": ["123e4567-e89b-12d3-a456-426614174000"],
+      "type": "string"
+    },
+    "postable_type": {
+      "description": "Type: post or premium_post",
+      "examples": ["post"],
       "type": "string"
     },
     "tag_id": {
@@ -19,7 +24,7 @@
       "type": "string"
     }
   },
-  "required": ["post_id", "tag_id"],
+  "required": ["postable_id", "postable_type", "tag_id"],
   "type": "object",
   "x-readme-ref-name": "CreateTagPostBody"
 }

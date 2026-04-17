@@ -3,8 +3,10 @@
  * Do not edit manually.
  */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { DeleteApiV1StripePriceByIdMutationResponse } from "../models/DeleteApiV1StripePriceById.ts";
+import type {
+  DeleteApiV1StripePriceByIdMutationResponse,
+  DeleteApiV1StripePriceByIdPathParams,
+} from "../models/DeleteApiV1StripePriceById.ts";
 import type {
   Client,
   RequestConfig,
@@ -32,12 +34,12 @@ export function deleteApiV1StripePriceByIdMutationOptions<TContext = unknown>(
   return mutationOptions<
     DeleteApiV1StripePriceByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripePriceByIdPathParams["id"] },
     TContext
   >({
     mutationKey,
-    mutationFn: async () => {
-      return deleteApiV1StripePriceById(config);
+    mutationFn: async ({ id }) => {
+      return deleteApiV1StripePriceById(id, config);
     },
   });
 }
@@ -51,7 +53,7 @@ export function useDeleteApiV1StripePriceById<TContext>(
     mutation?: UseMutationOptions<
       DeleteApiV1StripePriceByIdMutationResponse,
       ResponseErrorConfig<Error>,
-      void,
+      { id: DeleteApiV1StripePriceByIdPathParams["id"] },
       TContext
     > & { client?: QueryClient };
     client?: Partial<RequestConfig> & { client?: Client };
@@ -67,14 +69,14 @@ export function useDeleteApiV1StripePriceById<TContext>(
   ) as UseMutationOptions<
     DeleteApiV1StripePriceByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripePriceByIdPathParams["id"] },
     TContext
   >;
 
   return useMutation<
     DeleteApiV1StripePriceByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripePriceByIdPathParams["id"] },
     TContext
   >(
     {
@@ -86,7 +88,7 @@ export function useDeleteApiV1StripePriceById<TContext>(
   ) as UseMutationResult<
     DeleteApiV1StripePriceByIdMutationResponse,
     ResponseErrorConfig<Error>,
-    void,
+    { id: DeleteApiV1StripePriceByIdPathParams["id"] },
     TContext
   >;
 }

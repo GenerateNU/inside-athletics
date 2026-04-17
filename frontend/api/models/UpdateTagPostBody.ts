@@ -10,10 +10,15 @@ export type UpdateTagPostBody = {
    */
   readonly $schema?: string;
   /**
-   * @description the post id to update to
+   * @description the postable id to update to
    * @type string
    */
-  post_id: string;
+  postable_id: string;
+  /**
+   * @description Type: post or premium_post
+   * @type string
+   */
+  postable_type: string;
   /**
    * @description the tag id to update to
    * @type string
