@@ -29,7 +29,7 @@ export default function OnboardingLegalPage() {
             Privacy Policy & Terms
           </h1>
           <p className="text-sm text-gray-600">
-            Review this note before continuing to verification.
+            Review this note before continuing to your plan.
           </p>
         </div>
 
@@ -90,7 +90,9 @@ export default function OnboardingLegalPage() {
                 accepted,
               });
               router.push(
-                `/onboarding/verification?role=${encodeURIComponent(role)}`,
+                role === "prospective-athlete"
+                  ? `/onboarding/plan?role=${encodeURIComponent(role)}`
+                  : "/onboarding/plan",
               );
             }}
             disabled={!accepted}

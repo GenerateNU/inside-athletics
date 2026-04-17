@@ -2,18 +2,23 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSession } from "@/utils/SessionContext";
 import { useOnboarding } from "@/utils/onboarding";
+import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const session = useSession();
   const { data, hydrated, updateSection } = useOnboarding();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -31,6 +36,45 @@ export default function SignUpPage() {
   const canContinue = Boolean(
     name.trim() && email.trim() && username.trim() && password,
   );
+
+  const handleSignup = async () => {
+    if (!canContinue || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    updateSection("account", { name, username });
+    updateSection("verification", { name, email });
+
+    if (session?.user) {
+      router.push("/onboarding/role");
+      return;
+    }
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error: signupError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {},
+        },
+      });
+
+      if (signupError) {
+        setError(signupError.message || "Unable to sign up.");
+        return;
+      }
+
+      router.push(
+        `/onboarding/verification/code?source=signup&email=${encodeURIComponent(email.trim())}`,
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#A8C8E8_0%,#E8F1FA_100%)] px-6 py-12">
@@ -94,20 +138,25 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {error ? (
+              <p className="text-sm text-red-600" role="alert">
+                {error}
+              </p>
+            ) : null}
 
             <div className="flex w-full flex-col items-center gap-2">
               <Button
                 type="button"
                 variant="default"
                 className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
-                onClick={() => {
-                  updateSection("account", { name, username });
-                  updateSection("verification", { name, email });
-                  router.push("/onboarding/role");
-                }}
-                disabled={!canContinue}
+                onClick={handleSignup}
+                disabled={!canContinue || isSubmitting}
               >
-                Continue
+                {isSubmitting
+                  ? "Signing Up..."
+                  : session?.user
+                    ? "Continue"
+                    : "Sign Up"}
               </Button>
             </div>
           </div>

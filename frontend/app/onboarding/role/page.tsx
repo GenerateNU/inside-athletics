@@ -37,6 +37,7 @@ const programOptions = [
 ] as const;
 
 type UploadUrlPayload = {
+  document_id: string;
   upload_url: string;
   key: string;
 };
@@ -504,17 +505,6 @@ export default function OnboardingRolePage() {
               program,
               university: role === "athlete" ? university : "",
             });
-            if (
-              role === "athlete" &&
-              data.verification.email.trim() &&
-              !session?.user.email_confirmed_at
-            ) {
-              router.push(
-                `/onboarding/verification/code?source=signup&role=${encodeURIComponent(role)}&email=${encodeURIComponent(data.verification.email)}`,
-              );
-              return;
-            }
-
             router.push(`/onboarding/legal?role=${encodeURIComponent(role)}`);
           }}
           disabled={!canContinue || isUploadingProfileImage}
