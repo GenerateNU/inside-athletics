@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build-prod":"next build",
-    "start-prod":"next start",
+    "build-prod": "next build",
+    "start-prod": "next start",
     "dev": "doppler run --command=\"next dev\"",
     "build": "doppler run --command=\"next build\"",
     "start": "doppler run --command=\"next start\"",
@@ -15,6 +15,7 @@
     "@base-ui/react": "^1.2.0",
     "@eslint/eslintrc": "^3.3.5",
     "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.103.3",
     "@tanstack/react-query": "^5.90.21",
     "ajv": "^8.18.0",
     "axios": "^1.15.0",

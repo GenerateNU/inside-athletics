@@ -14,6 +14,7 @@ func Route(api huma.API, db *gorm.DB) {
 		huma.Post(grp, "/", tagFollowService.CreateTagFollow)
 		huma.Get(grp, "/follows", tagFollowService.GetTagFollowsByUser)
 		huma.Get(grp, "/{tag_id}/users", tagFollowService.GetFollowingUsersByTag)
+		huma.Delete(grp, "/tag/{tag_id}", tagFollowService.DeleteTagFollowByTag)
 		huma.Delete(grp, "/{id}", tagFollowService.DeleteTagFollow)
 	}
 }

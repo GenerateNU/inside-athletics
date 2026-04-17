@@ -13,6 +13,17 @@ type TagDB struct {
 	db *gorm.DB
 }
 
+func (u *TagDB) ListTags(limit int, offset int) (*[]models.Tag, error) {
+	var tags []models.Tag
+	dbResponse := u.db.
+		Model(&models.Tag{}).
+		Order("name ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&tags)
+	return utils.HandleDBError(&tags, dbResponse.Error)
+}
+
 func (u *TagDB) GetPostsByTag(tag_id uuid.UUID, limit int, offset int, userID uuid.UUID) (*[]models.Post, error) {
 	var posts []models.Post
 	dbResponse := u.db.

@@ -50,3 +50,15 @@ func (u *TagFollowDB) DeleteTagFollow(id uuid.UUID) error {
 	}
 	return nil
 }
+
+func (u *TagFollowDB) DeleteTagFollowByUserAndTag(userID uuid.UUID, tagID uuid.UUID) error {
+	dbResponse := u.db.Delete(&models.TagFollow{}, "user_id = ? AND tag_id = ?", userID, tagID)
+	if dbResponse.Error != nil {
+		_, err := utils.HandleDBError(&models.TagFollow{}, dbResponse.Error)
+		return err
+	}
+	if dbResponse.RowsAffected == 0 {
+		return huma.Error404NotFound("Resource not found")
+	}
+	return nil
+}
