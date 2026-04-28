@@ -93,7 +93,6 @@ export default function CreatePremiumPostPopup({ onClose }: CreatePremiumPostPop
           body: file,
           headers: {
             "Content-Type": fileType,
-            "x-amz-meta-filename": uploadUrlData.document_id,
           },
         });
 

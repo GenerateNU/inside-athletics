@@ -29,7 +29,7 @@ export default function MediaDisplay({ media, className, ...props }: MediaDispla
 
     return (
        <div className="w-full block">
-            {(media.media_type == "mp4" || media.media_type == "webm" ||  media.media_type == "mov" ) ?
+            {(media.media_type.startsWith("video/") || media.media_type === "mp4" || media.media_type === "webm" || media.media_type === "mov") ?
                 <div className="w-full">
                     {isVideoLoading && (
                         <div className="w-full aspect-video rounded-lg bg-zinc-200 animate-pulse" />
@@ -56,7 +56,7 @@ export default function MediaDisplay({ media, className, ...props }: MediaDispla
                         </VideoPlayerControlBar>
                     </VideoPlayer>
                 </div>
-            : (media.media_type == "image/jpeg" || media.media_type == "image/png" ) ?
+            : (media.media_type.startsWith("image/") || media.media_type === "jpeg" || media.media_type === "png") ?
                 <Image src={media.s3key} width={0} height={0} sizes="100vw" alt={"Premium Content Image"} className="w-full h-auto rounded-lg" unoptimized />
             :
                 <PDFViewer src={media.s3key} />
