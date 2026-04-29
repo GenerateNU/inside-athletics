@@ -29,7 +29,7 @@ export default function LoginPage() {
           <h1 className="text-4xl font-bold text-[#001F3E]">Log In</h1>
           <div className="flex w-full items-center justify-center px-6 py-4">
             <Image
-              src="/ia mark.svg"
+              src="/logo_image.svg"
               alt="Inside Athletics"
               width={240}
               height={240}

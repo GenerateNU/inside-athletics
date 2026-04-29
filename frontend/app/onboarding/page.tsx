@@ -54,7 +54,7 @@ export default function SignUpPage() {
             </h1>
             <div className="flex w-full items-center justify-center rounded-md px-6 py-8">
               <Image
-                src="/ia mark.svg"
+                src="/logo_image.svg"
                 alt="Inside Athletics"
                 width={240}
                 height={240}

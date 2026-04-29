@@ -8,16 +8,19 @@ import {
 import PremiumSmallPost from "@/components/post/PremiumSmallPost";
 import { Navbar } from "@/components/ui/navbar";
 import { useSession, usePermissions } from "@/utils/SessionContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronDown } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import CreatePremiumPostPopup from "@/components/ui/create-premium-post-popup";
 import PremiumPaymentPopup from "@/components/ui/premium-payment-popup";
 import { SearchBar } from "@/components/post/SearchBar";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
 import SearchPopup from "@/components/ui/search-popup";
 import { Button } from "@/components/ui/button";
-import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
+import { GetCollegeResponse, GetTagResponse, PremiumPostResponse, SportResponse } from "@/api";
+
+const PAGE_SIZE = 20;
 
 export default function InsiderContentPage() {
     const router = useRouter();
@@ -36,39 +39,87 @@ export default function InsiderContentPage() {
     const [activeColleges, setActiveColleges] = useState<GetCollegeResponse[]>([]);
     const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
 
+    const [offset, setOffset] = useState(0);
+    const [accPosts, setAccPosts] = useState<PremiumPostResponse[]>([]);
+    const [total, setTotal] = useState(0);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         const t = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 300);
         return () => clearTimeout(t);
     }, [searchQuery]);
 
     const hasActiveFilters = activeTags.length > 0 || activeColleges.length > 0 || activeSports.length > 0;
+    const mode = debouncedQuery !== "" ? "search" : hasActiveFilters ? "filtered" : "all";
 
-    const { data, isLoading, isError, refetch } = useGetApiV1PostsPremium(
-        {},
-        { query: { enabled }, client: { headers: authHeaders } }
+    const filterKey = `${mode}|${debouncedQuery}|${[...activeTags].map(t => t.id).sort().join(",")}|${[...activeColleges].map(c => c.id).sort().join(",")}|${[...activeSports].map(s => s.id).sort().join(",")}`;
+
+    // Reset pagination when filters or mode change
+    useEffect(() => { setOffset(0); setAccPosts([]); setTotal(0); }, [filterKey]);
+
+    const { data, isError, refetch, isFetching: fetchingAll } = useGetApiV1PostsPremium(
+        { limit: PAGE_SIZE, offset },
+        { query: { enabled: enabled && mode === "all" }, client: { headers: authHeaders } }
     );
 
-    const { data: searchData, isLoading: isSearchLoading } = useGetApiV1PostsPremiumSearch(
-        { search_str: debouncedQuery },
-        { query: { enabled: enabled && debouncedQuery !== "" }, client: { headers: authHeaders } }
+    const { data: searchData, isFetching: fetchingSearch } = useGetApiV1PostsPremiumSearch(
+        { search_str: debouncedQuery, limit: PAGE_SIZE, offset },
+        { query: { enabled: enabled && mode === "search" }, client: { headers: authHeaders } }
     );
 
-    const { data: filteredData, isLoading: isFilterLoading } = useGetApiV1PostsPremiumFilter(
+    const { data: filteredData, isFetching: fetchingFiltered } = useGetApiV1PostsPremiumFilter(
         {
             sport_ids: activeSports.map((s) => s.id).join(","),
             tag_ids: activeTags.map((t) => t.id).join(","),
             college_ids: activeColleges.map((c) => c.id).join(","),
+            limit: PAGE_SIZE,
+            offset,
         },
-        { query: { enabled: enabled && hasActiveFilters }, client: { headers: authHeaders } }
+        { query: { enabled: enabled && mode === "filtered" }, client: { headers: authHeaders } }
     );
 
-    const posts = debouncedQuery !== ""
-        ? (searchData?.posts ?? [])
-        : hasActiveFilters
-            ? (filteredData?.posts ?? [])
-            : (data?.posts ?? []);
+    const activePosts = mode === "search" ? searchData?.posts
+        : mode === "filtered" ? filteredData?.posts
+        : data?.posts;
 
-    const isPostsLoading = debouncedQuery !== "" ? isSearchLoading : hasActiveFilters ? isFilterLoading : isLoading;
+    const activeTotal = mode === "search" ? (searchData?.count ?? 0)
+        : mode === "filtered" ? (filteredData?.total ?? 0)
+        : (data?.total ?? 0);
+
+    const isFetching = mode === "search" ? fetchingSearch
+        : mode === "filtered" ? fetchingFiltered
+        : fetchingAll;
+
+    const isPostsLoading = isFetching && accPosts.length === 0;
+
+    // Accumulate posts as pages arrive
+    useEffect(() => {
+        if (!activePosts) return;
+        setTotal(activeTotal);
+        setAccPosts(prev => {
+            if (offset === 0) return activePosts;
+            const existingIds = new Set(prev.map(p => p.id));
+            return [...prev, ...activePosts.filter(p => !existingIds.has(p.id))];
+        });
+    }, [activePosts, activeTotal, offset]);
+
+    const hasMore = accPosts.length < total;
+
+    // Trigger next page when sentinel scrolls into view
+    useEffect(() => {
+        const el = sentinelRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && !isFetching && hasMore) {
+                    setOffset(prev => prev + PAGE_SIZE);
+                }
+            },
+            { rootMargin: "200px" },
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [isFetching, hasMore]);
 
     function toggleTag(tag: GetTagResponse) {
         setActiveTags((prev) => prev.some((t) => t.id === tag.id) ? prev.filter((t) => t.id !== tag.id) : [...prev, tag]);
@@ -150,13 +201,17 @@ export default function InsiderContentPage() {
                         {isError && <p className="text-red-500">Failed to load insider content.</p>}
                         <div className="flex flex-col gap-4">
                             {isPostsLoading ? (
-                                <p className="text-gray-500">Loading...</p>
-                            ) : posts.length === 0 ? (
+                                <Spinner className="size-6 mx-auto text-gray-400" />
+                            ) : accPosts.length === 0 ? (
                                 <p className="text-gray-500">No insider content available.</p>
                             ) : (
-                                posts.map((post) => (
+                                accPosts.map((post) => (
                                     <PremiumSmallPost key={post.id} post={post} />
                                 ))
+                            )}
+                            <div ref={sentinelRef} className="h-1" />
+                            {isFetching && accPosts.length > 0 && (
+                                <p className="text-sm text-zinc-400 text-center py-2">Loading more...</p>
                             )}
                         </div>
                     </div>

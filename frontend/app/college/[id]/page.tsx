@@ -14,6 +14,7 @@ import { Navbar } from "@/components/ui/navbar";
 import { SearchBar } from "@/components/post/SearchBar";
 import Image from "next/image";
 import { Plus, Check } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 
 function CircleStat({ label, value, max, unit }: { label: string; value: number | null; max: number; unit?: string }) {
@@ -116,7 +117,7 @@ export default function CollegePage({
     }
   );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="flex items-center justify-center min-h-screen"><Spinner className="size-6" /></div>;
   if (error) return <div>Error loading college</div>;
 
   return (

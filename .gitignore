@@ -37,3 +37,5 @@ backend/scripts/seed/data/*.json
 # Supabase CLI local state (root supabase/)
 supabase/.branches/
 supabase/.temp/
+
+.DS_Store

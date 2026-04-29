@@ -2,7 +2,7 @@
 
 // Currently the popular tags are just replaced with user tag follows!
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/utils/SessionContext";
 
@@ -23,8 +23,10 @@ import {
     getApiV1SportByIdQueryOptions,
 } from "@/api/hooks";
 import { CancellableTag } from "@/components/filtering/CancellableTag";
-import { GetCollegeResponse, GetTagResponse, SportResponse } from "@/api";
+import { GetCollegeResponse, GetTagResponse, PostResponse, SportResponse } from "@/api";
+import { Spinner } from "@/components/ui/spinner";
 
+const PAGE_SIZE = 20;
 
 export default function ExplorePage() {
     const session = useSession();
@@ -40,6 +42,11 @@ export default function ExplorePage() {
     const [activeColleges, setActiveCollege] = useState<GetCollegeResponse[]>([]);
     const [activeSports, setActiveSports] = useState<SportResponse[]>([]);
 
+    const [offset, setOffset] = useState(0);
+    const [accPosts, setAccPosts] = useState<PostResponse[]>([]);
+    const [total, setTotal] = useState(0);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         if (!query.trim()) return;
         const t = setTimeout(() => {
@@ -47,7 +54,7 @@ export default function ExplorePage() {
         }, 300);
         return () => clearTimeout(t);
     }, [query, router]);
-    
+
     function toggleTag(tag: GetTagResponse) {
         setActiveTags((prev) =>
             prev.some((t) => t.id === tag.id)
@@ -108,7 +115,6 @@ export default function ExplorePage() {
         ),
     });
 
-
     const followedTags = tagQueries
         .map((q) => q.data)
         .filter((t) => t !== undefined);
@@ -119,41 +125,75 @@ export default function ExplorePage() {
         .map((q) => q.data)
         .filter((t) => t !== undefined);
 
-
-    const { data: allPostsData, isLoading: loadingAllPosts } = useGetApiV1Posts(
-        { },
-        {
-            query: { enabled },
-            client: { headers: authHeaders } },
-    );
-    console.log("all posts: " + allPostsData)
-
     const hasActiveFilters = activeTags.length > 0 || activeColleges.length > 0 || activeSports.length > 0;
 
-    const { data: filteredPostsData, isLoading: loadingFilteredPosts } = useGetApiV1PostsFilter(
-        { sport_ids: activeSports.map((t) => t.id).join(","),
-            tag_ids: activeTags.map((t) => t.id).join(","),
-          college_ids: activeColleges.map((t) => t.id).join(","),
-        },
+    const filterKey = `${hasActiveFilters ? "filtered" : "all"}|${[...activeTags].map(t => t.id).sort().join(",")}|${[...activeColleges].map(c => c.id).sort().join(",")}|${[...activeSports].map(s => s.id).sort().join(",")}`;
+
+    // Reset pagination when filters change
+    useEffect(() => { setOffset(0); setAccPosts([]); setTotal(0); }, [filterKey]);
+
+    const { data: allPostsData, isFetching: fetchingAll } = useGetApiV1Posts(
+        { limit: PAGE_SIZE, offset },
         {
-            query: { enabled: hasActiveFilters },
+            query: { enabled: enabled && !hasActiveFilters },
             client: { headers: authHeaders },
         },
     );
-    console.log("filtered: " + filteredPostsData)
 
-    const posts = hasActiveFilters
-        ? (filteredPostsData?.posts ?? [])
-        : (allPostsData?.posts ?? []);
-    const isLoading = hasActiveFilters ? loadingFilteredPosts : loadingAllPosts;
+    const { data: filteredPostsData, isFetching: fetchingFiltered } = useGetApiV1PostsFilter(
+        {
+            sport_ids: activeSports.map((t) => t.id).join(","),
+            tag_ids: activeTags.map((t) => t.id).join(","),
+            college_ids: activeColleges.map((t) => t.id).join(","),
+            limit: PAGE_SIZE,
+            offset,
+        },
+        {
+            query: { enabled: enabled && hasActiveFilters },
+            client: { headers: authHeaders },
+        },
+    );
 
+    const activePosts = hasActiveFilters ? filteredPostsData?.posts : allPostsData?.posts;
+    const activeTotal = hasActiveFilters ? (filteredPostsData?.total ?? 0) : (allPostsData?.total ?? 0);
+    const isFetching = hasActiveFilters ? fetchingFiltered : fetchingAll;
+    const isLoading = isFetching && accPosts.length === 0;
+
+    // Accumulate posts as pages arrive
+    useEffect(() => {
+        if (!activePosts) return;
+        setTotal(activeTotal);
+        setAccPosts(prev => {
+            if (offset === 0) return activePosts;
+            const existingIds = new Set(prev.map(p => p.id));
+            return [...prev, ...activePosts.filter(p => !existingIds.has(p.id))];
+        });
+    }, [activePosts, activeTotal, offset]);
+
+    const hasMore = accPosts.length < total;
+
+    // Trigger next page when sentinel scrolls into view
+    useEffect(() => {
+        const el = sentinelRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && !isFetching && hasMore) {
+                    setOffset(prev => prev + PAGE_SIZE);
+                }
+            },
+            { rootMargin: "200px" },
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [isFetching, hasMore]);
 
     return (
         <div className="min-h-screen bg-linear-to-b from-[#A8C8E8]/60 to-[#E8F1FA]/60 w-full ">
-            <div className="flex min-h-screen">
+            <div className="flex h-screen">
                 <Navbar className="h-screen shrink-0" />
-                <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10">
-                    <div className="flex w-full w-full flex-col gap-6">
+                <main className="flex min-w-0 flex-1 justify-center p-6 md:p-10 overflow-scroll max-h-screen">
+                    <div className="flex w-full flex-col gap-6 h-full">
                         <SearchBar
                             value={query}
                             onChange={setQuery}
@@ -225,15 +265,19 @@ export default function ExplorePage() {
                             ))}
                         </div>
 
-                        <div className="flex flex-col gap-4 w-full">
+                        <div className="flex flex-col gap-4 w-full flex-1 min-h-0">
                             {isLoading ? (
-                                <p className="text-sm text-zinc-400">Loading posts...</p>
-                            ) : posts.length > 0 ? (
-                                posts.map((post) => (
+                                <Spinner className="size-6 mx-auto text-zinc-400" />
+                            ) : accPosts.length > 0 ? (
+                                accPosts.map((post) => (
                                     <SmallPost key={post.id} post={post} />
                                 ))
                             ) : (
                                 <p className="text-sm text-zinc-400">No posts found.</p>
+                            )}
+                            <div ref={sentinelRef} className="h-1" />
+                            {isFetching && accPosts.length > 0 && (
+                                <Spinner className="size-5 mx-auto text-zinc-400" />
                             )}
                         </div>
                     </div>

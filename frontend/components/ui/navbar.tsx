@@ -175,8 +175,8 @@ export function Navbar({ className, ...props }: NavbarProps) {
         >
           <Image
             src={"/logo_image.svg"}
-            width={45}
-            height={45}
+            width={80}
+            height={80}
             alt="Picture of the author"
           />
           {!isCollapsed && (
