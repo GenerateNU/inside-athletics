@@ -2993,6 +2993,26 @@ components:
         - colleges
         - total
       type: object
+    ListTagsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/ListTagsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        tags:
+          description: List of tags
+          items:
+            $ref: "#/components/schemas/GetTagResponse"
+          type:
+            - array
+            - "null"
+      required:
+        - tags
+      type: object
     Media:
       additionalProperties: false
       properties:
@@ -7350,6 +7370,48 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Delete API v1 survey by ID
+  /api/v1/tag:
+    get:
+      operationId: get-api-v1-tag
+      parameters:
+        - description: Number of tags to return
+          example: 100
+          explode: false
+          in: query
+          name: limit
+          schema:
+            default: 100
+            description: Number of tags to return
+            examples:
+              - 100
+            format: int64
+            type: integer
+        - description: Number of tags to skip
+          example: 0
+          explode: false
+          in: query
+          name: offset
+          schema:
+            default: 0
+            description: Number of tags to skip
+            examples:
+              - 0
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListTagsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 tag
   /api/v1/tag/:
     post:
       operationId: post-api-v1-tag
@@ -7726,13 +7788,13 @@ paths:
     delete:
       operationId: delete-api-v1-user-college-by-id
       parameters:
-        - description: ID of the college follow to be deleted
+        - description: ID of the college to unfollow
           example: 123e4567-e89b-12d3-a456-426614174000
           in: path
           name: id
           required: true
           schema:
-            description: ID of the college follow to be deleted
+            description: ID of the college to unfollow
             examples:
               - 123e4567-e89b-12d3-a456-426614174000
             type: string
@@ -7903,6 +7965,34 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Get API v1 user tag follows
+  /api/v1/user/tag/tag/{tag_id}:
+    delete:
+      operationId: delete-api-v1-user-tag-tag-by-tag-id
+      parameters:
+        - description: ID of the tag follow's tag to be deleted for current user
+          example: 123e4567-e89b-12d3-a456-426614174000
+          in: path
+          name: tag_id
+          required: true
+          schema:
+            description: ID of the tag follow's tag to be deleted for current user
+            examples:
+              - 123e4567-e89b-12d3-a456-426614174000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTagFollowResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Delete API v1 user tag tag by tag ID
   /api/v1/user/tag/{id}:
     delete:
       operationId: delete-api-v1-user-tag-by-id

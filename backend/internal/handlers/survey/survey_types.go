@@ -61,16 +61,16 @@ type GetSurveysByUserResponse struct {
 
 // AverageRatingsRow is the raw DB scan target for the averages query
 type AverageRatingsRow struct {
-	SportID                   uuid.UUID `json:"sport_id"`
-	CollegeID                 uuid.UUID `json:"college_id"`
-	PlayerDev                 float64   `json:"player_dev"`
-	AcademicsAthleticsPriority float64  `json:"academics_athletics_priority"`
-	AcademicCareerResources   float64   `json:"academic_career_resources"`
-	MentalHealthPriority      float64   `json:"mental_health_priority"`
-	Environment               float64   `json:"environment"`
-	Culture                   float64   `json:"culture"`
-	Transparency              float64   `json:"transparency"`
-	ResponseCount             int64     `json:"response_count"`
+	SportID                    uuid.UUID `json:"sport_id"                    gorm:"column:sport_id"`
+	CollegeID                  uuid.UUID `json:"college_id"                  gorm:"column:college_id"`
+	PlayerDev                  float64   `json:"player_dev"                  gorm:"column:player_dev"`
+	AcademicsAthleticsPriority float64   `json:"academics_athletics_priority" gorm:"column:academics_athletics_priority"`
+	AcademicCareerResources    float64   `json:"academic_career_resources"   gorm:"column:academic_career_resources"`
+	MentalHealthPriority       float64   `json:"mental_health_priority"      gorm:"column:mental_health_priority"`
+	Environment                float64   `json:"environment"                 gorm:"column:environment"`
+	Culture                    float64   `json:"culture"                     gorm:"column:culture"`
+	Transparency               float64   `json:"transparency"                gorm:"column:transparency"`
+	ResponseCount              int64     `json:"response_count"              gorm:"column:response_count"`
 }
 
 // AverageRatingsResponse wraps the list of grouped averages

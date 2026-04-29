@@ -39,8 +39,8 @@ func (u *CollegeFollowDB) CreateCollegeFollow(collegefollow *models.CollegeFollo
 	return utils.HandleDBError(collegefollow, dbResponse.Error)
 }
 
-func (u *CollegeFollowDB) DeleteCollegeFollow(id uuid.UUID) error {
-	dbResponse := u.db.Delete(&models.CollegeFollow{}, "id = ?", id)
+func (u *CollegeFollowDB) DeleteCollegeFollow(userID uuid.UUID, collegeID uuid.UUID) error {
+	dbResponse := u.db.Delete(&models.CollegeFollow{}, "user_id = ? AND college_id = ?", userID, collegeID)
 	if dbResponse.Error != nil {
 		_, err := utils.HandleDBError(&models.CollegeFollow{}, dbResponse.Error)
 		return err

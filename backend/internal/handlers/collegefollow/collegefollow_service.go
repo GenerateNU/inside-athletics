@@ -114,7 +114,12 @@ func (u *CollegeFollowService) CreateCollegeFollow(ctx context.Context, input *C
 func (u *CollegeFollowService) DeleteCollegeFollow(ctx context.Context, input *DeleteCollegeFollowParams) (*utils.ResponseBody[DeleteCollegeFollowResponse], error) {
 	respBody := &utils.ResponseBody[DeleteCollegeFollowResponse]{}
 
-	err := u.collegefollowDB.DeleteCollegeFollow(input.ID)
+	userID, err := u.getCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = u.collegefollowDB.DeleteCollegeFollow(userID, input.CollegeID)
 	if err != nil {
 		return respBody, err
 	}

@@ -8,7 +8,7 @@ import type { ErrorModel } from "./ErrorModel.ts";
 
 export type DeleteApiV1UserCollegeByIdPathParams = {
   /**
-   * @description ID of the college follow to be deleted
+   * @description ID of the college to unfollow
    * @type string
    */
   id: string;

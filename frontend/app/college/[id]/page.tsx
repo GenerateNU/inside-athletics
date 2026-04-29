@@ -1,48 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useRef } from "react";
 import { useSession } from "@/utils/SessionContext";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetApiV1CollegeById,
   useGetApiV1CollegesSearch,
   useGetApiV1UserCollegeFollows,
   usePostApiV1UserCollege,
   useDeleteApiV1UserCollegeById,
+  useGetApiV1PostsFilter,
+  getApiV1UserCollegeFollowsQueryKey,
 } from "@/api/hooks";
 import { Navbar } from "@/components/ui/navbar";
 import { SearchBar } from "@/components/post/SearchBar";
+import SmallPost from "@/components/post/SmallPost";
+import { RatingPanel } from "@/components/ui/rating-panel";
 import Image from "next/image";
 import { Plus, Check } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import type { PostResponse } from "@/api/models/PostResponse";
 
+const PAGE_SIZE = 20;
 
-function CircleStat({ label, value, max, unit }: { label: string; value: number | null; max: number; unit?: string }) {
-  const pct = value != null ? Math.min(value / max, 1) : 0;
-  const r = 36;
-  const circ = 2 * Math.PI * r;
-  const dash = pct * circ;
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative w-24 h-24">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 88 88">
-          <circle cx="44" cy="44" r={r} fill="none" stroke="#e5e7eb" strokeWidth="8" />
-          <circle
-            cx="44" cy="44" r={r} fill="none"
-            stroke="#3b82f6" strokeWidth="8"
-            strokeDasharray={`${dash} ${circ}`}
-            strokeLinecap="round"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black">
-          {value != null ? `${value}${unit ?? ""}` : "N/A"}
-        </div>
-      </div>
-      <span className="text-xs text-zinc-500">{label}</span>
-    </div>
-  );
-}
 
 export default function CollegePage({
   params,
@@ -58,14 +39,21 @@ export default function CollegePage({
 
   const [search, setSearch] = useState("");
   const [description, setDescription] = useState<string | null>(null);
-  const [followId, setFollowId] = useState<string | null>(null);
+
+  // Posts infinite scroll
+  const [offset, setOffset] = useState(0);
+  const [accPosts, setAccPosts] = useState<PostResponse[]>([]);
+  const [total, setTotal] = useState(0);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const queryClient = useQueryClient();
 
   const { data: college, isLoading, error } = useGetApiV1CollegeById(id, {
     query: { enabled },
     client: { headers: authHeaders },
   });
 
-  const { data: collegeFollows, refetch: refetchFollows } = useGetApiV1UserCollegeFollows({
+  const { data: collegeFollows } = useGetApiV1UserCollegeFollows({
     query: { enabled },
     client: { headers: authHeaders },
   });
@@ -80,23 +68,74 @@ export default function CollegePage({
     client: { headers: authHeaders },
   });
 
-  function handleFollowToggle() {
-    if (isFollowing) {
-        if (!followId) {
-        // Can't unfollow without the follow ID — this is an API limitation
-        // Would need backend to return follow ID in the college follows endpoint
-        console.warn("No follow ID available to unfollow");
-        return;
+  const { data: postsData, isFetching: fetchingPosts } = useGetApiV1PostsFilter(
+    { college_ids: id, limit: PAGE_SIZE, offset },
+    {
+      query: { enabled },
+      client: { headers: authHeaders },
+    }
+  );
+
+  // Reset posts when college changes
+  useEffect(() => {
+    setOffset(0);
+    setAccPosts([]);
+    setTotal(0);
+  }, [id]);
+
+  // Accumulate pages
+  useEffect(() => {
+    if (!postsData?.posts) return;
+    setTotal(postsData.total);
+    setAccPosts((prev) => {
+      if (offset === 0) return postsData.posts ?? [];
+      const existingIds = new Set(prev.map((p) => p.id));
+      return [...prev, ...(postsData.posts ?? []).filter((p) => !existingIds.has(p.id))];
+    });
+  }, [postsData, offset]);
+
+  // Infinite scroll sentinel
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !fetchingPosts && accPosts.length < total) {
+          setOffset((prev) => prev + PAGE_SIZE);
         }
-        unfollowCollege(
-        { id: followId },
-        { onSuccess: () => { setFollowId(null); refetchFollows(); } }
-        );
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchingPosts, accPosts.length, total]);
+
+  function handleFollowToggle() {
+    const key = getApiV1UserCollegeFollowsQueryKey();
+    const previous = queryClient.getQueryData(key);
+
+    if (isFollowing) {
+      queryClient.setQueryData<typeof collegeFollows>(key, (old) =>
+        old ? { ...old, college_ids: (old.college_ids ?? []).filter((cid) => cid !== id) } : old
+      );
+      unfollowCollege(
+        { id },
+        {
+          onSuccess: () => queryClient.invalidateQueries({ queryKey: key }),
+          onError: () => queryClient.setQueryData(key, previous),
+        }
+      );
     } else {
-        followCollege(
+      queryClient.setQueryData<typeof collegeFollows>(key, (old) =>
+        old ? { ...old, college_ids: [...(old.college_ids ?? []), id] } : old
+      );
+      followCollege(
         { data: { college_id: id } },
-        { onSuccess: (data) => { setFollowId(data.id); refetchFollows(); } }
-        );
+        {
+          onSuccess: () => queryClient.invalidateQueries({ queryKey: key }),
+          onError: () => queryClient.setQueryData(key, previous),
+        }
+      );
     }
   }
 
@@ -184,38 +223,43 @@ export default function CollegePage({
 
             {/* Follow button */}
             <button
-            onClick={handleFollowToggle}
-            className={`ml-6 px-4 py-1.5 cursor-pointer rounded-full text-sm font-medium transition-colors flex items-center gap-1 ${
+              onClick={handleFollowToggle}
+              className={`ml-6 px-4 py-1.5 cursor-pointer rounded-full text-sm font-medium transition-colors flex items-center gap-1 ${
                 isFollowing
-                ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
+                  ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
             >
-            {isFollowing ? (
+              {isFollowing ? (
                 <><Check className="size-4" /> Following</>
-            ) : (
+              ) : (
                 <><Plus className="size-4" /> Follow</>
-            )}
+              )}
             </button>
           </div>
         </main>
 
-        {/* Stats module */}
-        <main className="w-full min-w-0 p-10 flex flex-col bg-white rounded-4xl">
-          <h2 className="text-lg font-semibold text-black mb-6">Rankings</h2>
-          <div className="flex gap-10">
-            <CircleStat
-              label="Academic Rank"
-              value={college?.academic_rank ?? null}
-              max={500}
-            />
-            <CircleStat
-              label="NCAA Division"
-              value={college?.division_rank ?? null}
-              max={3}
-            />
-          </div>
-        </main>
+        {/* Ratings */}
+        <h2 className="text-lg font-semibold text-black">Rating</h2>
+        <RatingPanel collegeId={id} />
+
+        {/* Posts */}
+        <div className="flex flex-col gap-4 pb-10">
+          <h2 className="text-lg font-semibold text-black">Posts</h2>
+          {accPosts.length === 0 && !fetchingPosts ? (
+            <p className="text-sm text-zinc-400">No posts yet.</p>
+          ) : (
+            accPosts.map((post) => (
+              <SmallPost key={post.id} post={post} />
+            ))
+          )}
+          {fetchingPosts && (
+            <div className="flex justify-center py-4">
+              <Spinner className="size-5" />
+            </div>
+          )}
+          <div ref={sentinelRef} className="h-1" />
+        </div>
       </div>
     </div>
   );

@@ -26,7 +26,6 @@ import {
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Explore", icon: Search, href: "/explore" },
-  { label: "Profile", icon: User, href: "/profile"}
 ];
 
 function unwrapBody<T>(value: unknown): T | undefined {
@@ -340,6 +339,28 @@ export function Navbar({ className, ...props }: NavbarProps) {
         <Crown className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0" />
         {!isCollapsed && <span className="truncate">Insider Content</span>}
       </Button>
+
+      <div className="mt-auto flex flex-col gap-1">
+        <Separator className="my-[clamp(0.875rem,1.4vw,1rem)] bg-zinc-200/80" />
+        <Button
+          variant="ghost"
+          size="lg"
+          className={cn(
+            "h-[clamp(2.5rem,3.5vw,2.75rem)] min-w-0 rounded-lg text-[clamp(0.8rem,1.1vw,0.9rem)] font-medium hover:bg-zinc-100 hover:text-zinc-900",
+            pathname === "/profile" ? "bg-zinc-100 text-zinc-900" : "text-zinc-700",
+            isCollapsed
+              ? "w-12 justify-center px-0"
+              : "justify-start gap-[clamp(0.5rem,1vw,0.75rem)] px-[clamp(0.625rem,1vw,0.75rem)]",
+          )}
+          aria-label="Profile"
+          title="Profile"
+          nativeButton={false}
+          render={<Link href="/profile" />}
+        >
+          <User className="size-[clamp(0.9rem,1.2vw,1rem)] shrink-0" />
+          {!isCollapsed && <span className="truncate">Profile</span>}
+        </Button>
+      </div>
     </aside>
   );
 }

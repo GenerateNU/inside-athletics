@@ -8,7 +8,7 @@ import { errorModelSchema } from "./errorModelSchema.ts";
 import { z } from "zod/v4";
 
 export const deleteApiV1UserCollegeByIdPathParamsSchema = z.object({
-  id: z.string().describe("ID of the college follow to be deleted"),
+  id: z.string().describe("ID of the college to unfollow"),
 });
 
 /**

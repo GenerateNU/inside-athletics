@@ -20,6 +20,7 @@ export type { DeleteApiV1UserByIdMutationKey } from "./hooks/useDeleteApiV1UserB
 export type { DeleteApiV1UserCollegeByIdMutationKey } from "./hooks/useDeleteApiV1UserCollegeById.ts";
 export type { DeleteApiV1UserSportByIdMutationKey } from "./hooks/useDeleteApiV1UserSportById.ts";
 export type { DeleteApiV1UserTagByIdMutationKey } from "./hooks/useDeleteApiV1UserTagById.ts";
+export type { DeleteApiV1UserTagTagByTagIdMutationKey } from "./hooks/useDeleteApiV1UserTagTagByTagId.ts";
 export type { GetApiV1CheckoutSessionsByIdQueryKey } from "./hooks/useGetApiV1CheckoutSessionsById.ts";
 export type { GetApiV1CheckoutSessionsByIdSuspenseQueryKey } from "./hooks/useGetApiV1CheckoutSessionsByIdSuspense.ts";
 export type { GetApiV1CollegeQueryKey } from "./hooks/useGetApiV1College.ts";
@@ -106,12 +107,14 @@ export type { GetApiV1SurveyAveragesQueryKey } from "./hooks/useGetApiV1SurveyAv
 export type { GetApiV1SurveyAveragesSuspenseQueryKey } from "./hooks/useGetApiV1SurveyAveragesSuspense.ts";
 export type { GetApiV1SurveyUserByUserIdQueryKey } from "./hooks/useGetApiV1SurveyUserByUserId.ts";
 export type { GetApiV1SurveyUserByUserIdSuspenseQueryKey } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
+export type { GetApiV1TagQueryKey } from "./hooks/useGetApiV1Tag.ts";
 export type { GetApiV1TagByIdQueryKey } from "./hooks/useGetApiV1TagById.ts";
 export type { GetApiV1TagByIdSuspenseQueryKey } from "./hooks/useGetApiV1TagByIdSuspense.ts";
 export type { GetApiV1TagByTagIdPostsQueryKey } from "./hooks/useGetApiV1TagByTagIdPosts.ts";
 export type { GetApiV1TagByTagIdPostsSuspenseQueryKey } from "./hooks/useGetApiV1TagByTagIdPostsSuspense.ts";
 export type { GetApiV1TagNameByNameQueryKey } from "./hooks/useGetApiV1TagNameByName.ts";
 export type { GetApiV1TagNameByNameSuspenseQueryKey } from "./hooks/useGetApiV1TagNameByNameSuspense.ts";
+export type { GetApiV1TagSuspenseQueryKey } from "./hooks/useGetApiV1TagSuspense.ts";
 export type { GetApiV1TagsSearchQueryKey } from "./hooks/useGetApiV1TagsSearch.ts";
 export type { GetApiV1TagsSearchSuspenseQueryKey } from "./hooks/useGetApiV1TagsSearchSuspense.ts";
 export type { GetApiV1UserByIdQueryKey } from "./hooks/useGetApiV1UserById.ts";
@@ -383,6 +386,13 @@ export type {
   DeleteApiV1UserTagByIdMutationResponse,
   DeleteApiV1UserTagByIdPathParams,
 } from "./models/DeleteApiV1UserTagById.ts";
+export type {
+  DeleteApiV1UserTagTagByTagId200,
+  DeleteApiV1UserTagTagByTagIdError,
+  DeleteApiV1UserTagTagByTagIdMutation,
+  DeleteApiV1UserTagTagByTagIdMutationResponse,
+  DeleteApiV1UserTagTagByTagIdPathParams,
+} from "./models/DeleteApiV1UserTagTagByTagId.ts";
 export type { DeleteCollegeFollowResponse } from "./models/DeleteCollegeFollowResponse.ts";
 export type { DeleteCollegeResponse } from "./models/DeleteCollegeResponse.ts";
 export type { DeleteCommentLikeResponse } from "./models/DeleteCommentLikeResponse.ts";
@@ -711,6 +721,13 @@ export type {
   GetApiV1SurveyUserByUserIdQueryResponse,
 } from "./models/GetApiV1SurveyUserByUserId.ts";
 export type {
+  GetApiV1Tag200,
+  GetApiV1TagError,
+  GetApiV1TagQuery,
+  GetApiV1TagQueryParams,
+  GetApiV1TagQueryResponse,
+} from "./models/GetApiV1Tag.ts";
+export type {
   GetApiV1TagById200,
   GetApiV1TagByIdError,
   GetApiV1TagByIdPathParams,
@@ -875,6 +892,7 @@ export type {
   ListApiV1TagTypeByTypeQueryResponse,
 } from "./models/ListApiV1TagTypeByType.ts";
 export type { ListCollegesResponse } from "./models/ListCollegesResponse.ts";
+export type { ListTagsResponse } from "./models/ListTagsResponse.ts";
 export type { Media } from "./models/Media.ts";
 export type { MediaResponse } from "./models/MediaResponse.ts";
 export type {
@@ -1220,6 +1238,7 @@ export { deleteApiV1UserById } from "./clients/deleteApiV1UserById.ts";
 export { deleteApiV1UserCollegeById } from "./clients/deleteApiV1UserCollegeById.ts";
 export { deleteApiV1UserSportById } from "./clients/deleteApiV1UserSportById.ts";
 export { deleteApiV1UserTagById } from "./clients/deleteApiV1UserTagById.ts";
+export { deleteApiV1UserTagTagByTagId } from "./clients/deleteApiV1UserTagTagByTagId.ts";
 export { getApiV1CheckoutSessionsById } from "./clients/getApiV1CheckoutSessionsById.ts";
 export { getApiV1College } from "./clients/getApiV1College.ts";
 export { getApiV1CollegeById } from "./clients/getApiV1CollegeById.ts";
@@ -1263,6 +1282,7 @@ export { getApiV1StripePriceById } from "./clients/getApiV1StripePriceById.ts";
 export { getApiV1StripeProductById } from "./clients/getApiV1StripeProductById.ts";
 export { getApiV1SurveyAverages } from "./clients/getApiV1SurveyAverages.ts";
 export { getApiV1SurveyUserByUserId } from "./clients/getApiV1SurveyUserByUserId.ts";
+export { getApiV1Tag } from "./clients/getApiV1Tag.ts";
 export { getApiV1TagById } from "./clients/getApiV1TagById.ts";
 export { getApiV1TagByTagIdPosts } from "./clients/getApiV1TagByTagIdPosts.ts";
 export { getApiV1TagNameByName } from "./clients/getApiV1TagNameByName.ts";
@@ -1386,6 +1406,9 @@ export { useDeleteApiV1UserSportById } from "./hooks/useDeleteApiV1UserSportById
 export { deleteApiV1UserTagByIdMutationKey } from "./hooks/useDeleteApiV1UserTagById.ts";
 export { deleteApiV1UserTagByIdMutationOptions } from "./hooks/useDeleteApiV1UserTagById.ts";
 export { useDeleteApiV1UserTagById } from "./hooks/useDeleteApiV1UserTagById.ts";
+export { deleteApiV1UserTagTagByTagIdMutationKey } from "./hooks/useDeleteApiV1UserTagTagByTagId.ts";
+export { deleteApiV1UserTagTagByTagIdMutationOptions } from "./hooks/useDeleteApiV1UserTagTagByTagId.ts";
+export { useDeleteApiV1UserTagTagByTagId } from "./hooks/useDeleteApiV1UserTagTagByTagId.ts";
 export { getApiV1CheckoutSessionsByIdQueryKey } from "./hooks/useGetApiV1CheckoutSessionsById.ts";
 export { getApiV1CheckoutSessionsByIdQueryOptions } from "./hooks/useGetApiV1CheckoutSessionsById.ts";
 export { useGetApiV1CheckoutSessionsById } from "./hooks/useGetApiV1CheckoutSessionsById.ts";
@@ -1644,6 +1667,9 @@ export { useGetApiV1SurveyUserByUserId } from "./hooks/useGetApiV1SurveyUserByUs
 export { getApiV1SurveyUserByUserIdSuspenseQueryKey } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
 export { getApiV1SurveyUserByUserIdSuspenseQueryOptions } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
 export { useGetApiV1SurveyUserByUserIdSuspense } from "./hooks/useGetApiV1SurveyUserByUserIdSuspense.ts";
+export { getApiV1TagQueryKey } from "./hooks/useGetApiV1Tag.ts";
+export { getApiV1TagQueryOptions } from "./hooks/useGetApiV1Tag.ts";
+export { useGetApiV1Tag } from "./hooks/useGetApiV1Tag.ts";
 export { getApiV1TagByIdQueryKey } from "./hooks/useGetApiV1TagById.ts";
 export { getApiV1TagByIdQueryOptions } from "./hooks/useGetApiV1TagById.ts";
 export { useGetApiV1TagById } from "./hooks/useGetApiV1TagById.ts";
@@ -1662,6 +1688,9 @@ export { useGetApiV1TagNameByName } from "./hooks/useGetApiV1TagNameByName.ts";
 export { getApiV1TagNameByNameSuspenseQueryKey } from "./hooks/useGetApiV1TagNameByNameSuspense.ts";
 export { getApiV1TagNameByNameSuspenseQueryOptions } from "./hooks/useGetApiV1TagNameByNameSuspense.ts";
 export { useGetApiV1TagNameByNameSuspense } from "./hooks/useGetApiV1TagNameByNameSuspense.ts";
+export { getApiV1TagSuspenseQueryKey } from "./hooks/useGetApiV1TagSuspense.ts";
+export { getApiV1TagSuspenseQueryOptions } from "./hooks/useGetApiV1TagSuspense.ts";
+export { useGetApiV1TagSuspense } from "./hooks/useGetApiV1TagSuspense.ts";
 export { getApiV1TagsSearchQueryKey } from "./hooks/useGetApiV1TagsSearch.ts";
 export { getApiV1TagsSearchQueryOptions } from "./hooks/useGetApiV1TagsSearch.ts";
 export { useGetApiV1TagsSearch } from "./hooks/useGetApiV1TagsSearch.ts";
@@ -2051,6 +2080,12 @@ export {
   deleteApiV1UserTagByIdMutationResponseSchema,
   deleteApiV1UserTagByIdPathParamsSchema,
 } from "./zod/deleteApiV1UserTagByIdSchema.ts";
+export {
+  deleteApiV1UserTagTagByTagId200Schema,
+  deleteApiV1UserTagTagByTagIdErrorSchema,
+  deleteApiV1UserTagTagByTagIdMutationResponseSchema,
+  deleteApiV1UserTagTagByTagIdPathParamsSchema,
+} from "./zod/deleteApiV1UserTagTagByTagIdSchema.ts";
 export { deleteCollegeFollowResponseSchema } from "./zod/deleteCollegeFollowResponseSchema.ts";
 export { deleteCollegeResponseSchema } from "./zod/deleteCollegeResponseSchema.ts";
 export { deleteCommentLikeResponseSchema } from "./zod/deleteCommentLikeResponseSchema.ts";
@@ -2355,6 +2390,12 @@ export {
   getApiV1TagNameByNameQueryResponseSchema,
 } from "./zod/getApiV1TagNameByNameSchema.ts";
 export {
+  getApiV1Tag200Schema,
+  getApiV1TagErrorSchema,
+  getApiV1TagQueryParamsSchema,
+  getApiV1TagQueryResponseSchema,
+} from "./zod/getApiV1TagSchema.ts";
+export {
   getApiV1TagsSearch200Schema,
   getApiV1TagsSearchErrorSchema,
   getApiV1TagsSearchQueryParamsSchema,
@@ -2478,6 +2519,7 @@ export {
   listApiV1TagTypeByTypeQueryResponseSchema,
 } from "./zod/listApiV1TagTypeByTypeSchema.ts";
 export { listCollegesResponseSchema } from "./zod/listCollegesResponseSchema.ts";
+export { listTagsResponseSchema } from "./zod/listTagsResponseSchema.ts";
 export { mediaResponseSchema } from "./zod/mediaResponseSchema.ts";
 export { mediaSchema } from "./zod/mediaSchema.ts";
 export {

@@ -14,6 +14,7 @@ import {
   useDeleteApiV1PostLikeById,
   usePostApiV1Comment,
   listApiV1PostByPostIdCommentsQueryKey,
+  getApiV1PostByIdQueryKey,
 } from "@/api/hooks";
 import { CommentCard } from "@/components/post/CommentCard";
 import { Badge } from "@/components/post/Badge";
@@ -69,9 +70,8 @@ export default function PostPage({
         onSuccess: () => {
           setCommentText("");
           setCommentOpen(false);
-          queryClient.invalidateQueries({
-            queryKey: listApiV1PostByPostIdCommentsQueryKey(id),
-          });
+          queryClient.invalidateQueries({ queryKey: listApiV1PostByPostIdCommentsQueryKey(id) });
+          queryClient.invalidateQueries({ queryKey: getApiV1PostByIdQueryKey(id) });
         },
       },
     );
@@ -99,6 +99,9 @@ export default function PostPage({
       unlikePost(
         { id },
         {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: getApiV1PostByIdQueryKey(id) });
+          },
           onError: () => {
             setIsLiked(true);
             setLikeCount((c) => c + 1);
@@ -111,6 +114,9 @@ export default function PostPage({
       likePost(
         { data: { post_id: id } },
         {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: getApiV1PostByIdQueryKey(id) });
+          },
           onError: () => {
             setIsLiked(false);
             setLikeCount((c) => c - 1);

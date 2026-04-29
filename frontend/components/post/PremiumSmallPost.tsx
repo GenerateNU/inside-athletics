@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart, MessageSquareText, UserRound } from "lucide-react";
 import { Badge } from "@/components/post/Badge"
 import { Tag } from "@/components/post/Tag"
@@ -14,6 +15,7 @@ type SmallPostProps = React.ComponentProps<"div"> & {
 };
 
 export default function PremiumSmallPost({ post, className, ...props }: SmallPostProps) {
+    const router = useRouter();
     const authorName = `${post.author.first_name} ${post.author.last_name}`;
     const pfpURL = post.author?.profile_picture
 
@@ -27,7 +29,14 @@ export default function PremiumSmallPost({ post, className, ...props }: SmallPos
 
                 <div className="flex flex-wrap gap-2 mb-3">
                     {post.sport && <Tag label={post.sport.name} />}
-                    {post.college && <Tag label={post.college.name} />}
+                    {post.college && (
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); router.push(`/college/${post.college.id}`); }}
+                        >
+                            <Tag label={post.college.name} />
+                        </button>
+                    )}
                     {post.tags?.map((tag) => (
                         <Tag key={tag.id} label={tag.name} />
                     ))}

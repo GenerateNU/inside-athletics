@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { useGetApiV1Sports, useListApiV1TagTypeByType } from "@/api/hooks";
 import { useSession } from "@/utils/SessionContext";
 import { Tag, TagButton } from "./tag-button";
@@ -203,7 +204,9 @@ export default function SearchPopup({
         )}
 
         {loading ? (
-          <p className="text-sm text-gray-400">Loading tags...</p>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Spinner className="size-6 text-gray-400" />
+          </div>
         ) : (
           TAG_SECTIONS.map(({ header, type, max }, i) => (
             <div key={type}>

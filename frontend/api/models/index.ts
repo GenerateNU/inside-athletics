@@ -199,6 +199,13 @@ export type {
   DeleteApiV1UserTagByIdMutationResponse,
   DeleteApiV1UserTagByIdPathParams,
 } from "./DeleteApiV1UserTagById.ts";
+export type {
+  DeleteApiV1UserTagTagByTagId200,
+  DeleteApiV1UserTagTagByTagIdError,
+  DeleteApiV1UserTagTagByTagIdMutation,
+  DeleteApiV1UserTagTagByTagIdMutationResponse,
+  DeleteApiV1UserTagTagByTagIdPathParams,
+} from "./DeleteApiV1UserTagTagByTagId.ts";
 export type { DeleteCollegeFollowResponse } from "./DeleteCollegeFollowResponse.ts";
 export type { DeleteCollegeResponse } from "./DeleteCollegeResponse.ts";
 export type { DeleteCommentLikeResponse } from "./DeleteCommentLikeResponse.ts";
@@ -527,6 +534,13 @@ export type {
   GetApiV1SurveyUserByUserIdQueryResponse,
 } from "./GetApiV1SurveyUserByUserId.ts";
 export type {
+  GetApiV1Tag200,
+  GetApiV1TagError,
+  GetApiV1TagQuery,
+  GetApiV1TagQueryParams,
+  GetApiV1TagQueryResponse,
+} from "./GetApiV1Tag.ts";
+export type {
   GetApiV1TagById200,
   GetApiV1TagByIdError,
   GetApiV1TagByIdPathParams,
@@ -691,6 +705,7 @@ export type {
   ListApiV1TagTypeByTypeQueryResponse,
 } from "./ListApiV1TagTypeByType.ts";
 export type { ListCollegesResponse } from "./ListCollegesResponse.ts";
+export type { ListTagsResponse } from "./ListTagsResponse.ts";
 export type { Media } from "./Media.ts";
 export type { MediaResponse } from "./MediaResponse.ts";
 export type {

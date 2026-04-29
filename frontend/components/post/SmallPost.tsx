@@ -31,7 +31,10 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
     return (
         <div
             className={cn("bg-white rounded-2xl border border-gray-200 p-5 w-full shadow-sm hover:shadow-md transition-shadow cursor-pointer", className)}
-            onClick={() => router.push(`/posts/${post.id}`)}
+            onClick={(e) => {
+                if ((e.target as HTMLElement).closest("button, a")) return;
+                router.push(`/posts/${post.id}`);
+            }}
             onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -46,7 +49,14 @@ export default function SmallPost({ post, className, ...props }: SmallPostProps)
 
                 <div className="flex gap-2 mb-3">
                     {sportEnable && <Tag label={post.sport.name} />}
-                    {collegeEnable && <Tag label={post.college.name} />}
+                    {collegeEnable && (
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); router.push(`/college/${post.college.id}`); }}
+                        >
+                            <Tag label={post.college.name} />
+                        </button>
+                    )}
                     {tagsEnable && tags?.map((tag) => (
                         <Tag key={tag.id} label={tag.name} />
                     ))}
