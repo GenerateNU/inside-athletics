@@ -168,7 +168,7 @@ func TestDeleteCollegeFollow(t *testing.T) {
 		t.Fatalf("Unable to add college follow to table: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
+	resp := api.Delete("/api/v1/user/college/"+college.ID.String(), authHeader)
 
 	var response collegefollow.DeleteCollegeFollowResponse
 	DecodeTo(&response, resp)
@@ -184,7 +184,7 @@ func TestDeleteCollegeFollow(t *testing.T) {
 	}
 }
 
-func TestDeleteCollegeFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
+func TestDeleteCollegeFollow_OtherUserHasNoFollow_Returns404(t *testing.T) {
 	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -210,13 +210,14 @@ func TestDeleteCollegeFollow_ForbiddenForOtherUsersFollow(t *testing.T) {
 		t.Fatalf("Unable to add college follow to table: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
-	if resp.Code != http.StatusForbidden {
-		t.Fatalf("expected 403 when deleting another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+	// otherUser has no follow for this college — endpoint uses caller's user ID, so returns 404
+	resp := api.Delete("/api/v1/user/college/"+college.ID.String(), authHeader)
+	if resp.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 when deleting a college the user doesn't follow, got %d: %s", resp.Code, resp.Body.String())
 	}
 }
 
-func TestDeleteCollegeFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.T) {
+func TestDeleteCollegeFollow_ModeratorHasNoFollow_Returns404(t *testing.T) {
 	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
@@ -241,40 +242,39 @@ func TestDeleteCollegeFollow_ForbiddenForModeratorOnOtherUsersFollow(t *testing.
 		t.Fatalf("Unable to add college follow to table: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
-	if resp.Code != http.StatusForbidden {
-		t.Fatalf("expected 403 when moderator deletes another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+	// moderator has no follow for this college — endpoint uses caller's user ID, so returns 404
+	resp := api.Delete("/api/v1/user/college/"+college.ID.String(), authHeader)
+	if resp.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 when moderator has no follow for the college, got %d: %s", resp.Code, resp.Body.String())
 	}
 }
 
-func TestDeleteCollegeFollow_AllowedForAdminOnOtherUsersFollow(t *testing.T) {
+func TestDeleteCollegeFollow_AdminCanDeleteOwnFollow(t *testing.T) {
 	t.Parallel()
 	testDB := SetupTestDB(t)
 	defer testDB.Teardown(t)
 	api := testDB.API
 
-	owner, college := seedUserAndCollege(t, testDB, "delete-other-college-follow-owner-admin")
-	adminUser, _ := seedUserAndCollege(t, testDB, "delete-other-college-follow-admin")
-
-	assignRoleToUser(t, testDB.DB, owner.ID, getRoleID(t, testDB.DB, models.RoleUser))
+	_, college := seedUserAndCollege(t, testDB, "delete-admin-college-follow-college")
+	adminUser, _ := seedUserAndCollege(t, testDB, "delete-admin-college-follow-admin")
 
 	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleAdmin, []permissionSpec{
 		{Action: models.PermissionDelete, Resource: "collegefollow"},
 	}, adminUser.ID)
 
-	createdCollegeFollow := models.CollegeFollow{
+	adminCollegeFollow := models.CollegeFollow{
 		ID:        uuid.New(),
-		UserID:    owner.ID,
+		UserID:    adminUser.ID,
 		CollegeID: college.ID,
 	}
 
-	if err := testDB.DB.Create(&createdCollegeFollow).Error; err != nil {
+	if err := testDB.DB.Create(&adminCollegeFollow).Error; err != nil {
 		t.Fatalf("Unable to add college follow to table: %v", err)
 	}
 
-	resp := api.Delete("/api/v1/user/college/"+createdCollegeFollow.ID.String(), authHeader)
+	resp := api.Delete("/api/v1/user/college/"+college.ID.String(), authHeader)
 	if resp.Code != http.StatusOK {
-		t.Fatalf("expected 200 when admin deletes another user's college follow, got %d: %s", resp.Code, resp.Body.String())
+		t.Fatalf("expected 200 when admin deletes their own college follow, got %d: %s", resp.Code, resp.Body.String())
 	}
 }
 

@@ -81,6 +81,18 @@ func PermissionHumaMiddleware(api huma.API, db *gorm.DB) func(huma.Context, func
 			return
 		}
 
+		// DELETE /api/v1/user/college/{college_id} unfollows by college id (not college_follow row id).
+		// Ownership is enforced in the handler via current user + college_id; require delete_own on collegefollow.
+		if resource == "collegefollow" && action == models.PermissionDelete {
+			allowed, status, msg := authorizeByPermission(db, parsedUserID, models.PermissionDeleteOwn, resource)
+			if !allowed {
+				_ = huma.WriteErr(api, ctx, status, msg)
+				return
+			}
+			next(ctx)
+			return
+		}
+
 		if (action == models.PermissionUpdate || action == models.PermissionDelete) &&
 			(resource == "post" || resource == "comment" || resource == "tagfollow" || resource == "premiumpost" || resource == "sportfollow" || resource == "collegefollow") &&
 			ctx.Param("id") != "" {
