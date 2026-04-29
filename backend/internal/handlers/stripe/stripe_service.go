@@ -744,18 +744,14 @@ func (s *StripeService) HandleWebhook(c *fiber.Ctx) error {
 }
 
 func (s *StripeService) handleCheckoutCompleted(sess *stripego.CheckoutSession) error {
-	fmt.Printf("[checkout] customer=%v subscription=%v\n", sess.Customer, sess.Subscription)
 	if sess.Customer == nil || sess.Subscription == nil {
-		fmt.Println("[checkout] early return: customer or subscription is nil")
 		return nil
 	}
 
 	var user models.User
 	if err := s.db.First(&user, "stripe_customer_id = ?", sess.Customer.ID).Error; err != nil {
-		fmt.Printf("[checkout] user not found for customer %s: %v\n", sess.Customer.ID, err)
 		return fmt.Errorf("user not found for customer %s", sess.Customer.ID)
 	}
-	fmt.Printf("[checkout] found user %s, granting premium role\n", user.ID)
 
 	// Fetch full subscription from Stripe since webhook payload doesn't expand it
 	fullSub, err := subscription.Get(sess.Subscription.ID, nil)
@@ -784,10 +780,7 @@ func (s *StripeService) handleCheckoutCompleted(sess *stripego.CheckoutSession) 
 		return err
 	}
 
-	fmt.Printf("[checkout] calling grantPremiumRole for user %s\n", user.ID)
-	err = s.grantPremiumRole(user.ID)
-	fmt.Printf("[checkout] grantPremiumRole result: %v\n", err)
-	return err
+	return s.grantPremiumRole(user.ID)
 }
 
 func (s *StripeService) handleSubscriptionUpdated(sub *stripego.Subscription) error {
