@@ -20,6 +20,7 @@ type SessionContextValue = {
   hasPremium: boolean;
   isAdmin: boolean;
   currentUser: GetUserResponse | null;
+  refreshPermissions: () => void;
 };
 
 const SessionContext = createContext<SessionContextValue>({
@@ -27,6 +28,7 @@ const SessionContext = createContext<SessionContextValue>({
   hasPremium: false,
   isAdmin: false,
   currentUser: null,
+  refreshPermissions: () => {},
 });
 
 export function SessionProvider({
@@ -56,18 +58,8 @@ export function SessionProvider({
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (!session?.access_token) {
-      setHasPremium(false);
-      setIsAdmin(false);
-      setCurrentUser(null);
-      queryClient.removeQueries({ queryKey: getApiV1UserCurrentQueryKey() });
-      return;
-    }
-
-    const headers = { Authorization: `Bearer ${session.access_token}` };
-
-    // Fetch permissions and current user in parallel so both are ready immediately
+  function fetchPermissions(token: string) {
+    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
       getApiV1UtilityAccessCheck({ headers }),
       getApiV1UserCurrent({ headers }),
@@ -76,17 +68,32 @@ export function SessionProvider({
         setHasPremium(access.has_premium ?? false);
         setIsAdmin(access.is_admin ?? false);
         setCurrentUser(user);
-        // Seed React Query's cache so useGetApiV1UserCurrent resolves instantly everywhere
         queryClient.setQueryData(getApiV1UserCurrentQueryKey(), user);
       })
       .catch(() => {
         setHasPremium(false);
         setIsAdmin(false);
       });
+  }
+
+  useEffect(() => {
+    if (!session?.access_token) {
+      setHasPremium(false);
+      setIsAdmin(false);
+      setCurrentUser(null);
+      queryClient.removeQueries({ queryKey: getApiV1UserCurrentQueryKey() });
+      return;
+    }
+    fetchPermissions(session.access_token);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.access_token, queryClient]);
 
+  function refreshPermissions() {
+    if (session?.access_token) fetchPermissions(session.access_token);
+  }
+
   return (
-    <SessionContext value={{ session, hasPremium, isAdmin, currentUser }}>
+    <SessionContext value={{ session, hasPremium, isAdmin, currentUser, refreshPermissions }}>
       {children}
     </SessionContext>
   );
@@ -97,8 +104,8 @@ export function useSession() {
 }
 
 export function usePermissions() {
-  const { hasPremium, isAdmin } = useContext(SessionContext);
-  return { hasPremium, isAdmin };
+  const { hasPremium, isAdmin, refreshPermissions } = useContext(SessionContext);
+  return { hasPremium, isAdmin, refreshPermissions };
 }
 
 export function useCurrentUser() {

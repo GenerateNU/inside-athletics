@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2/humatest"
-	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v82"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	gormPostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -2,67 +2,37 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { X } from "lucide-react";
+import { usePostApiV1CheckoutSessions } from "@/api/hooks";
+import { useSession } from "@/utils/SessionContext";
+import { useCurrentUser } from "@/utils/SessionContext";
 
-type Step = "plan" | "billing";
-
-type BillingForm = {
-  cardholderName: string;
-  cardNumber: string;
-  expiryDate: string;
-  cvc: string;
-  contactEmail: string;
-  contactPhone: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-};
-
-const requiredFields: Array<keyof BillingForm> = [
-  "cardholderName",
-  "cardNumber",
-  "expiryDate",
-  "cvc",
-  "contactEmail",
-  "contactPhone",
-  "addressLine1",
-  "city",
-  "state",
-  "postalCode",
-  "country",
-];
-
-const expiryMonths = Array.from({ length: 12 }, (_, i) =>
-  String(i + 1).padStart(2, "0"),
-);
-const expiryYears = Array.from({ length: 12 }, (_, i) =>
-  String(new Date().getFullYear() + i),
-);
-
-function parseExpiryDate(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return { month: "", year: "" };
-  const [rawMonth = "", rawYear = ""] = trimmed.split("/");
-  const month = rawMonth.padStart(2, "0").slice(0, 2);
-  if (rawYear.length === 4) return { month, year: rawYear };
-  if (rawYear.length === 2) return { month, year: `20${rawYear}` };
-  return { month, year: "" };
-}
+const PREMIUM_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID ?? "";
 
 const planOptions = [
-  { label: "Premium Plan", value: "premium", price: "$9.99/mo" },
-  { label: "Standard Plan", value: "free", price: "$0/mo" },
+  {
+    label: "Premium Plan",
+    value: "premium" as const,
+    price: "$9.99/mo",
+    features: ["Access to all insider content", "Exclusive athlete insights", "Priority support"],
+    gradient: "bg-[#7F8C2D]",
+    card: "bg-[#E9F4A5]",
+    inner: "border-[#7F8C2D] bg-[#FCFDF1]",
+    divider: "border-[#7F8C2D]",
+    text: "text-black",
+  },
+  {
+    label: "Standard Plan",
+    value: "free" as const,
+    price: "$0/mo",
+    features: ["Public posts only", "Basic college info", "Community access"],
+    gradient: "bg-[#D4E94B]",
+    card: "bg-[#FCFDF1]",
+    inner: "border-[#D4E94B] bg-white",
+    divider: "border-[#D4E94B]",
+    text: "text-gray-600",
+  },
 ] as const;
 
 interface PremiumPaymentPopupProps {
@@ -70,32 +40,60 @@ interface PremiumPaymentPopupProps {
 }
 
 export default function PremiumPaymentPopup({ onClose }: PremiumPaymentPopupProps) {
-  const [step, setStep] = useState<Step>("plan");
-  const [selectedPlan, setSelectedPlan] = useState("");
-  const [form, setForm] = useState<BillingForm>({
-    cardholderName: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvc: "",
-    contactEmail: "",
-    contactPhone: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "",
+  const [selectedPlan, setSelectedPlan] = useState<"premium" | "free" | "">("");
+  const [error, setError] = useState<string | null>(null);
+
+  const session = useSession();
+  const currentUser = useCurrentUser();
+
+  const { mutate: createSession, isPending } = usePostApiV1CheckoutSessions({
+    client: {
+      headers: session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : undefined,
+    },
   });
 
-  const { month: expiryMonth, year: expiryYear } = parseExpiryDate(form.expiryDate);
+  function handleContinue() {
+    if (selectedPlan === "free") {
+      onClose();
+      return;
+    }
 
-  const updateField = (field: keyof BillingForm, value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
+    if (!currentUser?.id) {
+      setError("You must be signed in to subscribe.");
+      return;
+    }
 
-  const updateExpiryDate = ({ month = expiryMonth, year = expiryYear }: { month?: string; year?: string }) =>
-    updateField("expiryDate", month && year ? `${month}/${year}` : "");
+    if (!PREMIUM_PRICE_ID) {
+      setError("Subscription is not configured. Please try again later.");
+      return;
+    }
 
-  const billingCanContinue = requiredFields.every((f) => form[f].trim().length > 0);
+    setError(null);
+
+    createSession(
+      {
+        data: {
+          user_id: currentUser.id,
+          price_id: PREMIUM_PRICE_ID,
+          quantity: 1,
+          success_url: `${window.location.origin}/insidercontent?checkout=success`,
+          cancel_url: `${window.location.origin}/insidercontent`,
+        },
+      },
+      {
+        onSuccess: (response) => {
+          if (response.url) {
+            window.location.href = response.url;
+          }
+        },
+        onError: () => {
+          setError("Failed to start checkout. Please try again.");
+        },
+      },
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -109,266 +107,66 @@ export default function PremiumPaymentPopup({ onClose }: PremiumPaymentPopupProp
             <X size={16} />
           </button>
         </div>
-        <div className="overflow-y-auto px-8 pb-8 -mt-4">
 
-        {step === "plan" && (
-          <div className="space-y-6">
-            <div className="space-y-2 text-center">
-              <h1 className="text-4xl font-bold text-[#001F3E]">Choose Your Plan</h1>
-              <p className="text-sm text-gray-600">
-                Pick the plan you want to start with.
-              </p>
-            </div>
+        <div className="overflow-y-auto px-8 pb-8 -mt-4 space-y-6">
+          <div className="space-y-2 text-center">
+            <h1 className="text-4xl font-bold text-[#001F3E]">Choose Your Plan</h1>
+            <p className="text-sm text-gray-600">Pick the plan you want to start with.</p>
+          </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              {planOptions.map((plan) => {
-                const isSelected = selectedPlan === plan.value;
-                const isPremium = plan.value === "premium";
-
-                return (
-                  <div
-                    key={plan.value}
-                    className={`rounded-xl p-[2px] transition-all ${
-                      isPremium ? "bg-[#7F8C2D]" : "bg-[#D4E94B]"
-                    } ${
-                      isSelected
-                        ? isPremium
-                          ? "-translate-y-0.5 shadow-[4px_6px_14px_rgba(127,140,45,0.24)]"
-                          : "-translate-y-0.5 shadow-[4px_6px_14px_rgba(44,100,154,0.18)]"
-                        : ""
-                    }`}
+          <div className="grid grid-cols-2 gap-5">
+            {planOptions.map((plan) => {
+              const isSelected = selectedPlan === plan.value;
+              return (
+                <div
+                  key={plan.value}
+                  className={`rounded-xl p-[2px] transition-all ${plan.gradient} ${
+                    isSelected ? "-translate-y-0.5 shadow-lg" : ""
+                  }`}
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={`flex h-full min-h-72 w-full min-w-0 flex-col items-start rounded-[calc(0.75rem-2px)] border-transparent px-0 py-0 text-left text-black whitespace-normal ${plan.card}`}
+                    onClick={() => setSelectedPlan(plan.value)}
                   >
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className={`flex h-full min-h-72 w-full min-w-0 flex-col items-start rounded-[calc(0.75rem-2px)] border-transparent px-0 py-0 text-left text-black whitespace-normal ${
-                        isPremium ? "bg-[#E9F4A5]" : "bg-[#FCFDF1]"
-                      }`}
-                      onClick={() => setSelectedPlan(plan.value)}
-                    >
-                      <div className="w-full px-4 py-4">
-                        {isPremium ? (
-                          <div className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border-[1.5px] border-[#7F8C2D] bg-[#FCFDF1] px-3 py-3 text-sm font-semibold">
-                            {plan.label}
-                          </div>
-                        ) : (
-                          <div className="mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border border-[#D4E94B] bg-white px-3 py-3 text-sm font-semibold">
-                            {plan.label}
-                          </div>
-                        )}
+                    <div className="w-full px-4 py-4">
+                      <div className={`mx-3 flex min-h-16 w-[calc(100%-1.5rem)] items-start rounded-md border ${plan.inner} px-3 py-3 text-sm font-semibold`}>
+                        {plan.label}
                       </div>
-                      <div className="w-full px-4">
-                        <div className={`mx-3 border-t ${isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"}`} />
-                      </div>
-                      <div className={`w-full px-4 py-4 text-sm ${isPremium ? "text-black" : "text-gray-600"}`}>
-                        {plan.price}
-                      </div>
-                      <div className="w-full px-4">
-                        <div className={`mx-3 border-t ${isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"}`} />
-                      </div>
-                      <div className={`w-full px-4 py-4 text-sm ${isPremium ? "text-black" : "text-gray-600"}`}>
-                        Feature 1
-                      </div>
-                      <div className="w-full px-4">
-                        <div className={`mx-3 border-t ${isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"}`} />
-                      </div>
-                      <div className={`w-full px-4 py-4 text-sm ${isPremium ? "text-black" : "text-gray-600"}`}>
-                        Feature 2
-                      </div>
-                      <div className="w-full px-4">
-                        <div className={`mx-3 border-t ${isPremium ? "border-[#7F8C2D]" : "border-[#D4E94B]"}`} />
-                      </div>
-                      <div className={`w-full px-4 py-4 text-sm ${isPremium ? "text-black" : "text-gray-600"}`}>
-                        Feature 3
-                      </div>
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <Button
-              type="button"
-              className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
-              disabled={!selectedPlan}
-              onClick={() => {
-                if (selectedPlan === "free") {
-                  onClose();
-                } else {
-                  setStep("billing");
-                }
-              }}
-            >
-              Continue
-            </Button>
-          </div>
-        )}
-
-        {step === "billing" && (
-          <div className="space-y-6">
-            <div className="space-y-2 text-center">
-              <h1 className="text-4xl font-bold text-[#001F3E]">Payment Info</h1>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-4 rounded-xl border border-gray-200 p-5">
-                <h2 className="text-sm font-semibold text-[#001F3E]">Payment</h2>
-                <div className="grid gap-4">
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Cardholder name</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.cardholderName}
-                      onChange={(e) => updateField("cardholderName", e.target.value)}
-                      placeholder="Name on card"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Card number</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.cardNumber}
-                      onChange={(e) => updateField("cardNumber", e.target.value)}
-                      inputMode="numeric"
-                      placeholder="1234 5678 9012 3456"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Expiry date</span>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <Select value={expiryMonth} onValueChange={(v) => updateExpiryDate({ month: v ?? "" })}>
-                        <SelectTrigger className="h-11 w-full rounded-md border-[#3E7DBB] bg-white px-4 text-sm">
-                          <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {expiryMonths.map((m) => (
-                            <SelectItem key={m} value={m}>{m}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select value={expiryYear} onValueChange={(v) => updateExpiryDate({ year: v ?? "" })}>
-                        <SelectTrigger className="h-11 w-full rounded-md border-[#3E7DBB] bg-white px-4 text-sm">
-                          <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {expiryYears.map((y) => (
-                            <SelectItem key={y} value={y}>{y}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     </div>
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">CVC</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.cvc}
-                      onChange={(e) => updateField("cvc", e.target.value)}
-                      inputMode="numeric"
-                      placeholder="123"
-                    />
-                  </label>
+                    {[plan.price, ...plan.features].map((line, i) => (
+                      <div key={i} className="w-full">
+                        <div className="w-full px-4">
+                          <div className={`mx-3 border-t ${plan.divider}`} />
+                        </div>
+                        <div className={`w-full px-7 py-4 text-sm ${plan.text}`}>{line}</div>
+                      </div>
+                    ))}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="space-y-4 rounded-xl border border-gray-200 p-5">
-                <h2 className="text-sm font-semibold text-[#001F3E]">Billing</h2>
-                <div className="grid gap-4">
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Country</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.country}
-                      onChange={(e) => updateField("country", e.target.value)}
-                      placeholder="Country"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Address</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.addressLine1}
-                      onChange={(e) => updateField("addressLine1", e.target.value)}
-                      placeholder="Street address"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">City</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.city}
-                      onChange={(e) => updateField("city", e.target.value)}
-                      placeholder="City"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">State</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.state}
-                      onChange={(e) => updateField("state", e.target.value)}
-                      placeholder="State"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">ZIP code</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.postalCode}
-                      onChange={(e) => updateField("postalCode", e.target.value)}
-                      placeholder="ZIP code"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-4 rounded-xl border border-gray-200 p-5">
-                <h2 className="text-sm font-semibold text-[#001F3E]">Contact information</h2>
-                <div className="grid gap-4">
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Contact email</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.contactEmail}
-                      onChange={(e) => updateField("contactEmail", e.target.value)}
-                      placeholder="name@email.com"
-                      type="email"
-                    />
-                  </label>
-                  <label className="space-y-2">
-                    <span className="text-sm font-medium text-black">Contact phone</span>
-                    <Input
-                      className="h-11 rounded-md border-[#3E7DBB] px-4 text-sm md:text-sm"
-                      value={form.contactPhone}
-                      onChange={(e) => updateField("contactPhone", e.target.value)}
-                      placeholder="(555) 555-5555"
-                      type="tel"
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 flex-1 rounded-xl text-sm font-semibold"
-                onClick={() => setStep("plan")}
-              >
-                Back
-              </Button>
-              <Button
-                type="button"
-                className="h-10 flex-1 rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
-                disabled={!billingCanContinue}
-                onClick={onClose}
-              >
-                Continue
-              </Button>
-            </div>
+              );
+            })}
           </div>
-        )}
+
+          {error && (
+            <p className="text-center text-sm text-red-500">{error}</p>
+          )}
+
+          <Button
+            type="button"
+            className="h-10 w-full rounded-xl bg-[#2C649A] text-sm font-semibold text-white"
+            disabled={!selectedPlan || isPending}
+            onClick={handleContinue}
+          >
+            {isPending ? (
+              <span className="flex items-center gap-2">
+                <Spinner className="size-4" /> Redirecting to checkout...
+              </span>
+            ) : (
+              "Continue"
+            )}
+          </Button>
         </div>
       </div>
     </div>

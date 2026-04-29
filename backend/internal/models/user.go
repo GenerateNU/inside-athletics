@@ -26,6 +26,7 @@ type User struct {
 	CollegeID               *uuid.UUID            `json:"college" doc:"The college of a user" gorm:"type:uuid"` //nullable
 	College                 *College              `json:"-" gorm:"foreignKey:CollegeID;references:ID"`
 	Division                *Division             `json:"division" example:"1" doc:"The divison of their college" gorm:"type:uint;"`
+	StripeCustomerID        *string               `json:"stripe_customer_id,omitempty" gorm:"type:varchar(255);uniqueIndex"`
 }
 
 type VerifiedAthleteStatus string

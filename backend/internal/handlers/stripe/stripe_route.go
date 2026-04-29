@@ -2,8 +2,15 @@ package stripe
 
 import (
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
+
+// RegisterWebhookRoute registers the Stripe webhook on the raw Fiber app (bypassing Huma/auth).
+func RegisterWebhookRoute(router *fiber.App, db *gorm.DB) {
+	svc := NewStripeService(db)
+	router.Post("/api/v1/stripe/webhook", svc.HandleWebhook)
+}
 
 func Route(api huma.API, db *gorm.DB) {
 	stripeService := NewStripeService(db)

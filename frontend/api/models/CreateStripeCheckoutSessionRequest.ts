@@ -12,6 +12,10 @@ export type CreateStripeCheckoutSessionRequest = {
   /**
    * @type string
    */
+  user_id: string;
+  /**
+   * @type string
+   */
   cancel_url: string;
   /**
    * @type string

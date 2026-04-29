@@ -9,7 +9,7 @@ import PremiumSmallPost from "@/components/post/PremiumSmallPost";
 import { Navbar } from "@/components/ui/navbar";
 import { useSession, usePermissions } from "@/utils/SessionContext";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, ChevronDown } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import CreatePremiumPostPopup from "@/components/ui/create-premium-post-popup";
@@ -24,8 +24,11 @@ const PAGE_SIZE = 20;
 
 export default function InsiderContentPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const session = useSession();
-    const { isAdmin, hasPremium } = usePermissions();
+    const { isAdmin, hasPremium, refreshPermissions } = usePermissions();
+    const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+    const [awaitingPremium, setAwaitingPremium] = useState(false);
     const enabled = !!session?.access_token && hasPremium;
     const authHeaders = session?.access_token
         ? { Authorization: `Bearer ${session.access_token}` }
@@ -43,6 +46,27 @@ export default function InsiderContentPage() {
     const [accPosts, setAccPosts] = useState<PremiumPostResponse[]>([]);
     const [total, setTotal] = useState(0);
     const sentinelRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (searchParams.get("checkout") === "success") {
+            setAwaitingPremium(true);
+            router.replace("/insidercontent");
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Poll until hasPremium flips true (webhook may arrive after redirect)
+    useEffect(() => {
+        if (!awaitingPremium) return;
+        if (hasPremium) {
+            setAwaitingPremium(false);
+            setShowCheckoutSuccess(true);
+            return;
+        }
+        const t = setTimeout(() => refreshPermissions(), 2000);
+        return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [awaitingPremium, hasPremium]);
 
     useEffect(() => {
         const t = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 300);
@@ -229,8 +253,30 @@ export default function InsiderContentPage() {
                 </div>
             )}
 
-            {!hasPremium && session && (
+            {!hasPremium && !awaitingPremium && session && (
                 <PremiumPaymentPopup onClose={() => router.push("/")} />
+            )}
+
+            {awaitingPremium && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="flex flex-col items-center gap-3 rounded-xl bg-white px-10 py-8 shadow-lg">
+                        <Spinner className="size-6 text-[#2C649A]" />
+                        <p className="text-sm font-medium text-gray-700">Activating your premium access...</p>
+                    </div>
+                </div>
+            )}
+
+            {showCheckoutSuccess && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl bg-[#2C649A] px-5 py-3 text-sm text-white shadow-lg">
+                    <span>Welcome to Insider! Your premium access is now active.</span>
+                    <button
+                        onClick={() => setShowCheckoutSuccess(false)}
+                        className="ml-2 opacity-70 hover:opacity-100 transition-opacity"
+                        aria-label="Dismiss"
+                    >
+                        ✕
+                    </button>
+                </div>
             )}
         </div>
     );

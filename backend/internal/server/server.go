@@ -69,6 +69,7 @@ func CreateApp(db *gorm.DB) *App {
 
 	var api = humafiber.New(router, config)
 	CreateRoutes(db, api)
+	stripe.RegisterWebhookRoute(router, db)
 	return &App{
 		Server: router,
 		Api:    api,
@@ -113,7 +114,10 @@ func setupApp() *fiber.App {
 	}))
 
 	app.Use(skip.New(AuthMiddleware, func(ctx *fiber.Ctx) bool {
-		return strings.HasPrefix(ctx.Path(), "/docs") || strings.HasPrefix(ctx.Path(), "/openapi.yaml") || ctx.Path() == "/"
+		return strings.HasPrefix(ctx.Path(), "/docs") ||
+			strings.HasPrefix(ctx.Path(), "/openapi.yaml") ||
+			ctx.Path() == "/" ||
+			ctx.Path() == "/api/v1/stripe/webhook"
 	}))
 	app.Use(favicon.New())
 	app.Use(compress.New(compress.Config{

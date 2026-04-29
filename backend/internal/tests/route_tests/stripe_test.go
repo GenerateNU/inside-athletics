@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stripe/stripe-go/v81"
-	"github.com/stripe/stripe-go/v81/checkout/session"
-	"github.com/stripe/stripe-go/v81/customer"
-	"github.com/stripe/stripe-go/v81/price"
-	"github.com/stripe/stripe-go/v81/product"
+	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v82/checkout/session"
+	"github.com/stripe/stripe-go/v82/customer"
+	"github.com/stripe/stripe-go/v82/price"
+	"github.com/stripe/stripe-go/v82/product"
 )
 
 func TestCreateProduct(t *testing.T) {
@@ -715,6 +715,8 @@ func TestCreateCheckoutSession(t *testing.T) {
 	defer testDB.Teardown(t)
 	api := testDB.API
 
+	user, _ := seedUserAndCollege(t, testDB, "create-checkout-session")
+
 	productParams := &stripe.ProductParams{
 		Name:        stripe.String("Premium Plan"),
 		Description: stripe.String("Get premium content with this subscription"),
@@ -741,6 +743,7 @@ func TestCreateCheckoutSession(t *testing.T) {
 	}
 
 	reqBody := s.CreateStripeCheckoutSessionRequest{
+		UserID:     user.ID.String(),
 		PriceID:    priceResult.ID,
 		SuccessURL: "https://example.com/success",
 		CancelURL:  "https://example.com/cancel",

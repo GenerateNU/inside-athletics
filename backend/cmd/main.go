@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v82"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -23,7 +23,7 @@ func main() {
 	var dbUrl string
 	env := os.Getenv("APP_ENV") // or "ENV", "APP_ENV", etc.
 
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
 	if env == "production" {
 		dbUrl = os.Getenv("PROD_DB_CONNECTION_STRING")

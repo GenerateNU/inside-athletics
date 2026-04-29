@@ -27,6 +27,7 @@ type UpdateStripeProductRequest struct {
 }
 
 type CreateStripeCheckoutSessionRequest struct {
+	UserID     string `json:"user_id" binding:"required" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Our internal user ID"`
 	PriceID    string `json:"price_id" binding:"required" example:"price_12345"`
 	SuccessURL string `json:"success_url" binding:"required,url" example:"https://example.com/success"`
 	CancelURL  string `json:"cancel_url" binding:"required,url" example:"https://example.com/cancel"`
