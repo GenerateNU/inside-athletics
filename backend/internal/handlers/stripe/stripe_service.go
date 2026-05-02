@@ -16,20 +16,20 @@ import (
 	"gorm.io/gorm"
 
 	stripego "github.com/stripe/stripe-go/v82"
-	"github.com/stripe/stripe-go/v82/checkout/session"
-	"github.com/stripe/stripe-go/v82/customer"
-	"github.com/stripe/stripe-go/v82/price"
-	"github.com/stripe/stripe-go/v82/product"
-	"github.com/stripe/stripe-go/v82/subscription"
 	"github.com/stripe/stripe-go/v82/webhook"
 )
 
 type StripeService struct {
-	db *gorm.DB
+	db     *gorm.DB
+	client StripeClient
 }
 
 func NewStripeService(db *gorm.DB) *StripeService {
-	return &StripeService{db: db}
+	return &StripeService{db: db, client: &realStripeClient{}}
+}
+
+func NewStripeServiceWithClient(db *gorm.DB, client StripeClient) *StripeService {
+	return &StripeService{db: db, client: client}
 }
 
 // products are created with default no associated prices
@@ -48,7 +48,7 @@ func (s *StripeService) CreateStripeProduct(ctx context.Context, input *struct{ 
 		Description: stripego.String(input.Body.Description),
 	}
 
-	stripe_product, err := utils.HandleDBError(product.New(product_params))
+	stripe_product, err := s.client.CreateProduct(product_params)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (s *StripeService) CreateStripePrice(ctx context.Context, input *struct{ Bo
 		},
 	}
 
-	stripe_price, err := price.New(price_params)
+	stripe_price, err := s.client.CreatePrice(price_params)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (s *StripeService) GetStripeProductByID(ctx context.Context, input *GetStri
 		return nil, fmt.Errorf("product ID is empty")
 	}
 
-	stripe_product, err := product.Get(input.ID, nil)
+	stripe_product, err := s.client.GetProduct(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (s *StripeService) GetStripePriceByID(ctx context.Context, input *GetStripe
 		return nil, fmt.Errorf("price ID is empty")
 	}
 
-	stripePrice, err := price.Get(input.ID, nil)
+	stripePrice, err := s.client.GetPrice(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func (s *StripeService) UpdateStripeProduct(ctx context.Context, input *struct {
 		Description: input.Body.Description,
 	}
 
-	stripe_product, err := product.Update(input.ID, product_params)
+	stripe_product, err := s.client.UpdateProduct(input.ID, product_params)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 		return nil, fmt.Errorf("price ID is empty")
 	}
 
-	oldPrice, err := price.Get(input.ID, nil)
+	oldPrice, err := s.client.GetPrice(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -229,12 +229,12 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 		},
 	}
 
-	newStripePrice, err := price.New(newPriceParams)
+	newStripePrice, err := s.client.CreatePrice(newPriceParams)
 	if err != nil {
 		return nil, err
 	}
 
-	_, _ = price.Update(input.ID, &stripego.PriceParams{
+	_, _ = s.client.UpdatePrice(input.ID, &stripego.PriceParams{
 		Active: stripego.Bool(false),
 	})
 
@@ -263,24 +263,19 @@ func (s *StripeService) UpdateStripePrice(ctx context.Context, input *struct {
 }
 
 func (s *StripeService) GetAllStripeProducts(ctx context.Context, input *GetAllStripeProductsRequest) (*utils.ResponseBody[[]*StripeProductResponse], error) {
-	params := &stripego.ProductListParams{}
-	iter := product.List(params)
-	products := make([]*StripeProductResponse, 0)
-
-	for iter.Next() {
-		stripe_product := iter.Product()
-		response := &StripeProductResponse{
+	stripeProducts, err := s.client.ListProducts(&stripego.ProductListParams{})
+	if err != nil {
+		return nil, err
+	}
+	products := make([]*StripeProductResponse, 0, len(stripeProducts))
+	for _, stripe_product := range stripeProducts {
+		products = append(products, &StripeProductResponse{
 			ID:          stripe_product.ID,
 			Name:        stripe_product.Name,
 			Description: stripe_product.Description,
 			Active:      stripe_product.Active,
 			Created:     stripe_product.Created,
-		}
-		products = append(products, response)
-	}
-
-	if err := iter.Err(); err != nil {
-		return nil, err
+		})
 	}
 
 	return &utils.ResponseBody[[]*StripeProductResponse]{
@@ -292,27 +287,22 @@ func (s *StripeService) GetAllStripePrices(ctx context.Context, input *GetAllStr
 	if input.ID == "" {
 		return nil, fmt.Errorf("product ID is empty")
 	}
-	params := &stripego.PriceListParams{
+	stripePrices, err := s.client.ListPrices(&stripego.PriceListParams{
 		Product: stripego.String(input.ID),
+	})
+	if err != nil {
+		return nil, err
 	}
-	iter := price.List(params)
-	prices := make([]*StripePriceResponse, 0)
-
-	for iter.Next() {
-		stripe_price := iter.Price()
-		response := &StripePriceResponse{
+	prices := make([]*StripePriceResponse, 0, len(stripePrices))
+	for _, stripe_price := range stripePrices {
+		prices = append(prices, &StripePriceResponse{
 			ID:         stripe_price.ID,
 			ProductID:  stripe_price.Product.ID,
 			UnitAmount: stripe_price.UnitAmount,
 			Currency:   string(stripe_price.Currency),
 			Active:     stripe_price.Active,
 			Created:    stripe_price.Created,
-		}
-		prices = append(prices, response)
-	}
-
-	if err := iter.Err(); err != nil {
-		return nil, err
+		})
 	}
 
 	return &utils.ResponseBody[[]*StripePriceResponse]{
@@ -329,27 +319,15 @@ func (s *StripeService) ArchiveStripeProduct(ctx context.Context, input *Archive
 	params := &stripego.ProductParams{
 		Active: stripego.Bool(false),
 	}
-	stripe_product, err := product.Update(input.ID, params)
+	stripe_product, err := s.client.UpdateProduct(input.ID, params)
 	if err != nil {
 		return nil, err
 	}
-	priceParams := &stripego.PriceListParams{
+	archivePrices, _ := s.client.ListPrices(&stripego.PriceListParams{
 		Product: stripego.String(input.ID),
-	}
-	i := price.List(priceParams)
-
-	for i.Next() {
-		p := i.Price()
-		_, err = price.Update(p.ID, &stripego.PriceParams{
-			Active: stripego.Bool(false),
-		})
-		if err != nil {
-			continue
-		}
-	}
-
-	if err := i.Err(); err != nil {
-		return nil, err
+	})
+	for _, p := range archivePrices {
+		_, _ = s.client.UpdatePrice(p.ID, &stripego.PriceParams{Active: stripego.Bool(false)})
 	}
 
 	response := &StripeProductResponse{
@@ -372,7 +350,7 @@ func (s *StripeService) ArchiveStripePrice(ctx context.Context, input *ArchiveSt
 		Active: stripego.Bool(false),
 	}
 
-	stripe_price, err := price.Update(input.ID, params)
+	stripe_price, err := s.client.UpdatePrice(input.ID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +377,7 @@ func (s *StripeService) RegisterStripeCustomer(ctx context.Context, input *Regis
 		Description: input.Body.Description,
 	}
 
-	result, err := customer.New(params)
+	result, err := s.client.CreateCustomer(params)
 	if err != nil {
 		return nil, err
 	}
@@ -413,8 +391,7 @@ func (s *StripeService) RegisterStripeCustomer(ctx context.Context, input *Regis
 func (s *StripeService) GetStripeCustomer(ctx context.Context, input *GetStripeCustomerInput) (*utils.ResponseBody[GetStripeCustomerResponse], error) {
 	id := input.ID
 
-	params := &stripego.CustomerParams{}
-	result, err := customer.Get(id, params)
+	result, err := s.client.GetCustomer(id)
 	if err != nil {
 		return nil, err
 	}
@@ -432,15 +409,14 @@ func (s *StripeService) GetStripeCustomerByEmail(ctx context.Context, input *Get
 			Query: "email:'" + email + "'",
 		},
 	}
-	iter := customer.Search(params)
-	if err := iter.Err(); err != nil {
+	customers, err := s.client.SearchCustomers(params)
+	if err != nil {
 		return nil, err
 	}
-
-	if !iter.Next() {
+	if len(customers) == 0 {
 		return nil, fmt.Errorf("customer not found with that email")
 	}
-	cust := iter.Customer()
+	cust := customers[0]
 
 	return &utils.ResponseBody[GetStripeCustomerByEmailResponse]{
 		Body: &GetStripeCustomerByEmailResponse{
@@ -472,7 +448,7 @@ func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateS
 		}
 	}
 
-	result, err := customer.Update(id, params)
+	result, err := s.client.UpdateCustomer(id, params)
 	if err != nil {
 		return nil, err
 	}
@@ -484,16 +460,13 @@ func (s *StripeService) UpdateStripeCustomer(ctx context.Context, input *UpdateS
 func (s *StripeService) DeleteStripeCustomer(ctx context.Context, input *DeleteStripeCustomerInput) (*utils.ResponseBody[DeleteStripeCustomerResponse], error) {
 	id := input.ID
 
-	params := &stripego.CustomerParams{}
-
-	results, err := customer.Del(id, params)
+	results, err := s.client.DeleteCustomer(id)
 	if err != nil {
 		return nil, err
 	}
 	respBody := &DeleteStripeCustomerResponse{
 		ID:      results.ID,
-		Object:  results.Object,
-		Deleted: results.Deleted,
+		Deleted: true,
 	}
 	return &utils.ResponseBody[DeleteStripeCustomerResponse]{
 		Body: respBody,
@@ -555,26 +528,21 @@ func (s *StripeService) CheckActiveSubscription(ctx context.Context, input *HasA
 		Status:   stripego.String("all"),
 	}
 
-	iter := subscription.List(params)
-
-	for iter.Next() {
-		sub := iter.Subscription()
-
+	subs, err := s.client.ListSubscriptions(params)
+	if err != nil {
+		return nil, err
+	}
+	for _, sub := range subs {
 		if sub.Status == stripego.SubscriptionStatusActive {
-			respBody := &HasActiveSubscriptionResponse{
-				HasActiveSubscription: true,
-				SubscriptionID:        sub.ID,
-				Status:                string(sub.Status),
-				CurrentPeriodEnd:      sub.BillingCycleAnchor,
-			}
 			return &utils.ResponseBody[HasActiveSubscriptionResponse]{
-				Body: respBody,
+				Body: &HasActiveSubscriptionResponse{
+					HasActiveSubscription: true,
+					SubscriptionID:        sub.ID,
+					Status:                string(sub.Status),
+					CurrentPeriodEnd:      sub.BillingCycleAnchor,
+				},
 			}, nil
 		}
-	}
-
-	if err := iter.Err(); err != nil {
-		return nil, err
 	}
 
 	return &utils.ResponseBody[HasActiveSubscriptionResponse]{
@@ -647,7 +615,7 @@ func (s *StripeService) CreateStripeCheckoutSession(
 		},
 	}
 
-	stripeSession, err := utils.HandleDBError(session.New(params))
+	stripeSession, err := s.client.CreateSession(params)
 	if err != nil {
 		return nil, err
 	}
@@ -678,7 +646,7 @@ func (s *StripeService) getOrCreateStripeCustomer(user *models.User) (string, er
 			"user_id": user.ID.String(),
 		},
 	}
-	cust, err := customer.New(params)
+	cust, err := s.client.CreateCustomer(params)
 	if err != nil {
 		return "", err
 	}
@@ -754,7 +722,7 @@ func (s *StripeService) handleCheckoutCompleted(sess *stripego.CheckoutSession) 
 	}
 
 	// Fetch full subscription from Stripe since webhook payload doesn't expand it
-	fullSub, err := subscription.Get(sess.Subscription.ID, nil)
+	fullSub, err := s.client.GetSubscription(sess.Subscription.ID)
 	if err != nil {
 		return fmt.Errorf("failed to fetch subscription %s: %w", sess.Subscription.ID, err)
 	}
@@ -882,7 +850,7 @@ func (s *StripeService) GetStripeCheckoutSessionByID(ctx context.Context, input 
 		return nil, fmt.Errorf("product ID is empty")
 	}
 
-	stripeSession, err := session.Get(input.ID, nil)
+	stripeSession, err := s.client.GetSession(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -908,7 +876,7 @@ func (s *StripeService) DeleteStripeCheckoutSession(
 		return nil, huma.Error422UnprocessableEntity("session id cannot be empty")
 	}
 
-	stripeSession, err := session.Expire(input.ID, nil)
+	stripeSession, err := s.client.ExpireSession(input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -945,25 +913,20 @@ func (s *StripeService) GetAllStripeSessions(
 		params.Customer = stripego.String(input.CustomerID)
 	}
 
-	i := session.List(params)
+	stripeSessions, err := s.client.ListSessions(params)
+	if err != nil {
+		return nil, err
+	}
 	var sessions []*StripeCheckoutSessionResponse
-
-	for i.Next() {
-		stripeSession := i.CheckoutSession()
-		response := &StripeCheckoutSessionResponse{
+	for _, stripeSession := range stripeSessions {
+		sessions = append(sessions, &StripeCheckoutSessionResponse{
 			ID:      stripeSession.ID,
 			URL:     stripeSession.URL,
 			Mode:    string(stripeSession.Mode),
 			Status:  string(stripeSession.Status),
 			Created: stripeSession.Created,
-		}
-		sessions = append(sessions, response)
+		})
 	}
-
-	if err := i.Err(); err != nil {
-		return nil, err
-	}
-
 	return &utils.ResponseBody[[]*StripeCheckoutSessionResponse]{
 		Body: &sessions,
 	}, nil

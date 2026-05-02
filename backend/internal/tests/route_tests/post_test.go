@@ -666,7 +666,7 @@ func TestFreeUserCannotCreateSecondPost(t *testing.T) {
 
 	CreateUserAndSport(testDB, t)
 
-	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
 		{Action: models.PermissionCreate, Resource: "post"},
 	}, JohnID)
@@ -775,8 +775,7 @@ func TestFreeUserGetPostReturns403AfterMaxViews(t *testing.T) {
 	if err := testDB.DB.Create(&freeUser).Error; err != nil {
 		t.Fatalf("failed to create free user: %v", err)
 	}
-	assignRoleToUser(t, testDB.DB, freeUserID, getRoleID(t, testDB.DB, models.RoleUser))
-	authHeader := authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
+	authHeader := authHeaderWithPermissionsGivenUserForRole(t, testDB.DB, models.RoleUser, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
 	}, freeUserID)
 

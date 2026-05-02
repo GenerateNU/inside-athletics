@@ -23,6 +23,8 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	gormPostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	stripehandler "inside-athletics/internal/handlers/stripe"
 )
 
 // TestDatabase holds the test database connection and container
@@ -36,7 +38,7 @@ type TestDatabase struct {
 func SetupTestDB(t *testing.T) *TestDatabase {
 	ctx := context.Background()
 
-	stripe.Key = os.Getenv("STRIPE_TEST_KEY")
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 
 	// Create PostgreSQL container
 	postgresContainer, err := postgres.Run(ctx,
@@ -175,9 +177,14 @@ func SetupTestAPI(t *testing.T, dbUrl string) (humatest.TestAPI, *gorm.DB) {
 	}
 
 	server.CreateRoutes(db, api)
+	registerStripeRoutesWithMock(api, db)
 	registerContentRoutesWithMock(api, db)
 
 	return api, db
+}
+
+func registerStripeRoutesWithMock(api humatest.TestAPI, db *gorm.DB) {
+	stripehandler.RouteWithClient(api, db, stripehandler.NewMockStripeClient())
 }
 
 // Returns an API with only content routes and mock S3.

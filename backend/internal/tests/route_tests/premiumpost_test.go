@@ -11,10 +11,14 @@ import (
 
 func premiumPostAdminAuthHeader(t *testing.T, testDB *TestDatabase) string {
 	t.Helper()
-	assignRoleToUser(t, testDB.DB, JohnID, getRoleID(t, testDB.DB, models.RoleAdmin))
 	return authHeaderWithPermissionsGivenUser(t, testDB.DB, []permissionSpec{
 		{Action: models.PermissionCreate, Resource: "sport"},
 		{Action: models.PermissionCreate, Resource: "post"},
+		{Action: models.PermissionCreate, Resource: "premiumpost"},
+		{Action: models.PermissionUpdate, Resource: "premiumpost"},
+		{Action: models.PermissionUpdateOwn, Resource: "premiumpost"},
+		{Action: models.PermissionDelete, Resource: "premiumpost"},
+		{Action: models.PermissionDeleteOwn, Resource: "premiumpost"},
 	}, JohnID)
 }
 
@@ -54,9 +58,6 @@ func TestCreatePremiumPost(t *testing.T) {
 
 	CreateUserAndSport(testDB, t)
 	authHeader := premiumPostAdminAuthHeader(t, testDB)
-
-	// assigning admin user to JohnID
-	assignRoleToUser(t, testDB.DB, JohnID, getRoleID(t, testDB.DB, models.RoleAdmin))
 
 	tag1 := models.Tag{Name: "recruiting"}
 	tag2 := models.Tag{Name: "fencing"}

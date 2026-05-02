@@ -69,6 +69,7 @@ func CreateApp(db *gorm.DB) *App {
 
 	var api = humafiber.New(router, config)
 	CreateRoutes(db, api)
+	stripe.Route(api, db)
 	stripe.RegisterWebhookRoute(router, db)
 	return &App{
 		Server: router,
@@ -76,10 +77,10 @@ func CreateApp(db *gorm.DB) *App {
 	}
 }
 
-// CreateRoutes registers all route groups on the given Huma API.
+// CreateRoutes registers all core route groups on the given Huma API (stripe excluded).
 func CreateRoutes(db *gorm.DB, api huma.API) {
 	api.UseMiddleware(PermissionHumaMiddleware(api, db))
-	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, sport.Route, role.Route, permission.Route, collegefollow.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, stripe.Route, comment.Route}
+	routeGroups := [...]RouteFN{survey.Route, media.Route, health.Route, sport.Route, role.Route, permission.Route, collegefollow.Route, tagfollow.Route, sportfollow.Route, tagpost.Route, comment.Route, comment_like.Route, post_like.Route, comment.Route}
 	for _, fn := range routeGroups {
 		fn(api, db)
 	}

@@ -91,7 +91,10 @@ func assignRoleToUser(t *testing.T, db *gorm.DB, userID, roleID uuid.UUID) {
 		UserID: userID,
 		RoleID: roleID,
 	}
-	if err := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&userRole).Error; err != nil {
+	if err := db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "user_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"role_id"}),
+	}).Create(&userRole).Error; err != nil {
 		t.Fatalf("failed to assign role to user: %v", err)
 	}
 }
