@@ -3,7 +3,7 @@
 import { PenSquare, UserRound, X } from "lucide-react";
 import * as React from "react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +16,7 @@ type Props = {
     lastName: string;
     pronouns: string;
     about: string;
+    profilePicture?: string;
   };
   onSave: (values: {
     firstName: string;
@@ -23,6 +24,7 @@ type Props = {
     pronouns: string;
     about: string;
     selectedTagIds: string[];
+    profilePictureFile?: File;
   }) => Promise<void>;
   availableTags: Array<{ id: string; name: string }>;
   selectedTagIds: string[];
@@ -78,6 +80,9 @@ export function EditProfileModal({
   const [about, setAbout] = React.useState(user.about);
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = React.useState<File | undefined>(undefined);
+  const [previewUrl, setPreviewUrl] = React.useState<string | undefined>(undefined);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (!open) return;
@@ -87,7 +92,16 @@ export function EditProfileModal({
     setAbout(user.about);
     setSelectedTags(selectedTagIds);
     setSaveError(null);
+    setProfilePictureFile(undefined);
+    setPreviewUrl(undefined);
   }, [open, selectedTagIds, user.about, user.firstName, user.lastName, user.pronouns]);
+
+  React.useEffect(() => {
+    if (!profilePictureFile) return;
+    const url = URL.createObjectURL(profilePictureFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [profilePictureFile]);
 
   if (!open) return null;
 
@@ -108,6 +122,7 @@ export function EditProfileModal({
         pronouns: pronouns.trim(),
         about: about.trim(),
         selectedTagIds: selectedTags,
+        profilePictureFile,
       });
     } catch {
       setSaveError("Unable to save profile changes. Please try again.");
@@ -137,6 +152,12 @@ export function EditProfileModal({
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="h-24 w-24 border-slate-500 text-slate-600">
+                {previewUrl || user.profilePicture ? (
+                  <AvatarImage
+                    src={previewUrl ?? user.profilePicture}
+                    alt="Profile picture"
+                  />
+                ) : null}
                 <AvatarFallback>
                   <UserRound className="h-12 w-12" />
                 </AvatarFallback>
@@ -144,9 +165,21 @@ export function EditProfileModal({
               <button
                 type="button"
                 className="absolute right-0 bottom-0 rounded-full bg-slate-200 p-1"
+                onClick={() => fileInputRef.current?.click()}
               >
                 <PenSquare className="h-4 w-4 text-slate-700" />
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setProfilePictureFile(file);
+                  e.target.value = "";
+                }}
+              />
             </div>
           </div>
 

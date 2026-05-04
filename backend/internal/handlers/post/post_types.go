@@ -206,6 +206,15 @@ type GetSearchResponse struct {
 	Count int64          `json:"count" example:"5" doc:"Count of search results found for given search"`
 }
 
+type GetUserLikedPostsParams struct {
+	UserID uuid.UUID `path:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the user whose liked posts to fetch"`
+}
+
+type GetUserLikedPostsResponse struct {
+	Posts []PostResponse `json:"posts" doc:"List of posts liked by the user"`
+	Total int            `json:"total" example:"25" doc:"Total number of liked posts"`
+}
+
 type GetFilterPostsParams struct {
 	CollegeIds string `query:"college_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of college_ids to filter by"`
 	SportIds   string `query:"sport_ids" default:"" example:"98d830a4-3ddd-441f-a8b8-12d99b597894,98d830a4-3ddd-441f-a8b8-12d99b597894" doc:"Comma seperated list of sport_ids to filter by"`

@@ -22,4 +22,8 @@ func Route(api huma.API, db *gorm.DB) {
 		grp := huma.NewGroup(api, "/api/v1/post")
 		huma.Get(grp, "/{post_id}/comments", commentService.GetCommentsByPost) // List comments by post
 	}
+	{
+		grp := huma.NewGroup(api, "/api/v1/user")
+		huma.Get(grp, "/{user_id}/comments", commentService.GetUserComments) // List comments by user
+	}
 }

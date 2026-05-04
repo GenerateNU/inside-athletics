@@ -11,7 +11,7 @@ export function ProfileLikesFeed({ likedPosts }: Props) {
   return (
     <div className="mt-4 space-y-6">
       {likedPosts.map((post) => (
-        <FeedPostCard key={post.id} post={post} filledHeart />
+        <FeedPostCard key={post.id} post={post} filledHeart showAvatar={false} />
       ))}
     </div>
   );

@@ -27,4 +27,8 @@ func Route(api huma.API, db *gorm.DB, s3Svc *s3.Service) {
 		huma.Get(grp, "/search", postService.FuzzySearchForPost)               // Find all posts based on title for given search string
 		huma.Get(grp, "/filter", postService.FilterPosts)                      // Filter for posts based on college, sport, and tags
 	}
+	{
+		grp := huma.NewGroup(api, "/api/v1/user")
+		huma.Get(grp, "/{user_id}/liked-posts", postService.GetUserLikedPosts) // List posts liked by user
+	}
 }

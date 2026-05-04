@@ -275,6 +275,26 @@ func (s *PostDB) GetPostsByAuthorID(limit, offset int, authorID uuid.UUID, userI
 	return posts, total, nil
 }
 
+// GetPostsLikedByUser returns all posts liked by the given user.
+func (s *PostDB) GetPostsLikedByUser(userID uuid.UUID, requestingUserID uuid.UUID) ([]models.Post, error) {
+	var posts []models.Post
+	if err := s.db.
+		Table("posts").
+		Select(POST_SELECT_QUERY, requestingUserID).
+		Joins("JOIN post_likes ON post_likes.post_id = posts.id AND post_likes.user_id = ?", userID).
+		Preload("Author").
+		Preload("Sport", "id IS NOT NULL").
+		Preload("College", "id IS NOT NULL").
+		Preload("Tags", func(db *gorm.DB) *gorm.DB {
+			return db.Table("tags AS t").Joins("JOIN tag_posts tp ON tp.tag_id = t.id AND tp.postable_type = 'post'")
+		}).
+		Order("post_likes.created_at DESC").
+		Find(&posts).Error; err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
 // DeletePost soft deletes a post by ID
 func (p *PostDB) DeletePost(id uuid.UUID) error {
 	dbResponse := p.db.Delete(&models.Post{}, "id = ?", id)

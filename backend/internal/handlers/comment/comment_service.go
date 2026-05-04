@@ -156,6 +156,24 @@ func (s *CommentService) GetReplies(ctx context.Context, input *GetReplyParams) 
 	return &utils.ResponseBody[[]CommentResponse]{Body: &responses}, nil
 }
 
+// Retrieves all comments made by a specific user.
+func (s *CommentService) GetUserComments(ctx context.Context, input *GetUserCommentsParams) (*utils.ResponseBody[[]CommentResponse], error) {
+	requestingUserID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	comments, err := s.commentDB.GetCommentsByUser(input.UserID, requestingUserID)
+	if err != nil {
+		_, humaErr := utils.HandleDBError[[]CommentResponse](nil, err)
+		return nil, humaErr
+	}
+	responses := make([]CommentResponse, len(comments))
+	for i := range comments {
+		responses[i] = *ToCommentResponse(&comments[i], requestingUserID)
+	}
+	return &utils.ResponseBody[[]CommentResponse]{Body: &responses}, nil
+}
+
 // Updates a comment's description by ID.
 func (s *CommentService) UpdateComment(ctx context.Context, input *UpdateCommentInput) (*utils.ResponseBody[CommentResponse], error) {
 	userID, err := utils.GetCurrentUserID(ctx)

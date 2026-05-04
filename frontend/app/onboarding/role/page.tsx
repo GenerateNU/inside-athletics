@@ -18,6 +18,7 @@ import {
 const roleOptions = [
   { label: "Athlete", value: "athlete" },
   { label: "Prospective Athlete", value: "prospective-athlete" },
+  { label: "Parent", value: "parent" },
 ] as const;
 
 const primarySports = [

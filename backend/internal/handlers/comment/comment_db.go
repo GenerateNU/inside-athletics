@@ -112,6 +112,26 @@ func (c *CommentDB) DeleteComment(id uuid.UUID) error {
 	return nil
 }
 
+// GetCommentsByUser retrieves all comments made by a specific user.
+func (c *CommentDB) GetCommentsByUser(targetUserID uuid.UUID, requestingUserID uuid.UUID) ([]models.Comment, error) {
+	var comments []models.Comment
+	res := c.db.
+		Model(&models.Comment{}).
+		Select(`comments.*,
+            (SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id) AS like_count,
+            (SELECT COUNT(*) > 0 FROM comment_likes WHERE comment_likes.comment_id = comments.id AND comment_likes.user_id = ?) AS is_liked,
+            (SELECT COUNT(*) > 0 FROM comments AS replies WHERE replies.parent_comment_id = comments.id AND replies.deleted_at IS NULL) AS has_replies`,
+			requestingUserID).
+		Preload("User").
+		Where("user_id = ?", targetUserID).
+		Order("created_at DESC").
+		Find(&comments)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return comments, nil
+}
+
 // IsUserPremium returns true when the user does not have the free "user" role.
 func (c *CommentDB) IsUserPremium(userID uuid.UUID) (bool, error) {
 	var count int64

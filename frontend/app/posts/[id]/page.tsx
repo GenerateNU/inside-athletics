@@ -50,6 +50,7 @@ export default function PostPage({
   const [likeCount, setLikeCount] = useState(0);
   const [commentOpen, setCommentOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [commentAnonymous, setCommentAnonymous] = useState(false);
 
   const { mutate: submitComment, isPending: submittingComment } =
     usePostApiV1Comment({
@@ -62,13 +63,14 @@ export default function PostPage({
       {
         data: {
           description: commentText.trim(),
-          is_anonymous: false,
+          is_anonymous: commentAnonymous,
           post_id: id,
         },
       },
       {
         onSuccess: () => {
           setCommentText("");
+          setCommentAnonymous(false);
           setCommentOpen(false);
           queryClient.invalidateQueries({ queryKey: listApiV1PostByPostIdCommentsQueryKey(id) });
           queryClient.invalidateQueries({ queryKey: getApiV1PostByIdQueryKey(id) });
@@ -253,22 +255,38 @@ export default function PostPage({
               <p className="py-4 text-lg font-semibold text-black">Comments</p>
 
               {commentOpen && (
-                <div className="mb-4 flex gap-2 relative">
+                <div className="mb-4 flex flex-col gap-2">
                   <textarea
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Write a comment..."
                     rows={4}
-                    className="min-h-0 flex-1 resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
+                    className="min-h-0 w-full resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
                   />
-                  <button
-                    type="button"
-                    onClick={handleCommentSubmit}
-                    disabled={!commentText.trim() || submittingComment}
-                    className="absolute bottom-2 right-2 rounded-3xl bg-[#A8C8E8] px-4 py-1.5 text-sm font-medium text-[#E8F1FA] disabled:opacity-50"
-                  >
-                    {submittingComment ? "Posting..." : "Post"}
-                  </button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <label className="text-xs font-bold text-[#001225]">
+                        Comment Anonymously
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setCommentAnonymous((v) => !v)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${commentAnonymous ? "bg-[#2C649A]" : "bg-gray-300"}`}
+                      >
+                        <span
+                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${commentAnonymous ? "translate-x-5" : "translate-x-1"}`}
+                        />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCommentSubmit}
+                      disabled={!commentText.trim() || submittingComment}
+                      className="rounded-3xl bg-[#A8C8E8] px-4 py-1.5 text-sm font-medium text-[#E8F1FA] disabled:opacity-50"
+                    >
+                      {submittingComment ? "Posting..." : "Post"}
+                    </button>
+                  </div>
                 </div>
               )}
 

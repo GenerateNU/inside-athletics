@@ -28,6 +28,7 @@ export function CommentCard({
 
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
+  const [replyAnonymous, setReplyAnonymous] = useState(false);
   const [repliesOpen, setRepliesOpen] = useState(false);
   const [localHasReplies, setLocalHasReplies] = useState(comment.has_replies);
 
@@ -46,7 +47,7 @@ export function CommentCard({
       {
         data: {
           description: replyText.trim(),
-          is_anonymous: false,
+          is_anonymous: replyAnonymous,
           parent_comment_id: comment.id,
           post_id: postId,
         },
@@ -54,6 +55,7 @@ export function CommentCard({
       {
         onSuccess: () => {
           setReplyText("");
+          setReplyAnonymous(false);
           setReplyOpen(false);
           setLocalHasReplies(true);
           setRepliesOpen(true);
@@ -111,24 +113,38 @@ export function CommentCard({
         </div>
 
         {replyOpen && (
-          <div className="mt-3 flex gap-2 relative">
+          <div className="mt-3 flex flex-col gap-2">
             <textarea
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Write a reply..."
               rows={4}
-              className="min-h-0 flex-1 resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
+              className="min-h-0 w-full resize-none rounded-2xl border border-[#3E7DBB] bg-white px-3 py-2 text-base text-zinc-900 placeholder:text-zinc-400"
             />
-            <Button
-              className={
-                "absolute bottom-1 right-2 rounded-3xl bg-[#A8C8E8] text-[#E8F1FA]"
-              }
-              size="lg"
-              onClick={handleReplySubmit}
-              disabled={!replyText.trim() || submittingReply}
-            >
-              {submittingReply ? "Posting..." : "Post"}
-            </Button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <label className="text-xs font-bold text-[#001225]">
+                  Reply Anonymously
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setReplyAnonymous((v) => !v)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${replyAnonymous ? "bg-[#2C649A]" : "bg-gray-300"}`}
+                >
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${replyAnonymous ? "translate-x-5" : "translate-x-1"}`}
+                  />
+                </button>
+              </div>
+              <Button
+                className="rounded-3xl bg-[#A8C8E8] text-[#E8F1FA]"
+                size="lg"
+                onClick={handleReplySubmit}
+                disabled={!replyText.trim() || submittingReply}
+              >
+                {submittingReply ? "Posting..." : "Post"}
+              </Button>
+            </div>
           </div>
         )}
 

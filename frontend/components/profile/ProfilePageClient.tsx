@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import * as React from "react";
 
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
@@ -12,7 +12,6 @@ import { Navbar } from "@/components/ui/navbar";
 import Loading from "@/components/ui/loading";
 import {
   getApiV1TagByIdQueryOptions,
-  listApiV1PostByPostIdCommentsQueryOptions,
   usePatchApiV1User,
   usePostApiV1UserTag,
   useGetApiV1PostsByAuthorByAuthorId,
@@ -21,6 +20,7 @@ import {
   useGetApiV1UserTagFollows,
 } from "@/api/hooks";
 import type { CommentResponse } from "@/api/models/CommentResponse";
+import type { PostResponse } from "@/api/models/PostResponse";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/utils/SessionContext";
 
@@ -134,16 +134,33 @@ export function ProfilePageClient({ profileUserId }: Props) {
   });
 
   const posts = postsQuery.data?.posts ?? [];
-  const commentPostIds = posts.slice(0, 6).map((p) => p.id);
 
-  const commentResults = useQueries({
-    queries: commentPostIds.map((postId) => ({
-      ...listApiV1PostByPostIdCommentsQueryOptions(postId, {
-        headers: authHeaders,
-      }),
-      ...commonQueryConfig,
-      enabled: enabled && !!postId,
-    })),
+  const userCommentsQuery = useQuery({
+    queryKey: ["user-comments", userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/user/${userId}/comments`, {
+        headers: authHeaders as Record<string, string>,
+      });
+      if (!res.ok) return [] as CommentResponse[];
+      const data = (await res.json()) as CommentResponse[] | null;
+      return data ?? ([] as CommentResponse[]);
+    },
+    ...commonQueryConfig,
+    enabled: enabled && !!userId,
+  });
+
+  const userLikedPostsQuery = useQuery({
+    queryKey: ["user-liked-posts", userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/user/${userId}/liked-posts`, {
+        headers: authHeaders as Record<string, string>,
+      });
+      if (!res.ok) return [] as PostResponse[];
+      const data = (await res.json()) as { posts?: PostResponse[] | null };
+      return data.posts ?? ([] as PostResponse[]);
+    },
+    ...commonQueryConfig,
+    enabled: enabled && !!userId,
   });
 
   const isLoadingProfile =
@@ -218,12 +235,8 @@ export function ProfilePageClient({ profileUserId }: Props) {
   }
 
   // Data preparation logic
-  const likedPosts = posts.filter((post) => Boolean(post.is_liked));
-
-  const comments = commentResults
-    .flatMap((r) => r.data ?? [])
-    .filter(Boolean)
-    .slice(0, 8) as CommentResponse[];
+  const likedPosts = userLikedPostsQuery.data ?? [];
+  const comments = (userCommentsQuery.data ?? []).slice(0, 8);
 
   const interestNames = isViewingOwnProfile
     ? tagResults
@@ -262,6 +275,7 @@ export function ProfilePageClient({ profileUserId }: Props) {
     pronouns,
     email: isAthlete ? user.email : undefined,
     about: user.bio || "No bio yet.",
+    profilePicture: user.profile_picture ?? undefined,
     divisionTag: user.division ? `D${user.division}` : undefined,
     sportTag: user.sport?.name,
     collegeTag: user.college?.name,
@@ -326,14 +340,51 @@ export function ProfilePageClient({ profileUserId }: Props) {
             lastName: user.last_name,
             pronouns,
             about: user.bio || "",
+            profilePicture: user.profile_picture ?? undefined,
           }}
           onSave={async (values) => {
+            let newProfilePictureKey: string | undefined;
+
+            if (values.profilePictureFile) {
+              const file = values.profilePictureFile;
+              const ext = file.name.includes(".")
+                ? file.name.slice(file.name.lastIndexOf("."))
+                : "";
+              const key = `users/profile-pictures/${Date.now()}-${crypto.randomUUID()}${ext}`;
+
+              const uploadUrlRes = await fetch("/api/v1/content/upload-url", {
+                method: "POST",
+                headers: { ...authHeaders, "Content-Type": "application/json" },
+                body: JSON.stringify({ key, fileName: file.name, fileType: file.type || "image/jpeg" }),
+              });
+              if (!uploadUrlRes.ok) throw new Error("Failed to get upload URL");
+              const uploadUrlData = (await uploadUrlRes.json()) as { upload_url: string; key: string };
+
+              const s3Res = await fetch(uploadUrlData.upload_url, {
+                method: "PUT",
+                body: file,
+                headers: { "Content-Type": file.type || "image/jpeg" },
+              });
+              if (!s3Res.ok) throw new Error("Failed to upload profile picture");
+
+              const confirmRes = await fetch("/api/v1/content/confirm-upload", {
+                method: "POST",
+                headers: { ...authHeaders, "Content-Type": "application/json" },
+                body: JSON.stringify({ key: uploadUrlData.key }),
+              });
+              if (!confirmRes.ok) throw new Error("Failed to confirm profile picture upload");
+              const confirmData = (await confirmRes.json()) as { key: string };
+              newProfilePictureKey = confirmData.key;
+            }
+
             await patchUserMutation.mutateAsync({
               data: {
                 first_name: values.firstName,
                 last_name: values.lastName,
                 bio: values.about,
-              },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...(newProfilePictureKey ? { profile_picture: newProfilePictureKey } : {}),
+              } as any,
             });
 
             const existingTagIds = new Set(tagIds);

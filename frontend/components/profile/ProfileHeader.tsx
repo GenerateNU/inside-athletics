@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ProfilePageData } from "@/components/profile/types";
@@ -27,6 +27,9 @@ export function ProfileHeader({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-1 gap-5">
           <Avatar className="h-[120px] w-[120px] border-slate-300 bg-slate-300 text-slate-500">
+            {user.profilePicture ? (
+              <AvatarImage src={user.profilePicture} alt={user.username} />
+            ) : null}
             <AvatarFallback />
           </Avatar>
           <div className="min-w-0">

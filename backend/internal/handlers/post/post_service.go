@@ -349,3 +349,27 @@ func (s *PostService) FilterPosts(ctx context.Context, input *GetFilterPostsPara
 		},
 	}, nil
 }
+
+// GetUserLikedPosts returns all posts liked by the given user.
+func (s *PostService) GetUserLikedPosts(ctx context.Context, input *GetUserLikedPostsParams) (*utils.ResponseBody[GetUserLikedPostsResponse], error) {
+	requestingUserID, err := utils.GetCurrentUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	posts, err := s.postDB.GetPostsLikedByUser(input.UserID, requestingUserID)
+	if err != nil {
+		return nil, err
+	}
+	responses := make([]PostResponse, len(posts))
+	for i := range posts {
+		s.resolvePostKeys(ctx, &posts[i])
+		responses[i] = *ToPostResponse(&posts[i], requestingUserID)
+	}
+	return &utils.ResponseBody[GetUserLikedPostsResponse]{
+		Body: &GetUserLikedPostsResponse{
+			Posts: responses,
+			Total: len(responses),
+		},
+	}, nil
+}
+

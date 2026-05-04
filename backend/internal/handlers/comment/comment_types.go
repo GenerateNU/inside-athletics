@@ -11,6 +11,11 @@ type GetCommentParams struct {
 	ID uuid.UUID `path:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of comment"`
 }
 
+// Defines parameters for getting comments by a user
+type GetUserCommentsParams struct {
+	UserID uuid.UUID `path:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the user whose comments to fetch"`
+}
+
 // Defines parameters for getting top-level comments for a post
 type GetCommentsByPostParams struct {
 	PostID uuid.UUID `path:"post_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"ID of the post"`

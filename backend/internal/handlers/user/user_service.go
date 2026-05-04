@@ -125,6 +125,12 @@ func (u *UserService) UpdateUser(ctx context.Context, input *UpdateUserInput) (*
 		return respBody, err
 	}
 
+	if u.s3 != nil && input.Body.ProfilePicture != nil && *input.Body.ProfilePicture != "" {
+		if existing, err := u.userDB.GetUser(currentUserID); err == nil && existing.ProfilePicture != "" && existing.ProfilePicture != *input.Body.ProfilePicture {
+			_ = u.s3.DeleteObject(ctx, existing.ProfilePicture)
+		}
+	}
+
 	updatedUser, err := u.userDB.UpdateUser(currentUserID, input.Body)
 	if err != nil {
 		return respBody, err

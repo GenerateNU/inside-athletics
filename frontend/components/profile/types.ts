@@ -14,6 +14,7 @@ export type ProfilePageData = {
     pronouns: string;
     email?: string;
     about: string;
+    profilePicture?: string;
     divisionTag?: string;
     sportTag?: string;
     collegeTag?: string;

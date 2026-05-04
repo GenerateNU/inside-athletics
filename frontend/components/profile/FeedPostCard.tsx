@@ -4,37 +4,43 @@ import { Heart, Bookmark } from "lucide-react";
 import Link from "next/link";
 
 import type { PostResponse } from "@/api/models";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type Props = {
   post: PostResponse;
   filledHeart: boolean;
+  showAvatar?: boolean;
 };
 
-export function FeedPostCard({ post, filledHeart }: Props) {
+export function FeedPostCard({ post, filledHeart, showAvatar = true }: Props) {
   const avatar = (
     <Avatar className="h-9 w-9 bg-slate-300">
+      {post.author?.profile_picture ? (
+        <AvatarImage src={post.author.profile_picture} alt={post.author.username ?? ""} />
+      ) : null}
       <AvatarFallback />
     </Avatar>
   );
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
-      {post.author?.id ? (
-        <Link
-          href={`/profile/${post.author.id}`}
-          className="shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label={`View ${
-            post.author.username || "user"
-          }'s profile`}
-        >
-          {avatar}
-        </Link>
-      ) : (
-        avatar
-      )}
+      {showAvatar ? (
+        post.author?.id ? (
+          <Link
+            href={`/profile/${post.author.id}`}
+            className="shrink-0 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`View ${
+              post.author.username || "user"
+            }'s profile`}
+          >
+            {avatar}
+          </Link>
+        ) : (
+          avatar
+        )
+      ) : null}
       <div>
         <div className="mb-1 flex items-baseline gap-3">
           {post.author?.id ? (
