@@ -52,6 +52,11 @@
             "format": "int32",
             "type": "integer"
           },
+          "program_gender": {
+            "description": "Program gender (mens or womens)",
+            "enum": ["mens", "womens"],
+            "type": "string"
+          },
           "sport_id": { "description": "Sport ID", "type": "string" },
           "transparency": {
             "description": "Transparency rating",
@@ -65,6 +70,7 @@
           "user_id",
           "college_id",
           "sport_id",
+          "program_gender",
           "player_dev",
           "academics_athletics_priority",
           "academic_career_resources",

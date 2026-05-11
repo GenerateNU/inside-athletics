@@ -19,9 +19,14 @@
     "success_url": {
       "examples": ["https://example.com/success"],
       "type": "string"
+    },
+    "user_id": {
+      "description": "Our internal user ID",
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"],
+      "type": "string"
     }
   },
-  "required": ["price_id", "success_url", "cancel_url", "quantity"],
+  "required": ["user_id", "price_id", "success_url", "cancel_url", "quantity"],
   "type": "object",
   "x-readme-ref-name": "CreateStripeCheckoutSessionRequest"
 }

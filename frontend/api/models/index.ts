@@ -36,7 +36,10 @@ export type { CreateSportRequest } from "./CreateSportRequest.ts";
 export type { CreateStripeCheckoutSessionRequest } from "./CreateStripeCheckoutSessionRequest.ts";
 export type { CreateStripePriceRequest } from "./CreateStripePriceRequest.ts";
 export type { CreateStripeProductRequest } from "./CreateStripeProductRequest.ts";
-export type { CreateSurveyRequest } from "./CreateSurveyRequest.ts";
+export type {
+  CreateSurveyRequest,
+  CreateSurveyRequestProgramGenderEnumKey,
+} from "./CreateSurveyRequest.ts";
 export type { CreateTagBody } from "./CreateTagBody.ts";
 export type { CreateTagFollowBody } from "./CreateTagFollowBody.ts";
 export type { CreateTagFollowResponse } from "./CreateTagFollowResponse.ts";
@@ -523,6 +526,7 @@ export type {
   GetApiV1SurveyAveragesError,
   GetApiV1SurveyAveragesQuery,
   GetApiV1SurveyAveragesQueryParams,
+  GetApiV1SurveyAveragesQueryParamsProgramGenderEnumKey,
   GetApiV1SurveyAveragesQueryResponse,
 } from "./GetApiV1SurveyAverages.ts";
 export type {
@@ -576,6 +580,13 @@ export type {
   GetApiV1UserByIdQuery,
   GetApiV1UserByIdQueryResponse,
 } from "./GetApiV1UserById.ts";
+export type {
+  GetApiV1UserByUserIdLikedPosts200,
+  GetApiV1UserByUserIdLikedPostsError,
+  GetApiV1UserByUserIdLikedPostsPathParams,
+  GetApiV1UserByUserIdLikedPostsQuery,
+  GetApiV1UserByUserIdLikedPostsQueryResponse,
+} from "./GetApiV1UserByUserIdLikedPosts.ts";
 export type {
   GetApiV1UserCollegeByCollegeIdUsers200,
   GetApiV1UserCollegeByCollegeIdUsersError,
@@ -660,6 +671,7 @@ export type { GetTagPostByIDResponse } from "./GetTagPostByIDResponse.ts";
 export type { GetTagResponse } from "./GetTagResponse.ts";
 export type { GetUploadURLRequest } from "./GetUploadURLRequest.ts";
 export type { GetUploadURLResponse } from "./GetUploadURLResponse.ts";
+export type { GetUserLikedPostsResponse } from "./GetUserLikedPostsResponse.ts";
 export type { GetUserResponse } from "./GetUserResponse.ts";
 export type { HealthResponse } from "./HealthResponse.ts";
 export type { InvoiceSettings } from "./InvoiceSettings.ts";
@@ -704,6 +716,13 @@ export type {
   ListApiV1TagTypeByTypeQuery,
   ListApiV1TagTypeByTypeQueryResponse,
 } from "./ListApiV1TagTypeByType.ts";
+export type {
+  ListApiV1UserByUserIdComments200,
+  ListApiV1UserByUserIdCommentsError,
+  ListApiV1UserByUserIdCommentsPathParams,
+  ListApiV1UserByUserIdCommentsQuery,
+  ListApiV1UserByUserIdCommentsQueryResponse,
+} from "./ListApiV1UserByUserIdComments.ts";
 export type { ListCollegesResponse } from "./ListCollegesResponse.ts";
 export type { ListTagsResponse } from "./ListTagsResponse.ts";
 export type { Media } from "./Media.ts";
@@ -1002,7 +1021,10 @@ export type { SportResponse } from "./SportResponse.ts";
 export type { StripeCheckoutSessionResponse } from "./StripeCheckoutSessionResponse.ts";
 export type { StripePriceResponse } from "./StripePriceResponse.ts";
 export type { StripeProductResponse } from "./StripeProductResponse.ts";
-export type { SurveyResponse } from "./SurveyResponse.ts";
+export type {
+  SurveyResponse,
+  SurveyResponseProgramGenderEnumKey,
+} from "./SurveyResponse.ts";
 export type { Tag } from "./Tag.ts";
 export type { TagRequest } from "./TagRequest.ts";
 export type {
@@ -1032,6 +1054,9 @@ export type { UserRoleResponse } from "./UserRoleResponse.ts";
 export { collegeDivisionRankEnum } from "./College.ts";
 export { createCollegeRequestDivisionRankEnum } from "./CreateCollegeRequest.ts";
 export { createCollegeResponseDivisionRankEnum } from "./CreateCollegeResponse.ts";
+export { createSurveyRequestProgramGenderEnum } from "./CreateSurveyRequest.ts";
+export { getApiV1SurveyAveragesQueryParamsProgramGenderEnum } from "./GetApiV1SurveyAverages.ts";
 export { getCollegeResponseDivisionRankEnum } from "./GetCollegeResponse.ts";
+export { surveyResponseProgramGenderEnum } from "./SurveyResponse.ts";
 export { updateCollegeRequestDivisionRankEnum } from "./UpdateCollegeRequest.ts";
 export { updateCollegeResponseDivisionRankEnum } from "./UpdateCollegeResponse.ts";

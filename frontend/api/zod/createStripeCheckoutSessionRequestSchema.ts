@@ -13,4 +13,5 @@ export const createStripeCheckoutSessionRequestSchema = z.object({
   price_id: z.string(),
   quantity: z.int(),
   success_url: z.string(),
+  user_id: z.string().describe("Our internal user ID"),
 });

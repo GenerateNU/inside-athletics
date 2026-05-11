@@ -103,6 +103,8 @@ components:
         player_dev:
           format: double
           type: number
+        program_gender:
+          type: string
         response_count:
           format: int64
           type: integer
@@ -114,6 +116,7 @@ components:
       required:
         - sport_id
         - college_id
+        - program_gender
         - player_dev
         - academics_athletics_priority
         - academic_career_resources
@@ -1019,7 +1022,13 @@ components:
           examples:
             - https://example.com/success
           type: string
+        user_id:
+          description: Our internal user ID
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+          type: string
       required:
+        - user_id
         - price_id
         - success_url
         - cancel_url
@@ -1134,6 +1143,14 @@ components:
             - 4
           format: int32
           type: integer
+        program_gender:
+          description: Whether the rated program is the men's or women's team
+          enum:
+            - mens
+            - womens
+          examples:
+            - womens
+          type: string
         sport_id:
           description: ID of the sport program being rated
           type: string
@@ -1150,6 +1167,7 @@ components:
         - user_id
         - college_id
         - sport_id
+        - program_gender
         - player_dev
         - academics_athletics_priority
         - academic_career_resources
@@ -2844,6 +2862,33 @@ components:
         - document_id
         - expires_in
       type: object
+    GetUserLikedPostsResponse:
+      additionalProperties: false
+      properties:
+        $schema:
+          description: A URL to the JSON Schema for this object.
+          examples:
+            - https://example.com/schemas/GetUserLikedPostsResponse.json
+          format: uri
+          readOnly: true
+          type: string
+        posts:
+          description: List of posts liked by the user
+          items:
+            $ref: "#/components/schemas/PostResponse"
+          type:
+            - array
+            - "null"
+        total:
+          description: Total number of liked posts
+          examples:
+            - 25
+          format: int64
+          type: integer
+      required:
+        - posts
+        - total
+      type: object
     GetUserResponse:
       additionalProperties: false
       properties:
@@ -3615,6 +3660,12 @@ components:
           description: Player development rating
           format: int32
           type: integer
+        program_gender:
+          description: Program gender (mens or womens)
+          enum:
+            - mens
+            - womens
+          type: string
         sport_id:
           description: Sport ID
           type: string
@@ -3630,6 +3681,7 @@ components:
         - user_id
         - college_id
         - sport_id
+        - program_gender
         - player_dev
         - academics_athletics_priority
         - academic_career_resources
@@ -4241,6 +4293,9 @@ components:
           examples:
             - Suli
           type: string
+        profile_picture:
+          description: S3 key for the user's profile picture
+          type: string
         sport:
           description: The sport(s) the user is interested in
           examples:
@@ -4318,6 +4373,8 @@ components:
           description: The sport the user plays
           examples:
             - hockey
+          type: string
+        stripe_customer_id:
           type: string
         updated_at:
           format: date-time
@@ -7279,6 +7336,16 @@ paths:
           schema:
             description: Filter by college ID
             type: string
+        - description: Filter by program gender (mens or womens)
+          explode: false
+          in: query
+          name: program_gender
+          schema:
+            description: Filter by program gender (mens or womens)
+            enum:
+              - mens
+              - womens
+            type: string
       responses:
         "200":
           content:
@@ -8141,6 +8208,66 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
           description: Error
       summary: Post API v1 user by ID roles
+  /api/v1/user/{user_id}/comments:
+    get:
+      operationId: list-api-v1-user-by-user-id-comments
+      parameters:
+        - description: ID of the user whose comments to fetch
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: user_id
+          required: true
+          schema:
+            description: ID of the user whose comments to fetch
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/CommentResponse"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: List API v1 user by user ID comments
+  /api/v1/user/{user_id}/liked-posts:
+    get:
+      operationId: get-api-v1-user-by-user-id-liked-posts
+      parameters:
+        - description: ID of the user whose liked posts to fetch
+          example: 550e8400-e29b-41d4-a716-446655440000
+          in: path
+          name: user_id
+          required: true
+          schema:
+            description: ID of the user whose liked posts to fetch
+            examples:
+              - 550e8400-e29b-41d4-a716-446655440000
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserLikedPostsResponse"
+          description: OK
+        default:
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+          description: Error
+      summary: Get API v1 user by user ID liked posts
   /api/v1/utility/access-check:
     get:
       operationId: get-api-v1-utility-access-check

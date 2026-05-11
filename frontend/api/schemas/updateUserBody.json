@@ -43,6 +43,10 @@
       "examples": ["Suli"],
       "type": "string"
     },
+    "profile_picture": {
+      "description": "S3 key for the user's profile picture",
+      "type": "string"
+    },
     "sport": {
       "description": "The sport(s) the user is interested in",
       "examples": ["[\"hockey\",\"soccer\"]"],

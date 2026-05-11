@@ -60,11 +60,17 @@ func seedSport(t *testing.T, testDB *TestDatabase) *models.Sport {
 // seedSurvey inserts a Survey row. userID, collegeID and sportID must already exist in the DB.
 func seedSurvey(t *testing.T, testDB *TestDatabase, userID, collegeID, sportID uuid.UUID) *models.Survey {
 	t.Helper()
+	return seedSurveyWithGender(t, testDB, userID, collegeID, sportID, "mens")
+}
+
+func seedSurveyWithGender(t *testing.T, testDB *TestDatabase, userID, collegeID, sportID uuid.UUID, programGender string) *models.Survey {
+	t.Helper()
 	survey := models.Survey{
 		ID:                         uuid.New(),
 		UserID:                     userID,
 		CollegeID:                  collegeID,
 		SportID:                    sportID,
+		ProgramGender:              programGender,
 		PlayerDev:                  4,
 		AcademicsAthleticsPriority: 3,
 		AcademicCareerResources:    4,
@@ -107,6 +113,7 @@ func TestCreateSurvey(t *testing.T) {
 		UserID:                     uuid.MustParse(mockUUID),
 		CollegeID:                  college.ID,
 		SportID:                    sport.ID,
+		ProgramGender:              "womens",
 		PlayerDev:                  4,
 		AcademicsAthleticsPriority: 3,
 		AcademicCareerResources:    4,
@@ -130,6 +137,9 @@ func TestCreateSurvey(t *testing.T) {
 	if response.UserID != payload.UserID {
 		t.Fatalf("unexpected user_id: got %s, want %s", response.UserID, payload.UserID)
 	}
+	if response.ProgramGender != "womens" {
+		t.Fatalf("unexpected program_gender: got %q, want %q", response.ProgramGender, "womens")
+	}
 }
 
 func TestCreateSurveyInvalidRating(t *testing.T) {
@@ -145,6 +155,7 @@ func TestCreateSurveyInvalidRating(t *testing.T) {
 		UserID:                     uuid.MustParse(mockUUID),
 		CollegeID:                  college.ID,
 		SportID:                    sport.ID,
+		ProgramGender:              "mens",
 		PlayerDev:                  6, // out of range
 		AcademicsAthleticsPriority: 3,
 		AcademicCareerResources:    4,
@@ -371,5 +382,57 @@ func TestGetAverageRatingsFilterBySportAndCollege(t *testing.T) {
 	}
 	if row.ResponseCount != 1 {
 		t.Fatalf("expected response_count 1, got %d", row.ResponseCount)
+	}
+}
+
+// Men's and women's teams at the same (college, sport) must be returned as
+// separate rows so parents can distinguish e.g. men's basketball from
+// women's basketball at the same school.
+func TestGetAverageRatingsSplitByGender(t *testing.T) {
+	t.Parallel()
+	testDB := SetupTestDB(t)
+	defer testDB.Teardown(t)
+	api := testDB.API
+
+	college := seedCollege(t, testDB)
+	sport := seedSport(t, testDB)
+	mensRater := seedUser(t, testDB)
+	womensRater := seedUser(t, testDB)
+
+	seedSurveyWithGender(t, testDB, mensRater.ID, college.ID, sport.ID, "mens")
+	seedSurveyWithGender(t, testDB, womensRater.ID, college.ID, sport.ID, "womens")
+
+	resp := api.Get("/api/v1/survey/averages?college_id="+college.ID.String()+"&sport_id="+sport.ID.String(), "Authorization: Bearer "+mockUUID)
+	if resp.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", resp.Code, resp.Body.String())
+	}
+
+	var response surveyPackage.AverageRatingsResponse
+	DecodeTo(&response, resp)
+
+	if len(response.Averages) != 2 {
+		t.Fatalf("expected 2 rows (one per gender), got %d", len(response.Averages))
+	}
+
+	seen := map[string]bool{}
+	for _, row := range response.Averages {
+		if row.ResponseCount != 1 {
+			t.Fatalf("expected each gender bucket to have 1 response, got %d for %q", row.ResponseCount, row.ProgramGender)
+		}
+		seen[row.ProgramGender] = true
+	}
+	if !seen["mens"] || !seen["womens"] {
+		t.Fatalf("expected one row each for mens and womens, got: %#v", seen)
+	}
+
+	// Filter the same data by program_gender and confirm only one row comes back.
+	respWomens := api.Get("/api/v1/survey/averages?college_id="+college.ID.String()+"&sport_id="+sport.ID.String()+"&program_gender=womens", "Authorization: Bearer "+mockUUID)
+	if respWomens.Code != http.StatusOK {
+		t.Fatalf("expected status 200 for womens filter, got %d: %s", respWomens.Code, respWomens.Body.String())
+	}
+	var womensResp surveyPackage.AverageRatingsResponse
+	DecodeTo(&womensResp, respWomens)
+	if len(womensResp.Averages) != 1 || womensResp.Averages[0].ProgramGender != "womens" {
+		t.Fatalf("expected single womens row, got %#v", womensResp.Averages)
 	}
 }

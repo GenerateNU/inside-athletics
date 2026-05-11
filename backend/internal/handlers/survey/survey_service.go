@@ -23,6 +23,9 @@ func (s *SurveyService) CreateSurvey(ctx context.Context, input *struct{ Body Cr
 	if err := validateRatings(b.PlayerDev, b.AcademicsAthleticsPriority, b.AcademicCareerResources, b.MentalHealthPriority, b.Environment, b.Culture, b.Transparency); err != nil {
 		return nil, err
 	}
+	if b.ProgramGender != "mens" && b.ProgramGender != "womens" {
+		return nil, huma.Error422UnprocessableEntity("program_gender must be 'mens' or 'womens'")
+	}
 
 	created, err := s.surveyDB.CreateSurvey(b)
 	if err != nil {
@@ -74,7 +77,10 @@ func (s *SurveyService) GetSurveysByUser(ctx context.Context, input *GetSurveysB
 }
 
 func (s *SurveyService) GetAverageRatings(ctx context.Context, input *GetAverageRatingsParams) (*utils.ResponseBody[AverageRatingsResponse], error) {
-	rows, err := s.surveyDB.GetAverageRatings(input.SportID, input.CollegeID)
+	if input.ProgramGender != "" && input.ProgramGender != "mens" && input.ProgramGender != "womens" {
+		return nil, huma.Error422UnprocessableEntity("program_gender must be 'mens' or 'womens'")
+	}
+	rows, err := s.surveyDB.GetAverageRatings(input.SportID, input.CollegeID, input.ProgramGender)
 	if err != nil {
 		return nil, err
 	}

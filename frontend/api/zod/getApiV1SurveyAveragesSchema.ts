@@ -11,6 +11,11 @@ export const getApiV1SurveyAveragesQueryParamsSchema = z
   .object({
     sport_id: z.optional(z.string().describe("Filter by sport ID")),
     college_id: z.optional(z.string().describe("Filter by college ID")),
+    program_gender: z.optional(
+      z
+        .enum(["mens", "womens"])
+        .describe("Filter by program gender (mens or womens)"),
+    ),
   })
   .optional();
 

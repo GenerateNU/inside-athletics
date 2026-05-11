@@ -129,7 +129,7 @@ export default function OnboardingTopicTagsPage() {
           onClick={async () => {
             updateSection("topicTags", { selectedTags });
 
-            if (data.role.role !== "prospective-athlete" && data.role.role !== "parent") {
+            if (data.role.role === "current-college-athlete") {
               router.push("/onboarding/athletic-program-survey");
               return;
             }

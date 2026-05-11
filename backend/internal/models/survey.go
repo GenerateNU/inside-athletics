@@ -19,6 +19,10 @@ type Survey struct {
 	CollegeID uuid.UUID `json:"college_id" gorm:"type:uuid;not null;index" validate:"required"`
 	SportID   uuid.UUID `json:"sport_id" gorm:"type:uuid;not null;index" validate:"required"`
 
+	// ProgramGender separates men's vs women's teams for the same (college, sport).
+	// Values: "mens" or "womens".
+	ProgramGender string `json:"program_gender" gorm:"type:varchar(16);not null;index;default:''" validate:"required,oneof=mens womens"`
+
 	// Associations
 	User    User    `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	College College `json:"college,omitempty" gorm:"foreignKey:CollegeID"`

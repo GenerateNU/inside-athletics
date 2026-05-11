@@ -21,6 +21,9 @@ export const surveyResponseSchema = z.object({
   id: z.string().describe("Survey ID"),
   mental_health_priority: z.int().describe("Mental health priority rating"),
   player_dev: z.int().describe("Player development rating"),
+  program_gender: z
+    .enum(["mens", "womens"])
+    .describe("Program gender (mens or womens)"),
   sport_id: z.string().describe("Sport ID"),
   transparency: z.int().describe("Transparency rating"),
   user_id: z.string().describe("User ID"),

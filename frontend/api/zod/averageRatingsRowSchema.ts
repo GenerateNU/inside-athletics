@@ -13,6 +13,7 @@ export const averageRatingsRowSchema = z.object({
   environment: z.number(),
   mental_health_priority: z.number(),
   player_dev: z.number(),
+  program_gender: z.string(),
   response_count: z.int(),
   sport_id: z.string(),
   transparency: z.number(),

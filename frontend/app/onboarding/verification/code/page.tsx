@@ -129,7 +129,7 @@ export default function OnboardingVerificationCodePage() {
 
     if (!isSignupVerification) {
       router.push(
-        role === "prospective-athlete"
+        role === "youth-athlete"
           ? `/onboarding/teams-of-interest?role=${encodeURIComponent(role)}`
           : "/onboarding/plan",
       );

@@ -8,6 +8,7 @@ import { postApiV1UserByIdRoles } from "@/api/clients/postApiV1UserByIdRoles";
 import { getApiV1TagNameByName } from "@/api/clients/getApiV1TagNameByName";
 import { postApiV1Tag } from "@/api/clients/postApiV1Tag";
 import { postApiV1UserTag } from "@/api/clients/postApiV1UserTag";
+import { postApiV1Survey } from "@/api/clients/postApiV1Survey";
 
 const CURRENT_USER_SYNC_RETRIES = 8;
 const CURRENT_USER_SYNC_DELAY_MS = 250;
@@ -45,7 +46,11 @@ function buildCreateUserPayload(data: OnboardingData, sessionEmail?: string) {
     last_name: lastName || firstName,
     email,
     username: data.account.username,
-    verified_athlete_status: data.role.role === "athlete" ? "pending" : "none",
+    verified_athlete_status:
+      data.role.role === "current-college-athlete" ||
+      data.role.role === "former-college-athlete"
+        ? "pending"
+        : "none",
   };
 }
 
@@ -143,14 +148,16 @@ export async function submitOnboardingUser(
     "Content-Type": "application/json",
   };
 
+  let userId: string | undefined;
+
   try {
-    await getApiV1UserCurrent({ headers });
+    const current = await getApiV1UserCurrent({ headers });
+    userId = current?.id;
   } catch (error: any) {
     if (error?.response?.status !== 404) {
       throw new Error("Unable to verify current user.");
     }
 
-    let userId: string;
     try {
       const created = await postApiV1User(payload, { headers });
       userId = created.id;
@@ -165,7 +172,7 @@ export async function submitOnboardingUser(
     const role = (rolesData?.roles ?? []).find((r) => r.name === roleName);
     if (role) {
       try {
-        await postApiV1UserByIdRoles(userId, { role_id: role.id }, { headers });
+        await postApiV1UserByIdRoles(userId!, { role_id: role.id }, { headers });
       } catch (e: any) {
         if (e?.response?.status !== 409) {
           throw new Error("Unable to assign user role.");
@@ -175,4 +182,63 @@ export async function submitOnboardingUser(
   }
 
   await syncSelectedTagFollows(data, headers);
+
+  if (userId) {
+    await submitSurveyIfComplete(data, userId, headers);
+  }
+}
+
+async function submitSurveyIfComplete(
+  data: OnboardingData,
+  userId: string,
+  headers: Record<string, string>,
+) {
+  const collegeId = data.preferences.universityId;
+  const sportId = data.preferences.primarySportId;
+  const programGender = data.preferences.program;
+  const responses = data.survey.responses;
+
+  if (
+    !collegeId ||
+    !sportId ||
+    (programGender !== "mens" && programGender !== "womens")
+  ) {
+    return;
+  }
+
+  const ratings = [
+    responses[0],
+    responses[1],
+    responses[2],
+    responses[3],
+    responses[4],
+    responses[5],
+    responses[6],
+  ].map((value) => Number.parseInt(value ?? "", 10));
+
+  if (ratings.some((value) => !Number.isFinite(value) || value < 1 || value > 5)) {
+    return;
+  }
+
+  try {
+    await postApiV1Survey(
+      {
+        user_id: userId,
+        college_id: collegeId,
+        sport_id: sportId,
+        program_gender: programGender,
+        player_dev: ratings[0],
+        academics_athletics_priority: ratings[1],
+        academic_career_resources: ratings[2],
+        mental_health_priority: ratings[3],
+        environment: ratings[4],
+        culture: ratings[5],
+        transparency: ratings[6],
+      },
+      { headers },
+    );
+  } catch {
+    // Best-effort: the user has already been created. Surface a softer error
+    // by no-oping; future profile editing can re-submit.
+  }
 }

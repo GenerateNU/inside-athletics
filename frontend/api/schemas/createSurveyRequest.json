@@ -48,6 +48,12 @@
       "format": "int32",
       "type": "integer"
     },
+    "program_gender": {
+      "description": "Whether the rated program is the men's or women's team",
+      "enum": ["mens", "womens"],
+      "examples": ["womens"],
+      "type": "string"
+    },
     "sport_id": {
       "description": "ID of the sport program being rated",
       "type": "string"
@@ -67,6 +73,7 @@
     "user_id",
     "college_id",
     "sport_id",
+    "program_gender",
     "player_dev",
     "academics_athletics_priority",
     "academic_career_resources",

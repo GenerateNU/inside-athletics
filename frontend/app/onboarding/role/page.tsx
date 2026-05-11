@@ -7,6 +7,7 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOnboarding } from "@/utils/onboarding";
 import { useSession } from "@/utils/SessionContext";
+import { useGetApiV1Sports } from "@/api/hooks";
 import {
   Select,
   SelectContent,
@@ -16,21 +17,23 @@ import {
 } from "@/components/ui/select";
 
 const roleOptions = [
-  { label: "Athlete", value: "athlete" },
-  { label: "Prospective Athlete", value: "prospective-athlete" },
-  { label: "Parent", value: "parent" },
+  { label: "Current college athlete", value: "current-college-athlete" },
+  { label: "Former college athlete", value: "former-college-athlete" },
+  { label: "Youth athlete", value: "youth-athlete" },
+  { label: "Parent of an athlete", value: "parent-of-athlete" },
+  { label: "Other", value: "other" },
 ] as const;
 
-const primarySports = [
-  { label: "Basketball", value: "basketball" },
-  { label: "Soccer", value: "soccer" },
-  { label: "Track & Field", value: "track-and-field" },
-  { label: "Volleyball", value: "volleyball" },
-  { label: "Tennis", value: "tennis" },
-  { label: "Swimming", value: "swimming" },
-  { label: "Softball", value: "softball" },
-  { label: "Baseball", value: "baseball" },
-] as const;
+const ROLES_NEEDING_UNIVERSITY = new Set([
+  "current-college-athlete",
+  "former-college-athlete",
+  "youth-athlete",
+  "parent-of-athlete",
+]);
+
+function roleNeedsUniversity(role: string) {
+  return ROLES_NEEDING_UNIVERSITY.has(role);
+}
 
 const programOptions = [
   { label: "Women's", value: "womens" },
@@ -94,9 +97,13 @@ export default function OnboardingRolePage() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageKey, setProfileImageKey] = useState<string | null>(null);
   const [primarySport, setPrimarySport] = useState("");
+  const [primarySportId, setPrimarySportId] = useState("");
   const [program, setProgram] = useState("");
   const [university, setUniversity] = useState("");
-  const [collegeOptions, setCollegeOptions] = useState<string[]>([]);
+  const [universityId, setUniversityId] = useState("");
+  const [collegeOptions, setCollegeOptions] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
   const [isLoadingColleges, setIsLoadingColleges] = useState(false);
   const [collegeError, setCollegeError] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -111,18 +118,32 @@ export default function OnboardingRolePage() {
     setProfileImage(data.role.profileImage);
     setProfileImageKey(data.role.profileImageKey);
     setPrimarySport(data.preferences.primarySport);
+    setPrimarySportId(data.preferences.primarySportId);
     setProgram(data.preferences.program);
     setUniversity(data.preferences.university);
+    setUniversityId(data.preferences.universityId);
   }, [data.preferences, data.role, hydrated]);
+
+  const sportsQuery = useGetApiV1Sports(
+    { limit: 200, offset: 0 },
+    {
+      query: { enabled: Boolean(session?.access_token) },
+      client: { headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined },
+    },
+  );
+  const sportOptions = (sportsQuery.data?.sports ?? [])
+    .map((sport) => ({ id: sport.id, name: sport.name }))
+    .filter((sport) => sport.id && sport.name);
 
   useEffect(() => {
     const accessToken = session?.access_token;
 
-    if (role !== "athlete" || !accessToken) {
+    if (!roleNeedsUniversity(role) || !accessToken) {
       setIsLoadingColleges(false);
       setCollegeError("");
-      if (role !== "athlete") {
+      if (!roleNeedsUniversity(role)) {
         setUniversity("");
+        setUniversityId("");
       }
       return;
     }
@@ -152,8 +173,8 @@ export default function OnboardingRolePage() {
 
         const payload = unwrapBody<CollegeListPayload>(await response.json());
         const colleges = (payload?.colleges ?? [])
-          .map((college) => college.name.trim())
-          .filter(Boolean);
+          .map((college) => ({ id: college.id, name: college.name.trim() }))
+          .filter((college) => college.id && college.name);
 
         if (cancelled) {
           return;
@@ -186,8 +207,9 @@ export default function OnboardingRolePage() {
     const nextRole = value ?? "";
     setRole(nextRole);
 
-    if (nextRole !== "athlete") {
+    if (!roleNeedsUniversity(nextRole)) {
       setUniversity("");
+      setUniversityId("");
     }
   };
 
@@ -306,10 +328,10 @@ export default function OnboardingRolePage() {
   const selectedRoleLabel =
     roleOptions.find((option) => option.value === role)?.label ?? "";
   const selectedPrimarySportLabel =
-    primarySports.find((sport) => sport.value === primarySport)?.label ?? "";
+    sportOptions.find((sport) => sport.id === primarySportId)?.name ?? primarySport;
 
   const canContinue = Boolean(
-    role && primarySport && program && (role === "athlete" ? university : true),
+    role && primarySport && program && (roleNeedsUniversity(role) ? university : true),
   );
 
   return (
@@ -393,23 +415,32 @@ export default function OnboardingRolePage() {
               Primary Sport
             </label>
             <Select
-              value={primarySport}
+              value={primarySportId}
               onValueChange={(value) => {
-                setPrimarySport(value ?? "");
+                const nextId = value ?? "";
+                setPrimarySportId(nextId);
+                const match = sportOptions.find((sport) => sport.id === nextId);
+                setPrimarySport(match?.name ?? "");
               }}
             >
               <SelectTrigger
                 id="primary-sport"
                 className="h-10 w-full border-[#3E7DBB] text-sm"
               >
-                <SelectValue placeholder="Select a primary sport">
+                <SelectValue
+                  placeholder={
+                    sportsQuery.isLoading
+                      ? "Loading sports..."
+                      : "Select a primary sport"
+                  }
+                >
                   {selectedPrimarySportLabel}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {primarySports.map((sport) => (
-                  <SelectItem key={sport.value} value={sport.value}>
-                    {sport.label}
+                {sportOptions.map((sport) => (
+                  <SelectItem key={sport.id} value={sport.id}>
+                    {sport.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -420,9 +451,13 @@ export default function OnboardingRolePage() {
         {role && primarySport ? (
           <div className="space-y-3">
             <p className="block text-sm font-medium text-black">
-              {role === "athlete"
+              {role === "current-college-athlete"
                 ? "Which team do you belong to?"
-                : "Which program would you join?"}
+                : role === "former-college-athlete"
+                ? "Which team did you play for?"
+                : role === "parent-of-athlete"
+                ? "Which program does your athlete belong to?"
+                : "Which program are you interested in?"}
             </p>
             <div className="grid grid-cols-2 gap-3">
               {programOptions.map((option) => {
@@ -450,7 +485,7 @@ export default function OnboardingRolePage() {
           </div>
         ) : null}
 
-        {role === "athlete" && primarySport && program ? (
+        {roleNeedsUniversity(role) && primarySport && program ? (
           <div className="space-y-3">
             <label
               htmlFor="university"
@@ -459,9 +494,14 @@ export default function OnboardingRolePage() {
               University
             </label>
             <Select
-              value={university}
+              value={universityId}
               onValueChange={(value) => {
-                setUniversity(value ?? "");
+                const nextId = value ?? "";
+                setUniversityId(nextId);
+                const match = collegeOptions.find(
+                  (school) => school.id === nextId,
+                );
+                setUniversity(match?.name ?? "");
               }}
             >
               <SelectTrigger
@@ -474,12 +514,14 @@ export default function OnboardingRolePage() {
                       ? "Loading universities..."
                       : "Select a university"
                   }
-                />
+                >
+                  {university}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {collegeOptions.map((school) => (
-                  <SelectItem key={school} value={school}>
-                    {school}
+                  <SelectItem key={school.id} value={school.id}>
+                    {school.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -503,8 +545,10 @@ export default function OnboardingRolePage() {
             });
             updateSection("preferences", {
               primarySport,
+              primarySportId,
               program,
-              university: role === "athlete" ? university : "",
+              university: roleNeedsUniversity(role) ? university : "",
+              universityId: roleNeedsUniversity(role) ? universityId : "",
             });
             router.push(`/onboarding/legal?role=${encodeURIComponent(role)}`);
           }}

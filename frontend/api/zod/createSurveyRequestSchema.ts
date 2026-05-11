@@ -22,6 +22,9 @@ export const createSurveyRequestSchema = z.object({
     .int()
     .describe("Mental health priority rating (1–5)"),
   player_dev: z.int().describe("Player development rating (1–5)"),
+  program_gender: z
+    .enum(["mens", "womens"])
+    .describe("Whether the rated program is the men's or women's team"),
   sport_id: z.string().describe("ID of the sport program being rated"),
   transparency: z.int().describe("Transparency rating (1–5)"),
   user_id: z.string().describe("ID of the user submitting the survey"),

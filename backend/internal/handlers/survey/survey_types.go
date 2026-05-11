@@ -11,6 +11,7 @@ type CreateSurveyRequest struct {
 	UserID                    uuid.UUID `json:"user_id" binding:"required" doc:"ID of the user submitting the survey"`
 	CollegeID                 uuid.UUID `json:"college_id" binding:"required" doc:"ID of the college being rated"`
 	SportID                   uuid.UUID `json:"sport_id" binding:"required" doc:"ID of the sport program being rated"`
+	ProgramGender             string    `json:"program_gender" binding:"required,oneof=mens womens" enum:"mens,womens" example:"womens" doc:"Whether the rated program is the men's or women's team"`
 	PlayerDev                 int32     `json:"player_dev" binding:"required,min=1,max=5" example:"4" doc:"Player development rating (1–5)"`
 	AcademicsAthleticsPriority int32   `json:"academics_athletics_priority" binding:"required,min=1,max=5" example:"3" doc:"Academics vs athletics priority rating (1–5)"`
 	AcademicCareerResources   int32     `json:"academic_career_resources" binding:"required,min=1,max=5" example:"4" doc:"Academic/career resources rating (1–5)"`
@@ -34,8 +35,9 @@ type GetSurveysByUserParams struct {
 
 // GetAverageRatingsParams defines optional query filters for the averages endpoint
 type GetAverageRatingsParams struct {
-	SportID   uuid.UUID `query:"sport_id" doc:"Filter by sport ID" required:"false"`
-	CollegeID uuid.UUID `query:"college_id" doc:"Filter by college ID" required:"false"`
+	SportID       uuid.UUID `query:"sport_id" doc:"Filter by sport ID" required:"false"`
+	CollegeID     uuid.UUID `query:"college_id" doc:"Filter by college ID" required:"false"`
+	ProgramGender string    `query:"program_gender" enum:"mens,womens" doc:"Filter by program gender (mens or womens)" required:"false"`
 }
 
 // SurveyResponse defines the response structure for a single survey
@@ -44,6 +46,7 @@ type SurveyResponse struct {
 	UserID                    uuid.UUID `json:"user_id" doc:"User ID"`
 	CollegeID                 uuid.UUID `json:"college_id" doc:"College ID"`
 	SportID                   uuid.UUID `json:"sport_id" doc:"Sport ID"`
+	ProgramGender             string    `json:"program_gender" enum:"mens,womens" doc:"Program gender (mens or womens)"`
 	PlayerDev                 int32     `json:"player_dev" doc:"Player development rating"`
 	AcademicsAthleticsPriority int32   `json:"academics_athletics_priority" doc:"Academics vs athletics priority rating"`
 	AcademicCareerResources   int32     `json:"academic_career_resources" doc:"Academic/career resources rating"`
@@ -63,6 +66,7 @@ type GetSurveysByUserResponse struct {
 type AverageRatingsRow struct {
 	SportID                    uuid.UUID `json:"sport_id"                    gorm:"column:sport_id"`
 	CollegeID                  uuid.UUID `json:"college_id"                  gorm:"column:college_id"`
+	ProgramGender              string    `json:"program_gender"              gorm:"column:program_gender"`
 	PlayerDev                  float64   `json:"player_dev"                  gorm:"column:player_dev"`
 	AcademicsAthleticsPriority float64   `json:"academics_athletics_priority" gorm:"column:academics_athletics_priority"`
 	AcademicCareerResources    float64   `json:"academic_career_resources"   gorm:"column:academic_career_resources"`
@@ -85,6 +89,7 @@ func ToSurveyResponse(m *models.Survey) *SurveyResponse {
 		UserID:                    m.UserID,
 		CollegeID:                 m.CollegeID,
 		SportID:                   m.SportID,
+		ProgramGender:             m.ProgramGender,
 		PlayerDev:                 m.PlayerDev,
 		AcademicsAthleticsPriority: m.AcademicsAthleticsPriority,
 		AcademicCareerResources:   m.AcademicCareerResources,

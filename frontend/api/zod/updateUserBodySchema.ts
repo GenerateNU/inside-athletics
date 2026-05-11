@@ -20,6 +20,9 @@ export const updateUserBodySchema = z.object({
   ),
   first_name: z.optional(z.string().describe("The first name of a user")),
   last_name: z.optional(z.string().describe("The last name of a user")),
+  profile_picture: z.optional(
+    z.string().describe("S3 key for the user's profile picture"),
+  ),
   sport: z.optional(
     z.string().describe("The sport(s) the user is interested in"),
   ),

@@ -47,6 +47,11 @@ export type UpdateUserBody = {
    */
   last_name?: string;
   /**
+   * @description S3 key for the user\'s profile picture
+   * @type string | undefined
+   */
+  profile_picture?: string;
+  /**
    * @description The sport(s) the user is interested in
    * @type string | undefined
    */

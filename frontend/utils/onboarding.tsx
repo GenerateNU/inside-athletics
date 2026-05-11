@@ -26,8 +26,10 @@ export type OnboardingData = {
     association: string;
     selectedUniversities: string[];
     primarySport: string;
+    primarySportId: string;
     program: string;
     university: string;
+    universityId: string;
   };
   verification: {
     name: string;
@@ -80,8 +82,10 @@ const defaultOnboardingData: OnboardingData = {
     association: "",
     selectedUniversities: [],
     primarySport: "",
+    primarySportId: "",
     program: "",
     university: "",
+    universityId: "",
   },
   verification: {
     name: "",

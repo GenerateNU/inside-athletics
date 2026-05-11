@@ -22,6 +22,7 @@ func (s *SurveyDB) CreateSurvey(req CreateSurveyRequest) (*models.Survey, error)
 		UserID:                     req.UserID,
 		CollegeID:                  req.CollegeID,
 		SportID:                    req.SportID,
+		ProgramGender:              req.ProgramGender,
 		PlayerDev:                  req.PlayerDev,
 		AcademicsAthleticsPriority: req.AcademicsAthleticsPriority,
 		AcademicCareerResources:    req.AcademicCareerResources,
@@ -73,12 +74,15 @@ func (s *SurveyDB) DeleteSurvey(id uuid.UUID) error {
 }
 
 // GetAverageRatings returns average scores for each rating field,
-// optionally filtered by sportID and/or collegeID, grouped by both.
-func (s *SurveyDB) GetAverageRatings(sportID, collegeID uuid.UUID) ([]AverageRatingsRow, error) {
+// optionally filtered by sportID, collegeID, and/or programGender,
+// grouped by (sport_id, college_id, program_gender) so that men's and
+// women's teams for the same (college, sport) are kept distinct.
+func (s *SurveyDB) GetAverageRatings(sportID, collegeID uuid.UUID, programGender string) ([]AverageRatingsRow, error) {
 	q := s.db.Model(&models.Survey{}).
 		Select(`
 			sport_id,
 			college_id,
+			program_gender,
 			AVG(player_dev)                       AS player_dev,
 			AVG(academics_athletics_priority)     AS academics_athletics_priority,
 			AVG(academic_career_resources)        AS academic_career_resources,
@@ -88,13 +92,16 @@ func (s *SurveyDB) GetAverageRatings(sportID, collegeID uuid.UUID) ([]AverageRat
 			AVG(transparency)                     AS transparency,
 			COUNT(*)                              AS response_count
 		`).
-		Group("sport_id, college_id")
+		Group("sport_id, college_id, program_gender")
 
 	if sportID != uuid.Nil {
 		q = q.Where("sport_id = ?", sportID)
 	}
 	if collegeID != uuid.Nil {
 		q = q.Where("college_id = ?", collegeID)
+	}
+	if programGender != "" {
+		q = q.Where("program_gender = ?", programGender)
 	}
 
 	var rows []AverageRatingsRow

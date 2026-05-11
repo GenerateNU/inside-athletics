@@ -3,6 +3,14 @@
  * Do not edit manually.
  */
 
+export const createSurveyRequestProgramGenderEnum = {
+  mens: "mens",
+  womens: "womens",
+} as const;
+
+export type CreateSurveyRequestProgramGenderEnumKey =
+  (typeof createSurveyRequestProgramGenderEnum)[keyof typeof createSurveyRequestProgramGenderEnum];
+
 export type CreateSurveyRequest = {
   /**
    * @description A URL to the JSON Schema for this object.
@@ -44,6 +52,11 @@ export type CreateSurveyRequest = {
    * @type integer, int32
    */
   player_dev: number;
+  /**
+   * @description Whether the rated program is the men\'s or women\'s team
+   * @type string
+   */
+  program_gender: CreateSurveyRequestProgramGenderEnumKey;
   /**
    * @description ID of the sport program being rated
    * @type string

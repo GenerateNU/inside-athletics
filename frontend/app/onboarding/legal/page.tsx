@@ -90,7 +90,7 @@ export default function OnboardingLegalPage() {
                 accepted,
               });
               router.push(
-                role === "prospective-athlete"
+                role === "youth-athlete"
                   ? `/onboarding/plan?role=${encodeURIComponent(role)}`
                   : "/onboarding/plan",
               );

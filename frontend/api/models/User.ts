@@ -64,6 +64,10 @@ export type User = {
    */
   sport: string;
   /**
+   * @type string | undefined
+   */
+  stripe_customer_id?: string;
+  /**
    * @type string, date-time
    */
   updated_at: string;

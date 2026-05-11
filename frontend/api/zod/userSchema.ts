@@ -20,6 +20,7 @@ export const userSchema = z.object({
     .string()
     .describe("The S3 key for the user's profile picture"),
   sport: z.string().describe("The sport the user plays"),
+  stripe_customer_id: z.optional(z.string()),
   updated_at: z.iso.datetime(),
   username: z.string().describe("The username of a user"),
   verified_athelete_status: z.string(),

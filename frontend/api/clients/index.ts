@@ -70,6 +70,7 @@ export { getApiV1TagByTagIdPosts } from "./getApiV1TagByTagIdPosts.ts";
 export { getApiV1TagNameByName } from "./getApiV1TagNameByName.ts";
 export { getApiV1TagsSearch } from "./getApiV1TagsSearch.ts";
 export { getApiV1UserById } from "./getApiV1UserById.ts";
+export { getApiV1UserByUserIdLikedPosts } from "./getApiV1UserByUserIdLikedPosts.ts";
 export { getApiV1UserCollegeByCollegeIdUsers } from "./getApiV1UserCollegeByCollegeIdUsers.ts";
 export { getApiV1UserCollegeFollows } from "./getApiV1UserCollegeFollows.ts";
 export { getApiV1UserCurrent } from "./getApiV1UserCurrent.ts";
@@ -84,6 +85,7 @@ export { listApiV1PostByPostIdComments } from "./listApiV1PostByPostIdComments.t
 export { listApiV1StripePricesById } from "./listApiV1StripePricesById.ts";
 export { listApiV1StripeProducts } from "./listApiV1StripeProducts.ts";
 export { listApiV1TagTypeByType } from "./listApiV1TagTypeByType.ts";
+export { listApiV1UserByUserIdComments } from "./listApiV1UserByUserIdComments.ts";
 export { patchApiV1CommentById } from "./patchApiV1CommentById.ts";
 export { patchApiV1PermissionById } from "./patchApiV1PermissionById.ts";
 export { patchApiV1PostById } from "./patchApiV1PostById.ts";

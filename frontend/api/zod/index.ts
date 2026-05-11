@@ -499,6 +499,12 @@ export {
   getApiV1UserByIdQueryResponseSchema,
 } from "./getApiV1UserByIdSchema.ts";
 export {
+  getApiV1UserByUserIdLikedPosts200Schema,
+  getApiV1UserByUserIdLikedPostsErrorSchema,
+  getApiV1UserByUserIdLikedPostsPathParamsSchema,
+  getApiV1UserByUserIdLikedPostsQueryResponseSchema,
+} from "./getApiV1UserByUserIdLikedPostsSchema.ts";
+export {
   getApiV1UserCollegeByCollegeIdUsers200Schema,
   getApiV1UserCollegeByCollegeIdUsersErrorSchema,
   getApiV1UserCollegeByCollegeIdUsersPathParamsSchema,
@@ -571,6 +577,7 @@ export { getTagPostByIDResponseSchema } from "./getTagPostByIDResponseSchema.ts"
 export { getTagResponseSchema } from "./getTagResponseSchema.ts";
 export { getUploadURLRequestSchema } from "./getUploadURLRequestSchema.ts";
 export { getUploadURLResponseSchema } from "./getUploadURLResponseSchema.ts";
+export { getUserLikedPostsResponseSchema } from "./getUserLikedPostsResponseSchema.ts";
 export { getUserResponseSchema } from "./getUserResponseSchema.ts";
 export { healthResponseSchema } from "./healthResponseSchema.ts";
 export { invoiceSettingsSchema } from "./invoiceSettingsSchema.ts";
@@ -609,6 +616,12 @@ export {
   listApiV1TagTypeByTypePathParamsSchema,
   listApiV1TagTypeByTypeQueryResponseSchema,
 } from "./listApiV1TagTypeByTypeSchema.ts";
+export {
+  listApiV1UserByUserIdComments200Schema,
+  listApiV1UserByUserIdCommentsErrorSchema,
+  listApiV1UserByUserIdCommentsPathParamsSchema,
+  listApiV1UserByUserIdCommentsQueryResponseSchema,
+} from "./listApiV1UserByUserIdCommentsSchema.ts";
 export { listCollegesResponseSchema } from "./listCollegesResponseSchema.ts";
 export { listTagsResponseSchema } from "./listTagsResponseSchema.ts";
 export { mediaResponseSchema } from "./mediaResponseSchema.ts";

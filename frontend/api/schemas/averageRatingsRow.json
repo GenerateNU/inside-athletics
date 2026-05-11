@@ -8,6 +8,7 @@
     "environment": { "format": "double", "type": "number" },
     "mental_health_priority": { "format": "double", "type": "number" },
     "player_dev": { "format": "double", "type": "number" },
+    "program_gender": { "type": "string" },
     "response_count": { "format": "int64", "type": "integer" },
     "sport_id": { "type": "string" },
     "transparency": { "format": "double", "type": "number" }
@@ -15,6 +16,7 @@
   "required": [
     "sport_id",
     "college_id",
+    "program_gender",
     "player_dev",
     "academics_athletics_priority",
     "academic_career_resources",

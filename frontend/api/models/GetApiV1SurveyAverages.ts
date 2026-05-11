@@ -6,6 +6,14 @@
 import type { AverageRatingsResponse } from "./AverageRatingsResponse.ts";
 import type { ErrorModel } from "./ErrorModel.ts";
 
+export const getApiV1SurveyAveragesQueryParamsProgramGenderEnum = {
+  mens: "mens",
+  womens: "womens",
+} as const;
+
+export type GetApiV1SurveyAveragesQueryParamsProgramGenderEnumKey =
+  (typeof getApiV1SurveyAveragesQueryParamsProgramGenderEnum)[keyof typeof getApiV1SurveyAveragesQueryParamsProgramGenderEnum];
+
 export type GetApiV1SurveyAveragesQueryParams = {
   /**
    * @description Filter by sport ID
@@ -17,6 +25,11 @@ export type GetApiV1SurveyAveragesQueryParams = {
    * @type string | undefined
    */
   college_id?: string;
+  /**
+   * @description Filter by program gender (mens or womens)
+   * @type string | undefined
+   */
+  program_gender?: GetApiV1SurveyAveragesQueryParamsProgramGenderEnumKey;
 };
 
 /**

@@ -33,6 +33,10 @@ export type AverageRatingsRow = {
    */
   player_dev: number;
   /**
+   * @type string
+   */
+  program_gender: string;
+  /**
    * @type integer, int64
    */
   response_count: number;
